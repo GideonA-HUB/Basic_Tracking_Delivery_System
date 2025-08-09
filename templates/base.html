@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Delivery Tracker{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <style>
+        .status-pending { @apply bg-yellow-100 text-yellow-800; }
+        .status-confirmed { @apply bg-blue-100 text-blue-800; }
+        .status-in_transit { @apply bg-purple-100 text-purple-800; }
+        .status-out_for_delivery { @apply bg-orange-100 text-orange-800; }
+        .status-delivered { @apply bg-green-100 text-green-800; }
+        .status-failed { @apply bg-red-100 text-red-800; }
+        .status-returned { @apply bg-gray-100 text-gray-800; }
+        
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+    </style>
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <!-- MAL Logo -->
+                    <div class="flex-shrink-0 flex items-center">
+                        {% if user.is_authenticated and user.is_staff %}
+                            <a href="{% url 'frontend:dashboard' %}" class="flex items-center space-x-3 hover:opacity-80 transition-opacity duration-200">
+                        {% else %}
+                            <a href="{% url 'frontend:landing_page' %}" class="flex items-center space-x-3 hover:opacity-80 transition-opacity duration-200">
+                        {% endif %}
+                            <div class="bg-blue-600 text-white font-bold text-2xl px-3 py-2 rounded-lg shadow-md">
+                                MAL
+                            </div>
+                            <div class="hidden sm:block">
+                                <span class="text-gray-900 font-semibold text-lg">Meridian Asset Logistics</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    {% if user.is_authenticated and user.is_staff %}
+                        <a href="{% url 'frontend:dashboard' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-chart-line mr-1"></i> Dashboard
+                        </a>
+                        <a href="{% url 'frontend:create_delivery' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-plus mr-1"></i> New Delivery
+                        </a>
+                        <div class="relative group">
+                            <button class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                                <i class="fas fa-user mr-1"></i> {{ user.get_full_name|default:user.username }}
+                                <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                            </button>
+                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden group-hover:block">
+                                <a href="{% url 'accounts:profile' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-user-circle mr-2"></i> Profile
+                                </a>
+                                <a href="{% url 'accounts:logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> Sign Out
+                                </a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'frontend:landing_page' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-home mr-1"></i> Home
+                        </a>
+                        <a href="{% url 'accounts:login' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-sign-in-alt mr-1"></i> Staff Login
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white mt-12">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <!-- Main Footer Content -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+                <!-- Tracking & Shipping -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4 text-blue-400">Tracking & Shipping</h3>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#" class="hover:text-white transition-colors">Track Package</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Shipping Rates</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Service Guide</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Drop-off Locations</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Schedule Pickup</a></li>
+                    </ul>
+                </div>
+
+                <!-- Help & Support -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4 text-blue-400">Help & Support</h3>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#" class="hover:text-white transition-colors">Contact Us</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Customer Service</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">FAQs</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Claims</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Support Center</a></li>
+                    </ul>
+                </div>
+
+                <!-- Communication Preferences -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4 text-blue-400">Communication Preferences</h3>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#" class="hover:text-white transition-colors">Email Preferences</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">SMS Notifications</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Marketing Preferences</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Account Settings</a></li>
+                    </ul>
+                </div>
+
+                <!-- Other Meridian Asset Logistics Sites -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4 text-blue-400">Other Meridian Asset Logistics Sites</h3>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#" class="hover:text-white transition-colors">MeridianAsset.com</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Meridian Store</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Meridian Freight</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Meridian Capital</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Secondary Footer Links -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+                <!-- About Meridian Asset Logistics -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4 text-blue-400">About Meridian Asset Logistics</h3>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#" class="hover:text-white transition-colors">Company Overview</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Leadership</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Investor Relations</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Newsroom</a></li>
+                    </ul>
+                </div>
+
+                <!-- Supply Chain Solutions -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4 text-blue-400">Supply Chain Solutions</h3>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#" class="hover:text-white transition-colors">Logistics</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Warehousing</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Distribution</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Customs Brokerage</a></li>
+                    </ul>
+                </div>
+
+                <!-- Meridian Asset Logistics Jobs -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4 text-blue-400">Meridian Asset Logistics Jobs</h3>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#" class="hover:text-white transition-colors">Careers</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Job Search</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Benefits</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Diversity</a></li>
+                    </ul>
+                </div>
+
+                <!-- Meridian Asset Logistics Developer Portal -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4 text-blue-400">Meridian Asset Logistics Developer Portal</h3>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#" class="hover:text-white transition-colors">API Documentation</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Developer Tools</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Integration Guide</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Support</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Global Home -->
+            <div class="border-t border-gray-700 pt-8 mb-8">
+                <div class="text-center">
+                    <h3 class="text-lg font-semibold mb-4 text-blue-400">Global Home</h3>
+                    <div class="flex flex-wrap justify-center gap-4 text-gray-300">
+                        <a href="#" class="hover:text-white transition-colors">United States</a>
+                        <a href="#" class="hover:text-white transition-colors">Canada</a>
+                        <a href="#" class="hover:text-white transition-colors">Mexico</a>
+                        <a href="#" class="hover:text-white transition-colors">United Kingdom</a>
+                        <a href="#" class="hover:text-white transition-colors">Germany</a>
+                        <a href="#" class="hover:text-white transition-colors">France</a>
+                        <a href="#" class="hover:text-white transition-colors">Spain</a>
+                        <a href="#" class="hover:text-white transition-colors">Italy</a>
+                        <a href="#" class="hover:text-white transition-colors">China</a>
+                        <a href="#" class="hover:text-white transition-colors">Japan</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Legal & Privacy -->
+            <div class="border-t border-gray-700 pt-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="text-center md:text-left">
+                        <h4 class="font-semibold mb-2 text-blue-400">Legal</h4>
+                        <ul class="space-y-1 text-sm text-gray-300">
+                            <li><a href="#" class="hover:text-white transition-colors">Terms and Conditions</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Website Terms of Use</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Privacy Notice</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Cookie Settings</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="text-center md:text-left">
+                        <h4 class="font-semibold mb-2 text-blue-400">Security</h4>
+                        <ul class="space-y-1 text-sm text-gray-300">
+                            <li><a href="#" class="hover:text-white transition-colors">Protect Against Fraud</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Security Center</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Report Suspicious Activity</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="text-center md:text-left">
+                        <h4 class="font-semibold mb-2 text-blue-400">Accessibility</h4>
+                        <ul class="space-y-1 text-sm text-gray-300">
+                            <li><a href="#" class="hover:text-white transition-colors">Accessibility Statement</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Screen Reader Support</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="text-center md:text-left">
+                        <h4 class="font-semibold mb-2 text-blue-400">Contact</h4>
+                        <ul class="space-y-1 text-sm text-gray-300">
+                            <li><a href="#" class="hover:text-white transition-colors">Customer Service</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Technical Support</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Feedback</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="border-t border-gray-700 pt-6 mt-8">
+                <div class="text-center text-gray-400 text-sm">
+                    <p>&copy; 2024 Meridian Asset Logistics. Built with Django REST Framework. All rights reserved.</p>
+                    <p class="mt-2">This is a demonstration system for delivery tracking functionality.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

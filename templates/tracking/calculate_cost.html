@@ -1,0 +1,628 @@
+{% extends 'base.html' %}
+
+{% block title %}Calculate Time and Cost - Meridian Asset Logistics{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <!-- Breadcrumbs -->
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2 text-sm text-gray-600">
+            <li><a href="{% url 'frontend:dashboard' %}" class="hover:text-blue-600">Home</a></li>
+            <li><i class="fas fa-chevron-right text-gray-400"></i></li>
+            <li><a href="#" class="hover:text-blue-600">Shipping Support</a></li>
+            <li><i class="fas fa-chevron-right text-gray-400"></i></li>
+            <li class="text-gray-900 font-medium">Calculate Time and Cost</li>
+        </ol>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="mb-8">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">Calculate Time and Cost</h1>
+        <div class="w-24 h-1 bg-yellow-400 mb-6"></div>
+        <p class="text-lg text-gray-700 mb-8">
+            Quickly get estimated shipping quotes for our global package delivery services. Provide the origin, destination, and weight of your shipment to compare service details then sort your results by time or cost to find the most cost-effective shipping service.
+        </p>
+    </div>
+
+    <!-- Login Prompt -->
+    <div class="mb-8 bg-gray-50 border border-blue-200 rounded-lg p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-700">Log in and select a Meridian Asset Logistics account to receive the most accurate rate and delivery time information.</p>
+            </div>
+            <a href="#" class="inline-flex items-center px-6 py-3 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-medium rounded-md transition-colors duration-200">
+                Log In
+                <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Shipment Type Tabs -->
+    <div class="mb-8">
+        <div class="border-b border-gray-200">
+            <nav class="-mb-px flex space-x-8">
+                <button id="package-tab" class="border-b-2 border-brown-500 py-2 px-1 text-sm font-medium text-gray-900 shipment-tab active" data-type="package">
+                    Package
+                </button>
+                <button id="freight-tab" class="border-b-2 border-transparent py-2 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 shipment-tab" data-type="freight">
+                    Freight
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="mb-8">
+        <p class="text-gray-700">
+            Please provide information about your shipment including destination, origin, shipment date, and weight. Required fields are indicated with <span class="text-red-500">★</span>.
+        </p>
+    </div>
+
+    <!-- Main Form Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Panel - Input Form -->
+        <div class="lg:col-span-1">
+            <div class="bg-white border border-gray-200 rounded-lg p-6">
+                <!-- Step 1: Where and When -->
+                <div class="mb-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center mr-3">
+                            <span class="text-white font-bold text-sm">1</span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900">Where and When?</h3>
+                    </div>
+
+                    <!-- Ship From Section -->
+                    <div class="mb-6">
+                        <h4 class="font-medium text-gray-900 mb-3">Ship From:</h4>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Country or Territory</label>
+                                <select id="from-country" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="nigeria">Nigeria</option>
+                                    <option value="united-states">United States</option>
+                                    <option value="united-kingdom">United Kingdom</option>
+                                    <option value="canada">Canada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Locality <span class="text-red-500">★</span></label>
+                                <div class="flex">
+                                    <input type="text" id="from-locality" placeholder="Enter locality" class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 required-field">
+                                    <button class="px-3 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 rounded-r-md">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Postcode</label>
+                                <div class="flex">
+                                    <input type="text" id="from-postcode" placeholder="Enter postcode" class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <button class="px-3 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 rounded-r-md">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ship To Section -->
+                    <div class="mb-6">
+                        <h4 class="font-medium text-gray-900 mb-3">Ship To:</h4>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Country or Territory</label>
+                                <select id="to-country" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="nigeria">Nigeria</option>
+                                    <option value="united-states">United States</option>
+                                    <option value="united-kingdom">United Kingdom</option>
+                                    <option value="canada">Canada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Locality <span class="text-red-500">★</span></label>
+                                <div class="flex">
+                                    <input type="text" id="to-locality" placeholder="Enter locality" class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 required-field">
+                                    <button class="px-3 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 rounded-r-md">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Postcode</label>
+                                <div class="flex">
+                                    <input type="text" id="to-postcode" placeholder="Enter postcode" class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <button class="px-3 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 rounded-r-md">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Destination Type -->
+                    <div class="mb-6">
+                        <h4 class="font-medium text-gray-900 mb-3">Destination Type:</h4>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="residential-address" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <span class="ml-2 text-sm text-gray-700">Residential Address</span>
+                        </label>
+                    </div>
+
+                    <!-- Shipment Date -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">When are you shipping? <span class="text-red-500">★</span></label>
+                        <div class="flex">
+                            <input type="date" id="shipment-date" value="2025-08-09" class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 required-field">
+                            <button class="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-r-md">
+                                <i class="fas fa-calendar"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Package Weight (Package Tab) -->
+                    <div id="package-weight-section" class="mb-6">
+                        <h4 class="font-medium text-gray-900 mb-3">Package Weight:</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Weight <span class="text-red-500">★</span></label>
+                                <input type="number" id="package-weight" placeholder="0.0" min="0.1" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 required-field">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Unit</label>
+                                <select id="weight-unit" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="kg">kg</option>
+                                    <option value="lbs">lbs</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Package Weight (Package Tab) -->
+                    <div id="package-weight-section" class="mb-6">
+                        <h4 class="font-medium text-gray-900 mb-3">Package Weight:</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Weight <span class="text-red-500">★</span></label>
+                                <input type="number" id="package-weight" placeholder="0.0" min="0.1" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 required-field">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Unit</label>
+                                <select id="weight-unit" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="kg">kg</option>
+                                    <option value="lbs">lbs</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Freight Details (Freight Tab) -->
+                    <div id="freight-details-section" class="mb-6 hidden">
+                        <h4 class="font-medium text-gray-900 mb-3">Freight Details:</h4>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Weight (kg) <span class="text-red-500">★</span></label>
+                                <input type="number" id="freight-weight" placeholder="0.0" min="0.1" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Dimensions (cm)</label>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <input type="number" id="freight-length" placeholder="Length" min="1" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <input type="number" id="freight-width" placeholder="Width" min="1" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <input type="number" id="freight-height" placeholder="Height" min="1" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex space-x-3">
+                        <button id="clear-btn" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 font-medium rounded-md transition-colors duration-200">
+                            Clear
+                        </button>
+                        <button id="calculate-btn" class="px-6 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-medium rounded-md transition-colors duration-200">
+                            Calculate
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel - Results Display -->
+        <div class="lg:col-span-2">
+            <div class="bg-white border border-gray-200 rounded-lg p-6">
+                <div class="bg-gray-100 px-4 py-3 rounded-t-lg mb-4">
+                    <h3 class="font-semibold text-gray-900">Showing Results For:</h3>
+                    <p id="route-display" class="text-gray-700">Nigeria to Nigeria</p>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loading-state" class="hidden text-center py-8">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-400"></div>
+                    <p class="mt-2 text-gray-600">Calculating shipping options...</p>
+                </div>
+
+                <!-- Results Table -->
+                <div id="results-table" class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-body" class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-6 py-4">
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900">Meridian Asset Logistics Express</div>
+                                        <div class="text-xs text-gray-500">Latest Pickup Time: 5:00 PM</div>
+                                        <div class="text-xs text-gray-500">Schedule by: 3:00 PM</div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm text-gray-900">
+                                        <div>Days In Transit: --</div>
+                                        <div>Delivered By: --</div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-900">--</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4">
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900">Meridian Asset Logistics Express Saver</div>
+                                        <div class="text-xs text-gray-500">Latest Pickup Time: 5:00 PM</div>
+                                        <div class="text-xs text-gray-500">Schedule by: 3:00 PM</div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm text-gray-900">
+                                        <div>Days In Transit: --</div>
+                                        <div>Delivered By: --</div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-900">--</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4">
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900">Meridian Asset Logistics Standard</div>
+                                        <div class="text-xs text-gray-500">Latest Pickup Time: 5:00 PM</div>
+                                        <div class="text-xs text-gray-500">Schedule by: 3:00 PM</div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm text-gray-900">
+                                        <div>Days In Transit: --</div>
+                                        <div>Delivered By: --</div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-900">--</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Footer Information -->
+                <div class="mt-6 text-xs text-gray-500">
+                    <p id="calculation-time">Result estimates calculated by Meridian Asset Logistics: Friday 8 August 2025 9:11 P.M. Eastern Time (USA)</p>
+                    <a href="#" class="text-blue-600 hover:text-blue-800 mt-2 inline-block">
+                        Guarantees and Notices
+                        <i class="fas fa-external-link-alt ml-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Resources -->
+    <div class="mt-8">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Additional Resources / Tools</h3>
+        <ul class="space-y-2">
+            <li>
+                <a href="#" class="text-blue-600 hover:text-blue-800">
+                    • Zones and Rates
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Elements
+    const packageTab = document.getElementById('package-tab');
+    const freightTab = document.getElementById('freight-tab');
+    const packageWeightSection = document.getElementById('package-weight-section');
+    const freightDetailsSection = document.getElementById('freight-details-section');
+    const fromCountry = document.getElementById('from-country');
+    const toCountry = document.getElementById('to-country');
+    const fromLocality = document.getElementById('from-locality');
+    const toLocality = document.getElementById('to-locality');
+    const packageWeight = document.getElementById('package-weight');
+    const freightWeight = document.getElementById('freight-weight');
+    const shipmentDate = document.getElementById('shipment-date');
+    const calculateBtn = document.getElementById('calculate-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const routeDisplay = document.getElementById('route-display');
+    const loadingState = document.getElementById('loading-state');
+    const resultsTable = document.getElementById('results-table');
+    const resultsBody = document.getElementById('results-body');
+    const calculationTime = document.getElementById('calculation-time');
+
+    // Shipment type switching
+    function switchShipmentType(type) {
+        if (type === 'package') {
+            packageTab.classList.add('active', 'border-brown-500', 'text-gray-900');
+            packageTab.classList.remove('border-transparent', 'text-gray-500');
+            freightTab.classList.remove('active', 'border-brown-500', 'text-gray-900');
+            freightTab.classList.add('border-transparent', 'text-gray-500');
+            packageWeightSection.classList.remove('hidden');
+            freightDetailsSection.classList.add('hidden');
+        } else {
+            freightTab.classList.add('active', 'border-brown-500', 'text-gray-900');
+            freightTab.classList.remove('border-transparent', 'text-gray-500');
+            packageTab.classList.remove('active', 'border-brown-500', 'text-gray-900');
+            packageTab.classList.add('border-transparent', 'text-gray-500');
+            freightDetailsSection.classList.remove('hidden');
+            packageWeightSection.classList.add('hidden');
+        }
+    }
+
+    // Tab click handlers
+    packageTab.addEventListener('click', () => switchShipmentType('package'));
+    freightTab.addEventListener('click', () => switchShipmentType('freight'));
+
+    // Update route display
+    function updateRouteDisplay() {
+        const from = fromCountry.options[fromCountry.selectedIndex].text;
+        const to = toCountry.options[toCountry.selectedIndex].text;
+        routeDisplay.textContent = `${from} to ${to}`;
+    }
+
+    // Country change handlers
+    fromCountry.addEventListener('change', updateRouteDisplay);
+    toCountry.addEventListener('change', updateRouteDisplay);
+
+    // Form validation
+    function validateForm() {
+        const requiredFields = document.querySelectorAll('.required-field');
+        let isValid = true;
+        
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add('border-red-500');
+                isValid = false;
+            } else {
+                field.classList.remove('border-red-500');
+            }
+        });
+
+        // Check weight based on shipment type
+        const activeTab = document.querySelector('.shipment-tab.active');
+        if (activeTab && activeTab.dataset.type === 'package') {
+            if (!packageWeight.value || parseFloat(packageWeight.value) <= 0) {
+                packageWeight.classList.add('border-red-500');
+                isValid = false;
+            } else {
+                packageWeight.classList.remove('border-red-500');
+            }
+        } else if (activeTab && activeTab.dataset.type === 'freight') {
+            if (!freightWeight.value || parseFloat(freightWeight.value) <= 0) {
+                freightWeight.classList.add('border-red-500');
+                isValid = false;
+            } else {
+                freightWeight.classList.remove('border-red-500');
+            }
+        }
+
+        return isValid;
+    }
+
+    // Calculate shipping options
+    function calculateShipping() {
+        if (!validateForm()) {
+            alert('Please fill in all required fields correctly.');
+            return;
+        }
+
+        // Show loading state
+        loadingState.classList.remove('hidden');
+        resultsTable.classList.add('hidden');
+
+        // Simulate API call delay
+        setTimeout(() => {
+            const activeTab = document.querySelector('.shipment-tab.active');
+            const fromCountryText = fromCountry.options[fromCountry.selectedIndex].text;
+            const toCountryText = toCountry.options[toCountry.selectedIndex].text;
+            const weight = activeTab && activeTab.dataset.type === 'package' ? packageWeight.value : freightWeight.value;
+            const unit = document.getElementById('weight-unit').value;
+
+            // Generate mock results based on input
+            const results = generateMockResults(fromCountryText, toCountryText, weight, unit);
+            
+            // Update results table
+            updateResultsTable(results);
+            
+            // Update calculation time
+            const now = new Date();
+            calculationTime.textContent = `Result estimates calculated by Meridian Asset Logistics: ${now.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            })} ${now.toLocaleTimeString('en-US', { 
+                hour: 'numeric', 
+                minute: '2-digit', 
+                hour12: true 
+            })} Eastern Time (USA)`;
+
+            // Hide loading, show results
+            loadingState.classList.add('hidden');
+            resultsTable.classList.remove('hidden');
+        }, 1500);
+    }
+
+    // Generate mock shipping results
+    function generateMockResults(from, to, weight, unit) {
+        const isInternational = from !== to;
+        const weightNum = parseFloat(weight);
+        
+        // Base rates (mock data)
+        const baseRates = {
+            'nigeria': { express: 25, expressSaver: 20, standard: 15 },
+            'united-states': { express: 45, expressSaver: 35, standard: 25 },
+            'united-kingdom': { express: 40, expressSaver: 30, standard: 20 },
+            'canada': { express: 35, expressSaver: 28, standard: 18 }
+        };
+
+        const fromBase = baseRates[from.toLowerCase().replace(' ', '-')] || baseRates.nigeria;
+        const toBase = baseRates[to.toLowerCase().replace(' ', '-')] || baseRates.nigeria;
+
+        // Calculate costs with weight factor and international surcharge
+        const weightFactor = weightNum * (unit === 'kg' ? 2.2 : 1);
+        const internationalSurcharge = isInternational ? 1.5 : 1;
+
+        return [
+            {
+                service: 'Meridian Asset Logistics Express',
+                pickupTime: '5:00 PM',
+                scheduleBy: '3:00 PM',
+                daysInTransit: isInternational ? '3-5' : '1-2',
+                deliveredBy: isInternational ? 'Next Week' : 'Tomorrow',
+                cost: `$${Math.round((fromBase.express * weightFactor * internationalSurcharge) * 100) / 100}`
+            },
+            {
+                service: 'Meridian Asset Logistics Express Saver',
+                pickupTime: '5:00 PM',
+                scheduleBy: '3:00 PM',
+                daysInTransit: isInternational ? '5-7' : '2-3',
+                deliveredBy: isInternational ? 'Next Week' : 'Day After Tomorrow',
+                cost: `$${Math.round((fromBase.expressSaver * weightFactor * internationalSurcharge) * 100) / 100}`
+            },
+            {
+                service: 'Meridian Asset Logistics Standard',
+                pickupTime: '5:00 PM',
+                scheduleBy: '3:00 PM',
+                daysInTransit: isInternational ? '7-10' : '3-5',
+                deliveredBy: isInternational ? 'Next Week' : 'This Week',
+                cost: `$${Math.round((fromBase.standard * weightFactor * internationalSurcharge) * 100) / 100}`
+            }
+        ];
+    }
+
+    // Update results table
+    function updateResultsTable(results) {
+        resultsBody.innerHTML = '';
+        
+        results.forEach(result => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="px-6 py-4">
+                    <div>
+                        <div class="text-sm font-medium text-gray-900">${result.service}</div>
+                        <div class="text-xs text-gray-500">Latest Pickup Time: ${result.pickupTime}</div>
+                        <div class="text-xs text-gray-500">Schedule by: ${result.scheduleBy}</div>
+                    </div>
+                </td>
+                <td class="px-6 py-4">
+                    <div class="text-sm text-gray-900">
+                        <div>Days In Transit: ${result.daysInTransit}</div>
+                        <div>Delivered By: ${result.deliveredBy}</div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-900">${result.cost}</td>
+            `;
+            resultsBody.appendChild(row);
+        });
+    }
+
+    // Clear form
+    function clearForm() {
+        fromLocality.value = '';
+        toLocality.value = '';
+        fromPostcode.value = '';
+        toPostcode.value = '';
+        packageWeight.value = '';
+        freightWeight.value = '';
+        shipmentDate.value = '2025-08-09';
+        document.getElementById('residential-address').checked = false;
+        
+        // Reset validation styling
+        document.querySelectorAll('.required-field').forEach(field => {
+            field.classList.remove('border-red-500');
+        });
+        
+        // Reset results
+        resultsBody.innerHTML = `
+            <tr>
+                <td class="px-6 py-4">
+                    <div>
+                        <div class="text-sm font-medium text-gray-900">Meridian Asset Logistics Express</div>
+                        <div class="text-xs text-gray-500">Latest Pickup Time: 5:00 PM</div>
+                        <div class="text-xs text-gray-500">Schedule by: 3:00 PM</div>
+                    </div>
+                </td>
+                <td class="px-6 py-4">
+                    <div class="text-sm text-gray-900">
+                        <div>Days In Transit: --</div>
+                        <div>Delivered By: --</div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-900">--</td>
+            </tr>
+            <tr>
+                <td class="px-6 py-4">
+                    <div>
+                        <div class="text-sm font-medium text-gray-900">Meridian Asset Logistics Express Saver</div>
+                        <div class="text-xs text-gray-500">Latest Pickup Time: 5:00 PM</div>
+                        <div class="text-xs text-gray-500">Schedule by: 3:00 PM</div>
+                    </div>
+                </td>
+                <td class="px-6 py-4">
+                    <div class="text-sm text-gray-900">
+                        <div>Days In Transit: --</div>
+                        <div>Delivered By: --</div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-900">--</td>
+            </tr>
+            <tr>
+                <td class="px-6 py-4">
+                    <div>
+                        <div class="text-sm font-medium text-gray-900">Meridian Asset Logistics Standard</div>
+                        <div class="text-xs text-gray-500">Latest Pickup Time: 5:00 PM</div>
+                        <div classtext-xs text-gray-500">Schedule by: 3:00 PM</div>
+                    </div>
+                </td>
+                <td class="px-6 py-4">
+                    <div class="text-sm text-gray-900">
+                        <div>Days In Transit: --</div>
+                        <div>Delivered By: --</div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-900">--</td>
+            </tr>
+        `;
+        
+        // Reset calculation time
+        calculationTime.textContent = 'Result estimates calculated by Meridian Asset Logistics: Friday 8 August 2025 9:11 P.M. Eastern Time (USA)';
+    }
+
+    // Event listeners
+    calculateBtn.addEventListener('click', calculateShipping);
+    clearBtn.addEventListener('click', clearForm);
+
+    // Initialize
+    updateRouteDisplay();
+    
+    // Set today's date as default
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0];
+    shipmentDate.value = formattedDate;
+});
+</script>
+{% endblock %}

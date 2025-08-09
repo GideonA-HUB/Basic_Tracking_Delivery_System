@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Where's My Parcel? - Meridian Asset Logistics{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <!-- Breadcrumbs -->
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2 text-sm text-gray-600">
+            <li><a href="{% url 'frontend:dashboard' %}" class="hover:text-blue-600">Home</a></li>
+            <li><i class="fas fa-chevron-right text-gray-400"></i></li>
+            <li><a href="#" class="hover:text-blue-600">Tracking Support</a></li>
+            <li><i class="fas fa-chevron-right text-gray-400"></i></li>
+            <li class="text-gray-900 font-medium">Where's My Parcel?</li>
+        </ol>
+    </nav>
+
+    <!-- Main Hero Section -->
+    <div class="flex flex-col lg:flex-row items-center mb-12">
+        <div class="lg:w-1/2 lg:pr-8 mb-8 lg:mb-0">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Where's My Parcel?</h1>
+            <div class="w-24 h-1 bg-yellow-400 mb-6"></div>
+            <p class="text-lg text-gray-700 mb-8">
+                Tracking your parcel will show you the most up-to-date information on your delivery's whereabouts.
+            </p>
+            <a href="#" class="inline-flex items-center px-6 py-3 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-medium rounded-md transition-colors duration-200">
+                Track Now
+                <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+        <div class="lg:w-1/2">
+            <div class="bg-blue-100 rounded-lg p-8 text-center">
+                <i class="fas fa-users text-6xl text-blue-600 mb-4"></i>
+                <div class="bg-white rounded-lg p-6 mt-4">
+                    <i class="fas fa-laptop text-4xl text-gray-600 mb-2"></i>
+                    <p class="text-sm text-gray-600">Two people in a lab looking at a laptop</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- InfoNotice Section -->
+    <div class="mb-12">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">First, Check for an InfoNotice</h2>
+            <div class="w-24 h-1 bg-yellow-400 mx-auto"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Step 1 -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-teal-500 rounded-full flex items-center justify-center mr-4">
+                        <span class="text-white font-bold text-lg">1</span>
+                    </div>
+                    <div class="w-8 h-8 bg-teal-500 rounded flex items-center justify-center">
+                        <i class="fas fa-shield-alt text-white text-sm"></i>
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Find One? Sorry We Missed You.</h3>
+                <p class="text-gray-700 leading-relaxed">
+                    Looks like our first delivery or collection attempt was unsuccessful. Your driver left a notice to let you know that was their first attempt.
+                </p>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-teal-500 rounded-full flex items-center justify-center mr-4">
+                        <span class="text-white font-bold text-lg">2</span>
+                    </div>
+                    <div class="w-8 h-8 bg-teal-500 rounded flex items-center justify-center">
+                        <i class="fas fa-shield-alt text-white text-sm"></i>
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Now What?</h3>
+                <p class="text-gray-700 leading-relaxed">
+                    Select the boxes on the notice. They'll tell you the status of your shipment and if we're able to try delivering or collecting it again.
+                </p>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-teal-500 rounded-full flex items-center justify-center mr-4">
+                        <span class="text-white font-bold text-lg">3</span>
+                    </div>
+                    <div class="w-8 h-8 bg-teal-500 rounded flex items-center justify-center">
+                        <i class="fas fa-shield-alt text-white text-sm"></i>
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-4">More Info</h3>
+                <p class="text-gray-700 leading-relaxed mb-4">
+                    Still need help with your notice? You can find more information on how to read the slip and what your options are next at the link below.
+                </p>
+                <a href="#" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
+                    Learn More
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Help Section -->
+    <div class="bg-gray-50 rounded-lg p-8">
+        <div class="text-center mb-6">
+            <h3 class="text-2xl font-bold text-gray-900 mb-2">Need More Help?</h3>
+            <p class="text-gray-600">We're here to help you track your parcel and resolve any delivery issues.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-lg p-6">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-phone text-2xl text-blue-600 mr-3"></i>
+                    <h4 class="text-lg font-semibold text-gray-900">Contact Support</h4>
+                </div>
+                <p class="text-gray-700 mb-4">Speak with our customer service team for immediate assistance.</p>
+                <a href="#" class="text-blue-600 hover:text-blue-800 font-medium">Call Now</a>
+            </div>
+            <div class="bg-white rounded-lg p-6">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-envelope text-2xl text-green-600 mr-3"></i>
+                    <h4 class="text-lg font-semibold text-gray-900">Email Support</h4>
+                </div>
+                <p class="text-gray-700 mb-4">Send us a detailed message and we'll get back to you quickly.</p>
+                <a href="#" class="text-blue-600 hover:text-blue-800 font-medium">Send Email</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

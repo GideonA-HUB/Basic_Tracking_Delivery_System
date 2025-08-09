@@ -1,0 +1,517 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - MAL (Meridian Asset Logistics){% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
+        <p class="mt-2 text-gray-600">Manage and track your MAL (Meridian Asset Logistics) deliveries</p>
+    </div>
+
+    <!-- Let's Start Shipping Section -->
+    <div class="mb-12 bg-white rounded-lg shadow-lg overflow-hidden">
+        <div class="flex flex-col lg:flex-row items-center">
+            <!-- Left Side - Image -->
+            <div class="lg:w-1/2 p-8">
+                <div class="relative">
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg p-8 text-center">
+                        <div class="relative">
+                            <!-- Person smiling image -->
+                            <img src="https://thumbs.dreamstime.com/b/happy-family-unpacking-boxes-new-home-moving-day-people-real-estate-concept-226197290.jpg" 
+                                 alt="A happy family unpacking boxes and preparing packages for shipment" 
+                                 class="w-64 h-64 object-cover rounded-lg shadow-md mx-auto">
+                            <!-- Decorative elements to simulate the workspace -->
+                            <div class="absolute -top-2 -right-2 bg-white rounded-full p-2 shadow-md">
+                                <i class="fas fa-laptop text-blue-600"></i>
+                            </div>
+                            <div class="absolute -bottom-2 -left-2 bg-white rounded-full p-2 shadow-md">
+                                <i class="fas fa-gem text-purple-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Side - Content and CTA -->
+            <div class="lg:w-1/2 p-8 lg:pl-0">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Let's Start Shipping</h2>
+                <div class="w-24 h-1 bg-yellow-400 mb-6"></div>
+                <p class="text-xl text-gray-700 mb-8">You have parcels. We'll take care of them.</p>
+                <a href="{% url 'frontend:create_delivery' %}" class="inline-flex items-center px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-lg transition-colors duration-200 text-lg">
+                    Ship Now
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Marketing Section -->
+    <div class="mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg overflow-hidden">
+        <div class="flex flex-col lg:flex-row items-center">
+            <div class="lg:w-1/2 p-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">Manage All Your Shipments In One Place</h2>
+                <p class="text-gray-700 text-lg leading-relaxed mb-6">
+                    See inbound and outbound parcels from one custom dashboard with Meridian Asset Logistics. 
+                    Streamline your logistics operations with our comprehensive tracking and management platform.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <a href="{% url 'frontend:create_delivery' %}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-plus mr-2"></i> Create New Delivery
+                    </a>
+                    <a href="#" class="inline-flex items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-chart-line mr-2"></i> View Analytics
+                    </a>
+                </div>
+            </div>
+            <div class="lg:w-1/2 p-8">
+                <div class="relative">
+                    <div class="bg-blue-100 rounded-lg p-6 text-center">
+                        <i class="fas fa-truck text-6xl text-blue-600 mb-4"></i>
+                        <div class="grid grid-cols-2 gap-4 mt-6">
+                            <div class="bg-white rounded-lg p-4">
+                                <i class="fas fa-box text-2xl text-green-600 mb-2"></i>
+                                <p class="text-sm font-medium text-gray-900">Inbound</p>
+                                <p class="text-xs text-gray-600">Parcels</p>
+                            </div>
+                            <div class="bg-white rounded-lg p-4">
+                                <i class="fas fa-shipping-fast text-2xl text-blue-600 mb-2"></i>
+                                <p class="text-sm font-medium text-gray-900">Outbound</p>
+                                <p class="text-xs text-gray-600">Deliveries</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 bg-white rounded-lg p-4">
+                            <i class="fas fa-chart-bar text-2xl text-purple-600 mb-2"></i>
+                            <p class="text-sm font-medium text-gray-900">Real-time Tracking</p>
+                            <p class="text-xs text-gray-600">Live Updates</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- World-Class Services Section -->
+    <div class="mb-8">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">World-Class Services You Can Count On</h2>
+            <div class="w-24 h-1 bg-yellow-400 mx-auto"></div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Card 1: Where's My Parcel? -->
+            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 p-6">
+                <div class="text-center">
+                    <i class="fas fa-search text-3xl text-blue-600 mb-4"></i>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Where's My Parcel?</h3>
+                    <a href="{% url 'frontend:where_is_my_parcel' %}" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
+                        Let's Find It
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card 2: What Does My Tracking Status Mean? -->
+            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 p-6">
+                <div class="text-center">
+                    <i class="fas fa-info-circle text-3xl text-green-600 mb-4"></i>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">What Does My Tracking Status Mean?</h3>
+                    <a href="{% url 'frontend:tracking_status_guide' %}" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
+                        We will tell you
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card 3: How Much Will My Shipment Cost? -->
+            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 p-6">
+                <div class="text-center">
+                    <i class="fas fa-calculator text-3xl text-purple-600 mb-4"></i>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">How Much Will My Shipment Cost?</h3>
+                    <a href="{% url 'frontend:calculate_cost' %}" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
+                        Let's Find Out
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-truck text-blue-600 text-2xl"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Total Deliveries</dt>
+                            <dd class="text-lg font-medium text-gray-900">{{ total_deliveries }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-clock text-yellow-600 text-2xl"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Pending</dt>
+                            <dd class="text-lg font-medium text-gray-900">{{ pending_deliveries }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-shipping-fast text-purple-600 text-2xl"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">In Transit</dt>
+                            <dd class="text-lg font-medium text-gray-900">{{ in_transit_deliveries }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Delivered</dt>
+                            <dd class="text-lg font-medium text-gray-900">{{ delivered_deliveries }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions and Search -->
+    <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <a href="{% url 'frontend:create_delivery' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <i class="fas fa-plus mr-2"></i> Create New Delivery
+        </a>
+        
+        <!-- Search Bar -->
+        <div class="flex items-center space-x-2">
+            <div class="relative">
+                <input type="text" id="searchInput" placeholder="Search by tracking number, customer, or order..." 
+                       class="w-64 px-4 py-2 pl-10 pr-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fas fa-search text-gray-400"></i>
+                </div>
+            </div>
+            <select id="statusFilter" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="in_transit">In Transit</option>
+                <option value="out_for_delivery">Out for Delivery</option>
+                <option value="delivered">Delivered</option>
+                <option value="failed">Failed</option>
+                <option value="returned">Returned</option>
+            </select>
+            <button onclick="clearSearch()" class="px-3 py-2 text-sm text-gray-600 hover:text-gray-800">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Search Results Info -->
+    <div id="searchInfo" class="mb-4 hidden">
+        <div class="bg-blue-50 border border-blue-200 rounded-md p-3">
+            <div class="flex items-center">
+                <i class="fas fa-info-circle text-blue-400 mr-2"></i>
+                <span id="searchResultsText" class="text-sm text-blue-800"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deliveries Table -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-md">
+        <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Recent Deliveries</h3>
+        </div>
+        <ul class="divide-y divide-gray-200">
+            {% for delivery in deliveries %}
+            <li class="px-4 py-4 sm:px-6" data-delivery-id="{{ delivery.id }}" data-tracking-number="{{ delivery.tracking_number }}" data-tracking-secret="{{ delivery.tracking_secret }}">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-box text-gray-400 text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <div class="flex items-center">
+                                <p class="text-sm font-medium text-gray-900">{{ delivery.tracking_number }}</p>
+                                <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium status-{{ delivery.current_status }}">
+                                    {{ delivery.get_current_status_display }}
+                                </span>
+                            </div>
+                            <div class="mt-1 flex items-center text-sm text-gray-500">
+                                <p>{{ delivery.customer_name }}</p>
+                                <span class="mx-1">•</span>
+                                <p>{{ delivery.order_number }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="viewDelivery('{{ delivery.id }}')" class="text-blue-600 hover:text-blue-900 text-sm font-medium">
+                            <i class="fas fa-eye mr-1"></i> View
+                        </button>
+                        <button onclick="updateStatus('{{ delivery.id }}')" class="text-green-600 hover:text-green-900 text-sm font-medium">
+                            <i class="fas fa-edit mr-1"></i> Update
+                        </button>
+                    </div>
+                </div>
+            </li>
+            {% empty %}
+            <li class="px-4 py-8 sm:px-6 text-center">
+                <div class="text-gray-500">
+                    <i class="fas fa-box-open text-4xl mb-4"></i>
+                    <p class="text-lg">No deliveries found</p>
+                    <p class="text-sm">Create your first delivery to get started</p>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<!-- Status Update Modal -->
+<div id="statusModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Update Delivery Status</h3>
+            <form id="statusForm">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <select id="statusSelect" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="in_transit">In Transit</option>
+                        <option value="out_for_delivery">Out for Delivery</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="failed">Failed</option>
+                        <option value="returned">Returned</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Location (Optional)</label>
+                    <input type="text" id="locationInput" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Warehouse, Distribution Center">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                    <textarea id="descriptionInput" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Status update description"></textarea>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeStatusModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+                        Update Status
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentDeliveryId = null;
+let searchTimeout = null;
+
+// Search functionality
+function performSearch() {
+    const query = document.getElementById('searchInput').value.trim();
+    const statusFilter = document.getElementById('statusFilter').value;
+    
+    // Build search parameters
+    const params = new URLSearchParams();
+    if (query) params.append('q', query);
+    if (statusFilter) params.append('status', statusFilter);
+    
+    // Show loading state
+    const deliveriesList = document.querySelector('ul');
+    deliveriesList.innerHTML = '<li class="px-4 py-8 sm:px-6 text-center"><div class="text-gray-500"><i class="fas fa-spinner fa-spin text-4xl mb-4"></i><p>Searching...</p></div></li>';
+    
+    // Make API call
+    axios.get(`/api/search/?${params.toString()}`)
+        .then(response => {
+            displaySearchResults(response.data, query, statusFilter);
+        })
+        .catch(error => {
+            console.error('Search error:', error);
+            deliveriesList.innerHTML = '<li class="px-4 py-8 sm:px-6 text-center"><div class="text-red-500"><i class="fas fa-exclamation-triangle text-4xl mb-4"></i><p>Error searching deliveries</p></div></li>';
+        });
+}
+
+function displaySearchResults(deliveries, query, statusFilter) {
+    const deliveriesList = document.querySelector('ul');
+    const searchInfo = document.getElementById('searchInfo');
+    const searchResultsText = document.getElementById('searchResultsText');
+    
+    // Update search info
+    if (query || statusFilter) {
+        let infoText = `Found ${deliveries.length} delivery${deliveries.length !== 1 ? 'ies' : ''}`;
+        if (query) infoText += ` matching "${query}"`;
+        if (statusFilter) infoText += ` with status "${statusFilter}"`;
+        searchResultsText.textContent = infoText;
+        searchInfo.classList.remove('hidden');
+    } else {
+        searchInfo.classList.add('hidden');
+    }
+    
+    // Display results
+    if (deliveries.length === 0) {
+        deliveriesList.innerHTML = `
+            <li class="px-4 py-8 sm:px-6 text-center">
+                <div class="text-gray-500">
+                    <i class="fas fa-search text-4xl mb-4"></i>
+                    <p class="text-lg">No deliveries found</p>
+                    <p class="text-sm">${query ? `No results for "${query}"` : 'Try adjusting your search criteria'}</p>
+                </div>
+            </li>
+        `;
+        return;
+    }
+    
+    deliveriesList.innerHTML = deliveries.map(delivery => `
+        <li class="px-4 py-4 sm:px-6" data-delivery-id="${delivery.id}" data-tracking-number="${delivery.tracking_number}" data-tracking-secret="${delivery.tracking_secret}">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-box text-gray-400 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <div class="flex items-center">
+                            <p class="text-sm font-medium text-gray-900">${delivery.tracking_number}</p>
+                            <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium status-${delivery.current_status}">
+                                ${delivery.current_status_display}
+                            </span>
+                        </div>
+                        <div class="mt-1 flex items-center text-sm text-gray-500">
+                            <p>${delivery.customer_name}</p>
+                            <span class="mx-1">•</span>
+                            <p>${delivery.order_number}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="viewDelivery('${delivery.id}')" class="text-blue-600 hover:text-blue-900 text-sm font-medium">
+                        <i class="fas fa-eye mr-1"></i> View
+                    </button>
+                    <button onclick="updateStatus('${delivery.id}')" class="text-green-600 hover:text-green-900 text-sm font-medium">
+                        <i class="fas fa-edit mr-1"></i> Update
+                    </button>
+                </div>
+            </div>
+        </li>
+    `).join('');
+}
+
+function clearSearch() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('statusFilter').value = '';
+    document.getElementById('searchInfo').classList.add('hidden');
+    location.reload(); // Reload to show all deliveries
+}
+
+// Event listeners for search
+document.getElementById('searchInput').addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(performSearch, 500); // Debounce search
+});
+
+document.getElementById('statusFilter').addEventListener('change', performSearch);
+
+// Original functions
+function viewDelivery(deliveryId) {
+    console.log('viewDelivery called with ID:', deliveryId);
+    
+    // Get delivery data from the page using data attributes
+    const deliveryElement = document.querySelector(`[data-delivery-id="${deliveryId}"]`);
+    console.log('Found delivery element:', deliveryElement);
+    
+    if (deliveryElement) {
+        const trackingNumber = deliveryElement.getAttribute('data-tracking-number');
+        const trackingSecret = deliveryElement.getAttribute('data-tracking-secret');
+        console.log('Tracking number:', trackingNumber);
+        console.log('Tracking secret:', trackingSecret);
+        
+        if (trackingNumber && trackingSecret) {
+            // Redirect to the tracking page using tracking number and secret
+            const trackingUrl = `/track/${trackingNumber}/${trackingSecret}/`;
+            console.log('Redirecting to:', trackingUrl);
+            window.location.href = trackingUrl;
+        } else {
+            alert('Unable to find tracking information for this delivery.');
+        }
+    } else {
+        alert('Unable to find delivery information.');
+    }
+}
+
+
+
+function updateStatus(deliveryId) {
+    currentDeliveryId = deliveryId;
+    document.getElementById('statusModal').classList.remove('hidden');
+}
+
+function closeStatusModal() {
+    document.getElementById('statusModal').classList.add('hidden');
+    document.getElementById('statusForm').reset();
+    currentDeliveryId = null;
+}
+
+document.getElementById('statusForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const status = document.getElementById('statusSelect').value;
+    const location = document.getElementById('locationInput').value;
+    const description = document.getElementById('descriptionInput').value;
+    
+    try {
+        const response = await axios.post(`/api/deliveries/${currentDeliveryId}/update_status/`, {
+            status: status,
+            location: location,
+            description: description
+        });
+        
+        alert('Status updated successfully!');
+        closeStatusModal();
+        location.reload();
+    } catch (error) {
+        alert('Error updating status: ' + error.response?.data?.message || error.message);
+    }
+});
+
+// Close modal when clicking outside
+document.getElementById('statusModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeStatusModal();
+    }
+});
+</script>
+{% endblock %}

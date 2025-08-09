@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block title %}Understanding Tracking Status - Meridian Asset Logistics{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <!-- Breadcrumbs -->
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2 text-sm text-gray-600">
+            <li><a href="{% url 'frontend:dashboard' %}" class="hover:text-blue-600">Home</a></li>
+            <li><i class="fas fa-chevron-right text-gray-400"></i></li>
+            <li><a href="#" class="hover:text-blue-600">Tracking Support</a></li>
+            <li><i class="fas fa-chevron-right text-gray-400"></i></li>
+            <li><a href="{% url 'frontend:where_is_my_parcel' %}" class="hover:text-blue-600">Where's My Parcel?</a></li>
+            <li><i class="fas fa-chevron-right text-gray-400"></i></li>
+            <li class="text-gray-900 font-medium">Understanding Tracking Status</li>
+        </ol>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="mb-12">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">What Does My Tracking Status Mean?</h1>
+        <div class="w-24 h-1 bg-yellow-400 mb-6"></div>
+        <p class="text-lg text-gray-700 mb-8">
+            Each time your parcel is scanned, shipment movement information is captured. Here's a list of what those common statuses you're seeing mean.
+        </p>
+    </div>
+
+    <!-- Status List and Explanations -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Status List (Left Column) -->
+        <div class="lg:pr-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Common Tracking Statuses</h2>
+            <div class="space-y-4">
+                <button onclick="showStatus('label-created')" class="w-full text-left p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors duration-200 status-link" data-status="label-created">
+                    <h3 class="text-lg font-semibold text-gray-900">Label Created</h3>
+                </button>
+                <button onclick="showStatus('shipped-on-way')" class="w-full text-left p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors duration-200 status-link" data-status="shipped-on-way">
+                    <h3 class="text-lg font-semibold text-gray-900">Shipped/On the Way</h3>
+                </button>
+                <button onclick="showStatus('out-for-delivery')" class="w-full text-left p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors duration-200 status-link" data-status="out-for-delivery">
+                    <h3 class="text-lg font-semibold text-gray-900">Out for Delivery</h3>
+                </button>
+                <button onclick="showStatus('delivered')" class="w-full text-left p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors duration-200 status-link" data-status="delivered">
+                    <h3 class="text-lg font-semibold text-gray-900">Delivered</h3>
+                </button>
+                <button onclick="showStatus('delivered-access-point')" class="w-full text-left p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors duration-200 status-link" data-status="delivered-access-point">
+                    <h3 class="text-lg font-semibold text-gray-900">Delivered to a Meridian Asset Logistics Access Point</h3>
+                </button>
+                <button onclick="showStatus('exception')" class="w-full text-left p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors duration-200 status-link" data-status="exception">
+                    <h3 class="text-lg font-semibold text-gray-900">Exception</h3>
+                </button>
+            </div>
+        </div>
+
+        <!-- Status Explanations (Right Column) -->
+        <div class="lg:pl-8">
+            <div id="status-explanations" class="space-y-8">
+                <!-- Label Created -->
+                <div id="label-created" class="status-explanation">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Label Created</h2>
+                    <div class="w-24 h-1 bg-yellow-400 mb-4"></div>
+                    <p class="text-gray-700 leading-relaxed">
+                        We've received the shipment details and billing information from the sender of the shipment. Once we have possession of the shipment and have it moving within our network, the status will be updated.
+                    </p>
+                </div>
+
+                <!-- Shipped/On the Way -->
+                <div id="shipped-on-way" class="status-explanation hidden">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Shipped/On the Way</h2>
+                    <div class="w-24 h-1 bg-yellow-400 mb-4"></div>
+                    <p class="text-gray-700 leading-relaxed">
+                        We've received the shipment, it's moving through our network and it now has a scheduled delivery date. Shipments can stay in this status until they are out for final delivery. Keep in mind, if shipments are travelling long distances, they probably won't be scanned again until they reach their destination hub.
+                    </p>
+                </div>
+
+                <!-- Out for Delivery -->
+                <div id="out-for-delivery" class="status-explanation hidden">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Out for Delivery</h2>
+                    <div class="w-24 h-1 bg-yellow-400 mb-4"></div>
+                    <p class="text-gray-700 leading-relaxed">
+                        The local Meridian Asset Logistics facility has received the shipment and they've dispatched it to a driver for its final delivery. Unless the sender has elected for a time-definite delivery service, parcels are typically delivered between 9 a.m. and 7 p.m. (occasionally later) to residences, and by close of business for a commercial address.
+                    </p>
+                </div>
+
+                <!-- Delivered -->
+                <div id="delivered" class="status-explanation hidden">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Delivered</h2>
+                    <div class="w-24 h-1 bg-yellow-400 mb-4"></div>
+                    <p class="text-gray-700 leading-relaxed">
+                        We've delivered the shipment to its final destination, with a timestamp of the delivery recorded. If the shipment doesn't require a signature, our driver will try to find a safe place to leave the shipment to keep it out of plain sight or harmful weather. This may include a front porch, side door, back porch or garage area, among others.
+                    </p>
+                </div>
+
+                <!-- Delivered to Access Point -->
+                <div id="delivered-access-point" class="status-explanation hidden">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Delivered to a Meridian Asset Logistics Access Point</h2>
+                    <div class="w-24 h-1 bg-yellow-400 mb-4"></div>
+                    <p class="text-gray-700 leading-relaxed">
+                        A selected Meridian Asset Logistics Access Point location has received the shipment and it's ready to be collected at the receiver's convenience.
+                    </p>
+                </div>
+
+                <!-- Exception -->
+                <div id="exception" class="status-explanation hidden">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Exception</h2>
+                    <div class="w-24 h-1 bg-yellow-400 mb-4"></div>
+                    <p class="text-gray-700 leading-relaxed">
+                        The shipment is in the Meridian Asset Logistics network, but there was an unexpected error that may result in a change in the scheduled delivery date. The reason for the exception will be noted in the Shipment Progress section of the Tracking Detail page. When the delivery date changes, the tracking status will show the new date.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action Section -->
+    <div class="mt-16 bg-gray-50 rounded-lg p-8">
+        <div class="text-center">
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Can't Find What You're Looking For?</h2>
+            <div class="w-24 h-1 bg-yellow-400 mx-auto mb-4"></div>
+            <p class="text-gray-700 mb-6">We're here to help. Find the customer service route best suited for you.</p>
+            <a href="#" class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors duration-200">
+                Contact Meridian Asset Logistics
+                <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Show the first status by default
+document.addEventListener('DOMContentLoaded', function() {
+    showStatus('label-created');
+});
+
+function showStatus(statusId) {
+    // Hide all status explanations
+    const explanations = document.querySelectorAll('.status-explanation');
+    explanations.forEach(exp => exp.classList.add('hidden'));
+    
+    // Remove active state from all status links
+    const statusLinks = document.querySelectorAll('.status-link');
+    statusLinks.forEach(link => {
+        link.classList.remove('border-blue-500', 'bg-blue-50');
+        link.classList.add('border-gray-200');
+    });
+    
+    // Show the selected status explanation
+    const selectedExplanation = document.getElementById(statusId);
+    if (selectedExplanation) {
+        selectedExplanation.classList.remove('hidden');
+    }
+    
+    // Add active state to the clicked status link
+    const activeLink = document.querySelector(`[data-status="${statusId}"]`);
+    if (activeLink) {
+        activeLink.classList.remove('border-gray-200');
+        activeLink.classList.add('border-blue-500', 'bg-blue-50');
+    }
+}
+</script>
+{% endblock %}
