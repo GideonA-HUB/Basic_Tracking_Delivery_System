@@ -53,7 +53,19 @@ class DeliverySerializer(serializers.ModelSerializer):
         """Get the tracking URL for the delivery"""
         request = self.context.get('request')
         if request:
-            return request.build_absolute_uri(obj.get_tracking_url())
+            # Generate tracking URL using the current request's scheme and host
+            scheme = request.scheme
+            host = request.get_host()
+            
+            # Handle port forwarding - use the forwarded host if available
+            if 'HTTP_X_FORWARDED_HOST' in request.META:
+                host = request.META['HTTP_X_FORWARDED_HOST']
+            elif 'HTTP_HOST' in request.META:
+                host = request.META['HTTP_HOST']
+            
+            # Build the tracking URL
+            tracking_path = obj.get_tracking_url()
+            return f"{scheme}://{host}{tracking_path}"
         return obj.get_tracking_url()
     
     def get_is_expired(self, obj):
@@ -80,13 +92,36 @@ class DeliverySerializer(serializers.ModelSerializer):
 class DeliveryCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating delivery entries"""
     
+    tracking_number = serializers.CharField(read_only=True)
+    tracking_url = serializers.SerializerMethodField()
+    
     class Meta:
         model = Delivery
         fields = [
             'order_number', 'customer_name', 'customer_email', 'customer_phone',
             'pickup_address', 'delivery_address', 'package_description',
-            'package_weight', 'package_dimensions', 'estimated_delivery'
+            'package_weight', 'package_dimensions', 'estimated_delivery',
+            'tracking_number', 'tracking_url'
         ]
+    
+    def get_tracking_url(self, obj):
+        """Get the tracking URL for the delivery"""
+        request = self.context.get('request')
+        if request:
+            # Generate tracking URL using the current request's scheme and host
+            scheme = request.scheme
+            host = request.get_host()
+            
+            # Handle port forwarding - use the forwarded host if available
+            if 'HTTP_X_FORWARDED_HOST' in request.META:
+                host = request.META['HTTP_X_FORWARDED_HOST']
+            elif 'HTTP_HOST' in request.META:
+                host = request.META['HTTP_HOST']
+            
+            # Build the tracking URL
+            tracking_path = obj.get_tracking_url()
+            return f"{scheme}://{host}{tracking_path}"
+        return obj.get_tracking_url()
     
     def create(self, validated_data):
         """Create a new delivery with tracking information"""

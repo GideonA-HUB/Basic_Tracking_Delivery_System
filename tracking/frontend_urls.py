@@ -7,6 +7,9 @@ urlpatterns = [
     # Public landing page
     path('', frontend_views.landing_page, name='landing_page'),
     
+    # Tracking search endpoint
+    path('search-tracking/', frontend_views.search_tracking_number, name='search_tracking'),
+    
     # Staff-only pages (require authentication)
     path('dashboard/', frontend_views.dashboard, name='dashboard'),
     path('create/', frontend_views.create_delivery_page, name='create_delivery'),

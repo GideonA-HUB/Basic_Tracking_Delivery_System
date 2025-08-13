@@ -1,8 +1,11 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 from .models import Delivery
+import json
 
 
 def is_staff_user(user):
@@ -33,6 +36,65 @@ def tracking_page(request, tracking_number, tracking_secret):
         
     except Delivery.DoesNotExist:
         raise Http404("Delivery not found")
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def search_tracking_number(request):
+    """Handle tracking number searches from landing page"""
+    try:
+        data = json.loads(request.body)
+        tracking_number = data.get('tracking_number', '').strip()
+        
+        if not tracking_number:
+            return JsonResponse({
+                'error': 'Please provide a tracking number'
+            }, status=400)
+        
+        # Try to find the delivery
+        try:
+            delivery = Delivery.objects.get(tracking_number=tracking_number)
+            
+            # Check if tracking link has expired
+            if delivery.is_tracking_link_expired():
+                return JsonResponse({
+                    'error': 'This tracking link has expired',
+                    'expired_at': delivery.tracking_link_expires.isoformat()
+                }, status=410)
+            
+            # Generate tracking URL using the current request's scheme and host
+            scheme = request.scheme
+            host = request.get_host()
+            
+            # Handle port forwarding - use the forwarded host if available
+            if 'HTTP_X_FORWARDED_HOST' in request.META:
+                host = request.META['HTTP_X_FORWARDED_HOST']
+            elif 'HTTP_HOST' in request.META:
+                host = request.META['HTTP_HOST']
+            
+            # Build the tracking URL
+            tracking_path = delivery.get_tracking_url()
+            tracking_url = f"{scheme}://{host}{tracking_path}"
+            
+            return JsonResponse({
+                'success': True,
+                'tracking_url': tracking_url,
+                'tracking_number': delivery.tracking_number
+            })
+            
+        except Delivery.DoesNotExist:
+            return JsonResponse({
+                'error': 'Tracking number not found. Please check your tracking number and try again.'
+            }, status=404)
+            
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'error': 'Invalid request data'
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'error': 'An error occurred while processing your request'
+        }, status=500)
 
 
 @login_required

@@ -13,6 +13,7 @@
     <!-- Form -->
     <div class="bg-white shadow-sm border border-gray-200 rounded-lg p-6">
         <form id="deliveryForm" class="space-y-6">
+            {% csrf_token %}
             <!-- Basic Information -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -150,6 +151,27 @@
 
 {% block extra_js %}
 <script>
+// Function to get CSRF token from cookies
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Set up axios defaults to include CSRF token
+axios.defaults.xsrfCookieName = 'csrftoken';
+axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+axios.defaults.withCredentials = true;
+
 document.getElementById('deliveryForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -163,7 +185,12 @@ document.getElementById('deliveryForm').addEventListener('submit', async functio
     });
     
     try {
-        const response = await axios.post('/api/deliveries/', data);
+        const response = await axios.post('/api/deliveries/', data, {
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            }
+        });
         
         // Show success modal with tracking information
         const trackingInfo = document.getElementById('trackingInfo');

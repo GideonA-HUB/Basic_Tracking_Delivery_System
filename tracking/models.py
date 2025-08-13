@@ -99,7 +99,7 @@ class Delivery(models.Model):
     def get_tracking_url(self):
         """Generate the tracking URL"""
         from django.urls import reverse
-        return reverse('tracking:track_delivery', kwargs={
+        return reverse('frontend:track_delivery', kwargs={
             'tracking_number': self.tracking_number,
             'tracking_secret': self.tracking_secret
         })
