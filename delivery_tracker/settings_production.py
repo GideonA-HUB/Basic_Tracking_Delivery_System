@@ -5,6 +5,7 @@ Production settings for delivery_tracker project.
 import os
 from pathlib import Path
 from decouple import config
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -70,14 +71,11 @@ WSGI_APPLICATION = 'delivery_tracker.wsgi.application'
 # Database
 # Railway provides DATABASE_URL environment variable
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME', default=os.environ.get('PGDATABASE')),
-        'USER': config('DB_USER', default=os.environ.get('PGUSER')),
-        'PASSWORD': config('DB_PASSWORD', default=os.environ.get('PGPASSWORD')),
-        'HOST': config('DB_HOST', default=os.environ.get('PGHOST')),
-        'PORT': config('DB_PORT', default=os.environ.get('PGPORT', '5432')),
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL'),
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
 # Password validation
