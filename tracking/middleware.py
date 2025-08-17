@@ -8,12 +8,10 @@ class CustomCsrfViewMiddleware(CsrfViewMiddleware):
     """
     
     def process_request(self, request):
-        # For development, allow external access
-        if settings.DEBUG:
-            # Set the referer to match the current host for CSRF validation
-            if 'HTTP_REFERER' not in request.META and 'HTTP_HOST' in request.META:
-                scheme = request.scheme
-                host = request.META['HTTP_HOST']
-                request.META['HTTP_REFERER'] = f"{scheme}://{host}/"
+        # Handle CSRF for both development and production
+        if 'HTTP_REFERER' not in request.META and 'HTTP_HOST' in request.META:
+            scheme = request.scheme
+            host = request.META['HTTP_HOST']
+            request.META['HTTP_REFERER'] = f"{scheme}://{host}/"
         
         return super().process_request(request)

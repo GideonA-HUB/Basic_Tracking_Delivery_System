@@ -144,14 +144,16 @@ REST_FRAMEWORK = {
 }
 
 # CORS settings for production
-CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='', cast=lambda v: [s.strip() for s in v.split(',') if s.strip()])
+CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='https://meridian-asset-logistics.up.railway.app,https://web-production-9c4aa.up.railway.app', cast=lambda v: [s.strip() for s in v.split(',') if s.strip()])
 CORS_ALLOW_CREDENTIALS = True
 
 # CSRF settings for production
-CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='', cast=lambda v: [s.strip() for s in v.split(',') if s.strip()])
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='https://meridian-asset-logistics.up.railway.app,https://web-production-9c4aa.up.railway.app', cast=lambda v: [s.strip() for s in v.split(',') if s.strip()])
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_USE_SESSIONS = True
+CSRF_COOKIE_DOMAIN = None
+CSRF_COOKIE_HTTPONLY = False
 
 # Security settings
 SECURE_BROWSER_XSS_FILTER = True
