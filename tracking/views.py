@@ -5,6 +5,8 @@ from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from .models import Delivery, DeliveryStatus
 from .serializers import (
     DeliverySerializer, DeliveryCreateSerializer, DeliveryStatusSerializer,
@@ -20,6 +22,7 @@ class IsStaffUser(permissions.BasePermission):
         return request.user and request.user.is_authenticated and request.user.is_staff
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class DeliveryViewSet(viewsets.ModelViewSet):
     """ViewSet for delivery management"""
     
@@ -98,6 +101,7 @@ class DeliveryViewSet(viewsets.ModelViewSet):
         }, status=status.HTTP_200_OK)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class DeliveryStatusViewSet(viewsets.ModelViewSet):
     """ViewSet for delivery status updates"""
     
@@ -145,6 +149,7 @@ class TrackingAPIView(APIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class DeliverySearchAPIView(APIView):
     """API for searching deliveries"""
     
@@ -171,6 +176,7 @@ class DeliverySearchAPIView(APIView):
         return Response(serializer.data)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class DeliveryStatsAPIView(APIView):
     """API for delivery statistics"""
     
