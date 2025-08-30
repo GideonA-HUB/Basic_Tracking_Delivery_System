@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+
+{% block title %}Investment Portal - Meridian Asset Logistics{% endblock %}
+
+{% block extra_css %}
+<style>
+    .investment-card {
+        transition: all 0.3s ease;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .investment-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        border-color: #3b82f6;
+    }
+    
+    .price-change-positive {
+        color: #10b981;
+    }
+    
+    .price-change-negative {
+        color: #ef4444;
+    }
+    
+    .price-change-neutral {
+        color: #6b7280;
+    }
+    
+    .investment-type-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.375rem;
+        font-weight: 500;
+    }
+    
+    .investment-type-hold {
+        background-color: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .investment-type-delivery {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+    
+    .portfolio-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .portfolio-card-alt {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+    }
+    
+    .chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
+    }
+    
+    .investment-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid #3b82f6;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #1f2937;
+    }
+    
+    .stat-label {
+        color: #6b7280;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .dark .investment-card {
+        background-color: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .investment-card:hover {
+        border-color: #60a5fa;
+    }
+    
+    .dark .stat-card {
+        background-color: #1f2937;
+        border-left-color: #60a5fa;
+    }
+    
+    .dark .stat-value {
+        color: #f9fafb;
+    }
+    
+    .dark .stat-label {
+        color: #d1d5db;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <!-- Investment Navigation -->
+    <nav class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-semibold text-gray-900 dark:text-white">
+                        Investment Portal
+                    </h1>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'investment-marketplace' %}" 
+                       class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                        Marketplace
+                    </a>
+                    
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'investment-dashboard' %}" 
+                           class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                            Dashboard
+                        </a>
+                        <a href="{% url 'user-portfolio' %}" 
+                           class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                            Portfolio
+                        </a>
+                    {% endif %}
+                    
+                    {% if user.is_staff %}
+                        <a href="{% url 'admin-investment-management' %}" 
+                           class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                            Admin
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        {% block investment_content %}{% endblock %}
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Common investment functions
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD'
+        }).format(amount);
+    }
+    
+    function formatPercentage(value) {
+        return new Intl.NumberFormat('en-US', {
+            style: 'percent',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(value / 100);
+    }
+    
+    function getPriceChangeClass(change) {
+        if (change > 0) return 'price-change-positive';
+        if (change < 0) return 'price-change-negative';
+        return 'price-change-neutral';
+    }
+    
+    function createPriceChart(canvasId, chartData) {
+        const ctx = document.getElementById(canvasId);
+        if (!ctx) return null;
+        
+        return new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: 'Price (USD)',
+                    data: chartData.prices,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        grid: {
+                            color: 'rgba(156, 163, 175, 0.1)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(156, 163, 175, 0.1)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Auto-refresh portfolio data every 30 seconds
+    if (window.location.pathname.includes('portfolio') || window.location.pathname.includes('dashboard')) {
+        setInterval(function() {
+            // Refresh portfolio summary
+            fetch('/investments/api/investments/portfolio_summary/')
+                .then(response => response.json())
+                .then(data => {
+                    // Update portfolio display
+                    updatePortfolioDisplay(data);
+                })
+                .catch(error => console.error('Error refreshing portfolio:', error));
+        }, 30000);
+    }
+    
+    function updatePortfolioDisplay(portfolioData) {
+        // Update portfolio summary cards
+        const totalInvested = document.getElementById('total-invested');
+        const currentValue = document.getElementById('current-value');
+        const totalReturn = document.getElementById('total-return');
+        const totalReturnPercentage = document.getElementById('total-return-percentage');
+        
+        if (totalInvested) totalInvested.textContent = formatCurrency(portfolioData.total_invested);
+        if (currentValue) currentValue.textContent = formatCurrency(portfolioData.current_value);
+        if (totalReturn) {
+            totalReturn.textContent = portfolioData.total_return_display;
+            totalReturn.className = portfolioData.is_profitable ? 'text-green-600' : 'text-red-600';
+        }
+        if (totalReturnPercentage) {
+            totalReturnPercentage.textContent = portfolioData.total_return_percentage_display;
+            totalReturnPercentage.className = portfolioData.is_profitable ? 'text-green-600' : 'text-red-600';
+        }
+    }
+</script>
+{% endblock %}

@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'tracking',
     'accounts',
+    'investments',
 ]
 
 MIDDLEWARE = [
@@ -176,6 +177,14 @@ TRACKING_LINK_SECRET_LENGTH = 32
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
+
+# Investment System Settings
+SITE_URL = config('SITE_URL', default='https://meridian-asset-logistics.up.railway.app')
+
+# NOWPayments Configuration
+NOWPAYMENTS_API_KEY = config('NOWPAYMENTS_API_KEY', default='')
+NOWPAYMENTS_API_SECRET = config('NOWPAYMENTS_API_SECRET', default='')
+NOWPAYMENTS_WEBHOOK_SECRET = config('NOWPAYMENTS_WEBHOOK_SECRET', default='')
 
 # Logging configuration
 LOGGING = {
