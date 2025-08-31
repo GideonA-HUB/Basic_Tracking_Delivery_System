@@ -473,6 +473,9 @@
                         <a href="{% url 'frontend:create_delivery' %}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium">
                             <i class="fas fa-plus mr-1"></i> New Delivery
                         </a>
+                        <a href="{% url 'investments:investment-marketplace' %}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-chart-line mr-1"></i> Investments
+                        </a>
                         <div class="relative group">
                             <button class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium flex items-center">
                                 <i class="fas fa-user mr-1"></i> {{ user.get_full_name|default:user.username }}
@@ -490,6 +493,9 @@
                     {% else %}
                         <a href="{% url 'frontend:landing_page' %}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium">
                             <i class="fas fa-home mr-1"></i> Home
+                        </a>
+                        <a href="{% url 'investments:investment-marketplace' %}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-chart-line mr-1"></i> Investments
                         </a>
                         <a href="{% url 'accounts:login' %}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium">
                             <i class="fas fa-sign-in-alt mr-1"></i> Staff Login
@@ -509,7 +515,7 @@
     <footer class="bg-gray-900 text-white mt-12">
         <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
             <!-- Main Footer Content -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
                 <!-- Tracking & Shipping -->
                 <div>
                     <h3 class="text-lg font-semibold mb-4 text-blue-400">Tracking & Shipping</h3>
@@ -542,6 +548,17 @@
                         <li><a href="#" class="hover:text-white transition-colors">SMS Notifications</a></li>
                         <li><a href="#" class="hover:text-white transition-colors">Marketing Preferences</a></li>
                         <li><a href="#" class="hover:text-white transition-colors">Account Settings</a></li>
+                    </ul>
+                </div>
+
+                <!-- Investment Services -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4 text-blue-400">Investment Services</h3>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="{% url 'investments:investment-marketplace' %}" class="hover:text-white transition-colors">Investment Marketplace</a></li>
+                        <li><a href="{% url 'investments:investment-marketplace' %}" class="hover:text-white transition-colors">Portfolio Dashboard</a></li>
+                        <li><a href="{% url 'investments:investment-marketplace' %}" class="hover:text-white transition-colors">Asset Categories</a></li>
+                        <li><a href="{% url 'investments:investment-marketplace' %}" class="hover:text-white transition-colors">Investment Guide</a></li>
                     </ul>
                 </div>
 

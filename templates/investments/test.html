@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Investment Test - Meridian Asset Logistics{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">Investment System Test</h1>
+        
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Navigation Links</h2>
+            <div class="space-y-2">
+                <a href="{% url 'investments:investment-marketplace' %}" class="block text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                    → Investment Marketplace
+                </a>
+                <a href="{% url 'investments:investment-dashboard' %}" class="block text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                    → Investment Dashboard
+                </a>
+                <a href="{% url 'investments:user-portfolio' %}" class="block text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                    → User Portfolio
+                </a>
+            </div>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Sample Investment Data</h2>
+            <div class="text-sm text-gray-600 dark:text-gray-300">
+                <p>Categories: {{ categories_count }}</p>
+                <p>Items: {{ items_count }}</p>
+            </div>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h2>
+            <div class="flex space-x-4">
+                <a href="{% url 'investments:investment-marketplace' %}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                    <i class="fas fa-chart-line mr-2"></i>
+                    Browse Investments
+                </a>
+                <a href="{% url 'frontend:landing_page' %}" class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700">
+                    <i class="fas fa-home mr-2"></i>
+                    Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
+from django.utils import timezone
 from decimal import Decimal
 import uuid
 
@@ -99,8 +100,18 @@ class InvestmentItem(models.Model):
             item=self,
             price=new_price,
             change_amount=price_change,
-            change_percentage=price_change_percentage
+            change_percentage=price_change_percentage,
+            timestamp=timezone.now()
         )
+    
+    def get_investment_type_display(self):
+        """Get display text for investment type"""
+        type_map = {
+            'investment_only': 'Investment Only',
+            'delivery_only': 'Delivery Only',
+            'both': 'Investment & Delivery'
+        }
+        return type_map.get(self.investment_type, 'Unknown')
 
 
 class PriceHistory(models.Model):
@@ -117,6 +128,16 @@ class PriceHistory(models.Model):
     
     def __str__(self):
         return f"{self.item.name} - ${self.price} at {self.timestamp}"
+    
+    @property
+    def get_price_change_class(self):
+        """Get CSS class for price change styling"""
+        if self.change_percentage > 0:
+            return 'text-green-600 dark:text-green-400'
+        elif self.change_percentage < 0:
+            return 'text-red-600 dark:text-red-400'
+        else:
+            return 'text-gray-600 dark:text-gray-400'
 
 
 class UserInvestment(models.Model):
@@ -179,6 +200,22 @@ class UserInvestment(models.Model):
     def days_held(self):
         from django.utils import timezone
         return (timezone.now() - self.purchased_at).days
+    
+    @property
+    def total_return_display(self):
+        """Get formatted total return display"""
+        if self.total_return_usd >= 0:
+            return f"+${self.total_return_usd}"
+        else:
+            return f"-${abs(self.total_return_usd)}"
+    
+    @property
+    def total_return_percentage_display(self):
+        """Get formatted total return percentage display"""
+        if self.total_return_percentage >= 0:
+            return f"+{self.total_return_percentage:.2f}%"
+        else:
+            return f"{self.total_return_percentage:.2f}%"
 
 
 class InvestmentTransaction(models.Model):
@@ -244,6 +281,16 @@ class InvestmentTransaction(models.Model):
     @property
     def is_pending(self):
         return self.payment_status == 'pending'
+    
+    @property
+    def status(self):
+        """Alias for payment_status for template compatibility"""
+        return self.payment_status
+    
+    @property
+    def get_status_display(self):
+        """Get status display for template compatibility"""
+        return self.get_payment_status_display()
 
 
 class InvestmentPortfolio(models.Model):
@@ -287,3 +334,19 @@ class InvestmentPortfolio(models.Model):
     @property
     def is_profitable(self):
         return self.total_return > 0
+    
+    @property
+    def total_return_display(self):
+        """Get formatted total return display"""
+        if self.total_return >= 0:
+            return f"+${self.total_return}"
+        else:
+            return f"-${abs(self.total_return)}"
+    
+    @property
+    def total_return_percentage_display(self):
+        """Get formatted total return percentage display"""
+        if self.total_return_percentage >= 0:
+            return f"+{self.total_return_percentage:.2f}%"
+        else:
+            return f"{self.total_return_percentage:.2f}%"

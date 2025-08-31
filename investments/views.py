@@ -264,6 +264,26 @@ def investment_dashboard(request):
         })
 
 
+def investment_test(request):
+    """Test page for investment system"""
+    try:
+        categories_count = InvestmentCategory.objects.filter(is_active=True).count()
+        items_count = InvestmentItem.objects.filter(is_active=True).count()
+        
+        context = {
+            'categories_count': categories_count,
+            'items_count': items_count,
+        }
+        
+        return render(request, 'investments/test.html', context)
+        
+    except Exception as e:
+        logger.error(f"Error loading investment test: {e}")
+        return render(request, 'investments/error.html', {
+            'error_message': 'Failed to load investment test'
+        })
+
+
 def investment_marketplace(request):
     """Public marketplace for browsing investment items"""
     try:

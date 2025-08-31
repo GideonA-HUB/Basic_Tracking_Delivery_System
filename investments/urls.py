@@ -23,6 +23,9 @@ urlpatterns = [
     path('portfolio/', views.user_portfolio, name='user-portfolio'),
     path('item/<int:item_id>/', views.investment_item_detail, name='investment-item-detail'),
     
+    # Test view
+    path('test/', views.investment_test, name='investment-test'),
+    
     # Admin views
     path('admin/management/', views.admin_investment_management, name='admin-investment-management'),
     

@@ -18,13 +18,13 @@
         </p>
         
         <div class="space-y-3">
-            <a href="{% url 'investment-marketplace' %}" 
+            <a href="{% url 'investments:investment-marketplace' %}" 
                class="block w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
                 Return to Marketplace
             </a>
             
             {% if user.is_authenticated %}
-            <a href="{% url 'investment-dashboard' %}" 
+            <a href="{% url 'investments:investment-dashboard' %}" 
                class="block w-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-lg font-medium transition-colors">
                 Go to Dashboard
             </a>

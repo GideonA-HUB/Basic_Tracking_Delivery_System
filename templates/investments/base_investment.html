@@ -125,24 +125,24 @@
                 </div>
                 
                 <div class="flex items-center space-x-4">
-                    <a href="{% url 'investment-marketplace' %}" 
+                                            <a href="{% url 'investments:investment-marketplace' %}" 
                        class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium">
                         Marketplace
                     </a>
                     
                     {% if user.is_authenticated %}
-                        <a href="{% url 'investment-dashboard' %}" 
+                        <a href="{% url 'investments:investment-dashboard' %}" 
                            class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium">
                             Dashboard
                         </a>
-                        <a href="{% url 'user-portfolio' %}" 
+                        <a href="{% url 'investments:user-portfolio' %}" 
                            class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium">
                             Portfolio
                         </a>
                     {% endif %}
                     
                     {% if user.is_staff %}
-                        <a href="{% url 'admin-investment-management' %}" 
+                        <a href="{% url 'investments:admin-investment-management' %}" 
                            class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium">
                             Admin
                         </a>

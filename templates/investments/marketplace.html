@@ -1,4 +1,5 @@
 {% extends 'investments/base_investment.html' %}
+{% load investment_filters %}
 
 {% block title %}Investment Marketplace - Meridian Asset Logistics{% endblock %}
 
@@ -112,7 +113,7 @@
                         </button>
                         {% endif %}
                         
-                        <a href="{% url 'investment-item-detail' item.id %}" 
+                        <a href="{% url 'investments:investment-item-detail' item.id %}" 
                            class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
                             Details
                         </a>
@@ -159,7 +160,7 @@
                         </button>
                         {% endif %}
                         
-                        <a href="{% url 'investment-item-detail' item.id %}" 
+                        <a href="{% url 'investments:investment-item-detail' item.id %}" 
                            class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
                             Details
                         </a>

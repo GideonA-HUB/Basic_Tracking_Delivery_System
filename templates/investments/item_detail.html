@@ -1,0 +1,270 @@
+{% extends 'investments/base_investment.html' %}
+{% load investment_filters %}
+
+{% block title %}{{ item.name }} - Investment Details{% endblock %}
+
+{% block investment_content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <!-- Breadcrumb -->
+    <nav class="flex mb-8" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+                <a href="{% url 'investments:investment-marketplace' %}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
+                    <i class="fas fa-home mr-2"></i>
+                    Marketplace
+                </a>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                    <a href="{% url 'investments:investment-marketplace' %}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
+                        {{ item.category.name }}
+                    </a>
+                </div>
+            </li>
+            <li aria-current="page">
+                <div class="flex items-center">
+                    <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                    <span class="text-gray-500 dark:text-gray-400">{{ item.name }}</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Main Content -->
+        <div class="lg:col-span-2">
+            <!-- Item Header -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                            {{ item.category.name }}
+                        </span>
+                        <span class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium investment-type-badge investment-type-{{ item.investment_type }}">
+                            {{ item.get_investment_type_display }}
+                        </span>
+                    </div>
+                    {% if item.is_featured %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                        <i class="fas fa-star mr-1"></i>
+                        Featured
+                    </span>
+                    {% endif %}
+                </div>
+                
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">{{ item.name }}</h1>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <div class="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+                            ${{ item.current_price_usd }}
+                        </div>
+                        <div class="text-sm {{ item.price_change_24h|get_price_change_class }}">
+                            {{ item.price_change_24h|get_price_change_display }}
+                            ({{ item.price_change_percentage_24h|get_percentage_change_display }})
+                        </div>
+                    </div>
+                    
+                    {% if item.weight %}
+                    <div class="text-right">
+                        <div class="text-2xl font-semibold text-gray-900 dark:text-white">{{ item.weight|format_weight }}</div>
+                        {% if item.purity %}
+                        <div class="text-sm text-gray-600 dark:text-gray-400">{{ item.purity }}</div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <p class="text-gray-600 dark:text-gray-300 text-lg">{{ item.description }}</p>
+            </div>
+
+            <!-- Price Chart -->
+            {% if chart_data %}
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Price History (30 Days)</h3>
+                <div class="chart-container">
+                    <canvas id="priceChart"></canvas>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Investment Details -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Investment Details</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-medium text-gray-900 dark:text-white mb-2">Investment Range</h4>
+                        <p class="text-gray-600 dark:text-gray-300">
+                            ${{ item.minimum_investment }} - 
+                            {% if item.maximum_investment %}
+                                ${{ item.maximum_investment }}
+                            {% else %}
+                                No limit
+                            {% endif %}
+                        </p>
+                    </div>
+                    
+                    {% if item.total_available %}
+                    <div>
+                        <h4 class="font-medium text-gray-900 dark:text-white mb-2">Availability</h4>
+                        <p class="text-gray-600 dark:text-gray-300">
+                            {{ item.currently_available }} of {{ item.total_available }} available
+                        </p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if item.dimensions %}
+                    <div>
+                        <h4 class="font-medium text-gray-900 dark:text-white mb-2">Dimensions</h4>
+                        <p class="text-gray-600 dark:text-gray-300">{{ item.dimensions }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if item.origin %}
+                    <div>
+                        <h4 class="font-medium text-gray-900 dark:text-white mb-2">Origin</h4>
+                        <p class="text-gray-600 dark:text-gray-300">{{ item.origin }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Take Action</h3>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    {% if item.is_available_for_investment %}
+                    <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200">
+                        <i class="fas fa-chart-line mr-2"></i>
+                        Invest Now
+                    </button>
+                    {% endif %}
+                    
+                    {% if item.is_available_for_delivery %}
+                    <button class="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200">
+                        <i class="fas fa-shipping-fast mr-2"></i>
+                        Buy & Deliver
+                    </button>
+                    {% endif %}
+                    
+                    <button class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200">
+                        <i class="fas fa-heart mr-2"></i>
+                        Add to Watchlist
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="lg:col-span-1">
+            <!-- Similar Items -->
+            {% if similar_items %}
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Similar Investments</h3>
+                <div class="space-y-4">
+                    {% for similar_item in similar_items %}
+                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-blue-300 transition-colors duration-200">
+                        <div class="flex items-center space-x-3">
+                            {% if similar_item.main_image %}
+                            <img src="{{ similar_item.main_image.url }}" alt="{{ similar_item.name }}" class="w-16 h-16 object-cover rounded-lg">
+                            {% else %}
+                            <div class="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-image text-gray-400"></i>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                    <a href="{% url 'investments:investment-item-detail' similar_item.id %}" class="hover:text-blue-600 dark:hover:text-blue-400">
+                                        {{ similar_item.name }}
+                                    </a>
+                                </h4>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">{{ similar_item.category.name }}</p>
+                                <p class="text-lg font-semibold text-gray-900 dark:text-white">${{ similar_item.current_price_usd }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Quick Stats -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Stats</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600 dark:text-gray-400">Category</span>
+                        <span class="font-medium text-gray-900 dark:text-white">{{ item.category.name }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600 dark:text-gray-400">Type</span>
+                        <span class="font-medium text-gray-900 dark:text-white">{{ item.get_investment_type_display }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600 dark:text-gray-400">Min Investment</span>
+                        <span class="font-medium text-gray-900 dark:text-white">${{ item.minimum_investment }}</span>
+                    </div>
+                    {% if item.weight %}
+                    <div class="flex justify-between">
+                        <span class="text-gray-600 dark:text-gray-400">Weight</span>
+                        <span class="font-medium text-gray-900 dark:text-white">{{ item.weight|format_weight }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="flex justify-between">
+                        <span class="text-gray-600 dark:text-gray-400">Added</span>
+                        <span class="font-medium text-gray-900 dark:text-white">{{ item.created_at|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if chart_data %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('priceChart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{ chart_data.labels|safe }},
+                datasets: [{
+                    label: 'Price (USD)',
+                    data: {{ chart_data.prices|safe }},
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        grid: {
+                            color: 'rgba(156, 163, 175, 0.1)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(156, 163, 175, 0.1)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endif %}
+{% endblock %}
