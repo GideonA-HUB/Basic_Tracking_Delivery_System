@@ -28,6 +28,10 @@ urlpatterns = [
     
     # Admin views
     path('admin/management/', views.admin_investment_management, name='admin-investment-management'),
+    path('admin/categories/', views.admin_manage_categories, name='admin-manage-categories'),
+    path('admin/items/', views.admin_manage_items, name='admin-manage-items'),
+    path('admin/categories/add/', views.admin_add_category, name='admin-add-category'),
+    path('admin/items/add/', views.admin_add_item, name='admin-add-item'),
     
     # NOWPayments webhook
     path('webhook/', views.nowpayments_webhook, name='nowpayments-webhook'),

@@ -1,0 +1,125 @@
+{% extends 'investments/base_investment.html' %}
+{% load investment_filters %}
+
+{% block title %}Add Item - Investment Admin{% endblock %}
+
+{% block investment_content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Add Investment Item</h1>
+        <p class="text-gray-600 dark:text-gray-300">Create a new investment item</p>
+    </div>
+
+    <!-- Add Item Form -->
+    <div class="max-w-2xl">
+        <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <!-- Item Name -->
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Item Name <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="name" id="name" required
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                               placeholder="e.g., Gold Bar 1oz, Luxury Apartment, Diamond Ring">
+                    </div>
+
+                    <!-- Category -->
+                    <div>
+                        <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Category <span class="text-red-500">*</span>
+                        </label>
+                        <select name="category" id="category" required
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                            <option value="">Select a category</option>
+                            {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Description -->
+                    <div>
+                        <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Description
+                        </label>
+                        <textarea name="description" id="description" rows="4"
+                                  class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                                  placeholder="Describe the investment item..."></textarea>
+                    </div>
+
+                    <!-- Price -->
+                    <div>
+                        <label for="price" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Price (USD) <span class="text-red-500">*</span>
+                        </label>
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-500 dark:text-gray-400 sm:text-sm">$</span>
+                            </div>
+                            <input type="number" name="price" id="price" step="0.01" min="0" required
+                                   class="pl-7 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                                   placeholder="0.00">
+                        </div>
+                    </div>
+
+                    <!-- Investment Type -->
+                    <div>
+                        <label for="investment_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Investment Type
+                        </label>
+                        <select name="investment_type" id="investment_type"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                            {% for value, label in investment_types %}
+                            <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Status Options -->
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <input type="checkbox" name="is_active" id="is_active" checked
+                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded dark:border-gray-600 dark:bg-gray-700">
+                            <label for="is_active" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                                Active Item
+                            </label>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <input type="checkbox" name="is_featured" id="is_featured"
+                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded dark:border-gray-600 dark:bg-gray-700">
+                            <label for="is_featured" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                                Featured Item
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <a href="{% url 'investments:admin-manage-items' %}" 
+                           class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                            Cancel
+                        </a>
+                        <button type="submit" 
+                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                            <i class="fas fa-plus mr-2"></i> Create Item
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Items -->
+    <div class="mt-8 text-center">
+        <a href="{% url 'investments:admin-manage-items' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Items
+        </a>
+    </div>
+</div>
+{% endblock %}

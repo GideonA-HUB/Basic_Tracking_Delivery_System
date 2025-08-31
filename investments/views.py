@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.decorators.csrf import csrf_exempt
@@ -15,6 +15,7 @@ from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnl
 from decimal import Decimal
 import json
 import logging
+from django.contrib import messages
 
 from .models import (
     InvestmentCategory, InvestmentItem, PriceHistory, 
@@ -457,6 +458,116 @@ def admin_investment_management(request):
         return render(request, 'investments/error.html', {
             'error_message': 'Failed to load admin management'
         })
+
+
+@login_required
+def admin_manage_categories(request):
+    """Custom view for managing investment categories"""
+    if not request.user.is_staff:
+        return HttpResponse(status=403)
+    
+    try:
+        categories = InvestmentCategory.objects.all().order_by('name')
+        context = {
+            'categories': categories,
+        }
+        return render(request, 'investments/admin_categories.html', context)
+    except Exception as e:
+        logger.error(f"Error loading categories management: {e}")
+        return render(request, 'investments/error.html', {
+            'error_message': 'Failed to load categories management'
+        })
+
+
+@login_required
+def admin_manage_items(request):
+    """Custom view for managing investment items"""
+    if not request.user.is_staff:
+        return HttpResponse(status=403)
+    
+    try:
+        items = InvestmentItem.objects.all().select_related('category').order_by('name')
+        context = {
+            'items': items,
+        }
+        return render(request, 'investments/admin_items.html', context)
+    except Exception as e:
+        logger.error(f"Error loading items management: {e}")
+        return render(request, 'investments/error.html', {
+            'error_message': 'Failed to load items management'
+        })
+
+
+@login_required
+def admin_add_category(request):
+    """Custom view for adding investment categories"""
+    if not request.user.is_staff:
+        return HttpResponse(status=403)
+    
+    if request.method == 'POST':
+        try:
+            name = request.POST.get('name')
+            description = request.POST.get('description', '')
+            is_active = request.POST.get('is_active') == 'on'
+            
+            if name:
+                category = InvestmentCategory.objects.create(
+                    name=name,
+                    description=description,
+                    is_active=is_active
+                )
+                messages.success(request, f'Category "{name}" created successfully!')
+                return redirect('investments:admin-manage-categories')
+            else:
+                messages.error(request, 'Category name is required.')
+        except Exception as e:
+            logger.error(f"Error creating category: {e}")
+            messages.error(request, 'Failed to create category.')
+    
+    return render(request, 'investments/admin_add_category.html')
+
+
+@login_required
+def admin_add_item(request):
+    """Custom view for adding investment items"""
+    if not request.user.is_staff:
+        return HttpResponse(status=403)
+    
+    if request.method == 'POST':
+        try:
+            name = request.POST.get('name')
+            category_id = request.POST.get('category')
+            description = request.POST.get('description', '')
+            price = request.POST.get('price')
+            investment_type = request.POST.get('investment_type')
+            is_active = request.POST.get('is_active') == 'on'
+            is_featured = request.POST.get('is_featured') == 'on'
+            
+            if name and category_id and price:
+                category = InvestmentCategory.objects.get(id=category_id)
+                item = InvestmentItem.objects.create(
+                    name=name,
+                    category=category,
+                    description=description,
+                    price=price,
+                    investment_type=investment_type,
+                    is_active=is_active,
+                    is_featured=is_featured
+                )
+                messages.success(request, f'Investment item "{name}" created successfully!')
+                return redirect('investments:admin-manage-items')
+            else:
+                messages.error(request, 'Name, category, and price are required.')
+        except Exception as e:
+            logger.error(f"Error creating investment item: {e}")
+            messages.error(request, 'Failed to create investment item.')
+    
+    categories = InvestmentCategory.objects.filter(is_active=True)
+    context = {
+        'categories': categories,
+        'investment_types': InvestmentItem.INVESTMENT_TYPES,
+    }
+    return render(request, 'investments/admin_add_item.html')
 
 
 # API Summary Endpoint
