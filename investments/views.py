@@ -301,10 +301,12 @@ def investment_marketplace(request):
             is_active=True
         ).select_related('category').order_by('-created_at')[:12]
         
-        # Get items with significant price changes
+        # Get items with significant price changes (positive or negative)
         trending_items = InvestmentItem.objects.filter(
-            is_active=True,
-            price_change_percentage_24h__abs__gte=5
+            is_active=True
+        ).filter(
+            Q(price_change_percentage_24h__gte=5) | 
+            Q(price_change_percentage_24h__lte=-5)
         ).select_related('category').order_by('-price_change_percentage_24h')[:6]
         
         context = {
