@@ -539,6 +539,7 @@ def admin_add_item(request):
             category_id = request.POST.get('category')
             description = request.POST.get('description', '')
             price = request.POST.get('price')
+            minimum_investment = request.POST.get('minimum_investment', price)
             investment_type = request.POST.get('investment_type')
             is_active = request.POST.get('is_active') == 'on'
             is_featured = request.POST.get('is_featured') == 'on'
@@ -549,8 +550,10 @@ def admin_add_item(request):
                     name=name,
                     category=category,
                     description=description,
-                    price=price,
-                    investment_type=investment_type,
+                    short_description=description[:300] if description else '',
+                    current_price_usd=price,
+                    minimum_investment=minimum_investment,
+                    investment_type=investment_type or 'both',
                     is_active=is_active,
                     is_featured=is_featured
                 )
@@ -565,7 +568,7 @@ def admin_add_item(request):
     categories = InvestmentCategory.objects.filter(is_active=True)
     context = {
         'categories': categories,
-        'investment_types': InvestmentItem.INVESTMENT_TYPES,
+        'investment_types': InvestmentItem.INVESTMENT_TYPE_CHOICES,
     }
     return render(request, 'investments/admin_add_item.html')
 

@@ -80,6 +80,33 @@
                         </select>
                     </div>
 
+                    <!-- Minimum Investment -->
+                    <div>
+                        <label for="minimum_investment" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Minimum Investment (USD)
+                        </label>
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-500 dark:text-gray-400 sm:text-sm">$</span>
+                            </div>
+                            <input type="number" name="minimum_investment" id="minimum_investment" step="0.01" min="0" required
+                                   class="pl-7 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                                   placeholder="0.00">
+                        </div>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Minimum amount required to invest in this item</p>
+                    </div>
+
+                    <script>
+                        // Auto-populate minimum investment when price changes
+                        document.getElementById('price').addEventListener('input', function() {
+                            const price = this.value;
+                            const minInvestment = document.getElementById('minimum_investment');
+                            if (price && !minInvestment.value) {
+                                minInvestment.value = price;
+                            }
+                        });
+                    </script>
+
                     <!-- Status Options -->
                     <div class="space-y-4">
                         <div class="flex items-center">
