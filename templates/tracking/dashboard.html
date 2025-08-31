@@ -99,7 +99,7 @@
             <div class="w-24 h-1 bg-yellow-400 mx-auto"></div>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <!-- Card 1: Where's My Parcel? -->
             <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 p-6">
                 <div class="text-center">
@@ -133,6 +133,63 @@
                         Let's Find Out
                         <i class="fas fa-arrow-right ml-2"></i>
                     </a>
+                </div>
+            </div>
+
+            <!-- Card 4: Investment Management -->
+            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 p-6">
+                <div class="text-center">
+                    <i class="fas fa-chart-line text-3xl text-emerald-600 mb-4"></i>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Investment Management</h3>
+                    <a href="{% url 'investments:investment-marketplace' %}" class="inline-flex items-center text-emerald-600 hover:text-emerald-800 font-medium">
+                        Manage Portfolio
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Investment Management Section -->
+    <div class="mb-8 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-gray-800 dark:to-gray-700 rounded-lg overflow-hidden">
+        <div class="flex flex-col lg:flex-row items-center">
+            <div class="lg:w-1/2 p-8">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Investment Portfolio Management</h2>
+                <p class="text-gray-700 dark:text-gray-300 text-lg leading-relaxed mb-6">
+                    Manage investment portfolios, track asset performance, and monitor real-time growth. 
+                    Our investment platform offers comprehensive tools for asset management and portfolio optimization.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <a href="{% url 'investments:investment-marketplace' %}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        <i class="fas fa-chart-line mr-2"></i> Investment Marketplace
+                    </a>
+                    <a href="{% url 'investments:admin-investment-management' %}" class="inline-flex items-center px-6 py-3 border border-gray-300 dark:border-gray-600 text-base font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        <i class="fas fa-cog mr-2"></i> Admin Management
+                    </a>
+                </div>
+            </div>
+            <div class="lg:w-1/2 p-8">
+                <div class="relative">
+                    <div class="bg-green-100 dark:bg-green-900 rounded-lg p-6 text-center">
+                        <i class="fas fa-chart-line text-6xl text-green-600 dark:text-green-400 mb-4"></i>
+                        <div class="grid grid-cols-2 gap-4 mt-6">
+                            <div class="bg-white dark:bg-gray-700 rounded-lg p-4">
+                                <i class="fas fa-coins text-2xl text-yellow-600 dark:text-yellow-400 mb-2"></i>
+                                <p class="text-sm font-medium text-gray-900 dark:text-white">Assets</p>
+                                <p class="text-xs text-gray-600 dark:text-gray-300">Under Management</p>
+                            </div>
+                            <div class="bg-white dark:bg-gray-700 rounded-lg p-4">
+                                <i class="fas fa-users text-2xl text-blue-600 dark:text-blue-400 mb-2"></i>
+                                <p class="text-sm font-medium text-gray-900 dark:text-white">Investors</p>
+                                <p class="text-xs text-gray-600 dark:text-gray-300">Active</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 bg-white dark:bg-gray-700 rounded-lg p-4">
+                            <i class="fas fa-trending-up text-2xl text-purple-600 dark:text-purple-400 mb-2"></i>
+                            <p class="text-sm font-medium text-gray-900 dark:text-white">Portfolio Growth</p>
+                            <p class="text-xs text-gray-600 dark:text-gray-300">Real-time Tracking</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

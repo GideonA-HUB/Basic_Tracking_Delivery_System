@@ -1,0 +1,3 @@
+[33m1a71de5[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Add complete investment system with NOWPayments integration - Investment marketplace, portfolio dashboard, real-time tracking, cryptocurrency payments, and comprehensive admin interface
+[33md9bb750[m 🔧 Fix CSRF issues: use form token instead of cookies and exempt API views
+[33m639511a[m 🔧 Fix CSRF issues for Railway production deployment
