@@ -1,7 +1,93 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
-from .models import StaffProfile
+from .models import StaffProfile, CustomerProfile
+
+
+class CustomerRegistrationForm(UserCreationForm):
+    """Form for customer registration"""
+    
+    email = forms.EmailField(required=True)
+    first_name = forms.CharField(max_length=30, required=True)
+    last_name = forms.CharField(max_length=30, required=True)
+    phone_number = forms.CharField(max_length=20, required=False)
+    address = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}), required=False)
+    city = forms.CharField(max_length=100, required=False)
+    state = forms.CharField(max_length=100, required=False)
+    country = forms.CharField(max_length=100, required=False)
+    postal_code = forms.CharField(max_length=20, required=False)
+    date_of_birth = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
+    
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name', 'last_name', 'password1', 'password2')
+    
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("This email address is already registered.")
+        return email
+    
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data['email']
+        user.first_name = self.cleaned_data['first_name']
+        user.last_name = self.cleaned_data['last_name']
+        user.is_staff = False  # Ensure they are not staff
+        
+        if commit:
+            user.save()
+            # Create customer profile
+            CustomerProfile.objects.create(
+                user=user,
+                phone_number=self.cleaned_data['phone_number'],
+                address=self.cleaned_data['address'],
+                city=self.cleaned_data['city'],
+                state=self.cleaned_data['state'],
+                country=self.cleaned_data['country'],
+                postal_code=self.cleaned_data['postal_code'],
+                date_of_birth=self.cleaned_data['date_of_birth']
+            )
+        
+        return user
+
+
+class CustomerLoginForm(AuthenticationForm):
+    """Custom login form for customers"""
+    
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'placeholder': 'Username or Email'
+        })
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'placeholder': 'Password'
+        })
+    )
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        username = cleaned_data.get('username')
+        password = cleaned_data.get('password')
+        
+        if username and password:
+            try:
+                user = User.objects.get(username=username)
+                if user.is_staff:
+                    raise forms.ValidationError("This login is for customers only. Staff members should use the staff login.")
+            except User.DoesNotExist:
+                # Try to find by email
+                try:
+                    user = User.objects.get(email=username)
+                    if user.is_staff:
+                        raise forms.ValidationError("This login is for customers only. Staff members should use the staff login.")
+                except User.DoesNotExist:
+                    pass
+        
+        return cleaned_data
 
 
 class StaffRegistrationForm(UserCreationForm):

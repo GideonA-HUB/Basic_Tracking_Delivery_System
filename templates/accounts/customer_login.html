@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Customer Login - Meridian Asset Logistics{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-12">
+    <div class="max-w-md mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="bg-blue-600 text-white font-bold text-3xl px-4 py-3 rounded-lg shadow-md inline-block mb-4">
+                MAL
+            </div>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Welcome Back</h1>
+            <p class="text-gray-600 dark:text-gray-300 mt-2">Sign in to your Meridian Asset Logistics account</p>
+        </div>
+
+        <!-- Login Form -->
+        <div class="bg-white dark:bg-gray-800 shadow-xl rounded-lg p-8">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Username or Email -->
+                <div>
+                    <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Username or Email
+                    </label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {% for error in form.username.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Password
+                    </label>
+                    {{ form.password }}
+                    {% if form.password.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {% for error in form.password.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Non-field errors -->
+                {% if form.non_field_errors %}
+                    <div class="bg-red-50 border border-red-200 rounded-md p-3">
+                        <div class="flex items-center">
+                            <i class="fas fa-exclamation-triangle text-red-400 mr-2"></i>
+                            <div class="text-sm text-red-800">
+                                {% for error in form.non_field_errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Submit Button -->
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 font-medium">
+                    Sign In
+                </button>
+            </form>
+
+            <!-- Registration Link -->
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    Don't have an account? 
+                    <a href="{% url 'accounts:customer_register' %}" class="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
+                        Create one here
+                    </a>
+                </p>
+            </div>
+
+            <!-- Staff Login Link -->
+            <div class="mt-4 text-center">
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    Are you staff? 
+                    <a href="{% url 'accounts:login' %}" class="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
+                        Staff login here
+                    </a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Back to Home -->
+        <div class="text-center mt-6">
+            <a href="{% url 'frontend:landing_page' %}" class="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Back to Home
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

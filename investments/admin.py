@@ -4,8 +4,11 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 from .models import (
     InvestmentCategory, InvestmentItem, PriceHistory, 
-    UserInvestment, InvestmentTransaction, InvestmentPortfolio
+    UserInvestment, InvestmentTransaction, InvestmentPortfolio,
+    RealTimePriceFeed, RealTimePriceHistory, AutoInvestmentPlan,
+    CurrencyConversion, CustomerCashoutRequest
 )
+from django.utils import timezone
 
 
 @admin.register(InvestmentCategory)
@@ -247,3 +250,116 @@ class InvestmentPortfolioAdmin(admin.ModelAdmin):
             )
         return '0.00%'
     get_total_return_percentage_display.short_description = 'Total Return %'
+
+
+@admin.register(RealTimePriceFeed)
+class RealTimePriceFeedAdmin(admin.ModelAdmin):
+    list_display = [
+        'name', 'asset_type', 'symbol', 'current_price', 'base_currency',
+        'price_change_percentage_24h', 'is_active', 'last_updated'
+    ]
+    list_filter = ['asset_type', 'base_currency', 'is_active', 'last_updated']
+    search_fields = ['name', 'symbol', 'asset_type']
+    ordering = ['asset_type', 'name']
+    readonly_fields = ['last_updated']
+    
+    def get_price_change_display(self, obj):
+        if obj.price_change_percentage_24h > 0:
+            return format_html(
+                '<span style="color: green;">+{}%</span>',
+                obj.price_change_percentage_24h
+            )
+        elif obj.price_change_percentage_24h < 0:
+            return format_html(
+                '<span style="color: red;">{}%</span>',
+                obj.price_change_percentage_24h
+            )
+        return '0.00%'
+    get_price_change_display.short_description = '24h Change %'
+
+
+@admin.register(RealTimePriceHistory)
+class RealTimePriceHistoryAdmin(admin.ModelAdmin):
+    list_display = [
+        'price_feed', 'price', 'change_amount', 'change_percentage', 'timestamp'
+    ]
+    list_filter = ['price_feed__asset_type', 'timestamp']
+    search_fields = ['price_feed__name']
+    ordering = ['-timestamp']
+    readonly_fields = ['timestamp']
+
+
+@admin.register(AutoInvestmentPlan)
+class AutoInvestmentPlanAdmin(admin.ModelAdmin):
+    list_display = [
+        'user', 'name', 'target_asset', 'investment_amount', 'frequency',
+        'status', 'next_investment_date', 'total_invested', 'investments_count'
+    ]
+    list_filter = ['status', 'frequency', 'target_asset__category', 'created_at']
+    search_fields = ['user__username', 'user__email', 'name', 'target_asset__name']
+    ordering = ['-created_at']
+    readonly_fields = ['created_at', 'updated_at', 'last_investment_at']
+    
+    fieldsets = (
+        ('Plan Information', {
+            'fields': ('user', 'name', 'description', 'target_asset')
+        }),
+        ('Investment Details', {
+            'fields': ('investment_amount', 'frequency')
+        }),
+        ('Schedule', {
+            'fields': ('start_date', 'next_investment_date', 'end_date')
+        }),
+        ('Status', {
+            'fields': ('status', 'total_invested', 'investments_count')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at', 'last_investment_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+
+@admin.register(CurrencyConversion)
+class CurrencyConversionAdmin(admin.ModelAdmin):
+    list_display = [
+        'from_currency', 'to_currency', 'exchange_rate', 'api_source', 'last_updated'
+    ]
+    list_filter = ['from_currency', 'to_currency', 'last_updated']
+    search_fields = ['from_currency', 'to_currency']
+    ordering = ['from_currency', 'to_currency']
+    readonly_fields = ['last_updated']
+
+
+@admin.register(CustomerCashoutRequest)
+class CustomerCashoutRequestAdmin(admin.ModelAdmin):
+    list_display = [
+        'user', 'amount_usd', 'requested_currency', 'status', 'approved_by', 'created_at'
+    ]
+    list_filter = ['status', 'requested_currency', 'created_at', 'approved_at']
+    search_fields = ['user__username', 'user__email', 'bank_account_details']
+    ordering = ['-created_at']
+    readonly_fields = ['created_at', 'updated_at']
+    
+    fieldsets = (
+        ('Request Information', {
+            'fields': ('user', 'amount_usd', 'requested_currency', 'bank_account_details', 'reason')
+        }),
+        ('Status & Approval', {
+            'fields': ('status', 'approved_by', 'approved_at', 'rejection_reason')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at', 'completed_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user', 'approved_by')
+    
+    def save_model(self, request, obj, form, change):
+        if change and 'status' in form.changed_data:
+            if obj.status == 'approved' and not obj.approved_by:
+                obj.approved_by = request.user
+                obj.approved_at = timezone.now()
+        super().save_model(request, obj, form, change)

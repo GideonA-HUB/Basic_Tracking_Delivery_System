@@ -350,3 +350,293 @@ class InvestmentPortfolio(models.Model):
             return f"+{self.total_return_percentage:.2f}%"
         else:
             return f"{self.total_return_percentage:.2f}%"
+
+
+class AutoInvestmentPlan(models.Model):
+    """Auto-investment plans for users"""
+    
+    PLAN_FREQUENCY_CHOICES = [
+        ('daily', 'Daily'),
+        ('weekly', 'Weekly'),
+        ('biweekly', 'Bi-weekly'),
+        ('monthly', 'Monthly'),
+        ('quarterly', 'Quarterly'),
+        ('yearly', 'Yearly'),
+    ]
+    
+    PLAN_STATUS_CHOICES = [
+        ('active', 'Active'),
+        ('paused', 'Paused'),
+        ('cancelled', 'Cancelled'),
+        ('completed', 'Completed'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='auto_investment_plans')
+    name = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    
+    # Investment details
+    investment_amount = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(Decimal('0.01'))])
+    frequency = models.CharField(max_length=20, choices=PLAN_FREQUENCY_CHOICES, default='monthly')
+    target_asset = models.ForeignKey(InvestmentItem, on_delete=models.CASCADE, related_name='auto_investment_plans')
+    
+    # Schedule
+    start_date = models.DateField()
+    next_investment_date = models.DateField()
+    end_date = models.DateField(blank=True, null=True)
+    
+    # Status
+    status = models.CharField(max_length=20, choices=PLAN_STATUS_CHOICES, default='active')
+    total_invested = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    investments_count = models.PositiveIntegerField(default=0)
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    last_investment_at = models.DateTimeField(blank=True, null=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = 'Auto Investment Plans'
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.name} ({self.frequency})"
+    
+    def calculate_next_investment_date(self):
+        """Calculate the next investment date based on frequency"""
+        from datetime import timedelta
+        from dateutil.relativedelta import relativedelta
+        
+        if self.last_investment_at:
+            base_date = self.last_investment_at.date()
+        else:
+            base_date = self.start_date
+        
+        if self.frequency == 'daily':
+            return base_date + timedelta(days=1)
+        elif self.frequency == 'weekly':
+            return base_date + timedelta(weeks=1)
+        elif self.frequency == 'biweekly':
+            return base_date + timedelta(weeks=2)
+        elif self.frequency == 'monthly':
+            return base_date + relativedelta(months=1)
+        elif self.frequency == 'quarterly':
+            return base_date + relativedelta(months=3)
+        elif self.frequency == 'yearly':
+            return base_date + relativedelta(years=1)
+        
+        return base_date
+    
+    def is_due_for_investment(self):
+        """Check if the plan is due for investment"""
+        from django.utils import timezone
+        return self.next_investment_date <= timezone.now().date() and self.status == 'active'
+
+
+class RealTimePriceFeed(models.Model):
+    """Real-time price feeds for various assets"""
+    
+    ASSET_TYPE_CHOICES = [
+        ('gold', 'Gold'),
+        ('silver', 'Silver'),
+        ('platinum', 'Platinum'),
+        ('palladium', 'Palladium'),
+        ('diamond', 'Diamond'),
+        ('crypto', 'Cryptocurrency'),
+        ('real_estate', 'Real Estate'),
+        ('art', 'Art'),
+        ('other', 'Other'),
+    ]
+    
+    CURRENCY_CHOICES = [
+        ('USD', 'US Dollar'),
+        ('EUR', 'Euro'),
+        ('GBP', 'British Pound'),
+        ('NGN', 'Nigerian Naira'),
+        ('BTC', 'Bitcoin'),
+        ('ETH', 'Ethereum'),
+    ]
+    
+    name = models.CharField(max_length=200)
+    asset_type = models.CharField(max_length=20, choices=ASSET_TYPE_CHOICES)
+    symbol = models.CharField(max_length=20, blank=True)
+    
+    # Current price
+    current_price = models.DecimalField(max_digits=20, decimal_places=8)
+    base_currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='USD')
+    
+    # Price changes
+    price_change_24h = models.DecimalField(max_digits=20, decimal_places=8, default=0)
+    price_change_percentage_24h = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    price_change_7d = models.DecimalField(max_digits=20, decimal_places=8, default=0)
+    price_change_percentage_7d = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    
+    # Market data
+    market_cap = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    volume_24h = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    
+    # API source
+    api_source = models.CharField(max_length=100, blank=True)
+    api_url = models.URLField(blank=True)
+    
+    # Status
+    is_active = models.BooleanField(default=True)
+    last_updated = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['asset_type', 'name']
+        verbose_name_plural = 'Real Time Price Feeds'
+    
+    def __str__(self):
+        return f"{self.name} - {self.get_asset_type_display()} ({self.base_currency})"
+    
+    def update_price(self, new_price, price_change_24h=None, price_change_percentage_24h=None):
+        """Update the current price and calculate changes"""
+        if price_change_24h is None:
+            price_change_24h = new_price - self.current_price
+        if price_change_percentage_24h is None and self.current_price > 0:
+            price_change_percentage_24h = (price_change_24h / self.current_price) * 100
+        
+        self.current_price = new_price
+        self.price_change_24h = price_change_24h
+        self.price_change_percentage_24h = price_change_percentage_24h or 0
+        self.save()
+        
+        # Create price history record
+        RealTimePriceHistory.objects.create(
+            price_feed=self,
+            price=new_price,
+            change_amount=price_change_24h,
+            change_percentage=price_change_percentage_24h or 0,
+            timestamp=timezone.now()
+        )
+
+
+class RealTimePriceHistory(models.Model):
+    """Historical real-time price data"""
+    price_feed = models.ForeignKey(RealTimePriceFeed, on_delete=models.CASCADE, related_name='price_history')
+    price = models.DecimalField(max_digits=20, decimal_places=8)
+    change_amount = models.DecimalField(max_digits=20, decimal_places=8)
+    change_percentage = models.DecimalField(max_digits=8, decimal_places=2)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-timestamp']
+        verbose_name_plural = 'Real Time Price History'
+    
+    def __str__(self):
+        return f"{self.price_feed.name} - {self.price} at {self.timestamp}"
+
+
+class CurrencyConversion(models.Model):
+    """Currency conversion rates"""
+    
+    CURRENCY_CHOICES = [
+        ('USD', 'US Dollar'),
+        ('EUR', 'Euro'),
+        ('GBP', 'British Pound'),
+        ('NGN', 'Nigerian Naira'),
+        ('BTC', 'Bitcoin'),
+        ('ETH', 'Ethereum'),
+    ]
+    
+    from_currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES)
+    to_currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES)
+    exchange_rate = models.DecimalField(max_digits=20, decimal_places=8)
+    
+    # API source
+    api_source = models.CharField(max_length=100, blank=True)
+    last_updated = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['from_currency', 'to_currency']
+        ordering = ['from_currency', 'to_currency']
+        verbose_name_plural = 'Currency Conversions'
+    
+    def __str__(self):
+        return f"{self.from_currency} to {self.to_currency}: {self.exchange_rate}"
+    
+    @classmethod
+    def get_conversion_rate(cls, from_currency, to_currency):
+        """Get conversion rate between two currencies"""
+        if from_currency == to_currency:
+            return Decimal('1.0')
+        
+        try:
+            conversion = cls.objects.get(from_currency=from_currency, to_currency=to_currency)
+            return conversion.exchange_rate
+        except cls.DoesNotExist:
+            # Try reverse conversion
+            try:
+                conversion = cls.objects.get(from_currency=to_currency, to_currency=from_currency)
+                return Decimal('1.0') / conversion.exchange_rate
+            except cls.DoesNotExist:
+                return None
+
+
+class CustomerCashoutRequest(models.Model):
+    """Customer cashout requests that need customer care approval"""
+    
+    STATUS_CHOICES = [
+        ('pending', 'Pending Approval'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+        ('processing', 'Processing'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cashout_requests')
+    
+    # Request details
+    amount_usd = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(Decimal('0.01'))])
+    requested_currency = models.CharField(max_length=3, choices=CurrencyConversion.CURRENCY_CHOICES, default='USD')
+    bank_account_details = models.TextField(blank=True)
+    reason = models.TextField(blank=True)
+    
+    # Status and approval
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    approved_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='approved_cashouts')
+    approved_at = models.DateTimeField(blank=True, null=True)
+    rejection_reason = models.TextField(blank=True)
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    completed_at = models.DateTimeField(blank=True, null=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = 'Customer Cashout Requests'
+    
+    def __str__(self):
+        return f"{self.user.username} - ${self.amount_usd} - {self.get_status_display()}"
+    
+    @property
+    def can_be_approved(self):
+        """Check if the cashout request can be approved"""
+        return self.status == 'pending'
+    
+    @property
+    def can_be_rejected(self):
+        """Check if the cashout request can be rejected"""
+        return self.status == 'pending'
+    
+    def approve(self, approved_by_user):
+        """Approve the cashout request"""
+        if self.can_be_approved:
+            self.status = 'approved'
+            self.approved_by = approved_by_user
+            self.approved_at = timezone.now()
+            self.save()
+            return True
+        return False
+    
+    def reject(self, rejection_reason):
+        """Reject the cashout request"""
+        if self.can_be_rejected:
+            self.status = 'rejected'
+            self.rejection_reason = rejection_reason
+            self.save()
+            return True
+        return False
