@@ -28,75 +28,7 @@ class InvestmentCategoryAdmin(admin.ModelAdmin):
     get_color_preview.short_description = 'Color'
 
 
-@admin.register(InvestmentItem)
-class InvestmentItemAdmin(admin.ModelAdmin):
-    list_display = [
-        'name', 'category', 'current_price_usd', 'price_change_24h', 
-        'price_change_percentage_24h', 'investment_type', 'is_active', 'is_featured'
-    ]
-    list_filter = [
-        'category', 'investment_type', 'is_active', 'is_featured', 
-        'created_at', 'updated_at'
-    ]
-    search_fields = ['name', 'description', 'category__name']
-    ordering = ['-is_featured', '-created_at']
-    readonly_fields = ['created_at', 'updated_at']
-    
-    fieldsets = (
-        ('Basic Information', {
-            'fields': ('category', 'name', 'description', 'short_description')
-        }),
-        ('Pricing', {
-            'fields': ('current_price_usd', 'price_change_24h', 'price_change_percentage_24h')
-        }),
-        ('Specifications', {
-            'fields': ('weight', 'purity', 'dimensions', 'origin')
-        }),
-        ('Investment Options', {
-            'fields': ('investment_type', 'minimum_investment', 'maximum_investment')
-        }),
-        ('Availability', {
-            'fields': ('total_available', 'currently_available')
-        }),
-        ('Media', {
-            'fields': ('main_image', 'additional_images')
-        }),
-        ('Status', {
-            'fields': ('is_active', 'is_featured')
-        }),
-        ('Timestamps', {
-            'fields': ('created_at', 'updated_at'),
-            'classes': ('collapse',)
-        }),
-    )
-    
-    def get_price_change_display(self, obj):
-        if obj.price_change_24h > 0:
-            return format_html(
-                '<span style="color: green;">+${}</span>',
-                obj.price_change_24h
-            )
-        elif obj.price_change_24h < 0:
-            return format_html(
-                '<span style="color: red;">-${}</span>',
-                abs(obj.price_change_24h)
-            )
-        return '$0.00'
-    get_price_change_display.short_description = '24h Change'
-    
-    def get_percentage_change_display(self, obj):
-        if obj.price_change_percentage_24h > 0:
-            return format_html(
-                '<span style="color: green;">+{}%</span>',
-                obj.price_change_percentage_24h
-            )
-        elif obj.price_change_percentage_24h < 0:
-            return format_html(
-                '<span style="color: red;">-{}%</span>',
-                abs(obj.price_change_percentage_24h)
-            )
-        return '0.00%'
-    get_percentage_change_display.short_description = '24h % Change'
+# InvestmentItem admin is now handled in forms.py
 
 
 @admin.register(PriceHistory)

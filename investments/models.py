@@ -58,8 +58,8 @@ class InvestmentItem(models.Model):
     currently_available = models.DecimalField(max_digits=12, decimal_places=3, blank=True, null=True)
     
     # Images and media
-    main_image = models.ImageField(upload_to='investment_items/', blank=True, null=True)
-    additional_images = models.JSONField(default=list, blank=True)
+    main_image_url = models.URLField(max_length=500, blank=True, null=True, help_text="Enter the URL of the main image")
+    additional_image_urls = models.JSONField(default=list, blank=True, help_text="Enter URLs of additional images as a list")
     
     # Status
     is_active = models.BooleanField(default=True)

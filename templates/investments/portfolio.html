@@ -95,8 +95,8 @@
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
-                                {% if investment.item.main_image %}
-                                <img class="h-10 w-10 rounded-lg object-cover" src="{{ investment.item.main_image.url }}" alt="{{ investment.item.name }}">
+                                {% if investment.item.main_image_url %}
+                                <img class="h-10 w-10 rounded-lg object-cover" src="{{ investment.item.main_image_url }}" alt="{{ investment.item.name }}">
                                 {% else %}
                                 <div class="h-10 w-10 rounded-lg bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
                                     <i class="fas fa-image text-gray-400"></i>
@@ -168,8 +168,8 @@
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
-                                {% if investment.item.main_image %}
-                                <img class="h-10 w-10 rounded-lg object-cover" src="{{ investment.item.main_image.url }}" alt="{{ investment.item.name }}">
+                                {% if investment.item.main_image_url %}
+                                <img class="h-10 w-10 rounded-lg object-cover" src="{{ investment.item.main_image_url }}" alt="{{ investment.item.name }}">
                                 {% else %}
                                 <div class="h-10 w-10 rounded-lg bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
                                     <i class="fas fa-image text-gray-400"></i>

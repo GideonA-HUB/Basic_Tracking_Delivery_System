@@ -149,8 +149,8 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
-                                {% if transaction.item.main_image %}
-                                <img class="h-8 w-8 rounded object-cover" src="{{ transaction.item.main_image.url }}" alt="{{ transaction.item.name }}">
+                                                {% if transaction.item.main_image_url %}
+                <img class="h-8 w-8 rounded object-cover" src="{{ transaction.item.main_image_url }}" alt="{{ transaction.item.name }}">
                                 {% else %}
                                 <div class="h-8 w-8 rounded bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
                                     <i class="fas fa-image text-gray-400 text-xs"></i>
