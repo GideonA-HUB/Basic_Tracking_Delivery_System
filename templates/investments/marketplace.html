@@ -100,17 +100,17 @@
                     
                     <div class="flex space-x-2">
                         {% if item.is_available_for_investment %}
-                        <button onclick="investInItem({{ item.id }}, 'hold')" 
-                                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                        <a href="{% url 'investments:invest-in-item' item.id 'hold' %}" 
+                           class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors text-center">
                             Invest
-                        </button>
+                        </a>
                         {% endif %}
                         
                         {% if item.is_available_for_delivery %}
-                        <button onclick="investInItem({{ item.id }}, 'delivery')" 
-                                class="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                        <a href="{% url 'investments:invest-in-item' item.id 'delivery' %}" 
+                           class="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors text-center">
                             Buy & Deliver
-                        </button>
+                        </a>
                         {% endif %}
                         
                         <a href="{% url 'investments:investment-item-detail' item.id %}" 
@@ -366,7 +366,8 @@
     
     function investInItem(itemId, investmentType) {
         if (!isAuthenticated()) {
-            window.location.href = '/accounts/login/?next=' + encodeURIComponent(window.location.pathname);
+            // Redirect to customer login, not staff login
+            window.location.href = '/accounts/customer/login/?next=' + encodeURIComponent(window.location.pathname);
             return;
         }
         

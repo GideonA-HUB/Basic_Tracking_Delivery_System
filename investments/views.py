@@ -730,3 +730,134 @@ class InvestmentSummaryView(View):
             return JsonResponse({
                 'error': 'Failed to get investment summary'
             }, status=500)
+
+
+# Add this new view after the existing views
+@login_required
+def invest_in_item(request, item_id, investment_type):
+    """Handle investment in a specific item"""
+    try:
+        item = get_object_or_404(InvestmentItem, id=item_id, is_active=True)
+        
+        if request.method == 'POST':
+            amount = request.POST.get('amount')
+            quantity = request.POST.get('quantity')
+            
+            if not amount or not quantity:
+                messages.error(request, 'Please provide investment amount and quantity.')
+                return redirect('investments:investment-item-detail', item_id=item_id)
+            
+            try:
+                amount = Decimal(amount)
+                quantity = Decimal(quantity)
+            except (ValueError, TypeError):
+                messages.error(request, 'Invalid amount or quantity.')
+                return redirect('investments:investment-item-detail', item_id=item_id)
+            
+            # Validate minimum investment
+            if amount < item.minimum_investment:
+                messages.error(request, f'Minimum investment amount is ${item.minimum_investment}.')
+                return redirect('investments:investment-item-detail', item_id=item_id)
+            
+            # Create investment transaction
+            transaction = InvestmentTransaction.objects.create(
+                user=request.user,
+                item=item,
+                transaction_type='purchase',
+                amount_usd=amount,
+                quantity=quantity,
+                price_per_unit=item.current_price_usd,
+                payment_method='nowpayments',
+                payment_status='pending',
+                description=f"{investment_type.title()} of {item.name}",
+            )
+            
+            # Create NOWPayments payment
+            payment_response = nowpayments_service.create_payment(transaction)
+            
+            if payment_response and payment_response.get('payment_id'):
+                # Update transaction with payment ID
+                transaction.nowpayments_payment_id = payment_response['payment_id']
+                transaction.save()
+                
+                # Redirect to payment page
+                payment_url = nowpayments_service.get_payment_url(payment_response['payment_id'])
+                return redirect(payment_url)
+            else:
+                messages.error(request, 'Failed to create payment. Please try again.')
+                transaction.delete()
+                return redirect('investments:investment-item-detail', item_id=item_id)
+        
+        # GET request - show investment form
+        context = {
+            'item': item,
+            'investment_type': investment_type,
+            'type_display': 'Investment' if investment_type == 'hold' else 'Buy & Deliver'
+        }
+        
+        return render(request, 'investments/invest_in_item.html', context)
+        
+    except Exception as e:
+        logger.error(f"Error in invest_in_item: {e}")
+        messages.error(request, 'An error occurred. Please try again.')
+        return redirect('investments:investment-marketplace')
+
+
+@login_required
+def investment_success(request, transaction_id):
+    """Handle successful investment completion"""
+    try:
+        transaction = get_object_or_404(InvestmentTransaction, id=transaction_id, user=request.user)
+        
+        # Create user investment if payment is completed
+        if transaction.payment_status == 'completed':
+            investment = UserInvestment.objects.create(
+                user=request.user,
+                item=transaction.item,
+                investment_amount_usd=transaction.amount_usd,
+                quantity=transaction.quantity,
+                purchase_price_per_unit=transaction.price_per_unit,
+                investment_type=transaction.description.split()[0].lower(),  # Extract type from description
+                status='active'
+            )
+            
+            # Update current value
+            investment.current_value_usd = investment.quantity * investment.item.current_price_usd
+            investment.total_return_usd = investment.current_value_usd - investment.investment_amount_usd
+            if investment.investment_amount_usd > 0:
+                investment.total_return_percentage = (investment.total_return_usd / investment.investment_amount_usd) * 100
+            investment.save()
+            
+            # Update portfolio
+            portfolio, created = InvestmentPortfolio.objects.get_or_create(user=request.user)
+            portfolio.update_portfolio_summary()
+            
+            messages.success(request, f'Investment in {transaction.item.name} completed successfully!')
+            return redirect('investments:user-portfolio')
+        else:
+            messages.warning(request, 'Payment is still processing. Please wait for confirmation.')
+            return redirect('investments:user-portfolio')
+            
+    except Exception as e:
+        logger.error(f"Error in investment_success: {e}")
+        messages.error(request, 'An error occurred. Please contact support.')
+        return redirect('investments:investment-marketplace')
+
+
+@login_required
+def investment_cancel(request, transaction_id):
+    """Handle cancelled investment"""
+    try:
+        transaction = get_object_or_404(InvestmentTransaction, id=transaction_id, user=request.user)
+        
+        if transaction.payment_status == 'pending':
+            transaction.payment_status = 'cancelled'
+            transaction.save()
+            messages.info(request, 'Investment was cancelled.')
+        
+        return redirect('investments:investment-marketplace')
+        
+    except Exception as e:
+        logger.error(f"Error in investment_cancel: {e}")
+        messages.error(request, 'An error occurred.')
+        return redirect('investments:investment-marketplace')

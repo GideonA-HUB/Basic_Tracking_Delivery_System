@@ -1,295 +1,296 @@
 import requests
-import asyncio
-import aiohttp
+import json
+import logging
 from decimal import Decimal
 from django.utils import timezone
-from .models import RealTimePriceFeed, RealTimePriceHistory
+from datetime import datetime, timedelta
+import random
+from .models import RealTimePriceFeed, InvestmentItem, PriceHistory
 
+logger = logging.getLogger(__name__)
 
-class PriceFeedService:
-    """Service for fetching and updating real-time price feeds"""
+class RealTimePriceService:
+    """Service for fetching real-time prices from external APIs"""
     
-    # API endpoints for different asset types
-    API_ENDPOINTS = {
-        'gold': {
-            'url': 'https://api.metals.live/v1/spot/gold',
-            'parser': 'metals_live'
-        },
-        'silver': {
-            'url': 'https://api.metals.live/v1/spot/silver',
-            'parser': 'metals_live'
-        },
-        'crypto': {
-            'url': 'https://api.coingecko.com/api/v3/simple/price',
-            'parser': 'coingecko'
-        },
-        'real_estate': {
-            'url': 'https://api.example.com/real-estate',  # Placeholder
-            'parser': 'custom'
-        }
-    }
+    def __init__(self):
+        self.session = requests.Session()
+        self.session.headers.update({
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        })
     
-    @classmethod
-    async def update_all_price_feeds(cls):
-        """Update all active price feeds asynchronously"""
-        active_feeds = RealTimePriceFeed.objects.filter(is_active=True)
-        
-        async with aiohttp.ClientSession() as session:
-            tasks = []
-            for feed in active_feeds:
-                task = cls.update_price_feed(session, feed)
-                tasks.append(task)
-            
-            # Execute all updates concurrently
-            results = await asyncio.gather(*tasks, return_exceptions=True)
-            
-            # Process results and log any errors
-            for i, result in enumerate(results):
-                if isinstance(result, Exception):
-                    print(f"Error updating price feed {active_feeds[i].name}: {result}")
-        
-        return True
-    
-    @classmethod
-    async def update_price_feed(cls, session, price_feed):
-        """Update a specific price feed"""
+    def fetch_crypto_prices(self):
+        """Fetch cryptocurrency prices from CoinGecko API"""
         try:
-            if price_feed.asset_type in ['gold', 'silver']:
-                await cls.update_metal_prices(session, price_feed)
-            elif price_feed.asset_type == 'crypto':
-                await cls.update_crypto_prices(session, price_feed)
-            elif price_feed.asset_type == 'real_estate':
-                await cls.update_real_estate_prices(session, price_feed)
-            else:
-                await cls.update_custom_prices(session, price_feed)
-                
-        except Exception as e:
-            print(f"Error updating {price_feed.name}: {e}")
-            raise
-    
-    @classmethod
-    async def update_metal_prices(cls, session, price_feed):
-        """Update precious metal prices"""
-        try:
-            # Use metals.live API for precious metals
-            url = "https://api.metals.live/v1/spot"
-            params = {'metals': price_feed.symbol.lower() if price_feed.symbol else price_feed.asset_type}
-            
-            async with session.get(url, params=params) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    
-                    if data and len(data) > 0:
-                        metal_data = data[0]
-                        new_price = Decimal(str(metal_data.get('price', 0)))
-                        
-                        # Calculate price changes
-                        old_price = price_feed.current_price
-                        price_change = new_price - old_price
-                        price_change_percentage = (price_change / old_price * 100) if old_price > 0 else 0
-                        
-                        # Update the price feed
-                        price_feed.update_price(
-                            new_price=new_price,
-                            price_change_24h=price_change,
-                            price_change_percentage_24h=price_change_percentage
-                        )
-                        
-                        print(f"Updated {price_feed.name}: ${new_price} ({price_change_percentage:+.2f}%)")
-                        
-        except Exception as e:
-            print(f"Error updating metal prices for {price_feed.name}: {e}")
-            raise
-    
-    @classmethod
-    async def update_crypto_prices(cls, session, price_feed):
-        """Update cryptocurrency prices"""
-        try:
-            # Use CoinGecko API for crypto prices
-            symbol = price_feed.symbol.lower() if price_feed.symbol else 'bitcoin'
-            url = f"https://api.coingecko.com/api/v3/simple/price"
+            # CoinGecko API for crypto prices
+            url = "https://api.coingecko.com/api/v3/simple/price"
             params = {
-                'ids': symbol,
+                'ids': 'bitcoin,ethereum,cardano',
                 'vs_currencies': 'usd',
-                'include_24hr_change': 'true',
-                'include_7d_change': 'true'
+                'include_24hr_change': 'true'
             }
             
-            async with session.get(url, params=params) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    
-                    if symbol in data:
-                        crypto_data = data[symbol]
-                        new_price = Decimal(str(crypto_data.get('usd', 0)))
-                        price_change_24h = Decimal(str(crypto_data.get('usd_24h_change', 0)))
+            response = self.session.get(url, params=params, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            
+            prices = {}
+            for coin_id, price_data in data.items():
+                if coin_id == 'bitcoin':
+                    symbol = 'BTC'
+                elif coin_id == 'ethereum':
+                    symbol = 'ETH'
+                elif coin_id == 'cardano':
+                    symbol = 'ADA'
+                else:
+                    continue
+                
+                prices[symbol] = {
+                    'price': Decimal(str(price_data['usd'])),
+                    'change_24h': Decimal(str(price_data.get('usd_24h_change', 0)))
+                }
+            
+            return prices
+            
+        except Exception as e:
+            logger.error(f"Error fetching crypto prices: {e}")
+            return {}
+    
+    def fetch_gold_silver_prices(self):
+        """Fetch gold and silver prices from Metals API"""
+        try:
+            # Metals API for precious metals
+            url = "https://api.metals.live/v1/spot"
+            response = self.session.get(url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            
+            prices = {}
+            for metal in data:
+                if metal['commodity'] == 'XAU' and metal['currency'] == 'USD':
+                    prices['XAU'] = {
+                        'price': Decimal(str(metal['price'])),
+                        'change_24h': Decimal(str(metal.get('change', 0)))
+                    }
+                elif metal['commodity'] == 'XAG' and metal['currency'] == 'USD':
+                    prices['XAG'] = {
+                        'price': Decimal(str(metal['price'])),
+                        'change_24h': Decimal(str(metal.get('change', 0)))
+                    }
+                elif metal['commodity'] == 'XPT' and metal['currency'] == 'USD':
+                    prices['XPT'] = {
+                        'price': Decimal(str(metal['price'])),
+                        'change_24h': Decimal(str(metal.get('change', 0)))
+                    }
+            
+            return prices
+            
+        except Exception as e:
+            logger.error(f"Error fetching metals prices: {e}")
+            return {}
+    
+    def fetch_real_estate_indices(self):
+        """Fetch real estate indices (simulated for now)"""
+        try:
+            # Simulate real estate price movements
+            base_prices = {
+                'REIT_INDEX': 1500.00,
+                'PROPERTY_FUND': 2500.00
+            }
+            
+            prices = {}
+            for index, base_price in base_prices.items():
+                # Simulate small daily changes
+                change_percent = random.uniform(-2.0, 2.0)
+                change_amount = base_price * (change_percent / 100)
+                new_price = base_price + change_amount
+                
+                prices[index] = {
+                    'price': Decimal(str(new_price)),
+                    'change_24h': Decimal(str(change_amount))
+                }
+            
+            return prices
+            
+        except Exception as e:
+            logger.error(f"Error fetching real estate indices: {e}")
+            return {}
+    
+    def update_all_prices(self):
+        """Update all price feeds with real-time data"""
+        try:
+            # Fetch prices from all sources
+            crypto_prices = self.fetch_crypto_prices()
+            metals_prices = self.fetch_gold_silver_prices()
+            real_estate_prices = self.fetch_real_estate_indices()
+            
+            # Combine all prices
+            all_prices = {**crypto_prices, **metals_prices, **real_estate_prices}
+            
+            # Update price feeds
+            updated_count = 0
+            for symbol, price_data in all_prices.items():
+                try:
+                    feed = RealTimePriceFeed.objects.filter(symbol=symbol).first()
+                    if feed:
+                        old_price = feed.current_price
+                        new_price = price_data['price']
+                        change_amount = price_data['change_24h']
+                        change_percentage = (change_amount / old_price * 100) if old_price > 0 else 0
                         
-                        # Update the price feed
-                        price_feed.update_price(
-                            new_price=new_price,
-                            price_change_24h=price_change_24h,
-                            price_change_percentage_24h=price_change_24h
+                        # Update the feed
+                        feed.update_price(new_price, change_amount, change_percentage)
+                        
+                        # Create price history record
+                        PriceHistory.objects.create(
+                            real_time_price_feed=feed,
+                            price=new_price,
+                            change_amount=change_amount,
+                            change_percentage=change_percentage,
+                            timestamp=timezone.now()
                         )
                         
-                        print(f"Updated {price_feed.name}: ${new_price} ({price_change_24h:+.2f}%)")
+                        updated_count += 1
+                        logger.info(f"Updated {symbol}: ${new_price} ({change_percentage:+.2f}%)")
                         
+                except Exception as e:
+                    logger.error(f"Error updating {symbol}: {e}")
+            
+            # Update investment item prices based on price feeds
+            self.update_investment_item_prices()
+            
+            logger.info(f"Updated {updated_count} price feeds")
+            return updated_count
+            
         except Exception as e:
-            print(f"Error updating crypto prices for {price_feed.name}: {e}")
-            raise
+            logger.error(f"Error updating all prices: {e}")
+            return 0
     
-    @classmethod
-    async def update_real_estate_prices(cls, session, price_feed):
-        """Update real estate prices (placeholder implementation)"""
+    def update_investment_item_prices(self):
+        """Update investment item prices based on price feeds"""
         try:
-            # This would integrate with real estate APIs
-            # For now, we'll use a simulated update
-            current_price = price_feed.current_price
-            # Simulate small random price movement
-            import random
-            change_percentage = Decimal(str(random.uniform(-2.0, 2.0)))
-            new_price = current_price * (1 + change_percentage / 100)
-            price_change = new_price - current_price
-            
-            price_feed.update_price(
-                new_price=new_price,
-                price_change_24h=price_change,
-                price_change_percentage_24h=change_percentage
-            )
-            
-            print(f"Updated {price_feed.name}: ${new_price} ({change_percentage:+.2f}%)")
-            
-        except Exception as e:
-            print(f"Error updating real estate prices for {price_feed.name}: {e}")
-            raise
-    
-    @classmethod
-    async def update_custom_prices(cls, session, price_feed):
-        """Update custom asset prices"""
-        try:
-            # For custom assets, we might have specific APIs
-            # This is a placeholder for future implementations
-            print(f"Custom price update not implemented for {price_feed.name}")
-            
-        except Exception as e:
-            print(f"Error updating custom prices for {price_feed.name}: {e}")
-            raise
-    
-    @classmethod
-    def create_sample_price_feeds(cls):
-        """Create sample price feeds for testing"""
-        sample_feeds = [
-            {
-                'name': 'Gold (XAU)',
-                'asset_type': 'gold',
-                'symbol': 'XAU',
-                'current_price': Decimal('1950.00'),
-                'base_currency': 'USD'
-            },
-            {
-                'name': 'Silver (XAG)',
-                'asset_type': 'silver',
-                'symbol': 'XAG',
-                'current_price': Decimal('24.50'),
-                'base_currency': 'USD'
-            },
-            {
-                'name': 'Bitcoin (BTC)',
-                'asset_type': 'crypto',
-                'symbol': 'BTC',
-                'current_price': Decimal('45000.00'),
-                'base_currency': 'USD'
-            },
-            {
-                'name': 'Ethereum (ETH)',
-                'asset_type': 'crypto',
-                'symbol': 'ETH',
-                'current_price': Decimal('2800.00'),
-                'base_currency': 'USD'
-            },
-            {
-                'name': 'Platinum (XPT)',
-                'asset_type': 'platinum',
-                'symbol': 'XPT',
-                'current_price': Decimal('950.00'),
-                'base_currency': 'USD'
-            },
-            {
-                'name': 'Palladium (XPD)',
-                'asset_type': 'palladium',
-                'symbol': 'XPD',
-                'current_price': Decimal('1200.00'),
-                'base_currency': 'USD'
+            # Map investment items to price feeds
+            item_feed_mapping = {
+                'Bitcoin (BTC)': 'BTC',
+                'Ethereum (ETH)': 'ETH',
+                'Cardano (ADA)': 'ADA',
+                'Gold Bullion (1 oz)': 'XAU',
+                'Silver Bullion (1 oz)': 'XAG',
+                'Platinum Bullion (1 oz)': 'XPT',
             }
-        ]
-        
-        created_feeds = []
-        for feed_data in sample_feeds:
-            feed, created = RealTimePriceFeed.objects.get_or_create(
-                name=feed_data['name'],
-                defaults=feed_data
-            )
-            if created:
-                created_feeds.append(feed)
-                print(f"Created price feed: {feed.name}")
-        
-        return created_feeds
-
-
-class CurrencyConversionService:
-    """Service for currency conversion"""
-    
-    @classmethod
-    async def update_exchange_rates(cls):
-        """Update currency exchange rates"""
-        try:
-            # Use a free currency API
-            url = "https://api.exchangerate-api.com/v4/latest/USD"
             
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url) as response:
-                    if response.status == 200:
-                        data = await response.json()
+            for item_name, feed_symbol in item_feed_mapping.items():
+                try:
+                    item = InvestmentItem.objects.filter(name=item_name).first()
+                    feed = RealTimePriceFeed.objects.filter(symbol=feed_symbol).first()
+                    
+                    if item and feed:
+                        old_price = item.current_price_usd
+                        new_price = feed.current_price
                         
-                        # Update exchange rates in database
-                        from .models import CurrencyConversion
-                        
-                        base_currency = 'USD'
-                        rates = data.get('rates', {})
-                        
-                        for currency, rate in rates.items():
-                            if currency != base_currency:
-                                conversion, created = CurrencyConversion.objects.get_or_create(
-                                    from_currency=base_currency,
-                                    to_currency=currency,
-                                    defaults={'exchange_rate': Decimal(str(rate))}
-                                )
-                                
-                                if not created:
-                                    conversion.exchange_rate = Decimal(str(rate))
-                                    conversion.save()
-                        
-                        print(f"Updated {len(rates)} exchange rates")
-                        return True
-                        
+                        if old_price != new_price:
+                            # Calculate price change
+                            price_change = new_price - old_price
+                            price_change_percentage = (price_change / old_price * 100) if old_price > 0 else 0
+                            
+                            # Update item price
+                            item.current_price_usd = new_price
+                            item.price_change_24h = price_change
+                            item.price_change_percentage_24h = price_change_percentage
+                            item.last_price_update = timezone.now()
+                            item.save()
+                            
+                            logger.info(f"Updated {item_name}: ${new_price} ({price_change_percentage:+.2f}%)")
+                            
+                except Exception as e:
+                    logger.error(f"Error updating {item_name}: {e}")
+                    
         except Exception as e:
-            print(f"Error updating exchange rates: {e}")
-            return False
+            logger.error(f"Error updating investment item prices: {e}")
     
-    @classmethod
-    def convert_currency(cls, amount, from_currency, to_currency):
-        """Convert amount between currencies"""
-        from .models import CurrencyConversion
-        
-        if from_currency == to_currency:
-            return amount
-        
+    def get_price_chart_data(self, item, days=30):
+        """Get price chart data for an item"""
         try:
-            conversion = CurrencyConversion.get_conversion_rate(from_currency, to_currency)
-            if conversion:
-                return amount * conversion
+            end_date = timezone.now()
+            start_date = end_date - timedelta(days=days)
+            
+            # Get price history for the item's price feed
+            if hasattr(item, 'price_feed') and item.price_feed:
+                history = PriceHistory.objects.filter(
+                    real_time_price_feed=item.price_feed,
+                    timestamp__range=(start_date, end_date)
+                ).order_by('timestamp')
             else:
-                print(f"No conversion rate found for {from_currency} to {to_currency}")
-                return amount
+                # Generate simulated data
+                history = self.generate_simulated_price_history(item, start_date, end_date)
+            
+            chart_data = {
+                'labels': [],
+                'prices': [],
+                'changes': []
+            }
+            
+            for record in history:
+                chart_data['labels'].append(record.timestamp.strftime('%Y-%m-%d'))
+                chart_data['prices'].append(float(record.price))
+                chart_data['changes'].append(float(record.change_percentage))
+            
+            return chart_data
+            
         except Exception as e:
-            print(f"Error converting currency: {e}")
-            return amount 
+            logger.error(f"Error getting chart data: {e}")
+            return {'labels': [], 'prices': [], 'changes': []}
+    
+    def generate_simulated_price_history(self, item, start_date, end_date):
+        """Generate simulated price history for items without price feeds"""
+        history = []
+        base_price = float(item.current_price_usd)
+        current_date = start_date
+        
+        while current_date <= end_date:
+            # Simulate price movement
+            change_percent = random.uniform(-5.0, 5.0)
+            change_amount = base_price * (change_percent / 100)
+            price = base_price + change_amount
+            
+            history.append({
+                'timestamp': current_date,
+                'price': Decimal(str(price)),
+                'change_percentage': Decimal(str(change_percent))
+            })
+            
+            base_price = price
+            current_date += timedelta(days=1)
+        
+        return history
+
+
+# Global instance
+price_service = RealTimePriceService()
+
+
+def update_real_time_prices():
+    """Function to update real-time prices (can be called by Celery)"""
+    return price_service.update_all_prices()
+
+
+def get_live_price_updates():
+    """Get live price updates for WebSocket broadcasting"""
+    try:
+        feeds = RealTimePriceFeed.objects.filter(is_active=True)
+        updates = []
+        
+        for feed in feeds:
+            updates.append({
+                'symbol': feed.symbol,
+                'name': feed.name,
+                'price': float(feed.current_price),
+                'change_24h': float(feed.price_change_24h),
+                'change_percentage': float(feed.price_change_percentage_24h),
+                'last_updated': feed.last_updated.isoformat() if feed.last_updated else None
+            })
+        
+        return updates
+        
+    except Exception as e:
+        logger.error(f"Error getting live price updates: {e}")
+        return [] 

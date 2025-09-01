@@ -27,6 +27,11 @@ urlpatterns = [
     path('add-funds/', views.add_funds, name='add-funds'),
     path('payment-status/<int:transaction_id>/', views.payment_status, name='payment-status'),
     
+    # Investment flow
+    path('invest/<int:item_id>/<str:investment_type>/', views.invest_in_item, name='invest-in-item'),
+    path('investment/success/<int:transaction_id>/', views.investment_success, name='investment-success'),
+    path('investment/cancel/<int:transaction_id>/', views.investment_cancel, name='investment-cancel'),
+    
     # Test view
     path('test/', views.investment_test, name='investment-test'),
     
