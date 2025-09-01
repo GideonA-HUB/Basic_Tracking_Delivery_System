@@ -64,7 +64,7 @@ class StaffProfile(models.Model):
 def create_customer_profile(sender, instance, created, **kwargs):
     """Create customer profile when user is created (if not staff)"""
     if created and not instance.is_staff:
-        CustomerProfile.objects.create(user=instance)
+        CustomerProfile.objects.get_or_create(user=instance)
 
 
 @receiver(post_save, sender=User)
@@ -78,7 +78,7 @@ def save_customer_profile(sender, instance, **kwargs):
 def create_staff_profile(sender, instance, created, **kwargs):
     """Create staff profile when user is created"""
     if created and instance.is_staff:
-        StaffProfile.objects.create(user=instance)
+        StaffProfile.objects.get_or_create(user=instance)
 
 
 @receiver(post_save, sender=User)

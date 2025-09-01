@@ -28,10 +28,17 @@ def customer_register(request):
     if request.method == 'POST':
         form = CustomerRegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)
-            messages.success(request, f'Welcome to Meridian Asset Logistics, {user.get_full_name()}! Your account has been created successfully.')
-            return redirect('frontend:landing_page')
+            try:
+                user = form.save()
+                login(request, user)
+                messages.success(request, f'Welcome to Meridian Asset Logistics, {user.get_full_name()}! Your account has been created successfully.')
+                return redirect('frontend:landing_page')
+            except Exception as e:
+                # Log the error for debugging
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"Error creating customer account: {str(e)}")
+                messages.error(request, 'An error occurred while creating your account. Please try again or contact support.')
         else:
             messages.error(request, 'Please correct the errors below.')
     else:

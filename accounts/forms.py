@@ -37,17 +37,30 @@ class CustomerRegistrationForm(UserCreationForm):
         
         if commit:
             user.save()
-            # Create customer profile
-            CustomerProfile.objects.create(
+            # Get or create customer profile to avoid duplicate key errors
+            customer_profile, created = CustomerProfile.objects.get_or_create(
                 user=user,
-                phone_number=self.cleaned_data['phone_number'],
-                address=self.cleaned_data['address'],
-                city=self.cleaned_data['city'],
-                state=self.cleaned_data['state'],
-                country=self.cleaned_data['country'],
-                postal_code=self.cleaned_data['postal_code'],
-                date_of_birth=self.cleaned_data['date_of_birth']
+                defaults={
+                    'phone_number': self.cleaned_data['phone_number'],
+                    'address': self.cleaned_data['address'],
+                    'city': self.cleaned_data['city'],
+                    'state': self.cleaned_data['state'],
+                    'country': self.cleaned_data['country'],
+                    'postal_code': self.cleaned_data['postal_code'],
+                    'date_of_birth': self.cleaned_data['date_of_birth']
+                }
             )
+            
+            # If profile already existed, update it with form data
+            if not created:
+                customer_profile.phone_number = self.cleaned_data['phone_number']
+                customer_profile.address = self.cleaned_data['address']
+                customer_profile.city = self.cleaned_data['city']
+                customer_profile.state = self.cleaned_data['state']
+                customer_profile.country = self.cleaned_data['country']
+                customer_profile.postal_code = self.cleaned_data['postal_code']
+                customer_profile.date_of_birth = self.cleaned_data['date_of_birth']
+                customer_profile.save()
         
         return user
 
@@ -113,13 +126,22 @@ class StaffRegistrationForm(UserCreationForm):
         
         if commit:
             user.save()
-            # Create staff profile
-            StaffProfile.objects.create(
+            # Get or create staff profile to avoid duplicate key errors
+            staff_profile, created = StaffProfile.objects.get_or_create(
                 user=user,
-                role=self.cleaned_data['role'],
-                phone_number=self.cleaned_data['phone_number'],
-                department=self.cleaned_data['department']
+                defaults={
+                    'role': self.cleaned_data['role'],
+                    'phone_number': self.cleaned_data['phone_number'],
+                    'department': self.cleaned_data['department']
+                }
             )
+            
+            # If profile already existed, update it with form data
+            if not created:
+                staff_profile.role = self.cleaned_data['role']
+                staff_profile.phone_number = self.cleaned_data['phone_number']
+                staff_profile.department = self.cleaned_data['department']
+                staff_profile.save()
         
         return user
 
