@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
+    'channels',  # Add channels for WebSocket support
     'tracking',
     'accounts',
     'investments',
@@ -68,6 +69,16 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'delivery_tracker.wsgi.application'
+
+# Django Channels Configuration for WebSocket support
+ASGI_APPLICATION = 'delivery_tracker.asgi.application'
+
+# Channel Layers for WebSocket support (using Redis or in-memory fallback)
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',  # Use in-memory for Railway (no Redis)
+    },
+}
 
 # Database
 # Railway provides DATABASE_URL environment variable
