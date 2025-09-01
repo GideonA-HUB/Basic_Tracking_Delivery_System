@@ -176,7 +176,75 @@
     <div>
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">All Investments</h2>
         <div id="items-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Items will be loaded here dynamically -->
+            {% if items %}
+                {% for item in items %}
+                <div class="investment-card bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
+                    {% if item.main_image_url %}
+                        <img src="{{ item.main_image_url }}" alt="{{ item.name }}" class="w-full h-48 object-cover">
+                    {% else %}
+                        <div class="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                            <i class="fas fa-image text-gray-400 text-4xl"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm text-gray-500 dark:text-gray-400">{{ item.category.name }}</span>
+                            <span class="investment-type-badge investment-type-{{ item.investment_type|default:'both' }}">
+                                {{ item.get_investment_type_display }}
+                            </span>
+                        </div>
+                        
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{{ item.name }}</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">{{ item.short_description|default:item.description|truncatewords:15 }}</p>
+                        
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <div class="text-2xl font-bold text-gray-900 dark:text-white">
+                                    ${{ item.current_price_usd }}
+                                </div>
+                                <div class="text-sm {{ item.price_change_24h|get_price_change_class }}">
+                                    {{ item.price_change_24h|get_price_change_display }}
+                                    ({{ item.price_change_percentage_24h|get_percentage_change_display }})
+                                </div>
+                            </div>
+                            
+                            {% if item.weight %}
+                            <div class="text-right text-sm text-gray-500 dark:text-gray-400">
+                                <div>{{ item.weight }} oz</div>
+                                {% if item.purity %}<div>{{ item.purity }}</div>{% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="flex space-x-2">
+                            {% if item.is_available_for_investment %}
+                            <a href="{% url 'investments:invest-in-item' item.id 'hold' %}" 
+                               class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors text-center">
+                                Invest
+                            </a>
+                            {% endif %}
+                            
+                            {% if item.is_available_for_delivery %}
+                            <a href="{% url 'investments:invest-in-item' item.id 'delivery' %}" 
+                               class="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors text-center">
+                                Buy & Deliver
+                            </a>
+                            {% endif %}
+                            
+                            <a href="{% url 'investments:investment-item-detail' item.id %}" 
+                               class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-span-full text-center py-8">
+                    <p class="text-gray-500 dark:text-gray-400">No investments found matching your criteria.</p>
+                </div>
+            {% endif %}
         </div>
         
         <div id="loading" class="text-center py-8 hidden">
