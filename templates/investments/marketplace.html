@@ -522,5 +522,126 @@
             timeout = setTimeout(later, wait);
         };
     }
+    
+    // Filter and search functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('search-input');
+        const categoryFilter = document.getElementById('category-filter');
+        const sortFilter = document.getElementById('sort-filter');
+        const itemsContainer = document.getElementById('items-container');
+        const loadingDiv = document.getElementById('loading');
+        const noItemsDiv = document.getElementById('no-items');
+        
+        // Load initial items
+        loadItems();
+        
+        // Add event listeners for filtering
+        searchInput.addEventListener('input', debounce(loadItems, 300));
+        categoryFilter.addEventListener('change', loadItems);
+        sortFilter.addEventListener('change', loadItems);
+        
+        function loadItems() {
+            const search = searchInput.value;
+            const category = categoryFilter.value;
+            const sort = sortFilter.value;
+            
+            // Show loading
+            loadingDiv.classList.remove('hidden');
+            noItemsDiv.classList.add('hidden');
+            itemsContainer.innerHTML = '';
+            
+            // Build query parameters
+            const params = new URLSearchParams();
+            if (search) params.append('search', search);
+            if (category) params.append('category', category);
+            if (sort) params.append('sort', sort);
+            
+            // Fetch items from API
+            fetch(`/investments/api/items/?${params.toString()}`)
+                .then(response => response.json())
+                .then(data => {
+                    loadingDiv.classList.add('hidden');
+                    
+                    if (data.results && data.results.length > 0) {
+                        displayItems(data.results);
+                    } else {
+                        noItemsDiv.classList.remove('hidden');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading items:', error);
+                    loadingDiv.classList.add('hidden');
+                    noItemsDiv.classList.remove('hidden');
+                });
+        }
+        
+        function displayItems(items) {
+            itemsContainer.innerHTML = '';
+            
+            items.forEach(item => {
+                const itemCard = createItemCard(item);
+                itemsContainer.appendChild(itemCard);
+            });
+        }
+        
+        function createItemCard(item) {
+            const card = document.createElement('div');
+            card.className = 'investment-card bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden';
+            
+            const priceChangeClass = item.price_change_24h > 0 ? 'text-green-600 dark:text-green-400' : 
+                                   item.price_change_24h < 0 ? 'text-red-600 dark:text-red-400' : 
+                                   'text-gray-600 dark:text-gray-400';
+            
+            card.innerHTML = `
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm text-gray-500 dark:text-gray-400">${item.category_name}</span>
+                        <span class="investment-type-badge investment-type-${item.investment_type}">
+                            ${item.investment_type === 'investment_only' ? 'Investment Only' : 
+                              item.investment_type === 'delivery_only' ? 'Delivery Only' : 'Investment & Delivery'}
+                        </span>
+                    </div>
+                    
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">${item.name}</h3>
+                    <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">${item.short_description || item.description}</p>
+                    
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <div class="text-2xl font-bold text-gray-900 dark:text-white">
+                                $${item.current_price_usd}
+                            </div>
+                            <div class="text-sm ${priceChangeClass}">
+                                ${item.price_change_24h > 0 ? '+' : ''}$${item.price_change_24h}
+                                (${item.price_change_percentage_24h > 0 ? '+' : ''}${item.price_change_percentage_24h}%)
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-2">
+                        ${item.is_available_for_investment ? `
+                            <button onclick="investInItem(${item.id}, 'hold')" 
+                                    class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                Invest
+                            </button>
+                        ` : ''}
+                        
+                        ${item.is_available_for_delivery ? `
+                            <button onclick="investInItem(${item.id}, 'delivery')" 
+                                    class="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                Buy & Deliver
+                            </button>
+                        ` : ''}
+                        
+                        <a href="/investments/item/${item.id}/" 
+                           class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                            Details
+                        </a>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+    });
 </script>
 {% endblock %}

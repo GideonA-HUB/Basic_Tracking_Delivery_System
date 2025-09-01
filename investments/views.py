@@ -16,6 +16,8 @@ from decimal import Decimal
 import json
 import logging
 from django.contrib import messages
+from django.forms import Form
+from django import forms
 
 from .models import (
     InvestmentCategory, InvestmentItem, PriceHistory, 
@@ -285,24 +287,145 @@ def investment_test(request):
         })
 
 
+# Add this new view function after the existing views
+class AddFundsForm(Form):
+    """Form for adding funds to investment account"""
+    amount = forms.DecimalField(
+        min_value=Decimal('10.00'),
+        max_value=Decimal('100000.00'),
+        decimal_places=2,
+        widget=forms.NumberInput(attrs={
+            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'placeholder': 'Enter amount (min $10)'
+        })
+    )
+    payment_method = forms.ChoiceField(
+        choices=[
+            ('crypto', 'Cryptocurrency (Bitcoin, Ethereum, etc.)'),
+            ('bank_transfer', 'Bank Transfer'),
+            ('card', 'Credit/Debit Card'),
+        ],
+        widget=forms.Select(attrs={
+            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+        })
+    )
+
+
+@login_required
+def add_funds(request):
+    """Add funds to user's investment account"""
+    if request.method == 'POST':
+        form = AddFundsForm(request.POST)
+        if form.is_valid():
+            try:
+                amount = form.cleaned_data['amount']
+                payment_method = form.cleaned_data['payment_method']
+                
+                # Create a transaction for adding funds
+                transaction = InvestmentTransaction.objects.create(
+                    user=request.user,
+                    transaction_type='purchase',
+                    amount_usd=amount,
+                    price_per_unit=amount,
+                    payment_method=payment_method,
+                    payment_status='pending',
+                    description=f"Add funds to investment account - {payment_method}",
+                )
+                
+                # If using NOWPayments (crypto), create payment
+                if payment_method == 'crypto':
+                    payment_response = nowpayments_service.create_payment(transaction)
+                    if payment_response:
+                        messages.success(request, f'Payment initiated for ${amount}. Please complete the payment.')
+                        return redirect('investments:payment-status', transaction_id=transaction.id)
+                    else:
+                        messages.error(request, 'Failed to create payment. Please try again.')
+                        transaction.delete()
+                else:
+                    # For other payment methods, mark as processing
+                    transaction.payment_status = 'processing'
+                    transaction.save()
+                    messages.success(request, f'Fund request submitted for ${amount}. We will process your payment.')
+                    return redirect('investments:user-portfolio')
+                    
+            except Exception as e:
+                logger.error(f"Error adding funds: {e}")
+                messages.error(request, 'An error occurred. Please try again.')
+    else:
+        form = AddFundsForm()
+    
+    return render(request, 'investments/add_funds.html', {'form': form})
+
+
+@login_required
+def payment_status(request, transaction_id):
+    """Check payment status for a transaction"""
+    try:
+        transaction = get_object_or_404(InvestmentTransaction, id=transaction_id, user=request.user)
+        
+        if transaction.nowpayments_payment_id:
+            status_response = nowpayments_service.get_payment_status_minimal(
+                transaction.nowpayments_payment_id
+            )
+            return render(request, 'investments/payment_status.html', {
+                'transaction': transaction,
+                'payment_status': status_response
+            })
+        else:
+            messages.error(request, 'No payment information found.')
+            return redirect('investments:user-portfolio')
+            
+    except Exception as e:
+        logger.error(f"Error checking payment status: {e}")
+        messages.error(request, 'Failed to check payment status.')
+        return redirect('investments:user-portfolio')
+
+
+# Update the marketplace view to handle category filtering better
 def investment_marketplace(request):
     """Public marketplace for browsing investment items"""
     try:
         # Get categories
         categories = InvestmentCategory.objects.filter(is_active=True)
         
-        # Get featured items
+        # Get selected category
+        selected_category = request.GET.get('category')
+        search_query = request.GET.get('search', '')
+        sort_by = request.GET.get('sort', '-is_featured')
+        
+        # Base queryset
+        items = InvestmentItem.objects.filter(is_active=True).select_related('category')
+        
+        # Apply filters
+        if selected_category:
+            items = items.filter(category_id=selected_category)
+        
+        if search_query:
+            items = items.filter(
+                Q(name__icontains=search_query) | 
+                Q(description__icontains=search_query) |
+                Q(category__name__icontains=search_query)
+            )
+        
+        # Apply sorting
+        if sort_by == 'price_low':
+            items = items.order_by('current_price_usd')
+        elif sort_by == 'price_high':
+            items = items.order_by('-current_price_usd')
+        elif sort_by == 'change_high':
+            items = items.order_by('-price_change_percentage_24h')
+        elif sort_by == 'newest':
+            items = items.order_by('-created_at')
+        else:
+            items = items.order_by('-is_featured', '-created_at')
+        
+        # Get featured items (for display at top)
         featured_items = InvestmentItem.objects.filter(
             is_active=True,
             is_featured=True
         ).select_related('category')[:6]
         
-        # Get recent items
-        recent_items = InvestmentItem.objects.filter(
-            is_active=True
-        ).select_related('category').order_by('-created_at')[:12]
-        
-        # Get items with significant price changes (positive or negative)
+        # Get trending items
         trending_items = InvestmentItem.objects.filter(
             is_active=True
         ).filter(
@@ -313,8 +436,11 @@ def investment_marketplace(request):
         context = {
             'categories': categories,
             'featured_items': featured_items,
-            'recent_items': recent_items,
             'trending_items': trending_items,
+            'items': items,
+            'selected_category': selected_category,
+            'search_query': search_query,
+            'sort_by': sort_by,
         }
         
         return render(request, 'investments/marketplace.html', context)

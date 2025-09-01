@@ -23,6 +23,10 @@ urlpatterns = [
     path('portfolio/', views.user_portfolio, name='user-portfolio'),
     path('item/<int:item_id>/', views.investment_item_detail, name='investment-item-detail'),
     
+    # Add Funds functionality
+    path('add-funds/', views.add_funds, name='add-funds'),
+    path('payment-status/<int:transaction_id>/', views.payment_status, name='payment-status'),
+    
     # Test view
     path('test/', views.investment_test, name='investment-test'),
     
