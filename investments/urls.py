@@ -34,6 +34,7 @@ urlpatterns = [
     
     # Test view
     path('test/', views.investment_test, name='investment-test'),
+    path('debug/', views.test_marketplace_debug, name='test-marketplace-debug'),
     
     # Admin views
     path('admin/management/', views.admin_investment_management, name='admin-investment-management'),

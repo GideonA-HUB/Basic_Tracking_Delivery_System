@@ -433,6 +433,8 @@ def investment_marketplace(request):
             Q(price_change_percentage_24h__lte=-5)
         ).select_related('category').order_by('-price_change_percentage_24h')[:6]
         
+        # Debug logging removed
+        
         context = {
             'categories': categories,
             'featured_items': featured_items,
@@ -450,6 +452,39 @@ def investment_marketplace(request):
         return render(request, 'investments/error.html', {
             'error_message': 'Failed to load investment marketplace'
         })
+
+
+def test_marketplace_debug(request):
+    """Debug view to test marketplace data"""
+    try:
+        # Get all active items
+        items = InvestmentItem.objects.filter(is_active=True).select_related('category')
+        
+        # Get featured items
+        featured_items = InvestmentItem.objects.filter(
+            is_active=True,
+            is_featured=True
+        ).select_related('category')[:6]
+        
+        # Get non-featured items
+        non_featured_items = InvestmentItem.objects.filter(
+            is_active=True,
+            is_featured=False
+        ).select_related('category')
+        
+        context = {
+            'total_items': items.count(),
+            'featured_items_count': featured_items.count(),
+            'non_featured_items_count': non_featured_items.count(),
+            'items': items,
+            'featured_items': featured_items,
+            'non_featured_items': non_featured_items,
+        }
+        
+        return render(request, 'investments/test_marketplace_debug.html', context)
+        
+    except Exception as e:
+        return HttpResponse(f"Error: {e}")
 
 
 def investment_item_detail(request, item_id):

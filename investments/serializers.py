@@ -31,7 +31,7 @@ class InvestmentItemSerializer(serializers.ModelSerializer):
             'current_price_usd', 'price_change_24h', 'price_change_percentage_24h',
             'weight', 'purity', 'dimensions', 'origin', 'investment_type',
             'minimum_investment', 'maximum_investment', 'total_available',
-            'currently_available', 'main_image', 'additional_images',
+            'currently_available', 'main_image_url', 'additional_image_urls',
             'is_active', 'is_featured', 'created_at', 'updated_at',
             'price_history'
         ]
