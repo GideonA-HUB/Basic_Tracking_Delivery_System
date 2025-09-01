@@ -1,121 +1,159 @@
 from celery import shared_task
 from django.utils import timezone
-from django.contrib.auth.models import User
-from .models import AutoInvestmentPlan, RealTimePriceFeed, UserInvestment, InvestmentItem
-from .price_services import PriceFeedService, CurrencyConversionService
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+import json
+import logging
 
+from .models import RealTimePriceFeed, InvestmentItem
+from .price_services import price_service, get_live_price_updates
 
-@shared_task
-def process_auto_investments():
-    """Process auto-investment plans that are due"""
-    due_plans = AutoInvestmentPlan.objects.filter(
-        status='active',
-        next_investment_date__lte=timezone.now().date()
-    )
-    
-    processed_count = 0
-    for plan in due_plans:
-        try:
-            # Check if user has sufficient funds (this would integrate with payment system)
-            # For now, we'll just mark the plan as processed
-            
-            # Create investment record
-            investment = UserInvestment.objects.create(
-                user=plan.user,
-                item=plan.target_asset,
-                investment_amount_usd=plan.investment_amount,
-                quantity=plan.investment_amount / plan.target_asset.current_price_usd,
-                purchase_price_per_unit=plan.target_asset.current_price_usd,
-                investment_type='hold',
-                status='active'
-            )
-            
-            # Update plan statistics
-            plan.total_invested += plan.investment_amount
-            plan.investments_count += 1
-            plan.last_investment_at = timezone.now()
-            plan.next_investment_date = plan.calculate_next_investment_date()
-            plan.save()
-            
-            # Update user portfolio
-            portfolio, created = plan.user.investment_portfolio_set.get_or_create(
-                user=plan.user,
-                defaults={
-                    'total_invested': 0,
-                    'current_value': 0,
-                    'total_return': 0,
-                    'total_return_percentage': 0,
-                    'active_investments_count': 0,
-                    'total_investments_count': 0
-                }
-            )
-            portfolio.update_portfolio_summary()
-            
-            processed_count += 1
-            print(f"Processed auto-investment for {plan.user.username}: ${plan.investment_amount}")
-            
-        except Exception as e:
-            print(f"Error processing auto-investment for {plan.user.username}: {e}")
-            continue
-    
-    return f"Processed {processed_count} auto-investments"
-
+logger = logging.getLogger(__name__)
 
 @shared_task
-def update_price_feeds():
-    """Update all price feeds"""
+def update_real_time_prices():
+    """Update real-time prices and broadcast updates"""
     try:
-        # This would be called asynchronously
-        # For now, we'll use the synchronous version
-        PriceFeedService.update_all_price_feeds()
-        return "Price feeds updated successfully"
-    except Exception as e:
-        print(f"Error updating price feeds: {e}")
-        return f"Error: {e}"
-
-
-@shared_task
-def update_exchange_rates():
-    """Update currency exchange rates"""
-    try:
-        # This would be called asynchronously
-        # For now, we'll use the synchronous version
-        CurrencyConversionService.update_exchange_rates()
-        return "Exchange rates updated successfully"
-    except Exception as e:
-        print(f"Error updating exchange rates: {e}")
-        return f"Error: {e}"
-
-
-@shared_task
-def create_sample_price_feeds():
-    """Create sample price feeds for testing"""
-    try:
-        feeds = PriceFeedService.create_sample_price_feeds()
-        return f"Created {len(feeds)} sample price feeds"
-    except Exception as e:
-        print(f"Error creating sample price feeds: {e}")
-        return f"Error: {e}"
-
-
-@shared_task
-def update_user_portfolios():
-    """Update all user portfolios with current values"""
-    try:
-        from .models import InvestmentPortfolio
+        # Update all prices
+        updated_count = price_service.update_all_prices()
         
-        portfolios = InvestmentPortfolio.objects.all()
+        if updated_count > 0:
+            # Get live price updates for broadcasting
+            price_updates = get_live_price_updates()
+            
+            # Broadcast updates via WebSocket
+            broadcast_price_updates(price_updates)
+            
+            logger.info(f"Updated {updated_count} prices and broadcasted updates")
+        
+        return updated_count
+        
+    except Exception as e:
+        logger.error(f"Error updating real-time prices: {e}")
+        return 0
+
+@shared_task
+def broadcast_price_updates(price_updates):
+    """Broadcast price updates to all connected WebSocket clients"""
+    try:
+        channel_layer = get_channel_layer()
+        
+        # Broadcast to price feeds group
+        async_to_sync(channel_layer.group_send)(
+            'price_feeds',
+            {
+                'type': 'price_update',
+                'price_data': price_updates
+            }
+        )
+        
+        logger.info(f"Broadcasted {len(price_updates)} price updates")
+        
+    except Exception as e:
+        logger.error(f"Error broadcasting price updates: {e}")
+
+@shared_task
+def update_investment_item_prices():
+    """Update investment item prices based on price feeds"""
+    try:
+        # Map investment items to price feeds
+        item_feed_mapping = {
+            'Bitcoin (BTC)': 'BTC',
+            'Ethereum (ETH)': 'ETH',
+            'Cardano (ADA)': 'ADA',
+            'Gold Bullion (1 oz)': 'XAU',
+            'Silver Bullion (1 oz)': 'XAG',
+            'Platinum Bullion (1 oz)': 'XPT',
+        }
+        
         updated_count = 0
         
-        for portfolio in portfolios:
+        for item_name, feed_symbol in item_feed_mapping.items():
             try:
-                portfolio.update_portfolio_summary()
-                updated_count += 1
+                item = InvestmentItem.objects.filter(name=item_name).first()
+                feed = RealTimePriceFeed.objects.filter(symbol=feed_symbol).first()
+                
+                if item and feed:
+                    old_price = item.current_price_usd
+                    new_price = feed.current_price
+                    
+                    if old_price != new_price:
+                        # Calculate price change
+                        price_change = new_price - old_price
+                        price_change_percentage = (price_change / old_price * 100) if old_price > 0 else 0
+                        
+                        # Update item price
+                        item.current_price_usd = new_price
+                        item.price_change_24h = price_change
+                        item.price_change_percentage_24h = price_change_percentage
+                        item.last_price_update = timezone.now()
+                        item.save()
+                        
+                        updated_count += 1
+                        logger.info(f"Updated {item_name}: ${new_price} ({price_change_percentage:+.2f}%)")
+                        
             except Exception as e:
-                print(f"Error updating portfolio for {portfolio.user.username}: {e}")
-                continue
+                logger.error(f"Error updating {item_name}: {e}")
         
-        return f"Updated {updated_count} portfolios"
+        return updated_count
+        
     except Exception as e:
-        print(f"Error updating portfolios: {e}")
-        return f"Error: {e}"
+        logger.error(f"Error updating investment item prices: {e}")
+        return 0
+
+@shared_task
+def cleanup_old_price_history():
+    """Clean up old price history records"""
+    try:
+        from .models import PriceHistory, RealTimePriceHistory
+        from datetime import timedelta
+        
+        # Keep only last 30 days of price history
+        cutoff_date = timezone.now() - timedelta(days=30)
+        
+        # Clean up investment item price history
+        deleted_item_history = PriceHistory.objects.filter(
+            timestamp__lt=cutoff_date
+        ).delete()
+        
+        # Clean up real-time price feed history
+        deleted_feed_history = RealTimePriceHistory.objects.filter(
+            timestamp__lt=cutoff_date
+        ).delete()
+        
+        logger.info(f"Cleaned up {deleted_item_history[0]} item price history records")
+        logger.info(f"Cleaned up {deleted_feed_history[0]} feed price history records")
+        
+        return deleted_item_history[0] + deleted_feed_history[0]
+        
+    except Exception as e:
+        logger.error(f"Error cleaning up price history: {e}")
+        return 0
+
+@shared_task
+def health_check_price_feeds():
+    """Health check for price feeds"""
+    try:
+        feeds = RealTimePriceFeed.objects.filter(is_active=True)
+        healthy_count = 0
+        total_count = feeds.count()
+        
+        for feed in feeds:
+            # Check if feed was updated in the last hour
+            if feed.last_updated and (timezone.now() - feed.last_updated).total_seconds() < 3600:
+                healthy_count += 1
+            else:
+                logger.warning(f"Price feed {feed.name} ({feed.symbol}) may be stale")
+        
+        health_percentage = (healthy_count / total_count * 100) if total_count > 0 else 0
+        logger.info(f"Price feed health check: {healthy_count}/{total_count} feeds healthy ({health_percentage:.1f}%)")
+        
+        return {
+            'healthy_count': healthy_count,
+            'total_count': total_count,
+            'health_percentage': health_percentage
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in price feed health check: {e}")
+        return {'error': str(e)}

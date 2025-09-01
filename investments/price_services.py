@@ -5,7 +5,7 @@ from decimal import Decimal
 from django.utils import timezone
 from datetime import datetime, timedelta
 import random
-from .models import RealTimePriceFeed, InvestmentItem, PriceHistory
+from .models import RealTimePriceFeed, InvestmentItem, PriceHistory, RealTimePriceHistory
 
 logger = logging.getLogger(__name__)
 
@@ -140,9 +140,9 @@ class RealTimePriceService:
                         # Update the feed
                         feed.update_price(new_price, change_amount, change_percentage)
                         
-                        # Create price history record
-                        PriceHistory.objects.create(
-                            real_time_price_feed=feed,
+                        # Create price history record for RealTimePriceFeed
+                        RealTimePriceHistory.objects.create(
+                            price_feed=feed,
                             price=new_price,
                             change_amount=change_amount,
                             change_percentage=change_percentage,
@@ -215,8 +215,8 @@ class RealTimePriceService:
             
             # Get price history for the item's price feed
             if hasattr(item, 'price_feed') and item.price_feed:
-                history = PriceHistory.objects.filter(
-                    real_time_price_feed=item.price_feed,
+                history = RealTimePriceHistory.objects.filter(
+                    price_feed=item.price_feed,
                     timestamp__range=(start_date, end_date)
                 ).order_by('timestamp')
             else:

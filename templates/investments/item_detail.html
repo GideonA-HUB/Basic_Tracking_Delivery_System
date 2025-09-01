@@ -57,12 +57,15 @@
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
-                        <div class="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+                        <div class="text-4xl font-bold text-gray-900 dark:text-white mb-2" id="current-price">
                             ${{ item.current_price_usd }}
                         </div>
-                        <div class="text-sm {{ item.price_change_24h|get_price_change_class }}">
+                        <div class="text-sm {{ item.price_change_24h|get_price_change_class }}" id="price-change">
                             {{ item.price_change_24h|get_price_change_display }}
                             ({{ item.price_change_percentage_24h|get_percentage_change_display }})
+                        </div>
+                        <div class="text-xs text-gray-500 mt-1" id="last-updated">
+                            Last updated: {{ item.updated_at|date:"M d, Y H:i" }}
                         </div>
                     </div>
                     
@@ -79,15 +82,28 @@
                 <p class="text-gray-600 dark:text-gray-300 text-lg">{{ item.description }}</p>
             </div>
 
-            <!-- Price Chart -->
-            {% if chart_data %}
+            <!-- Live Price Chart -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Price History (30 Days)</h3>
-                <div class="chart-container">
-                    <canvas id="priceChart"></canvas>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Live Price Chart</h3>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm text-gray-500">Auto-refresh:</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="auto-refresh-toggle" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+                </div>
+                <div class="chart-container" style="height: 400px;">
+                    <canvas id="livePriceChart"></canvas>
+                </div>
+                <div class="mt-4 text-center">
+                    <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                        <div class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                        Live Updates Active
+                    </div>
                 </div>
             </div>
-            {% endif %}
 
             <!-- Investment Details -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
@@ -135,22 +151,22 @@
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Take Action</h3>
                 <div class="flex flex-col sm:flex-row gap-4">
                     {% if item.is_available_for_investment %}
-                    <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200">
+                    <a href="{% url 'investments:invest-in-item' item.id 'hold' %}" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 text-center">
                         <i class="fas fa-chart-line mr-2"></i>
                         Invest Now
-                    </button>
+                    </a>
                     {% endif %}
                     
                     {% if item.is_available_for_delivery %}
-                    <button class="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200">
+                    <a href="{% url 'investments:invest-in-item' item.id 'delivery' %}" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 text-center">
                         <i class="fas fa-shipping-fast mr-2"></i>
                         Buy & Deliver
-                    </button>
+                    </a>
                     {% endif %}
                     
-                    <button class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200">
-                        <i class="fas fa-heart mr-2"></i>
-                        Add to Watchlist
+                    <button id="wishlist-btn" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200" data-item-id="{{ item.id }}">
+                        <i class="fas fa-heart mr-2" id="wishlist-icon"></i>
+                        <span id="wishlist-text">Add to Watchlist</span>
                     </button>
                 </div>
             </div>
@@ -158,6 +174,14 @@
 
         <!-- Sidebar -->
         <div class="lg:col-span-1">
+            <!-- Live Price Feed -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Live Price Feed</h3>
+                <div id="live-price-feed" class="space-y-3">
+                    <!-- Live price updates will be inserted here -->
+                </div>
+            </div>
+
             <!-- Similar Items -->
             {% if similar_items %}
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
@@ -222,49 +246,259 @@
     </div>
 </div>
 
-{% if chart_data %}
+<!-- WebSocket and Chart Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const ctx = document.getElementById('priceChart');
-    if (ctx) {
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: {{ chart_data.labels|safe }},
-                datasets: [{
-                    label: 'Price (USD)',
-                    data: {{ chart_data.prices|safe }},
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
+    let priceChart;
+    let priceUpdateInterval;
+    let ws;
+    
+    // Initialize live price chart
+    function initPriceChart() {
+        const ctx = document.getElementById('livePriceChart');
+        if (ctx) {
+            priceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {{ chart_data.labels|safe }},
+                    datasets: [{
+                        label: 'Price (USD)',
+                        data: {{ chart_data.prices|safe }},
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
                 },
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        grid: {
-                            color: 'rgba(156, 163, 175, 0.1)'
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 1000
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Price: $' + context.parsed.y.toFixed(2);
+                                }
+                            }
                         }
                     },
-                    x: {
-                        grid: {
-                            color: 'rgba(156, 163, 175, 0.1)'
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                color: 'rgba(156, 163, 175, 0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toFixed(2);
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(156, 163, 175, 0.1)'
+                            }
                         }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
                     }
                 }
+            });
+        }
+    }
+    
+    // Initialize WebSocket connection
+    function initWebSocket() {
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${protocol}//${window.location.host}/ws/price-feeds/`;
+        
+        ws = new WebSocket(wsUrl);
+        
+        ws.onopen = function() {
+            console.log('WebSocket connected');
+            // Subscribe to price updates
+            ws.send(JSON.stringify({
+                type: 'get_prices'
+            }));
+        };
+        
+        ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            if (data.type === 'price_data' || data.type === 'price_update') {
+                updatePriceDisplay(data.prices);
+            }
+        };
+        
+        ws.onclose = function() {
+            console.log('WebSocket disconnected');
+            // Reconnect after 5 seconds
+            setTimeout(initWebSocket, 5000);
+        };
+        
+        ws.onerror = function(error) {
+            console.error('WebSocket error:', error);
+        };
+    }
+    
+    // Update price display
+    function updatePriceDisplay(prices) {
+        const currentPriceEl = document.getElementById('current-price');
+        const priceChangeEl = document.getElementById('price-change');
+        const lastUpdatedEl = document.getElementById('last-updated');
+        
+        // Find the price for current item
+        const itemPrice = prices.find(p => p.name === '{{ item.name }}' || p.symbol === '{{ item.symbol }}');
+        
+        if (itemPrice) {
+            // Update current price with animation
+            const newPrice = parseFloat(itemPrice.current_price);
+            const oldPrice = parseFloat(currentPriceEl.textContent.replace('$', ''));
+            
+            if (newPrice !== oldPrice) {
+                // Animate price change
+                currentPriceEl.style.transition = 'color 0.3s ease';
+                currentPriceEl.style.color = newPrice > oldPrice ? '#10b981' : '#ef4444';
+                setTimeout(() => {
+                    currentPriceEl.style.color = '';
+                }, 1000);
+                
+                currentPriceEl.textContent = '$' + newPrice.toFixed(2);
+            }
+            
+            // Update price change
+            const changeAmount = parseFloat(itemPrice.price_change_24h);
+            const changePercent = parseFloat(itemPrice.price_change_percentage_24h);
+            
+            const changeClass = changeAmount >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
+            const changeIcon = changeAmount >= 0 ? '▲' : '▼';
+            
+            priceChangeEl.className = `text-sm ${changeClass}`;
+            priceChangeEl.innerHTML = `${changeIcon} $${Math.abs(changeAmount).toFixed(2)} (${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}%)`;
+            
+            // Update last updated time
+            const now = new Date();
+            lastUpdatedEl.textContent = `Last updated: ${now.toLocaleTimeString()}`;
+            
+            // Update chart
+            updateChart(newPrice);
+        }
+    }
+    
+    // Update chart with new price
+    function updateChart(newPrice) {
+        if (priceChart) {
+            const now = new Date();
+            const timeLabel = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            // Add new data point
+            priceChart.data.labels.push(timeLabel);
+            priceChart.data.datasets[0].data.push(newPrice);
+            
+            // Keep only last 50 data points
+            if (priceChart.data.labels.length > 50) {
+                priceChart.data.labels.shift();
+                priceChart.data.datasets[0].data.shift();
+            }
+            
+            priceChart.update('none');
+        }
+    }
+    
+    // Wishlist functionality
+    function initWishlist() {
+        const wishlistBtn = document.getElementById('wishlist-btn');
+        const wishlistIcon = document.getElementById('wishlist-icon');
+        const wishlistText = document.getElementById('wishlist-text');
+        
+        // Check if item is in wishlist (you'll need to implement this)
+        const isInWishlist = localStorage.getItem(`wishlist_${itemId}`);
+        
+        if (isInWishlist) {
+            wishlistIcon.className = 'fas fa-heart mr-2 text-red-500';
+            wishlistText.textContent = 'Remove from Watchlist';
+        }
+        
+        wishlistBtn.addEventListener('click', function() {
+            const itemId = this.dataset.itemId;
+            const isInWishlist = localStorage.getItem(`wishlist_${itemId}`);
+            
+            if (isInWishlist) {
+                // Remove from wishlist
+                localStorage.removeItem(`wishlist_${itemId}`);
+                wishlistIcon.className = 'fas fa-heart mr-2';
+                wishlistText.textContent = 'Add to Watchlist';
+                this.classList.remove('bg-red-600');
+                this.classList.add('bg-gray-600');
+            } else {
+                // Add to wishlist
+                localStorage.setItem(`wishlist_${itemId}`, 'true');
+                wishlistIcon.className = 'fas fa-heart mr-2 text-red-500';
+                wishlistText.textContent = 'Remove from Watchlist';
+                this.classList.remove('bg-gray-600');
+                this.classList.add('bg-red-600');
             }
         });
     }
+    
+    // Auto-refresh toggle
+    function initAutoRefresh() {
+        const toggle = document.getElementById('auto-refresh-toggle');
+        
+        toggle.addEventListener('change', function() {
+            if (this.checked) {
+                // Enable auto-refresh
+                priceUpdateInterval = setInterval(() => {
+                    if (ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({type: 'get_prices'}));
+                    }
+                }, 30000); // Update every 30 seconds
+            } else {
+                // Disable auto-refresh
+                if (priceUpdateInterval) {
+                    clearInterval(priceUpdateInterval);
+                }
+            }
+        });
+        
+        // Start auto-refresh by default
+        if (toggle.checked) {
+            priceUpdateInterval = setInterval(() => {
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({type: 'get_prices'}));
+                }
+            }, 30000);
+        }
+    }
+    
+    // Initialize everything
+    initPriceChart();
+    initWebSocket();
+    initWishlist();
+    initAutoRefresh();
+    
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', function() {
+        if (ws) {
+            ws.close();
+        }
+        if (priceUpdateInterval) {
+            clearInterval(priceUpdateInterval);
+        }
+    });
 });
 </script>
-{% endif %}
 {% endblock %}

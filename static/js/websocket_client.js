@@ -1,396 +1,475 @@
 /**
- * WebSocket Client for Real-time Investment Updates
- * Handles connections to Django Channels WebSocket consumers
+ * WebSocket Client for Real-time Price Updates
+ * Handles WebSocket connections and price updates for the investment system
  */
 
-class InvestmentWebSocket {
-    constructor(userId = null) {
-        this.userId = userId;
-        this.connections = {};
-        this.reconnectAttempts = {};
-        this.maxReconnectAttempts = 5;
-        this.reconnectDelay = 1000;
+class PriceWebSocketClient {
+    constructor(options = {}) {
+        this.options = {
+            reconnectInterval: 5000,
+            maxReconnectAttempts: 10,
+            debug: false,
+            ...options
+        };
+        
+        this.ws = null;
+        this.reconnectAttempts = 0;
+        this.isConnecting = false;
+        this.callbacks = {
+            onConnect: [],
+            onDisconnect: [],
+            onPriceUpdate: [],
+            onError: []
+        };
+        
+        this.priceData = {};
+        this.lastUpdate = null;
     }
     
     /**
-     * Connect to price feeds WebSocket
+     * Connect to WebSocket server
      */
-    connectToPriceFeeds() {
-        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${protocol}//${window.location.host}/ws/price-feeds/`;
+    connect() {
+        if (this.isConnecting || this.ws?.readyState === WebSocket.OPEN) {
+            return;
+        }
+        
+        this.isConnecting = true;
         
         try {
-            const ws = new WebSocket(wsUrl);
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws/price-feeds/`;
             
-            ws.onopen = () => {
-                console.log('Connected to price feeds WebSocket');
-                this.connections.priceFeeds = ws;
+            this.ws = new WebSocket(wsUrl);
+            
+            this.ws.onopen = () => {
+                this.isConnecting = false;
+                this.reconnectAttempts = 0;
+                this.log('WebSocket connected');
+                this.triggerCallbacks('onConnect');
                 
                 // Request initial price data
-                ws.send(JSON.stringify({ type: 'get_prices' }));
+                this.sendMessage({
+                    type: 'get_prices'
+                });
             };
             
-            ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                this.handlePriceFeedMessage(data);
+            this.ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    this.handleMessage(data);
+                } catch (error) {
+                    this.log('Error parsing WebSocket message:', error);
+                }
             };
             
-            ws.onclose = () => {
-                console.log('Price feeds WebSocket disconnected');
-                this.connections.priceFeeds = null;
-                this.scheduleReconnect('priceFeeds');
-            };
-            
-            ws.onerror = (error) => {
-                console.error('Price feeds WebSocket error:', error);
-            };
-            
-        } catch (error) {
-            console.error('Failed to connect to price feeds WebSocket:', error);
-        }
-    }
-    
-    /**
-     * Connect to user's investment WebSocket
-     */
-    connectToInvestments() {
-        if (!this.userId) {
-            console.warn('User ID required for investment WebSocket');
-            return;
-        }
-        
-        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${protocol}//${window.location.host}/ws/investments/${this.userId}/`;
-        
-        try {
-            const ws = new WebSocket(wsUrl);
-            
-            ws.onopen = () => {
-                console.log('Connected to investments WebSocket');
-                this.connections.investments = ws;
+            this.ws.onclose = (event) => {
+                this.isConnecting = false;
+                this.log('WebSocket disconnected:', event.code, event.reason);
+                this.triggerCallbacks('onDisconnect', event);
                 
-                // Request initial investment data
-                ws.send(JSON.stringify({ type: 'get_investments' }));
+                // Attempt to reconnect
+                if (this.reconnectAttempts < this.options.maxReconnectAttempts) {
+                    this.reconnectAttempts++;
+                    this.log(`Reconnecting in ${this.options.reconnectInterval}ms (attempt ${this.reconnectAttempts})`);
+                    setTimeout(() => this.connect(), this.options.reconnectInterval);
+                } else {
+                    this.log('Max reconnection attempts reached');
+                }
             };
             
-            ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                this.handleInvestmentMessage(data);
-            };
-            
-            ws.onclose = () => {
-                console.log('Investments WebSocket disconnected');
-                this.connections.investments = null;
-                this.scheduleReconnect('investments');
-            };
-            
-            ws.onerror = (error) => {
-                console.error('Investments WebSocket error:', error);
+            this.ws.onerror = (error) => {
+                this.isConnecting = false;
+                this.log('WebSocket error:', error);
+                this.triggerCallbacks('onError', error);
             };
             
         } catch (error) {
-            console.error('Failed to connect to investments WebSocket:', error);
+            this.isConnecting = false;
+            this.log('Error creating WebSocket connection:', error);
+            this.triggerCallbacks('onError', error);
         }
     }
     
     /**
-     * Connect to user's portfolio WebSocket
+     * Handle incoming WebSocket messages
      */
-    connectToPortfolio() {
-        if (!this.userId) {
-            console.warn('User ID required for portfolio WebSocket');
-            return;
-        }
-        
-        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${protocol}//${window.location.host}/ws/portfolio/${this.userId}/`;
-        
-        try {
-            const ws = new WebSocket(wsUrl);
-            
-            ws.onopen = () => {
-                console.log('Connected to portfolio WebSocket');
-                this.connections.portfolio = ws;
-                
-                // Request initial portfolio data
-                ws.send(JSON.stringify({ type: 'get_portfolio' }));
-            };
-            
-            ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                this.handlePortfolioMessage(data);
-            };
-            
-            ws.onclose = () => {
-                console.log('Portfolio WebSocket disconnected');
-                this.connections.portfolio = null;
-                this.scheduleReconnect('portfolio');
-            };
-            
-            ws.onerror = (error) => {
-                console.error('Portfolio WebSocket error:', error);
-            };
-            
-        } catch (error) {
-            console.error('Failed to connect to portfolio WebSocket:', error);
-        }
-    }
-    
-    /**
-     * Handle price feed messages
-     */
-    handlePriceFeedMessage(data) {
+    handleMessage(data) {
         switch (data.type) {
             case 'price_data':
-                this.updatePriceDisplay(data.prices);
-                break;
             case 'price_update':
-                this.updatePriceDisplay([data.price_data]);
-                this.showPriceUpdateNotification(data.price_data);
+                this.updatePriceData(data.prices);
                 break;
             case 'subscription_confirmed':
-                console.log(`Subscribed to ${data.asset_type} updates`);
+                this.log('Subscription confirmed for:', data.asset_type);
                 break;
             default:
-                console.log('Unknown price feed message type:', data.type);
+                this.log('Unknown message type:', data.type);
         }
     }
     
     /**
-     * Handle investment messages
+     * Update price data and trigger callbacks
      */
-    handleInvestmentMessage(data) {
-        switch (data.type) {
-            case 'investment_data':
-                this.updateInvestmentDisplay(data.investments);
-                break;
-            case 'portfolio_data':
-                this.updatePortfolioDisplay(data.portfolio);
-                break;
-            default:
-                console.log('Unknown investment message type:', data.type);
-        }
-    }
-    
-    /**
-     * Handle portfolio messages
-     */
-    handlePortfolioMessage(data) {
-        switch (data.type) {
-            case 'portfolio_data':
-                this.updatePortfolioDisplay(data.portfolio);
-                break;
-            case 'investments_data':
-                this.updateInvestmentDisplay(data.investments);
-                break;
-            default:
-                console.log('Unknown portfolio message type:', data.type);
-        }
-    }
-    
-    /**
-     * Update price display on the page
-     */
-    updatePriceDisplay(prices) {
+    updatePriceData(prices) {
+        const previousData = { ...this.priceData };
+        this.priceData = {};
+        
         prices.forEach(price => {
-            const priceElement = document.querySelector(`[data-price-id="${price.id}"]`);
-            if (priceElement) {
-                // Update current price
-                const currentPriceEl = priceElement.querySelector('.current-price');
-                if (currentPriceEl) {
-                    currentPriceEl.textContent = `$${parseFloat(price.current_price).toLocaleString()}`;
-                }
-                
-                // Update price change
-                const changeEl = priceElement.querySelector('.price-change');
-                if (changeEl) {
-                    const changeValue = parseFloat(price.price_change_percentage_24h);
-                    const changeText = `${changeValue >= 0 ? '+' : ''}${changeValue.toFixed(2)}%`;
-                    changeEl.textContent = changeText;
-                    changeEl.className = `price-change ${changeValue >= 0 ? 'positive' : 'negative'}`;
-                }
-                
-                // Update last updated time
-                const timeEl = priceElement.querySelector('.last-updated');
-                if (timeEl) {
-                    timeEl.textContent = 'Just now';
-                }
-            }
-        });
-    }
-    
-    /**
-     * Update investment display on the page
-     */
-    updateInvestmentDisplay(investments) {
-        // This would update investment cards/lists on the page
-        console.log('Investment data updated:', investments);
-        
-        // Trigger custom event for other components to listen to
-        window.dispatchEvent(new CustomEvent('investmentsUpdated', {
-            detail: { investments }
-        }));
-    }
-    
-    /**
-     * Update portfolio display on the page
-     */
-    updatePortfolioDisplay(portfolio) {
-        // This would update portfolio summary on the page
-        console.log('Portfolio data updated:', portfolio);
-        
-        // Trigger custom event for other components to listen to
-        window.dispatchEvent(new CustomEvent('portfolioUpdated', {
-            detail: { portfolio }
-        }));
-    }
-    
-    /**
-     * Show price update notification
-     */
-    showPriceUpdateNotification(priceData) {
-        // Create toast notification for price updates
-        const notification = document.createElement('div');
-        notification.className = 'price-update-notification';
-        notification.innerHTML = `
-            <div class="notification-content">
-                <strong>${priceData.name}</strong> updated to $${parseFloat(priceData.current_price).toLocaleString()}
-                <span class="change ${parseFloat(priceData.price_change_percentage_24h) >= 0 ? 'positive' : 'negative'}">
-                    ${parseFloat(priceData.price_change_percentage_24h) >= 0 ? '+' : ''}${parseFloat(priceData.price_change_percentage_24h).toFixed(2)}%
-                </span>
-            </div>
-        `;
-        
-        // Add to page
-        document.body.appendChild(notification);
-        
-        // Remove after 5 seconds
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.parentNode.removeChild(notification);
-            }
-        }, 5000);
-    }
-    
-    /**
-     * Schedule reconnection attempt
-     */
-    scheduleReconnect(connectionType) {
-        if (!this.reconnectAttempts[connectionType]) {
-            this.reconnectAttempts[connectionType] = 0;
-        }
-        
-        if (this.reconnectAttempts[connectionType] < this.maxReconnectAttempts) {
-            this.reconnectAttempts[connectionType]++;
+            this.priceData[price.symbol] = price;
             
-            setTimeout(() => {
-                console.log(`Attempting to reconnect to ${connectionType}...`);
-                if (connectionType === 'priceFeeds') {
-                    this.connectToPriceFeeds();
-                } else if (connectionType === 'investments') {
-                    this.connectToInvestments();
-                } else if (connectionType === 'portfolio') {
-                    this.connectToPortfolio();
-                }
-            }, this.reconnectDelay * this.reconnectAttempts[connectionType]);
+            // Check if price changed
+            const previousPrice = previousData[price.symbol];
+            if (previousPrice && previousPrice.current_price !== price.current_price) {
+                this.triggerCallbacks('onPriceUpdate', {
+                    symbol: price.symbol,
+                    name: price.name,
+                    oldPrice: previousPrice.current_price,
+                    newPrice: price.current_price,
+                    change: price.current_price - previousPrice.current_price,
+                    changePercent: price.price_change_percentage_24h,
+                    data: price
+                });
+            }
+        });
+        
+        this.lastUpdate = new Date();
+    }
+    
+    /**
+     * Send message to WebSocket server
+     */
+    sendMessage(message) {
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+            this.ws.send(JSON.stringify(message));
         } else {
-            console.error(`Max reconnection attempts reached for ${connectionType}`);
+            this.log('WebSocket not connected, cannot send message');
         }
     }
     
     /**
-     * Disconnect all WebSocket connections
-     */
-    disconnect() {
-        Object.keys(this.connections).forEach(key => {
-            if (this.connections[key]) {
-                this.connections[key].close();
-                this.connections[key] = null;
-            }
-        });
-        
-        // Clear reconnection attempts
-        this.reconnectAttempts = {};
-    }
-    
-    /**
-     * Subscribe to specific asset type updates
+     * Subscribe to specific asset type
      */
     subscribeToAsset(assetType) {
-        if (this.connections.priceFeeds) {
-            this.connections.priceFeeds.send(JSON.stringify({
-                type: 'subscribe_asset',
-                asset_type: assetType
-            }));
+        this.sendMessage({
+            type: 'subscribe_asset',
+            asset_type: assetType
+        });
+    }
+    
+    /**
+     * Request current price data
+     */
+    requestPrices() {
+        this.sendMessage({
+            type: 'get_prices'
+        });
+    }
+    
+    /**
+     * Get current price data
+     */
+    getPriceData(symbol = null) {
+        if (symbol) {
+            return this.priceData[symbol] || null;
+        }
+        return this.priceData;
+    }
+    
+    /**
+     * Get last update time
+     */
+    getLastUpdate() {
+        return this.lastUpdate;
+    }
+    
+    /**
+     * Check if connected
+     */
+    isConnected() {
+        return this.ws && this.ws.readyState === WebSocket.OPEN;
+    }
+    
+    /**
+     * Disconnect WebSocket
+     */
+    disconnect() {
+        if (this.ws) {
+            this.ws.close();
+        }
+    }
+    
+    /**
+     * Add event callback
+     */
+    on(event, callback) {
+        if (this.callbacks[event]) {
+            this.callbacks[event].push(callback);
+        }
+    }
+    
+    /**
+     * Remove event callback
+     */
+    off(event, callback) {
+        if (this.callbacks[event]) {
+            const index = this.callbacks[event].indexOf(callback);
+            if (index > -1) {
+                this.callbacks[event].splice(index, 1);
+            }
+        }
+    }
+    
+    /**
+     * Trigger callbacks for an event
+     */
+    triggerCallbacks(event, data) {
+        if (this.callbacks[event]) {
+            this.callbacks[event].forEach(callback => {
+                try {
+                    callback(data);
+                } catch (error) {
+                    this.log('Error in callback:', error);
+                }
+            });
+        }
+    }
+    
+    /**
+     * Log message if debug is enabled
+     */
+    log(...args) {
+        if (this.options.debug) {
+            console.log('[PriceWebSocket]', ...args);
         }
     }
 }
 
-// Initialize WebSocket client when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    // Get user ID from page data if available
-    const userId = document.body.dataset.userId || null;
-    
-    // Create WebSocket instance
-    window.investmentWebSocket = new InvestmentWebSocket(userId);
-    
-    // Connect to price feeds (always available)
-    window.investmentWebSocket.connectToPriceFeeds();
-    
-    // Connect to user-specific WebSockets if user is authenticated
-    if (userId) {
-        window.investmentWebSocket.connectToInvestments();
-        window.investmentWebSocket.connectToPortfolio();
+/**
+ * Price Update Manager
+ * Manages price updates across the application
+ */
+class PriceUpdateManager {
+    constructor() {
+        this.client = new PriceWebSocketClient({
+            debug: true,
+            reconnectInterval: 3000,
+            maxReconnectAttempts: 20
+        });
+        
+        this.updateCallbacks = new Map();
+        this.elements = new Map();
+        this.autoRefresh = true;
+        this.refreshInterval = null;
+        
+        this.init();
     }
     
-    // Add CSS for notifications
-    const style = document.createElement('style');
-    style.textContent = `
-        .price-update-notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 1000;
-            max-width: 300px;
-            animation: slideIn 0.3s ease-out;
+    init() {
+        // Set up event handlers
+        this.client.on('onConnect', () => {
+            this.updateConnectionStatus(true);
+            this.startAutoRefresh();
+        });
+        
+        this.client.on('onDisconnect', () => {
+            this.updateConnectionStatus(false);
+            this.stopAutoRefresh();
+        });
+        
+        this.client.on('onPriceUpdate', (update) => {
+            this.handlePriceUpdate(update);
+        });
+        
+        this.client.on('onError', (error) => {
+            console.error('Price WebSocket error:', error);
+        });
+        
+        // Connect to WebSocket
+        this.client.connect();
+        
+        // Set up auto-refresh toggle
+        this.setupAutoRefreshToggle();
+    }
+    
+    /**
+     * Register an element for price updates
+     */
+    registerElement(elementId, symbol, options = {}) {
+        const element = document.getElementById(elementId);
+        if (!element) {
+            console.warn(`Element with ID '${elementId}' not found`);
+            return;
         }
         
-        .price-update-notification .change.positive {
-            color: #10b981;
+        const config = {
+            showChange: true,
+            showPercentage: true,
+            format: 'currency',
+            animate: true,
+            ...options
+        };
+        
+        this.elements.set(elementId, {
+            element,
+            symbol,
+            config
+        });
+        
+        // Update immediately if we have data
+        const priceData = this.client.getPriceData(symbol);
+        if (priceData) {
+            this.updateElement(elementId, priceData);
+        }
+    }
+    
+    /**
+     * Update a specific element
+     */
+    updateElement(elementId, priceData) {
+        const elementInfo = this.elements.get(elementId);
+        if (!elementInfo) return;
+        
+        const { element, config } = elementInfo;
+        const price = priceData.current_price;
+        const change = priceData.price_change_24h;
+        const changePercent = priceData.price_change_percentage_24h;
+        
+        let content = '';
+        
+        // Format price
+        if (config.format === 'currency') {
+            content = `$${price.toFixed(2)}`;
+        } else {
+            content = price.toString();
         }
         
-        .price-update-notification .change.negative {
-            color: #ef4444;
+        // Add change information
+        if (config.showChange && change !== 0) {
+            const changeText = change >= 0 ? `+$${change.toFixed(2)}` : `-$${Math.abs(change).toFixed(2)}`;
+            const changeClass = change >= 0 ? 'text-green-600' : 'text-red-600';
+            content += ` <span class="${changeClass} text-sm">(${changeText})</span>`;
         }
         
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
+        if (config.showPercentage && changePercent !== 0) {
+            const percentText = changePercent >= 0 ? `+${changePercent.toFixed(2)}%` : `${changePercent.toFixed(2)}%`;
+            const percentClass = changePercent >= 0 ? 'text-green-600' : 'text-red-600';
+            content += ` <span class="${percentClass} text-sm">${percentText}</span>`;
+        }
+        
+        // Animate if enabled
+        if (config.animate) {
+            element.style.transition = 'color 0.3s ease';
+            element.style.color = change >= 0 ? '#10b981' : '#ef4444';
+            setTimeout(() => {
+                element.style.color = '';
+            }, 1000);
+        }
+        
+        element.innerHTML = content;
+    }
+    
+    /**
+     * Handle price update
+     */
+    handlePriceUpdate(update) {
+        // Update registered elements
+        this.elements.forEach((elementInfo, elementId) => {
+            if (elementInfo.symbol === update.symbol) {
+                this.updateElement(elementId, update.data);
             }
-            to {
-                transform: translateX(0);
-                opacity: 1;
+        });
+        
+        // Trigger custom callbacks
+        if (this.updateCallbacks.has(update.symbol)) {
+            this.updateCallbacks.get(update.symbol).forEach(callback => {
+                try {
+                    callback(update);
+                } catch (error) {
+                    console.error('Error in price update callback:', error);
+                }
+            });
+        }
+    }
+    
+    /**
+     * Add custom callback for price updates
+     */
+    onPriceUpdate(symbol, callback) {
+        if (!this.updateCallbacks.has(symbol)) {
+            this.updateCallbacks.set(symbol, []);
+        }
+        this.updateCallbacks.get(symbol).push(callback);
+    }
+    
+    /**
+     * Update connection status display
+     */
+    updateConnectionStatus(connected) {
+        const statusElements = document.querySelectorAll('.price-connection-status');
+        statusElements.forEach(element => {
+            if (connected) {
+                element.classList.remove('text-red-500');
+                element.classList.add('text-green-500');
+                element.innerHTML = '<i class="fas fa-circle text-xs"></i> Live';
+            } else {
+                element.classList.remove('text-green-500');
+                element.classList.add('text-red-500');
+                element.innerHTML = '<i class="fas fa-circle text-xs"></i> Disconnected';
             }
+        });
+    }
+    
+    /**
+     * Start auto-refresh
+     */
+    startAutoRefresh() {
+        if (this.autoRefresh && !this.refreshInterval) {
+            this.refreshInterval = setInterval(() => {
+                this.client.requestPrices();
+            }, 30000); // Refresh every 30 seconds
         }
-        
-        .price-change.positive {
-            color: #10b981;
+    }
+    
+    /**
+     * Stop auto-refresh
+     */
+    stopAutoRefresh() {
+        if (this.refreshInterval) {
+            clearInterval(this.refreshInterval);
+            this.refreshInterval = null;
         }
-        
-        .price-change.negative {
-            color: #ef4444;
+    }
+    
+    /**
+     * Set up auto-refresh toggle
+     */
+    setupAutoRefreshToggle() {
+        const toggle = document.getElementById('auto-refresh-toggle');
+        if (toggle) {
+            toggle.addEventListener('change', (e) => {
+                this.autoRefresh = e.target.checked;
+                if (this.autoRefresh) {
+                    this.startAutoRefresh();
+                } else {
+                    this.stopAutoRefresh();
+                }
+            });
         }
-    `;
-    document.head.appendChild(style);
-});
+    }
+    
+    /**
+     * Get client instance
+     */
+    getClient() {
+        return this.client;
+    }
+}
 
-// Export for use in other modules
+// Global instance
+window.priceManager = new PriceUpdateManager();
+
+// Export for module systems
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = InvestmentWebSocket;
+    module.exports = { PriceWebSocketClient, PriceUpdateManager };
 }
