@@ -130,6 +130,4 @@ class InvestmentItemAdmin(admin.ModelAdmin):
     get_percentage_change_display.short_description = '24h % Change'
 
 
-# Update the admin registration
-admin.site.unregister(InvestmentItem)
-admin.site.register(InvestmentItem, InvestmentItemAdmin)
+# Admin registration is handled in admin.py

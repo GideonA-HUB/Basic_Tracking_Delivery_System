@@ -28,7 +28,11 @@ class InvestmentCategoryAdmin(admin.ModelAdmin):
     get_color_preview.short_description = 'Color'
 
 
-# InvestmentItem admin is now handled in forms.py
+from .forms import InvestmentItemAdmin
+
+@admin.register(InvestmentItem)
+class InvestmentItemAdmin(InvestmentItemAdmin):
+    pass
 
 
 @admin.register(PriceHistory)
