@@ -76,7 +76,31 @@ ASGI_APPLICATION = 'delivery_tracker.asgi.application'
 # Channel Layers for WebSocket support (using Redis or in-memory fallback)
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',  # Use in-memory for Railway (no Redis)
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379/0')],
+        },
+    },
+}
+
+# Celery Configuration
+CELERY_BROKER_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+CELERY_ENABLE_UTC = True
+
+# Celery Beat Schedule
+CELERY_BEAT_SCHEDULE = {
+    'update-real-time-prices': {
+        'task': 'investments.tasks.update_real_time_prices',
+        'schedule': 60.0,  # Every 60 seconds
+    },
+    'update-investment-prices': {
+        'task': 'investments.tasks.update_investment_item_prices',
+        'schedule': 120.0,  # Every 2 minutes
     },
 }
 
