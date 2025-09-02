@@ -326,47 +326,116 @@ document.addEventListener('DOMContentLoaded', function() {
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         const wsUrl = `${protocol}//${window.location.host}/ws/price-feeds/`;
         
+        console.log('🔌 Connecting to WebSocket:', wsUrl);
         ws = new WebSocket(wsUrl);
         
         ws.onopen = function() {
-            console.log('WebSocket connected');
+            console.log('✅ WebSocket connected successfully');
+            updateConnectionStatus(true);
+            
             // Subscribe to price updates
-            ws.send(JSON.stringify({
+            const message = {
                 type: 'get_prices'
-            }));
+            };
+            console.log('📤 Sending message:', message);
+            ws.send(JSON.stringify(message));
         };
         
         ws.onmessage = function(event) {
-            const data = JSON.parse(event.data);
-            if (data.type === 'price_data' || data.type === 'price_update') {
-                updatePriceDisplay(data.prices);
+            console.log('📥 Received WebSocket message:', event.data);
+            
+            try {
+                const data = JSON.parse(event.data);
+                console.log('📊 Parsed data:', data);
+                
+                if (data.type === 'price_data' || data.type === 'price_update') {
+                    console.log(`📈 Processing ${data.type} with ${data.prices ? data.prices.length : 0} prices`);
+                    updatePriceDisplay(data.prices || []);
+                } else if (data.type === 'error') {
+                    console.error('❌ WebSocket error:', data.message);
+                    updateConnectionStatus(false, data.message);
+                } else {
+                    console.log('ℹ️ Unknown message type:', data.type);
+                }
+            } catch (error) {
+                console.error('❌ Error parsing WebSocket message:', error);
             }
         };
         
-        ws.onclose = function() {
-            console.log('WebSocket disconnected');
+        ws.onclose = function(event) {
+            console.log('🔌 WebSocket disconnected:', event.code, event.reason);
+            updateConnectionStatus(false);
+            
             // Reconnect after 5 seconds
             setTimeout(initWebSocket, 5000);
         };
         
         ws.onerror = function(error) {
-            console.error('WebSocket error:', error);
+            console.error('❌ WebSocket error:', error);
+            updateConnectionStatus(false, 'Connection error');
         };
+    }
+    
+    // Update connection status display
+    function updateConnectionStatus(isConnected, errorMessage = '') {
+        const statusEl = document.getElementById('connection-status');
+        if (statusEl) {
+            if (isConnected) {
+                statusEl.className = 'inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+                statusEl.innerHTML = '<span class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>Live Updates Active';
+            } else {
+                statusEl.className = 'inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+                statusEl.innerHTML = `<span class="w-2 h-2 bg-red-400 rounded-full mr-2"></span>${errorMessage || 'Disconnected'}`;
+            }
+        }
     }
     
     // Update price display
     function updatePriceDisplay(prices) {
+        console.log('🔄 Updating price display with', prices.length, 'prices');
+        
         const currentPriceEl = document.getElementById('current-price');
         const priceChangeEl = document.getElementById('price-change');
         const lastUpdatedEl = document.getElementById('last-updated');
         
-        // Find the price for current item
-        const itemPrice = prices.find(p => p.name === '{{ item.name }}' || p.symbol === '{{ item.symbol }}');
+        if (!currentPriceEl || !priceChangeEl || !lastUpdatedEl) {
+            console.error('❌ Required price display elements not found');
+            return;
+        }
+        
+        // Find the price for current item - try multiple matching strategies
+        const currentItemName = '{{ item.name }}';
+        const currentItemSymbol = '{{ item.symbol }}';
+        
+        console.log('🔍 Looking for item:', currentItemName, 'with symbol:', currentItemSymbol);
+        
+        let itemPrice = null;
+        
+        // First try exact name match
+        itemPrice = prices.find(p => p.name === currentItemName);
+        if (itemPrice) {
+            console.log('✅ Found exact name match:', itemPrice);
+        } else {
+            // Try symbol match
+            itemPrice = prices.find(p => p.symbol === currentItemSymbol);
+            if (itemPrice) {
+                console.log('✅ Found symbol match:', itemPrice);
+            } else {
+                // Try partial name match (e.g., "Bitcoin" matches "Bitcoin (BTC)")
+                itemPrice = prices.find(p => currentItemName.includes(p.name.split(' ')[0]) || p.name.includes(currentItemName.split(' ')[0]));
+                if (itemPrice) {
+                    console.log('✅ Found partial name match:', itemPrice);
+                }
+            }
+        }
         
         if (itemPrice) {
+            console.log('💰 Updating price for item:', itemPrice.name, 'New price:', itemPrice.current_price);
+            
             // Update current price with animation
             const newPrice = parseFloat(itemPrice.current_price);
-            const oldPrice = parseFloat(currentPriceEl.textContent.replace('$', ''));
+            const oldPriceText = currentPriceEl.textContent.replace(/[$,]/g, '');
+            const oldPrice = parseFloat(oldPriceText) || 0;
             
             if (newPrice !== oldPrice) {
                 // Animate price change
@@ -377,11 +446,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 1000);
                 
                 currentPriceEl.textContent = '$' + newPrice.toFixed(2);
+                console.log('💵 Price updated:', oldPrice, '→', newPrice);
             }
             
             // Update price change
-            const changeAmount = parseFloat(itemPrice.price_change_24h);
-            const changePercent = parseFloat(itemPrice.price_change_percentage_24h);
+            const changeAmount = parseFloat(itemPrice.price_change_24h) || 0;
+            const changePercent = parseFloat(itemPrice.price_change_percentage_24h) || 0;
             
             const changeClass = changeAmount >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
             const changeIcon = changeAmount >= 0 ? '▲' : '▼';
@@ -395,6 +465,11 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Update chart
             updateChart(newPrice);
+            
+            console.log('✅ Price display updated successfully');
+        } else {
+            console.warn('⚠️ No matching price found for item:', currentItemName);
+            console.log('📊 Available prices:', prices.map(p => `${p.name} (${p.symbol}): $${p.current_price}`));
         }
     }
     
