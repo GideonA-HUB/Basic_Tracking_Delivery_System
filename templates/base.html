@@ -555,7 +555,7 @@
                                 <i class="fas fa-crown mr-2"></i> Mandatory Membership
                                 <i class="fas fa-chevron-down ml-2 text-xs"></i>
                             </button>
-                            <div class="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-700 rounded-lg shadow-xl py-4 z-50 hidden group-hover:block border border-gray-200 dark:border-gray-600">
+                            <div class="absolute right-0 mt-2 w-96 bg-white dark:bg-gray-700 rounded-lg shadow-xl py-4 z-50 hidden group-hover:block border border-gray-200 dark:border-gray-600">
                                 <div class="px-4 pb-3 border-b border-gray-200 dark:border-gray-600">
                                     <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">
                                         <i class="fas fa-shield-alt text-purple-500 mr-2"></i>Premium Access Required
@@ -570,10 +570,15 @@
                                         <h4 class="font-semibold text-green-800 dark:text-green-200 mb-2">
                                             <i class="fas fa-wallet text-green-600 mr-2"></i>Payment Details
                                         </h4>
-                                        <div class="space-y-2 text-sm">
-                                            <div class="flex justify-between">
-                                                <span class="text-gray-600 dark:text-gray-300">Crypto Address:</span>
-                                                <span class="font-mono text-green-700 dark:text-green-300 text-xs">Hwa9GyJATebQdwiXrab239awyvc572Pe3Vsb2eBWD8wu</span>
+                                        <div class="space-y-3 text-sm">
+                                            <div class="flex flex-col space-y-1">
+                                                <span class="text-gray-600 dark:text-gray-300 text-xs">Crypto Address:</span>
+                                                <div class="flex items-center space-x-2">
+                                                    <span class="font-mono text-green-700 dark:text-green-300 text-xs break-all bg-green-100 dark:bg-green-900 px-2 py-1 rounded" id="crypto-address-main">Hwa9GyJATebQdwiXrab239awyvc572Pe3Vsb2eBWD8wu</span>
+                                                    <button onclick="copyCryptoAddressMain()" class="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-200" title="Copy address">
+                                                        <i class="fas fa-copy text-sm"></i>
+                                                    </button>
+                                                </div>
                                             </div>
                                             <div class="flex justify-between">
                                                 <span class="text-gray-600 dark:text-gray-300">Network:</span>
@@ -588,14 +593,9 @@
                                 </div>
                                 
                                 <div class="px-4 pt-3">
-                                    <div class="flex space-x-2">
-                                        <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                                            <i class="fas fa-copy mr-1"></i> Copy Address
-                                        </button>
-                                        <button class="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                                            <i class="fas fa-external-link-alt mr-1"></i> Learn More
-                                        </button>
-                                    </div>
+                                    <button onclick="copyCryptoAddressMain()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center justify-center">
+                                        <i class="fas fa-copy mr-1"></i> Copy Address
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -904,6 +904,51 @@
         scrollToBottomBtn.addEventListener('mouseleave', function() {
             this.style.transform = 'scale(1)';
         });
+    </script>
+    
+    <!-- Copy Crypto Address Function -->
+    <script>
+        function copyCryptoAddressMain() {
+            const address = document.getElementById('crypto-address-main').textContent;
+            navigator.clipboard.writeText(address).then(function() {
+                // Show success feedback
+                const copyButton = event.target.closest('button');
+                const originalText = copyButton.innerHTML;
+                copyButton.innerHTML = '<i class="fas fa-check mr-1"></i> Copied!';
+                copyButton.classList.add('bg-green-600', 'hover:bg-green-700');
+                copyButton.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                
+                // Reset button after 2 seconds
+                setTimeout(function() {
+                    copyButton.innerHTML = originalText;
+                    copyButton.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    copyButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                }, 2000);
+            }).catch(function(err) {
+                console.error('Failed to copy: ', err);
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = address;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                // Show success feedback
+                const copyButton = event.target.closest('button');
+                const originalText = copyButton.innerHTML;
+                copyButton.innerHTML = '<i class="fas fa-check mr-1"></i> Copied!';
+                copyButton.classList.add('bg-green-600', 'hover:bg-green-700');
+                copyButton.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                
+                // Reset button after 2 seconds
+                setTimeout(function() {
+                    copyButton.innerHTML = originalText;
+                    copyButton.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    copyButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                }, 2000);
+            });
+        }
     </script>
     
     {% block extra_js %}{% endblock %}
