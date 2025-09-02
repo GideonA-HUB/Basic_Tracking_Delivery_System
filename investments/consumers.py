@@ -1,8 +1,7 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
-from django.contrib.auth.models import User
-from .models import RealTimePriceFeed, UserInvestment, InvestmentPortfolio
+from django.apps import apps
 
 
 class InvestmentConsumer(AsyncWebsocketConsumer):
@@ -60,6 +59,10 @@ class InvestmentConsumer(AsyncWebsocketConsumer):
     def get_user_investments(self):
         """Get user investments from database"""
         try:
+            # Get models dynamically to avoid import issues
+            User = apps.get_model('auth', 'User')
+            UserInvestment = apps.get_model('investments', 'UserInvestment')
+            
             user = User.objects.get(id=self.user_id)
             investments = UserInvestment.objects.filter(user=user, status='active')
             return [{
@@ -72,13 +75,17 @@ class InvestmentConsumer(AsyncWebsocketConsumer):
                 'purchased_at': inv.purchased_at.isoformat(),
                 'status': inv.status
             } for inv in investments]
-        except User.DoesNotExist:
+        except Exception as e:
             return []
     
     @database_sync_to_async
     def get_user_portfolio(self):
         """Get user portfolio from database"""
         try:
+            # Get models dynamically to avoid import issues
+            User = apps.get_model('auth', 'User')
+            InvestmentPortfolio = apps.get_model('investments', 'InvestmentPortfolio')
+            
             user = User.objects.get(id=self.user_id)
             portfolio = InvestmentPortfolio.objects.get(user=user)
             return {
@@ -89,7 +96,7 @@ class InvestmentConsumer(AsyncWebsocketConsumer):
                 'active_investments_count': portfolio.active_investments_count,
                 'last_updated': portfolio.last_updated.isoformat()
             }
-        except (User.DoesNotExist, InvestmentPortfolio.DoesNotExist):
+        except Exception as e:
             return {}
 
 
@@ -119,69 +126,63 @@ class PriceFeedConsumer(AsyncWebsocketConsumer):
     
     async def receive(self, text_data):
         """Receive message from WebSocket"""
-        text_data_json = json.loads(text_data)
-        message_type = text_data_json.get('type', 'message')
-        
-        if message_type == 'get_prices':
-            await self.send_price_data()
-        elif message_type == 'subscribe_asset':
-            asset_type = text_data_json.get('asset_type')
-            await self.subscribe_to_asset(asset_type)
+        try:
+            text_data_json = json.loads(text_data)
+            message_type = text_data_json.get('type', 'message')
+            
+            if message_type == 'get_prices':
+                await self.send_price_data()
+        except json.JSONDecodeError:
+            pass
     
     async def send_price_data(self):
         """Send current price data to client"""
-        prices = await self.get_price_feeds()
-        await self.send(text_data=json.dumps({
-            'type': 'price_data',
-            'prices': prices
-        }))
-    
-    async def subscribe_to_asset(self, asset_type):
-        """Subscribe to specific asset type updates"""
-        # This could be implemented to filter specific asset types
-        await self.send(text_data=json.dumps({
-            'type': 'subscription_confirmed',
-            'asset_type': asset_type
-        }))
-    
-    @database_sync_to_async
-    def get_price_feeds(self):
-        """Get price feeds from database"""
-        feeds = RealTimePriceFeed.objects.filter(is_active=True)
-        return [{
-            'id': feed.id,
-            'name': feed.name,
-            'asset_type': feed.asset_type,
-            'symbol': feed.symbol,
-            'current_price': float(feed.current_price),
-            'base_currency': feed.base_currency,
-            'price_change_24h': float(feed.price_change_24h),
-            'price_change_percentage_24h': float(feed.price_change_percentage_24h),
-            'price_change_7d': float(feed.price_change_7d),
-            'price_change_percentage_7d': float(feed.price_change_percentage_7d),
-            'last_updated': feed.last_updated.isoformat()
-        } for feed in feeds]
-    
-    @classmethod
-    async def broadcast_price_update(cls, price_feed_data):
-        """Broadcast price update to all connected clients"""
-        from channels.layers import get_channel_layer
-        channel_layer = get_channel_layer()
-        
-        await channel_layer.group_send(
-            'price_feeds',
-            {
-                'type': 'price_update',
-                'price_data': price_feed_data
-            }
-        )
+        try:
+            # Get models dynamically to avoid import issues
+            RealTimePriceFeed = apps.get_model('investments', 'RealTimePriceFeed')
+            
+            feeds = RealTimePriceFeed.objects.filter(is_active=True)
+            price_data = []
+            
+            for feed in feeds:
+                price_data.append({
+                    'symbol': feed.symbol,
+                    'name': feed.name,
+                    'current_price': float(feed.current_price),
+                    'price_change_24h': float(feed.price_change_24h),
+                    'price_change_percentage_24h': float(feed.price_change_percentage_24h),
+                    'last_updated': feed.last_updated.isoformat() if feed.last_updated else None
+                })
+            
+            await self.send(text_data=json.dumps({
+                'type': 'price_data',
+                'prices': price_data
+            }))
+        except Exception as e:
+            await self.send(text_data=json.dumps({
+                'type': 'error',
+                'message': 'Failed to load price data'
+            }))
     
     async def price_update(self, event):
-        """Handle price update from channel layer"""
+        """Handle price update events"""
         await self.send(text_data=json.dumps({
             'type': 'price_update',
             'price_data': event['price_data']
         }))
+    
+    @classmethod
+    async def broadcast_price_update(cls, price_data):
+        """Broadcast price update to all connected clients"""
+        from channels.layers import get_channel_layer
+        channel_layer = get_channel_layer()
+        await channel_layer.group_send(
+            'price_feeds',
+            {
+                'type': 'price_update',
+                'price_data': price_data
+            }
+        )
 
 
 class PortfolioConsumer(AsyncWebsocketConsumer):
@@ -216,58 +217,30 @@ class PortfolioConsumer(AsyncWebsocketConsumer):
         
         if message_type == 'get_portfolio':
             await self.send_portfolio_data()
-        elif message_type == 'get_investments':
-            await self.send_investments_data()
     
     async def send_portfolio_data(self):
         """Send portfolio data to client"""
-        portfolio = await self.get_user_portfolio()
-        await self.send(text_data=json.dumps({
-            'type': 'portfolio_data',
-            'portfolio': portfolio
-        }))
-    
-    async def send_investments_data(self):
-        """Send investments data to client"""
-        investments = await self.get_user_investments()
-        await self.send(text_data=json.dumps({
-            'type': 'investments_data',
-            'investments': investments
-        }))
-    
-    @database_sync_to_async
-    def get_user_portfolio(self):
-        """Get user portfolio from database"""
         try:
+            # Get models dynamically to avoid import issues
+            User = apps.get_model('auth', 'User')
+            InvestmentPortfolio = apps.get_model('investments', 'InvestmentPortfolio')
+            
             user = User.objects.get(id=self.user_id)
             portfolio = InvestmentPortfolio.objects.get(user=user)
-            return {
-                'total_invested': float(portfolio.total_invested),
-                'current_value': float(portfolio.current_value),
-                'total_return': float(portfolio.total_return),
-                'total_return_percentage': float(portfolio.total_return_percentage),
-                'active_investments_count': portfolio.active_investments_count,
-                'last_updated': portfolio.last_updated.isoformat()
-            }
-        except (User.DoesNotExist, InvestmentPortfolio.DoesNotExist):
-            return {}
-    
-    @database_sync_to_async
-    def get_user_investments(self):
-        """Get user investments from database"""
-        try:
-            user = User.objects.get(id=self.user_id)
-            investments = UserInvestment.objects.filter(user=user, status='active')
-            return [{
-                'id': inv.id,
-                'item_name': inv.item.name,
-                'category': inv.item.category.name,
-                'investment_amount': float(inv.investment_amount_usd),
-                'current_value': float(inv.current_value_usd),
-                'total_return': float(inv.total_return_usd),
-                'total_return_percentage': float(inv.total_return_percentage),
-                'purchased_at': inv.purchased_at.isoformat(),
-                'days_held': inv.days_held
-            } for inv in investments]
-        except User.DoesNotExist:
-            return []
+            
+            await self.send(text_data=json.dumps({
+                'type': 'portfolio_data',
+                'portfolio': {
+                    'total_invested': float(portfolio.total_invested),
+                    'current_value': float(portfolio.current_value),
+                    'total_return': float(portfolio.total_return),
+                    'total_return_percentage': float(portfolio.total_return_percentage),
+                    'active_investments_count': portfolio.active_investments_count,
+                    'last_updated': portfolio.last_updated.isoformat()
+                }
+            }))
+        except Exception as e:
+            await self.send(text_data=json.dumps({
+                'type': 'error',
+                'message': 'Failed to load portfolio data'
+            }))
