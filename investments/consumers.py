@@ -173,6 +173,32 @@ class PriceFeedConsumer(AsyncWebsocketConsumer):
         try:
             logger.info("Fetching price data from database...")
             
+            # Get price data using sync_to_async
+            price_data = await self.get_price_data()
+            
+            response_data = {
+                'type': 'price_data',
+                'prices': price_data,
+                'timestamp': await self.get_current_timestamp(),
+                'total_items': len(price_data)
+            }
+            
+            logger.info(f"Sending price data: {len(price_data)} items")
+            await self.send(text_data=json.dumps(response_data))
+            logger.info("Price data sent successfully")
+            
+        except Exception as e:
+            logger.error(f"Error sending price data: {e}")
+            error_response = {
+                'type': 'error',
+                'message': f'Failed to load price data: {str(e)}'
+            }
+            await self.send(text_data=json.dumps(error_response))
+    
+    @database_sync_to_async
+    def get_price_data(self):
+        """Get price data from database - wrapped in sync_to_async"""
+        try:
             # Get models dynamically to avoid import issues
             RealTimePriceFeed = apps.get_model('investments', 'RealTimePriceFeed')
             InvestmentItem = apps.get_model('investments', 'InvestmentItem')
@@ -245,24 +271,17 @@ class PriceFeedConsumer(AsyncWebsocketConsumer):
                     })
                     logger.info(f"Added static investment item data for {item.name}: ${item.current_price_usd}")
             
-            response_data = {
-                'type': 'price_data',
-                'prices': price_data,
-                'timestamp': apps.get_model('django.utils', 'timezone').now().isoformat(),
-                'total_items': len(price_data)
-            }
-            
-            logger.info(f"Sending price data: {len(price_data)} items")
-            await self.send(text_data=json.dumps(response_data))
-            logger.info("Price data sent successfully")
+            return price_data
             
         except Exception as e:
-            logger.error(f"Error sending price data: {e}")
-            error_response = {
-                'type': 'error',
-                'message': f'Failed to load price data: {str(e)}'
-            }
-            await self.send(text_data=json.dumps(error_response))
+            logger.error(f"Error getting price data: {e}")
+            return []
+    
+    @database_sync_to_async
+    def get_current_timestamp(self):
+        """Get current timestamp - wrapped in sync_to_async"""
+        from django.utils import timezone
+        return timezone.now().isoformat()
     
     async def price_update(self, event):
         """Handle price update events from channel layer"""
@@ -329,23 +348,12 @@ class PortfolioConsumer(AsyncWebsocketConsumer):
     async def send_portfolio_data(self):
         """Send portfolio data to client"""
         try:
-            # Get models dynamically to avoid import issues
-            User = apps.get_model('auth', 'User')
-            InvestmentPortfolio = apps.get_model('investments', 'InvestmentPortfolio')
-            
-            user = User.objects.get(id=self.user_id)
-            portfolio = InvestmentPortfolio.objects.get(user=user)
+            # Get portfolio data using sync_to_async
+            portfolio_data = await self.get_portfolio_data()
             
             await self.send(text_data=json.dumps({
                 'type': 'portfolio_data',
-                'portfolio': {
-                    'total_invested': float(portfolio.total_invested),
-                    'current_value': float(portfolio.current_value),
-                    'total_return': float(portfolio.total_return),
-                    'total_return_percentage': float(portfolio.total_return_percentage),
-                    'active_investments_count': portfolio.active_investments_count,
-                    'last_updated': portfolio.last_updated.isoformat()
-                }
+                'portfolio': portfolio_data
             }))
         except Exception as e:
             logger.error(f"Error sending portfolio data: {e}")
@@ -353,3 +361,26 @@ class PortfolioConsumer(AsyncWebsocketConsumer):
                 'type': 'error',
                 'message': 'Failed to load portfolio data'
             }))
+    
+    @database_sync_to_async
+    def get_portfolio_data(self):
+        """Get portfolio data from database - wrapped in sync_to_async"""
+        try:
+            # Get models dynamically to avoid import issues
+            User = apps.get_model('auth', 'User')
+            InvestmentPortfolio = apps.get_model('investments', 'InvestmentPortfolio')
+            
+            user = User.objects.get(id=self.user_id)
+            portfolio = InvestmentPortfolio.objects.get(user=user)
+            
+            return {
+                'total_invested': float(portfolio.total_invested),
+                'current_value': float(portfolio.current_value),
+                'total_return': float(portfolio.total_return),
+                'total_return_percentage': float(portfolio.total_return_percentage),
+                'active_investments_count': portfolio.active_investments_count,
+                'last_updated': portfolio.last_updated.isoformat()
+            }
+        except Exception as e:
+            logger.error(f"Error getting portfolio data: {e}")
+            return {}
