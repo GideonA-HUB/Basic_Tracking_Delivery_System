@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
@@ -18,10 +18,14 @@ import logging
 from django.contrib import messages
 from django.forms import Form
 from django import forms
+from django.core.management import call_command
+from django.core.paginator import Paginator
+from django.template.loader import render_to_string
+from django.urls import reverse
 
 from .models import (
     InvestmentCategory, InvestmentItem, PriceHistory, 
-    UserInvestment, InvestmentTransaction, InvestmentPortfolio
+    UserInvestment, InvestmentTransaction, InvestmentPortfolio, RealTimePriceFeed
 )
 from .serializers import (
     InvestmentCategorySerializer, InvestmentItemSerializer, 
@@ -896,3 +900,27 @@ def investment_cancel(request, transaction_id):
         logger.error(f"Error in investment_cancel: {e}")
         messages.error(request, 'An error occurred.')
         return redirect('investments:investment-marketplace')
+
+
+@user_passes_test(is_staff_user)
+def fix_production_database_view(request):
+    """View to fix production database issues"""
+    if request.method == 'POST':
+        try:
+            # Call the management command
+            call_command('fix_production_db', verbosity=0)
+            messages.success(request, '✅ Production database fixed successfully! Live price updates should now work.')
+            
+            # Redirect to admin or show success
+            return redirect('admin:investments_real_time_price_feed_changelist')
+            
+        except Exception as e:
+            messages.error(request, f'❌ Error fixing production database: {str(e)}')
+            logger.error(f"Error fixing production database: {e}")
+    
+    # Show the fix form
+    context = {
+        'title': 'Fix Production Database',
+        'description': 'This will fix missing last_price_update fields and create price feeds for live updates.'
+    }
+    return render(request, 'investments/fix_production_db.html', context)

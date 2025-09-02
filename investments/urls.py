@@ -45,4 +45,7 @@ urlpatterns = [
     
     # NOWPayments webhook
     path('webhook/', views.nowpayments_webhook, name='nowpayments-webhook'),
+    
+    # Production database fix
+    path('fix-production-db/', views.fix_production_database_view, name='fix-production-db'),
 ]

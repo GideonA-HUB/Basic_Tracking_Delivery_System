@@ -9,6 +9,10 @@ from .models import (
     CurrencyConversion, CustomerCashoutRequest
 )
 from django.utils import timezone
+from django.http import HttpResponseRedirect
+from django.urls import path
+from django.contrib import messages
+from django.core.management import call_command
 
 
 @admin.register(InvestmentCategory)
@@ -31,8 +35,35 @@ class InvestmentCategoryAdmin(admin.ModelAdmin):
 from .forms import InvestmentItemAdmin
 
 @admin.register(InvestmentItem)
-class InvestmentItemAdmin(InvestmentItemAdmin):
-    pass
+class InvestmentItemAdmin(admin.ModelAdmin):
+    list_display = [
+        'name', 'category', 'current_price_usd', 'symbol', 
+        'investment_type', 'is_active', 'is_featured', 'created_at'
+    ]
+    list_filter = [
+        'category', 'investment_type', 'is_active', 'is_featured', 
+        'created_at', 'symbol'
+    ]
+    search_fields = ['name', 'description', 'symbol']
+    ordering = ['name']
+    list_editable = ['is_active', 'is_featured', 'symbol']
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'description', 'category', 'investment_type')
+        }),
+        ('Pricing', {
+            'fields': ('current_price_usd', 'minimum_investment', 'symbol')
+        }),
+        ('Status', {
+            'fields': ('is_active', 'is_featured')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        })
+    )
+    readonly_fields = ['created_at', 'updated_at']
 
 
 @admin.register(PriceHistory)
@@ -191,27 +222,65 @@ class InvestmentPortfolioAdmin(admin.ModelAdmin):
 @admin.register(RealTimePriceFeed)
 class RealTimePriceFeedAdmin(admin.ModelAdmin):
     list_display = [
-        'name', 'asset_type', 'symbol', 'current_price', 'base_currency',
-        'price_change_percentage_24h', 'is_active', 'last_updated'
+        'name', 'symbol', 'asset_type', 'current_price', 
+        'price_change_24h', 'price_change_percentage_24h', 
+        'is_active', 'last_updated'
     ]
-    list_filter = ['asset_type', 'base_currency', 'is_active', 'last_updated']
-    search_fields = ['name', 'symbol', 'asset_type']
-    ordering = ['asset_type', 'name']
-    readonly_fields = ['last_updated']
+    list_filter = ['asset_type', 'is_active', 'api_source', 'last_updated']
+    search_fields = ['name', 'symbol']
+    ordering = ['name']
+    list_editable = ['is_active', 'current_price']
     
-    def get_price_change_display(self, obj):
-        if obj.price_change_percentage_24h > 0:
-            return format_html(
-                '<span style="color: green;">+{}%</span>',
-                obj.price_change_percentage_24h
-            )
-        elif obj.price_change_percentage_24h < 0:
-            return format_html(
-                '<span style="color: red;">{}%</span>',
-                obj.price_change_percentage_24h
-            )
-        return '0.00%'
-    get_price_change_display.short_description = '24h Change %'
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'symbol', 'asset_type', 'api_source')
+        }),
+        ('Pricing', {
+            'fields': ('current_price', 'price_change_24h', 'price_change_percentage_24h')
+        }),
+        ('API Configuration', {
+            'fields': ('api_url', 'is_active')
+        }),
+        ('Timestamps', {
+            'fields': ('last_updated',),
+            'classes': ('collapse',)
+        })
+    )
+    readonly_fields = ['last_updated']
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('fix-production-db/', self.admin_site.admin_view(self.fix_production_db), name='fix-production-db'),
+        ]
+        return custom_urls + urls
+
+    def fix_production_db(self, request):
+        """Fix production database issues"""
+        try:
+            # Call the management command
+            call_command('fix_production_db', verbosity=0)
+            messages.success(request, '✅ Production database fixed successfully! Live price updates should now work.')
+        except Exception as e:
+            messages.error(request, f'❌ Error fixing production database: {str(e)}')
+        
+        return HttpResponseRedirect('../')
+
+# Add custom admin actions
+@admin.action(description="Fix production database issues")
+def fix_production_database(modeladmin, request, queryset):
+    """Admin action to fix production database"""
+    try:
+        call_command('fix_production_db', verbosity=0)
+        messages.success(request, '✅ Production database fixed successfully! Live price updates should now work.')
+    except Exception as e:
+        messages.error(request, f'❌ Error fixing production database: {str(e)}')
+
+# Add the action to InvestmentItem admin
+InvestmentItemAdmin.actions = [fix_production_database]
+
+# Add the action to RealTimePriceFeed admin  
+RealTimePriceFeedAdmin.actions = [fix_production_database]
 
 
 @admin.register(RealTimePriceHistory)
