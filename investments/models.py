@@ -37,6 +37,9 @@ class InvestmentItem(models.Model):
     description = models.TextField()
     short_description = models.CharField(max_length=300, blank=True)
     
+    # Symbol for live price updates (links to RealTimePriceFeed)
+    symbol = models.CharField(max_length=20, blank=True, null=True, help_text="Symbol for live price updates (e.g., BTC, ETH, XAU)")
+    
     # Investment details
     current_price_usd = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(Decimal('0.01'))])
     price_change_24h = models.DecimalField(max_digits=8, decimal_places=2, default=0)
