@@ -4,6 +4,13 @@
 
 {% block extra_css %}
 <style>
+    /* Fix layout issues and ensure proper content positioning */
+    .investment-content-wrapper {
+        margin-top: 0;
+        padding-top: 0;
+        min-height: calc(100vh - 64px); /* Account for navigation height */
+    }
+    
     .investment-card {
         transition: all 0.3s ease;
         border: 1px solid #e5e7eb;
@@ -109,13 +116,103 @@
     .dark .stat-label {
         color: #d1d5db;
     }
+    
+    /* Ensure content starts immediately after navigation */
+    main {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+    
+    /* Fix any potential z-index issues */
+    .investment-navigation {
+        z-index: 40;
+        position: relative;
+    }
+    
+    /* Ensure proper content flow */
+    .investment-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Remove any default margins/padding that might cause spacing issues */
+    .investment-content-wrapper > *:first-child {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+    
+    /* Ensure navigation doesn't interfere with content */
+    .investment-navigation {
+        position: relative;
+        z-index: 40;
+        margin-bottom: 0;
+    }
+    
+    /* Fix any potential body/html spacing issues */
+    body, html {
+        margin: 0;
+        padding: 0;
+    }
+    
+    /* Ensure main content area starts immediately after navigation */
+    .investment-content {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Hide scroll buttons on investment pages to prevent layout interference */
+    .investment-content ~ #scrollToTop,
+    .investment-content ~ #scrollToBottom {
+        display: none !important;
+    }
+    
+    /* Alternative approach: ensure scroll buttons don't interfere */
+    #scrollToTop, #scrollToBottom {
+        z-index: 1000;
+        pointer-events: auto;
+    }
+    
+    /* Ensure no hidden elements are pushing content down */
+    .investment-content-wrapper {
+        overflow: visible;
+        position: relative;
+    }
+    
+    /* Force content to start at the top */
+    .investment-content-wrapper::before {
+        content: '';
+        display: block;
+        height: 0;
+        margin: 0;
+        padding: 0;
+    }
+    
+    /* Specific fixes for investment pages */
+    .investment-content-wrapper h1:first-of-type {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+    
+    /* Ensure hero sections start immediately */
+    .investment-content-wrapper .text-center:first-of-type {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+    
+    /* Remove any top spacing from first elements */
+    .investment-content-wrapper > *:first-child {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
     <!-- Investment Navigation -->
-    <nav class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+    <nav class="investment-navigation bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
@@ -125,7 +222,7 @@
                 </div>
                 
                 <div class="flex items-center space-x-4">
-                                            <a href="{% url 'investments:investment-marketplace' %}" 
+                    <a href="{% url 'investments:investment-marketplace' %}" 
                        class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium">
                         Marketplace
                     </a>
@@ -190,11 +287,10 @@
                                 <div class="flex space-x-2">
                                     <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
                                         <i class="fas fa-copy mr-1"></i> Copy Address
-                                        </button>
-                                        <button class="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                                            <i class="fas fa-external-link-alt mr-1"></i> Learn More
-                                        </button>
-                                    </div>
+                                    </button>
+                                    <button class="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+                                        <i class="fas fa-external-link-alt mr-1"></i> Learn More
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -205,7 +301,7 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <main class="investment-content max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         {% block investment_content %}{% endblock %}
     </main>
 </div>
@@ -214,6 +310,21 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    // Fix layout issues - ensure content starts at top
+    document.addEventListener('DOMContentLoaded', function() {
+        // Force scroll to top on investment pages
+        if (window.location.pathname.includes('/investments/')) {
+            window.scrollTo(0, 0);
+            
+            // Also ensure content wrapper starts at top
+            const contentWrapper = document.querySelector('.investment-content-wrapper');
+            if (contentWrapper) {
+                contentWrapper.style.marginTop = '0';
+                contentWrapper.style.paddingTop = '0';
+            }
+        }
+    });
+    
     // Common investment functions
     function formatCurrency(amount) {
         return new Intl.NumberFormat('en-US', {
