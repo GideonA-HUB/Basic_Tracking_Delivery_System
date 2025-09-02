@@ -4,6 +4,6 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "python manage.py migrate --settings=delivery_tracker.settings_production && python manage.py collectstatic --noinput --settings=delivery_tracker.settings_production && python manage.py shell --settings=delivery_tracker.settings_production -c \"from django.contrib.auth.models import User; User.objects.filter(username='admin').delete(); User.objects.create_superuser('admin', 'admin@example.com', '$DJANGO_SUPERUSER_PASSWORD')\" && daphne -b 0.0.0.0 -p $PORT delivery_tracker.asgi:application --env DJANGO_SETTINGS_MODULE=delivery_tracker.settings_production"
+    "startCommand": "python manage.py migrate --settings=delivery_tracker.settings_production && python manage.py collectstatic --noinput --settings=delivery_tracker.settings_production && python manage.py shell --settings=delivery_tracker.settings_production -c \"from django.contrib.auth.models import User; User.objects.filter(username='admin').delete(); User.objects.create_superuser('admin', 'admin@example.com', '$DJANGO_SUPERUSER_PASSWORD')\" && DJANGO_SETTINGS_MODULE=delivery_tracker.settings_production daphne -b 0.0.0.0 -p $PORT delivery_tracker.asgi:application"
   }
 }
