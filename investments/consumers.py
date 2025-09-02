@@ -263,7 +263,7 @@ class PriceFeedConsumer(AsyncWebsocketConsumer):
                         'current_price': float(item.current_price_usd),
                         'price_change_24h': float(item.price_change_24h) if item.price_change_24h else 0,
                         'price_change_percentage_24h': float(item.price_change_percentage_24h) if item.price_change_percentage_24h else 0,
-                        'last_updated': item.last_price_update.isoformat() if item.last_price_update else None,
+                        'last_updated': getattr(item, 'last_price_update', item.updated_at).isoformat() if hasattr(item, 'last_price_update') and item.last_price_update else item.updated_at.isoformat(),
                         'source': 'investment_item_static',
                         'item_id': item.id,
                         'minimum_investment': float(item.minimum_investment) if item.minimum_investment else None,
