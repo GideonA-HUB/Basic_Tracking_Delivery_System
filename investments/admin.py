@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.admin import action
 from django.utils.html import format_html
 from django.urls import reverse
 from django.utils.safestring import mark_safe
@@ -31,8 +32,6 @@ class InvestmentCategoryAdmin(admin.ModelAdmin):
         return '-'
     get_color_preview.short_description = 'Color'
 
-
-from .forms import InvestmentItemAdmin
 
 @admin.register(InvestmentItem)
 class InvestmentItemAdmin(admin.ModelAdmin):
@@ -267,7 +266,7 @@ class RealTimePriceFeedAdmin(admin.ModelAdmin):
         return HttpResponseRedirect('../')
 
 # Add custom admin actions
-@admin.action(description="Fix production database issues")
+@action(description="Fix production database issues")
 def fix_production_database(modeladmin, request, queryset):
     """Admin action to fix production database"""
     try:

@@ -39,6 +39,11 @@ from .services import nowpayments_service, price_service
 logger = logging.getLogger(__name__)
 
 
+def is_staff_user(user):
+    """Check if user is staff"""
+    return user.is_staff
+
+
 # API Viewsets
 class InvestmentCategoryViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet for investment categories"""

@@ -71,6 +71,7 @@ class InvestmentItem(models.Model):
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    last_price_update = models.DateTimeField(auto_now=True, help_text="Last time the price was updated")
     
     class Meta:
         ordering = ['-is_featured', '-created_at']
