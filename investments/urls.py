@@ -29,6 +29,7 @@ urlpatterns = [
     
     # Investment flow
     path('invest/<int:item_id>/<str:investment_type>/', views.invest_in_item, name='invest-in-item'),
+    path('investment/payment-details/<int:transaction_id>/', views.investment_payment_details, name='investment-payment-details'),
     path('investment/success/<int:transaction_id>/', views.investment_success, name='investment-success'),
     path('investment/cancel/<int:transaction_id>/', views.investment_cancel, name='investment-cancel'),
     
@@ -45,6 +46,17 @@ urlpatterns = [
     
     # NOWPayments webhook
     path('webhook/', views.nowpayments_webhook, name='nowpayments-webhook'),
+    
+    # NOWPayments Payment URLs
+    path('api/payments/ipn/', views.nowpayments_ipn_webhook, name='nowpayments-ipn'),
+    path('api/payments/membership/create/', views.create_membership_payment, name='create-membership-payment'),
+    path('api/payments/<str:payment_id>/status/', views.get_payment_status, name='get-payment-status'),
+    path('api/payments/list/', views.user_payments_list, name='user-payments-list'),
+    path('api/membership/status/', views.check_membership_status, name='check-membership-status'),
+    path('api/investment-payment/<int:transaction_id>/status/', views.check_investment_payment_status, name='check-investment-payment-status'),
+    
+    # Membership Payment Page
+    path('membership/payment/', views.membership_payment_view, name='membership-payment'),
     
     # Production database fix
     path('fix-production-db/', views.fix_production_database_view, name='fix-production-db'),

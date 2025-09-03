@@ -261,6 +261,7 @@ class InvestmentTransaction(models.Model):
     nowpayments_payment_status = models.CharField(max_length=50, blank=True, null=True)
     crypto_amount = models.DecimalField(max_digits=20, decimal_places=8, blank=True, null=True)
     crypto_currency = models.CharField(max_length=10, blank=True, null=True)
+    payment_address = models.CharField(max_length=255, blank=True, null=True, help_text="NOWPayments payment address")
     
     # Metadata
     description = models.TextField(blank=True)
@@ -644,3 +645,102 @@ class CustomerCashoutRequest(models.Model):
             self.save()
             return True
         return False
+
+class PaymentTransaction(models.Model):
+    """Model for tracking payment transactions"""
+    PAYMENT_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('waiting', 'Waiting for Payment'),
+        ('confirming', 'Confirming'),
+        ('confirmed', 'Confirmed'),
+        ('sending', 'Sending'),
+        ('partially_paid', 'Partially Paid'),
+        ('finished', 'Finished'),
+        ('failed', 'Failed'),
+        ('expired', 'Expired'),
+        ('refunded', 'Refunded'),
+    ]
+    
+    PAYMENT_TYPE_CHOICES = [
+        ('membership', 'Membership Fee'),
+        ('investment', 'Investment'),
+        ('delivery', 'Buy & Deliver'),
+    ]
+    
+    # Basic payment info
+    payment_id = models.CharField(max_length=255, unique=True, help_text="NOWPayments payment ID")
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')
+    payment_type = models.CharField(max_length=20, choices=PAYMENT_TYPE_CHOICES)
+    
+    # Amount details
+    amount_usd = models.DecimalField(max_digits=10, decimal_places=2)
+    amount_crypto = models.DecimalField(max_digits=20, decimal_places=8, null=True, blank=True)
+    crypto_currency = models.CharField(max_length=10, default='SOL')
+    
+    # User and item info
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    investment_item = models.ForeignKey(InvestmentItem, on_delete=models.CASCADE, null=True, blank=True)
+    
+    # NOWPayments specific fields
+    nowpayments_payment_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
+    payment_address = models.CharField(max_length=255, null=True, blank=True)
+    payment_extra_id = models.CharField(max_length=255, null=True, blank=True)
+    
+    # Webhook data
+    ipn_data = models.JSONField(default=dict, blank=True)
+    signature_verified = models.BooleanField(default=False)
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    paid_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Payment Transaction'
+        verbose_name_plural = 'Payment Transactions'
+    
+    def __str__(self):
+        return f"{self.payment_type} - ${self.amount_usd} - {self.payment_status}"
+    
+    @property
+    def is_paid(self):
+        return self.payment_status in ['confirmed', 'finished']
+    
+    @property
+    def is_failed(self):
+        return self.payment_status in ['failed', 'expired']
+    
+    @property
+    def is_pending(self):
+        return self.payment_status in ['pending', 'waiting', 'confirming', 'sending', 'partially_paid']
+
+class MembershipPayment(models.Model):
+    """Model for tracking membership payments"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    payment_transaction = models.OneToOneField(PaymentTransaction, on_delete=models.CASCADE)
+    membership_type = models.CharField(max_length=50, default='Standard')
+    membership_duration = models.CharField(max_length=50, default='1 Year')
+    is_active = models.BooleanField(default=False)
+    activated_at = models.DateTimeField(null=True, blank=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Membership Payment'
+        verbose_name_plural = 'Membership Payments'
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.membership_type} Membership"
+    
+    @property
+    def days_remaining(self):
+        if self.expires_at:
+            from django.utils import timezone
+            now = timezone.now()
+            if self.expires_at > now:
+                return (self.expires_at - now).days
+        return 0

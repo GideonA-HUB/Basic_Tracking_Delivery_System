@@ -34,7 +34,7 @@ from .serializers import (
     CreateInvestmentTransactionSerializer, UpdateInvestmentItemSerializer,
     InvestmentChartDataSerializer, InvestmentSummarySerializer
 )
-from .services import nowpayments_service, price_service
+from .services import nowpayments_service
 
 logger = logging.getLogger(__name__)
 
@@ -803,6 +803,9 @@ def invest_in_item(request, item_id, investment_type):
                 messages.error(request, f'Minimum investment amount is ${item.minimum_investment}.')
                 return redirect('investments:investment-item-detail', item_id=item_id)
             
+            # Get payment method from form
+            payment_method = request.POST.get('payment_method', 'crypto')
+            
             # Create investment transaction
             transaction = InvestmentTransaction.objects.create(
                 user=request.user,
@@ -811,24 +814,36 @@ def invest_in_item(request, item_id, investment_type):
                 amount_usd=amount,
                 quantity=quantity,
                 price_per_unit=item.current_price_usd,
-                payment_method='nowpayments',
+                payment_method=payment_method,
                 payment_status='pending',
                 description=f"{investment_type.title()} of {item.name}",
             )
             
-            # Create NOWPayments payment
-            payment_response = nowpayments_service.create_payment(transaction)
-            
-            if payment_response and payment_response.get('payment_id'):
-                # Update transaction with payment ID
-                transaction.nowpayments_payment_id = payment_response['payment_id']
-                transaction.save()
+            # Handle different payment methods
+            if payment_method == 'crypto':
+                # Create NOWPayments payment for cryptocurrency
+                payment_response = nowpayments_service.create_investment_payment(
+                    user=request.user,
+                    amount_usd=amount,
+                    investment_type=investment_type,
+                    item=item,
+                    transaction=transaction
+                )
                 
-                # Redirect to payment page
-                payment_url = nowpayments_service.get_payment_url(payment_response['payment_id'])
-                return redirect(payment_url)
+                if payment_response and payment_response.get('success'):
+                    # Update transaction with NOWPayments data
+                    transaction.nowpayments_payment_id = payment_response.get('nowpayments_payment_id')
+                    transaction.save()
+                    
+                    # Redirect to payment details page
+                    return redirect('investments:investment-payment-details', transaction_id=transaction.id)
+                else:
+                    messages.error(request, 'Failed to create cryptocurrency payment. Please try again.')
+                    transaction.delete()
+                    return redirect('investments:investment-item-detail', item_id=item_id)
             else:
-                messages.error(request, 'Failed to create payment. Please try again.')
+                # Handle bank transfer (you can implement this later)
+                messages.info(request, 'Bank transfer option will be available soon.')
                 transaction.delete()
                 return redirect('investments:investment-item-detail', item_id=item_id)
         
@@ -929,3 +944,267 @@ def fix_production_database_view(request):
         'description': 'This will fix missing last_price_update fields and create price feeds for live updates.'
     }
     return render(request, 'investments/fix_production_db.html', context)
+
+# NOWPayments Webhook and Payment Views
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from django.http import JsonResponse, HttpResponse
+from django.utils.decorators import method_decorator
+from django.views import View
+import json
+import logging
+
+logger = logging.getLogger(__name__)
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def nowpayments_ipn_webhook(request):
+    """Handle NOWPayments IPN (Instant Payment Notification) webhooks"""
+    try:
+        # Get the raw request body
+        body = request.body.decode('utf-8')
+        
+        # Get the signature header
+        signature = request.headers.get('X-NowPayments-Sig')
+        
+        if not signature:
+            logger.error("Missing NOWPayments signature header")
+            return HttpResponse(status=400)
+        
+        # Verify the signature
+        from .services import nowpayments_service
+        if not nowpayments_service.verify_ipn_signature(body, signature):
+            logger.error("Invalid NOWPayments IPN signature")
+            return HttpResponse(status=400)
+        
+        # Parse the JSON data
+        try:
+            ipn_data = json.loads(body)
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON in IPN: {e}")
+            return HttpResponse(status=400)
+        
+        # Process the IPN data
+        if nowpayments_service.process_ipn_data(ipn_data):
+            logger.info(f"IPN processed successfully for payment {ipn_data.get('payment_id')}")
+            return HttpResponse(status=200)
+        else:
+            logger.error(f"Failed to process IPN for payment {ipn_data.get('payment_id')}")
+            return HttpResponse(status=500)
+            
+    except Exception as e:
+        logger.error(f"Error processing NOWPayments IPN: {str(e)}")
+        return HttpResponse(status=500)
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def create_membership_payment(request):
+    """Create a new membership payment request"""
+    try:
+        if not request.user.is_authenticated:
+            return JsonResponse({'error': 'Authentication required'}, status=401)
+        
+        # Get amount from request (default to $1,270)
+        data = json.loads(request.body) if request.body else {}
+        amount = data.get('amount', 1270.00)
+        
+        # Create membership payment
+        from .services import nowpayments_service
+        transaction = nowpayments_service.create_membership_payment(request.user, amount)
+        
+        if transaction:
+            # Return payment details
+            response_data = {
+                'success': True,
+                'payment_id': transaction.payment_id,
+                'amount_usd': float(transaction.amount_usd),
+                'crypto_amount': float(transaction.amount_crypto) if transaction.amount_crypto else None,
+                'crypto_currency': transaction.crypto_currency,
+                'payment_address': transaction.payment_address,
+                'payment_status': transaction.payment_status,
+                'payment_url': f"https://nowpayments.io/payment/?iid={transaction.nowpayments_payment_id}"
+            }
+            return JsonResponse(response_data)
+        else:
+            return JsonResponse({'error': 'Failed to create payment'}, status=500)
+            
+    except Exception as e:
+        logger.error(f"Error creating membership payment: {str(e)}")
+        return JsonResponse({'error': 'Internal server error'}, status=500)
+
+@require_http_methods(["GET"])
+def get_payment_status(request, payment_id):
+    """Get payment status for a specific payment"""
+    try:
+        if not request.user.is_authenticated:
+            return JsonResponse({'error': 'Authentication required'}, status=401)
+        
+        # Get payment transaction
+        from .models import PaymentTransaction
+        try:
+            transaction = PaymentTransaction.objects.get(
+                payment_id=payment_id,
+                user=request.user
+            )
+        except PaymentTransaction.DoesNotExist:
+            return JsonResponse({'error': 'Payment not found'}, status=404)
+        
+        # Return payment details
+        response_data = {
+            'payment_id': transaction.payment_id,
+            'payment_type': transaction.payment_type,
+            'amount_usd': float(transaction.amount_usd),
+            'crypto_amount': float(transaction.amount_crypto) if transaction.amount_crypto else None,
+            'crypto_currency': transaction.crypto_currency,
+            'payment_status': transaction.payment_status,
+            'payment_address': transaction.payment_address,
+            'created_at': transaction.created_at.isoformat(),
+            'paid_at': transaction.paid_at.isoformat() if transaction.paid_at else None,
+            'is_paid': transaction.is_paid,
+            'is_failed': transaction.is_failed,
+            'is_pending': transaction.is_pending
+        }
+        
+        return JsonResponse(response_data)
+        
+    except Exception as e:
+        logger.error(f"Error getting payment status: {str(e)}")
+        return JsonResponse({'error': 'Internal server error'}, status=500)
+
+@require_http_methods(["GET"])
+def user_payments_list(request):
+    """Get list of user's payment transactions"""
+    try:
+        if not request.user.is_authenticated:
+            return JsonResponse({'error': 'Authentication required'}, status=401)
+        
+        # Get user's payments
+        from .models import PaymentTransaction
+        payments = PaymentTransaction.objects.filter(user=request.user).order_by('-created_at')
+        
+        payments_data = []
+        for payment in payments:
+            payments_data.append({
+                'payment_id': payment.payment_id,
+                'payment_type': payment.payment_type,
+                'amount_usd': float(payment.amount_usd),
+                'crypto_amount': float(payment.amount_crypto) if payment.amount_crypto else None,
+                'crypto_currency': payment.crypto_currency,
+                'payment_status': payment.payment_status,
+                'created_at': payment.created_at.isoformat(),
+                'paid_at': payment.paid_at.isoformat() if payment.paid_at else None,
+                'is_paid': payment.is_paid,
+                'is_failed': payment.is_failed,
+                'is_pending': payment.is_pending
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'payments': payments_data,
+            'total_count': len(payments_data)
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting user payments: {str(e)}")
+        return JsonResponse({'error': 'Internal server error'}, status=500)
+
+@require_http_methods(["GET"])
+def check_membership_status(request):
+    """Check if user has active membership"""
+    try:
+        if not request.user.is_authenticated:
+            return JsonResponse({'error': 'Authentication required'}, status=401)
+        
+        # Check for active membership
+        from .models import MembershipPayment
+        try:
+            membership = MembershipPayment.objects.get(
+                user=request.user,
+                is_active=True
+            )
+            
+            response_data = {
+                'has_membership': True,
+                'membership_type': membership.membership_type,
+                'membership_duration': membership.membership_duration,
+                'activated_at': membership.activated_at.isoformat(),
+                'expires_at': membership.expires_at.isoformat(),
+                'days_remaining': membership.days_remaining,
+                'is_active': membership.is_active
+            }
+        except MembershipPayment.DoesNotExist:
+            response_data = {
+                'has_membership': False,
+                'membership_type': None,
+                'membership_duration': None,
+                'activated_at': None,
+                'expires_at': None,
+                'days_remaining': 0,
+                'is_active': False
+            }
+        
+        return JsonResponse(response_data)
+        
+    except Exception as e:
+        logger.error(f"Error checking membership status: {str(e)}")
+        return JsonResponse({'error': 'Internal server error'}, status=500)
+
+@login_required
+def investment_payment_details(request, transaction_id):
+    """Show investment payment details and instructions"""
+    try:
+        transaction = get_object_or_404(InvestmentTransaction, id=transaction_id, user=request.user)
+        
+        if not transaction.nowpayments_payment_id:
+            messages.error(request, 'Payment not found or invalid.')
+            return redirect('investments:investment-marketplace')
+        
+        context = {
+            'transaction': transaction,
+            'item': transaction.item,
+            'user': request.user
+        }
+        return render(request, 'investments/investment_payment_details.html', context)
+        
+    except Exception as e:
+        logger.error(f"Error in investment_payment_details: {str(e)}")
+        messages.error(request, 'An error occurred. Please try again.')
+        return redirect('investments:investment-marketplace')
+
+@login_required
+def check_investment_payment_status(request, transaction_id):
+    """Check payment status for a specific investment transaction"""
+    try:
+        transaction = get_object_or_404(InvestmentTransaction, id=transaction_id, user=request.user)
+        
+        # Return payment details
+        response_data = {
+            'transaction_id': transaction.id,
+            'payment_status': transaction.payment_status,
+            'nowpayments_status': transaction.nowpayments_payment_status,
+            'amount_usd': float(transaction.amount_usd),
+            'crypto_amount': float(transaction.crypto_amount) if transaction.crypto_amount else None,
+            'crypto_currency': transaction.crypto_currency,
+            'payment_address': transaction.payment_address,
+            'created_at': transaction.created_at.isoformat(),
+            'completed_at': transaction.completed_at.isoformat() if transaction.completed_at else None,
+            'is_completed': transaction.payment_status == 'completed',
+            'is_failed': transaction.payment_status == 'failed',
+            'is_pending': transaction.payment_status == 'pending'
+        }
+        
+        return JsonResponse(response_data)
+        
+    except Exception as e:
+        logger.error(f"Error checking investment payment status: {str(e)}")
+        return JsonResponse({'error': 'Internal server error'}, status=500)
+
+def membership_payment_view(request):
+    """View for membership payment page"""
+    if not request.user.is_authenticated:
+        return redirect('accounts:customer_login')
+    
+    context = {
+        'user': request.user,
+    }
+    return render(request, 'investments/membership_payment.html', context)
