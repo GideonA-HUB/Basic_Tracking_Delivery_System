@@ -76,7 +76,7 @@
             </div>
             
             <!-- Copy Button -->
-            <button onclick="copyToClipboard()" class="inline-flex items-center px-6 py-3 bg-white text-orange-600 font-semibold rounded-lg hover:bg-orange-50 transition-colors">
+            <button id="copyButton" onclick="copyToClipboard()" class="inline-flex items-center px-6 py-3 bg-white text-orange-600 font-semibold rounded-lg hover:bg-orange-50 transition-colors duration-200 cursor-pointer">
                 <i class="fas fa-copy mr-2"></i>
                 Copy Address
             </button>
@@ -134,21 +134,114 @@
 <script>
 function copyToClipboard() {
     const cryptoAddress = '{{ crypto_address }}';
-    navigator.clipboard.writeText(cryptoAddress).then(function() {
-        // Show success message
-        const button = event.target.closest('button');
+    
+    // Try to use the modern clipboard API first
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(cryptoAddress).then(function() {
+            showCopySuccess();
+        }).catch(function(err) {
+            console.error('Clipboard API failed:', err);
+            fallbackCopy();
+        });
+    } else {
+        // Fallback for older browsers or non-secure contexts
+        fallbackCopy();
+    }
+}
+
+function showCopySuccess() {
+    const button = document.getElementById('copyButton');
+    if (button) {
         const originalText = button.innerHTML;
         button.innerHTML = '<i class="fas fa-check mr-2"></i>Copied!';
         button.classList.add('bg-green-500', 'hover:bg-green-600');
+        button.classList.remove('bg-white', 'hover:bg-orange-50');
         
         setTimeout(function() {
             button.innerHTML = originalText;
             button.classList.remove('bg-green-500', 'hover:bg-green-600');
+            button.classList.add('bg-white', 'hover:bg-orange-50');
         }, 2000);
-    }).catch(function(err) {
-        console.error('Could not copy text: ', err);
-        alert('Failed to copy address. Please copy manually: ' + cryptoAddress);
-    });
+    }
+}
+
+function fallbackCopy() {
+    const cryptoAddress = '{{ crypto_address }}';
+    
+    // Create a temporary textarea element
+    const textArea = document.createElement('textarea');
+    textArea.value = cryptoAddress;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    
+    try {
+        textArea.focus();
+        textArea.select();
+        const successful = document.execCommand('copy');
+        
+        if (successful) {
+            showCopySuccess();
+        } else {
+            // If execCommand fails, show manual copy instructions
+            showManualCopyInstructions(cryptoAddress);
+        }
+    } catch (err) {
+        console.error('Fallback copy failed:', err);
+        showManualCopyInstructions(cryptoAddress);
+    } finally {
+        document.body.removeChild(textArea);
+    }
+}
+
+function showManualCopyInstructions(address) {
+    // Create a modal or alert to show the address for manual copying
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    `;
+    
+    modal.innerHTML = `
+        <div style="
+            background: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            max-width: 500px;
+            text-align: center;
+        ">
+            <h3 style="margin-bottom: 1rem; color: #1f2937;">Copy Address Manually</h3>
+            <p style="margin-bottom: 1rem; color: #6b7280;">Please copy this address manually:</p>
+            <div style="
+                background: #f3f4f6;
+                padding: 1rem;
+                border-radius: 0.375rem;
+                margin-bottom: 1rem;
+                word-break: break-all;
+                font-family: monospace;
+                font-size: 0.875rem;
+            ">${address}</div>
+            <button onclick="this.parentElement.parentElement.remove()" style="
+                background: #3b82f6;
+                color: white;
+                padding: 0.5rem 1rem;
+                border: none;
+                border-radius: 0.375rem;
+                cursor: pointer;
+            ">Close</button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
 }
 </script>
 {% endblock %}
