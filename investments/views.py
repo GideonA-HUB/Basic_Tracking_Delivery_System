@@ -862,7 +862,7 @@ def invest_in_item(request, item_id, investment_type):
                 if not nowpayments_service.ipn_callback_url:
                     messages.error(request, '❌ NOWPayments IPN callback URL not configured. This is required for payment processing.')
                     messages.error(request, '🔧 Please add NOWPAYMENTS_IPN_URL to your Railway environment variables.')
-                    messages.error(request, '📋 Required value: https://meridianassetlogistics.com/investments/api/payments/ipn/')
+                    messages.error(request, '📋 Required value: https://meridian-asset-logistics.up.railway.app/investments/api/payments/ipn/')
                     transaction.delete()
                     return redirect('investments:investment-item-detail', item_id=item_id)
                 

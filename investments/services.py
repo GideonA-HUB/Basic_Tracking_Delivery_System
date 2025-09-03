@@ -41,14 +41,23 @@ class NOWPaymentsService:
             logger.error("NOWPAYMENTS_API_KEY is empty or None")
             return {}
         
-        # Validate API key format (should start with a number and contain dashes)
-        if not clean_api_key or not clean_api_key.replace('-', '').replace('_', '').isdigit():
+        # Validate API key format (should be alphanumeric with dashes/underscores)
+        if not clean_api_key or len(clean_api_key) < 10:
             logger.error(f"NOWPAYMENTS_API_KEY format appears invalid: {clean_api_key[:10]}...")
-            logger.error("API key should contain only numbers and dashes")
-            logger.error("Expected format: XXXXXXX-XXXXXXX-XXXXXXX-XXXXXXX")
+            logger.error("API key should be at least 10 characters long")
             logger.error("Please check your Railway environment variables")
             logger.error("You may need to regenerate your API key in NOWPayments dashboard")
-            logger.error("Current API key: {clean_api_key}")
+            logger.error(f"Current API key: {clean_api_key}")
+            return {}
+        
+        # Check if API key contains valid characters (alphanumeric, dashes, underscores)
+        valid_chars = set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_')
+        if not all(c in valid_chars for c in clean_api_key):
+            logger.error(f"NOWPAYMENTS_API_KEY contains invalid characters: {clean_api_key[:10]}...")
+            logger.error("API key should contain only alphanumeric characters, dashes, and underscores")
+            logger.error("Please check your Railway environment variables")
+            logger.error("You may need to regenerate your API key in NOWPayments dashboard")
+            logger.error(f"Current API key: {clean_api_key}")
             return {}
             
         return {
@@ -84,9 +93,9 @@ class NOWPaymentsService:
                 return None
             
             # Validate URL is accessible
-            if not self.ipn_callback_url.startswith('https://meridianassetlogistics.com'):
+            if not self.ipn_callback_url.startswith('https://meridian-asset-logistics.up.railway.app'):
                 logger.warning(f"IPN callback URL is not using the expected domain: {self.ipn_callback_url}")
-                logger.warning("Expected domain: https://meridianassetlogistics.com")
+                logger.warning("Expected domain: https://meridian-asset-logistics.up.railway.app")
                 logger.warning("This may cause payment creation to fail")
                 logger.warning("Please update NOWPAYMENTS_IPN_URL in Railway environment variables")
                 logger.warning("The URL should point to your production domain")
@@ -182,7 +191,7 @@ class NOWPaymentsService:
                         logger.error("IPN callback URL is invalid")
                         logger.error(f"Current IPN URL: {self.ipn_callback_url}")
                         logger.error("Please check NOWPAYMENTS_IPN_URL in Railway environment variables")
-                        logger.error("URL should be: https://meridianassetlogistics.com/investments/api/payments/ipn/")
+                        logger.error("URL should be: https://meridian-asset-logistics.up.railway.app/investments/api/payments/ipn/")
                         logger.error("Make sure the URL is accessible and properly formatted")
                     elif error_code == 'PAYMENT_CREATION_FAILED':
                         logger.error("Payment creation failed on NOWPayments side")
@@ -475,8 +484,13 @@ class NOWPaymentsService:
         
         if not self.api_key or not self.api_key.strip():
             errors.append("NOWPAYMENTS_API_KEY is missing or empty")
-        elif not self.api_key.replace('-', '').replace('_', '').isdigit():
-            errors.append("NOWPAYMENTS_API_KEY format is invalid")
+        elif len(self.api_key.strip()) < 10:
+            errors.append("NOWPAYMENTS_API_KEY is too short (minimum 10 characters)")
+        else:
+            # Check if API key contains valid characters (alphanumeric, dashes, underscores)
+            valid_chars = set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_')
+            if not all(c in valid_chars for c in self.api_key.strip()):
+                errors.append("NOWPAYMENTS_API_KEY contains invalid characters")
             
         if not self.ipn_secret or not self.ipn_secret.strip():
             errors.append("NOWPAYMENTS_IPN_SECRET is missing or empty")

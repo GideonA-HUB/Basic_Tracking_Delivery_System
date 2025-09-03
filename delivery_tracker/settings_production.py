@@ -219,7 +219,7 @@ SITE_URL = config('SITE_URL', default='https://meridian-asset-logistics.up.railw
 # NOWPayments Configuration
 NOWPAYMENTS_API_KEY = config('NOWPAYMENTS_API_KEY', default='')
 NOWPAYMENTS_IPN_SECRET = config('NOWPAYMENTS_IPN_SECRET', default='')
-NOWPAYMENTS_IPN_URL = config('NOWPAYMENTS_IPN_URL', default='https://meridianassetlogistics.com/investments/api/payments/ipn/')
+NOWPAYMENTS_IPN_URL = config('NOWPAYMENTS_IPN_URL', default='https://meridian-asset-logistics.up.railway.app/investments/api/payments/ipn/')
 
 # Logging configuration
 LOGGING = {
