@@ -17,11 +17,14 @@ class NOWPaymentsService:
         self.api_key = getattr(settings, 'NOWPAYMENTS_API_KEY', None)
         self.api_url = getattr(settings, 'NOWPAYMENTS_API_URL', 'https://api.nowpayments.io/v1')
         self.ipn_secret = getattr(settings, 'NOWPAYMENTS_IPN_SECRET', None)
+        self.ipn_callback_url = getattr(settings, 'NOWPAYMENTS_IPN_URL', '')
         
         if not self.api_key:
             logger.error("NOWPAYMENTS_API_KEY not configured")
         if not self.ipn_secret:
             logger.error("NOWPAYMENTS_IPN_SECRET not configured")
+        if not self.ipn_callback_url:
+            logger.error("NOWPAYMENTS_IPN_URL not configured - IPN callbacks will fail")
     
     def _get_headers(self):
         """Get headers for API requests"""
@@ -49,13 +52,18 @@ class NOWPaymentsService:
             clean_api_key = self.api_key.strip()
             logger.info(f"Creating payment with API key: {clean_api_key[:10]}...")
             
+            # Validate IPN callback URL
+            if not self.ipn_callback_url:
+                logger.error("IPN callback URL is not configured - cannot create payment")
+                return None
+                
             payload = {
                 'price_amount': float(amount_usd),
                 'price_currency': currency_from,
                 'pay_currency': currency_to,
                 'order_id': order_id,
                 'order_description': order_description,
-                'ipn_callback_url': getattr(settings, 'NOWPAYMENTS_IPN_URL', ''),
+                'ipn_callback_url': self.ipn_callback_url,
                 'is_fixed_rate': True,
                 'is_fixed_pay_currency': True
             }
@@ -267,7 +275,7 @@ class NOWPaymentsService:
             else:
                 # Delete transaction if NOWPayments failed
                 transaction.delete()
-                logger.error("Failed to create NOWPayments payment")
+                logger.error("Failed to create NOWPayments payment - check IPN callback URL configuration")
                 return None
                 
         except Exception as e:
