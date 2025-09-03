@@ -19,6 +19,12 @@ class NOWPaymentsService:
         self.ipn_secret = getattr(settings, 'NOWPAYMENTS_IPN_SECRET', None)
         self.ipn_callback_url = getattr(settings, 'NOWPAYMENTS_IPN_URL', '')
         
+        logger.info(f"NOWPayments service initialized:")
+        logger.info(f"  API Key: {'✅ Configured' if self.api_key else '❌ Missing'}")
+        logger.info(f"  IPN Secret: {'✅ Configured' if self.ipn_secret else '❌ Missing'}")
+        logger.info(f"  IPN Callback URL: {'✅ Configured' if self.ipn_callback_url else '❌ Missing'}")
+        logger.info(f"  API URL: {self.api_url}")
+        
         if not self.api_key:
             logger.error("NOWPAYMENTS_API_KEY not configured")
         if not self.ipn_secret:
@@ -34,6 +40,16 @@ class NOWPaymentsService:
         if not clean_api_key:
             logger.error("NOWPAYMENTS_API_KEY is empty or None")
             return {}
+        
+        # Validate API key format (should start with a number and contain dashes)
+        if not clean_api_key or not clean_api_key.replace('-', '').replace('_', '').isdigit():
+            logger.error(f"NOWPAYMENTS_API_KEY format appears invalid: {clean_api_key[:10]}...")
+            logger.error("API key should contain only numbers and dashes")
+            logger.error("Expected format: XXXXXXX-XXXXXXX-XXXXXXX-XXXXXXX")
+            logger.error("Please check your Railway environment variables")
+            logger.error("You may need to regenerate your API key in NOWPayments dashboard")
+            logger.error("Current API key: {clean_api_key}")
+            return {}
             
         return {
             'x-api-key': clean_api_key,
@@ -43,6 +59,11 @@ class NOWPaymentsService:
     def create_payment(self, amount_usd, currency_from='USD', currency_to='SOL', order_id=None, order_description=None):
         """Create a new payment request"""
         try:
+            # Validate service configuration first
+            if not self.validate_configuration():
+                logger.error("NOWPayments service configuration is invalid - cannot create payment")
+                return None
+            
             # Validate API key
             if not self.api_key or not self.api_key.strip():
                 logger.error("NOWPAYMENTS_API_KEY is not configured or empty")
@@ -56,16 +77,27 @@ class NOWPaymentsService:
             if not self.ipn_callback_url:
                 logger.error("IPN callback URL is not configured - cannot create payment")
                 return None
-                
+            
+            # Validate URL format
+            if not self.ipn_callback_url.startswith('http'):
+                logger.error(f"Invalid IPN callback URL format: {self.ipn_callback_url}")
+                return None
+            
+            # Validate URL is accessible
+            if not self.ipn_callback_url.startswith('https://meridianassetlogistics.com'):
+                logger.warning(f"IPN callback URL is not using the expected domain: {self.ipn_callback_url}")
+                logger.warning("Expected domain: https://meridianassetlogistics.com")
+                logger.warning("This may cause payment creation to fail")
+                logger.warning("Please update NOWPAYMENTS_IPN_URL in Railway environment variables")
+                logger.warning("The URL should point to your production domain")
+            
             payload = {
                 'price_amount': float(amount_usd),
                 'price_currency': currency_from,
                 'pay_currency': currency_to,
                 'order_id': order_id,
                 'order_description': order_description,
-                'ipn_callback_url': self.ipn_callback_url,
-                'is_fixed_rate': True,
-                'is_fixed_pay_currency': True
+                'ipn_callback_url': self.ipn_callback_url
             }
             
             headers = self._get_headers()
@@ -90,9 +122,81 @@ class NOWPaymentsService:
             if response.status_code == 200:
                 data = response.json()
                 logger.info(f"Payment created successfully: {data.get('payment_id')}")
+                
+                # Validate required fields in response
+                required_fields = ['payment_id', 'pay_address']
+                missing_fields = [field for field in required_fields if not data.get(field)]
+                
+                if missing_fields:
+                    logger.error(f"NOWPayments response missing required fields: {missing_fields}")
+                    logger.error(f"Full response: {data}")
+                    return None
+                
+                # Log successful payment creation details
+                logger.info(f"Payment ID: {data.get('payment_id')}")
+                logger.info(f"Payment Address: {data.get('pay_address')}")
+                logger.info(f"Crypto Amount: {data.get('pay_amount')}")
+                logger.info(f"Crypto Currency: {data.get('pay_currency')}")
+                
+                # Additional validation for required fields
+                if not data.get('payment_id'):
+                    logger.error("Payment ID is missing from response")
+                    logger.error("This field is required for payment processing")
+                    logger.error(f"Response data: {data}")
+                    logger.error("Please check NOWPayments API response format")
+                    return None
+                
+                if not data.get('pay_address'):
+                    logger.error("Payment address is missing from response")
+                    logger.error("This field is required for user payment instructions")
+                    logger.error(f"Response data: {data}")
+                    logger.error("Please check NOWPayments API response format")
+                    return None
+                
+                logger.info("✅ Payment creation successful - all required fields present")
+                logger.info(f"Payment will be processed with ID: {data.get('payment_id')}")
+                logger.info(f"User will pay to address: {data.get('pay_address')}")
                 return data
             else:
                 logger.error(f"Failed to create payment: {response.status_code} - {response.text}")
+                # Try to parse error response for better debugging
+                try:
+                    error_data = response.json()
+                    error_msg = error_data.get('message', 'Unknown error')
+                    error_code = error_data.get('code', 'Unknown code')
+                    logger.error(f"NOWPayments API error: {error_msg} (Code: {error_code})")
+                    
+                    # Handle specific error codes
+                    if error_code == 'INVALID_REQUEST_PARAMS':
+                        logger.error("Invalid request parameters - check payload structure")
+                        logger.error(f"Current payload: {payload}")
+                        logger.error("Common issues: invalid currency codes, missing required fields")
+                        logger.error("Trying to create payment with minimal required parameters")
+                        logger.error("Please check NOWPayments API documentation for required parameters")
+                    elif error_code == 'API_KEY_INVALID':
+                        logger.error("API key is invalid or expired")
+                        logger.error("Please check your NOWPayments API key in Railway environment variables")
+                        logger.error("You may need to regenerate your API key in NOWPayments dashboard")
+                        logger.error("Current API key format: {clean_api_key[:10]}...")
+                    elif error_code == 'IPN_CALLBACK_URL_INVALID':
+                        logger.error("IPN callback URL is invalid")
+                        logger.error(f"Current IPN URL: {self.ipn_callback_url}")
+                        logger.error("Please check NOWPAYMENTS_IPN_URL in Railway environment variables")
+                        logger.error("URL should be: https://meridianassetlogistics.com/investments/api/payments/ipn/")
+                        logger.error("Make sure the URL is accessible and properly formatted")
+                    elif error_code == 'PAYMENT_CREATION_FAILED':
+                        logger.error("Payment creation failed on NOWPayments side")
+                        logger.error("This may be a temporary issue with NOWPayments service")
+                        logger.error("Please try again in a few minutes")
+                        logger.error("If the issue persists, contact NOWPayments support")
+                    else:
+                        logger.error(f"Unknown error code: {error_code}")
+                        logger.error("Please check NOWPayments API documentation for this error code")
+                        logger.error("You may need to contact NOWPayments support")
+                        logger.error("Error message: {error_msg}")
+                    
+                except:
+                    logger.error(f"Could not parse error response: {response.text}")
                 return None
                 
         except Exception as e:
@@ -342,6 +446,13 @@ class NOWPaymentsService:
                 transaction.save()
                 
                 logger.info(f"Investment payment created successfully: {transaction.id}")
+                logger.info(f"Payment data: {payment_data}")
+                
+                # Check if we have the minimum required data
+                if not payment_data.get('payment_id'):
+                    logger.error("NOWPayments response missing payment_id")
+                    return {'success': False, 'error': 'Invalid payment response - missing payment ID'}
+                
                 return {
                     'success': True,
                     'nowpayments_payment_id': payment_data.get('payment_id'),
@@ -357,6 +468,32 @@ class NOWPaymentsService:
         except Exception as e:
             logger.error(f"Error creating investment payment: {str(e)}")
             return {'success': False, 'error': f'Service error: {str(e)}'}
+
+    def validate_configuration(self):
+        """Validate that the NOWPayments service is properly configured"""
+        errors = []
+        
+        if not self.api_key or not self.api_key.strip():
+            errors.append("NOWPAYMENTS_API_KEY is missing or empty")
+        elif not self.api_key.replace('-', '').replace('_', '').isdigit():
+            errors.append("NOWPAYMENTS_API_KEY format is invalid")
+            
+        if not self.ipn_secret or not self.ipn_secret.strip():
+            errors.append("NOWPAYMENTS_IPN_SECRET is missing or empty")
+            
+        if not self.ipn_callback_url or not self.ipn_callback_url.strip():
+            errors.append("NOWPAYMENTS_IPN_URL is missing or empty")
+        elif not self.ipn_callback_url.startswith('http'):
+            errors.append("NOWPAYMENTS_IPN_URL format is invalid")
+            
+        if errors:
+            logger.error("NOWPayments service configuration errors:")
+            for error in errors:
+                logger.error(f"  - {error}")
+            return False
+            
+        logger.info("✅ NOWPayments service configuration is valid")
+        return True
 
 # Global instance
 nowpayments_service = NOWPaymentsService()
