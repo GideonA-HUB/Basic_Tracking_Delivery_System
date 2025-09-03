@@ -822,7 +822,20 @@ def invest_in_item(request, item_id, investment_type):
             
             # Handle different payment methods
             if payment_method == 'crypto':
+                # Check if NOWPayments service is properly configured
+                if not nowpayments_service.api_key or not nowpayments_service.api_key.strip():
+                    messages.error(request, 'Payment service not configured. Please contact support.')
+                    transaction.delete()
+                    return redirect('investments:investment-item-detail', item_id=item_id)
+                
+                if not nowpayments_service.ipn_callback_url:
+                    messages.error(request, 'Payment callback URL not configured. Please contact support.')
+                    transaction.delete()
+                    return redirect('investments:investment-item-detail', item_id=item_id)
+                
                 # Create NOWPayments payment for cryptocurrency
+                logger.info(f"Creating investment payment for user {request.user.username}, amount: ${amount}, item: {item.name}")
+                
                 payment_response = nowpayments_service.create_investment_payment(
                     user=request.user,
                     amount_usd=amount,
@@ -831,15 +844,20 @@ def invest_in_item(request, item_id, investment_type):
                     transaction=transaction
                 )
                 
+                logger.info(f"Investment payment response: {payment_response}")
+                
                 if payment_response and payment_response.get('success'):
                     # Update transaction with NOWPayments data
                     transaction.nowpayments_payment_id = payment_response.get('nowpayments_payment_id')
                     transaction.save()
                     
+                    logger.info(f"Investment payment created successfully, redirecting to payment details")
                     # Redirect to payment details page
                     return redirect('investments:investment-payment-details', transaction_id=transaction.id)
                 else:
-                    messages.error(request, 'Failed to create cryptocurrency payment. Please try again.')
+                    error_msg = payment_response.get('error', 'Unknown error') if payment_response else 'No response from payment service'
+                    logger.error(f"Failed to create investment payment: {error_msg}")
+                    messages.error(request, f'Failed to create cryptocurrency payment: {error_msg}')
                     transaction.delete()
                     return redirect('investments:investment-item-detail', item_id=item_id)
             else:

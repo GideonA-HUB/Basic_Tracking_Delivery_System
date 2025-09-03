@@ -285,6 +285,17 @@ class NOWPaymentsService:
     def create_investment_payment(self, user, amount_usd, investment_type, item, transaction):
         """Create an investment payment request"""
         try:
+            # Validate service configuration
+            if not self.api_key or not self.api_key.strip():
+                logger.error("NOWPayments API key not configured")
+                return {'success': False, 'error': 'Payment service not configured'}
+            
+            if not self.ipn_callback_url:
+                logger.error("NOWPayments IPN callback URL not configured")
+                return {'success': False, 'error': 'Payment callback URL not configured'}
+            
+            logger.info(f"Creating investment payment for {user.username}: ${amount_usd} for {item.name}")
+            
             # Create NOWPayments payment
             payment_data = self.create_payment(
                 amount_usd=amount_usd,
@@ -300,7 +311,7 @@ class NOWPaymentsService:
                 transaction.crypto_currency = payment_data.get('pay_currency')
                 transaction.save()
                 
-                logger.info(f"Investment payment created: {transaction.id}")
+                logger.info(f"Investment payment created successfully: {transaction.id}")
                 return {
                     'success': True,
                     'nowpayments_payment_id': payment_data.get('payment_id'),
@@ -310,12 +321,12 @@ class NOWPaymentsService:
                     'payment_url': f"https://nowpayments.io/payment/?iid={payment_data.get('payment_id')}"
                 }
             else:
-                logger.error("Failed to create NOWPayments investment payment")
-                return {'success': False, 'error': 'Failed to create payment'}
+                logger.error("NOWPayments API returned no payment data")
+                return {'success': False, 'error': 'Payment service returned no data'}
                 
         except Exception as e:
             logger.error(f"Error creating investment payment: {str(e)}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': f'Service error: {str(e)}'}
 
 # Global instance
 nowpayments_service = NOWPaymentsService()
