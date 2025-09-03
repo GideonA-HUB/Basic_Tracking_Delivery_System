@@ -79,7 +79,7 @@
     </div>
 
     <!-- Quick Actions -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 text-center">
             <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 dark:bg-blue-900 mb-4">
                 <i class="fas fa-search text-2xl text-blue-600 dark:text-blue-400"></i>
@@ -110,6 +110,17 @@
             <p class="text-gray-600 dark:text-gray-400 mb-4">Detailed view of all your investments</p>
             <a href="{% url 'investments:user-portfolio' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700">
                 View
+            </a>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 text-center">
+            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-orange-100 dark:bg-orange-900 mb-4">
+                <i class="fas fa-rocket text-2xl text-orange-600 dark:text-orange-400"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Meridian Quick Access</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">Get expert trading insights and management</p>
+            <a href="{% url 'investments:meridian-quick-access' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700">
+                Add Quick Funds
             </a>
         </div>
     </div>

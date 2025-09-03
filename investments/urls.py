@@ -63,4 +63,7 @@ urlpatterns = [
     
     # NOWPayments Configuration Status (Admin only)
     path('admin/nowpayments-config/', views.nowpayments_config_status, name='nowpayments-config-status'),
+    
+    # Meridian Quick Access
+    path('meridian-quick-access/', views.meridian_quick_access, name='meridian-quick-access'),
 ]

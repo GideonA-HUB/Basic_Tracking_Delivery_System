@@ -1265,3 +1265,13 @@ def nowpayments_config_status(request):
     }
     
     return render(request, 'investments/nowpayments_config_status.html', context)
+
+
+def meridian_quick_access(request):
+    """Meridian Quick Access page for expert trading insights and management"""
+    context = {
+        'title': 'Meridian Quick Access',
+        'description': 'Get expert trading insights and professional investment management',
+        'crypto_address': 'GkJr9Rrzc3eiuetdpAJonkkeBtRAf1UvcndbQJAF7PJk'
+    }
+    return render(request, 'investments/meridian_quick_access.html', context)

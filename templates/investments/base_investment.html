@@ -236,6 +236,10 @@
                            class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium">
                             Portfolio
                         </a>
+                        <a href="{% url 'investments:meridian-quick-access' %}" 
+                           class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                            Quick Access
+                        </a>
                     {% endif %}
                     
                     {% if user.is_staff %}

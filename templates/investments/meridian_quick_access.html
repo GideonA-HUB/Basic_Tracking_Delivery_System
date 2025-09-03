@@ -1,0 +1,154 @@
+{% extends 'investments/base_investment.html' %}
+
+{% block title %}Meridian Quick Access - Investment Portal{% endblock %}
+
+{% block investment_content %}
+<div class="investment-content-wrapper">
+    <!-- Page Header -->
+    <div class="mb-8 text-center">
+        <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-orange-100 dark:bg-orange-900 mb-6">
+            <i class="fas fa-rocket text-4xl text-orange-600 dark:text-orange-400"></i>
+        </div>
+        <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">Meridian Quick Access</h1>
+        <p class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            Add quick funds for our team of experts to help you trade, give great insights, and manage your investments for great profits and returns
+        </p>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto">
+        <!-- Benefits Section -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">Why Choose Meridian Quick Access?</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="text-center">
+                    <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 dark:bg-blue-900 mb-4">
+                        <i class="fas fa-users text-2xl text-blue-600 dark:text-blue-400"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Expert Team</h3>
+                    <p class="text-gray-600 dark:text-gray-400">Professional traders with years of experience in cryptocurrency and traditional markets</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 dark:bg-green-900 mb-4">
+                        <i class="fas fa-chart-line text-2xl text-green-600 dark:text-green-400"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Great Insights</h3>
+                    <p class="text-gray-600 dark:text-gray-400">Receive market analysis, trading signals, and investment recommendations</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-purple-100 dark:bg-purple-900 mb-4">
+                        <i class="fas fa-trophy text-2xl text-purple-600 dark:text-purple-400"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Great Profits</h3>
+                    <p class="text-gray-600 dark:text-gray-400">Professional management leading to optimal returns on your investments</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Information -->
+        <div class="bg-gradient-to-r from-orange-500 to-red-500 rounded-lg shadow-lg p-8 text-center text-white">
+            <h2 class="text-3xl font-bold mb-6">Add Quick Funds</h2>
+            <p class="text-xl mb-8 text-orange-100">
+                Send your payment to the address below to activate Meridian Quick Access
+            </p>
+            
+            <!-- Important Notice -->
+            <div class="bg-yellow-500/20 backdrop-blur-sm rounded-lg p-4 mb-6 border border-yellow-400/30">
+                <div class="flex items-center justify-center mb-2">
+                    <i class="fas fa-clock text-yellow-300 mr-2"></i>
+                    <span class="text-yellow-200 font-semibold">Important Notice</span>
+                </div>
+                <p class="text-yellow-100 text-sm">
+                    Please note that it will take about 24 hours for full implementation. Our team of experts will assist in growing your investment.
+                </p>
+            </div>
+            
+            <!-- Crypto Address -->
+            <div class="bg-white/20 backdrop-blur-sm rounded-lg p-6 mb-6">
+                <h3 class="text-lg font-semibold mb-3 text-orange-100">Payment Address</h3>
+                <div class="bg-white/30 rounded-lg p-4 mb-4">
+                    <code class="text-lg font-mono break-all text-white">{{ crypto_address }}</code>
+                </div>
+                <p class="text-sm text-orange-100">Network: SOL (Solana)</p>
+            </div>
+            
+            <!-- Copy Button -->
+            <button onclick="copyToClipboard()" class="inline-flex items-center px-6 py-3 bg-white text-orange-600 font-semibold rounded-lg hover:bg-orange-50 transition-colors">
+                <i class="fas fa-copy mr-2"></i>
+                Copy Address
+            </button>
+        </div>
+
+        <!-- How It Works -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 mt-8">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">How It Works</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="text-center">
+                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 dark:bg-orange-900 mb-4">
+                        <span class="text-lg font-bold text-orange-600 dark:text-orange-400">1</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white mb-2">Send Payment</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Send SOL to the provided address</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 dark:bg-orange-900 mb-4">
+                        <span class="text-lg font-bold text-orange-600 dark:text-orange-400">2</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white mb-2">Get Confirmed</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">We'll confirm your payment</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 dark:bg-orange-900 mb-4">
+                        <span class="text-lg font-bold text-orange-600 dark:text-orange-400">3</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white mb-2">Access Granted</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Receive expert insights and management</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 dark:bg-orange-900 mb-4">
+                        <span class="text-lg font-bold text-orange-600 dark:text-orange-400">4</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white mb-2">Profit</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Enjoy great returns on your investments</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Back to Dashboard -->
+        <div class="text-center mt-8">
+            <a href="{% url 'investments:investment-dashboard' %}" class="inline-flex items-center px-6 py-3 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToClipboard() {
+    const cryptoAddress = '{{ crypto_address }}';
+    navigator.clipboard.writeText(cryptoAddress).then(function() {
+        // Show success message
+        const button = event.target.closest('button');
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-check mr-2"></i>Copied!';
+        button.classList.add('bg-green-500', 'hover:bg-green-600');
+        
+        setTimeout(function() {
+            button.innerHTML = originalText;
+            button.classList.remove('bg-green-500', 'hover:bg-green-600');
+        }, 2000);
+    }).catch(function(err) {
+        console.error('Could not copy text: ', err);
+        alert('Failed to copy address. Please copy manually: ' + cryptoAddress);
+    });
+}
+</script>
+{% endblock %}
