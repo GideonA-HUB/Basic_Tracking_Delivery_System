@@ -32,7 +32,8 @@ from .serializers import (
     InvestmentItemDetailSerializer, UserInvestmentSerializer,
     InvestmentTransactionSerializer, InvestmentPortfolioSerializer,
     CreateInvestmentTransactionSerializer, UpdateInvestmentItemSerializer,
-    InvestmentChartDataSerializer, InvestmentSummarySerializer
+    InvestmentChartDataSerializer, InvestmentSummarySerializer,
+    PriceHistorySerializer
 )
 from .services import nowpayments_service
 from .price_services import price_service
@@ -231,7 +232,7 @@ class InvestmentTransactionViewSet(viewsets.ModelViewSet):
         transaction = self.get_object()
         
         if transaction.nowpayments_payment_id:
-            status_response = nowpayments_service.get_payment_status_minimal(
+            status_response = nowpayments_service.get_payment_status(
                 transaction.nowpayments_payment_id
             )
             return Response(status_response)
@@ -331,21 +332,36 @@ def add_funds(request):
                 amount = form.cleaned_data['amount']
                 payment_method = form.cleaned_data['payment_method']
                 
-                # Create a transaction for adding funds
-                transaction = InvestmentTransaction.objects.create(
-                    user=request.user,
-                    transaction_type='purchase',
+                # For add funds, we need to create a special transaction
+                # Since InvestmentTransaction requires an item, we'll create a PaymentTransaction instead
+                from .models import PaymentTransaction
+                
+                # Create a payment transaction for adding funds
+                transaction = PaymentTransaction.objects.create(
+                    payment_id=f"FUNDS_{request.user.id}_{int(timezone.now().timestamp())}",
+                    payment_type='investment',
                     amount_usd=amount,
-                    price_per_unit=amount,
-                    payment_method=payment_method,
-                    payment_status='pending',
-                    description=f"Add funds to investment account - {payment_method}",
+                    user=request.user,
+                    payment_status='pending'
                 )
                 
                 # If using NOWPayments (crypto), create payment
                 if payment_method == 'crypto':
-                    payment_response = nowpayments_service.create_payment(transaction)
+                    from .services import nowpayments_service
+                    
+                    payment_response = nowpayments_service.create_payment(
+                        amount_usd=amount,
+                        order_id=transaction.payment_id,
+                        order_description=f"Add funds to investment account - {request.user.username}"
+                    )
                     if payment_response:
+                        # Update transaction with NOWPayments data
+                        transaction.nowpayments_payment_id = payment_response.get('payment_id')
+                        transaction.payment_address = payment_response.get('pay_address')
+                        transaction.amount_crypto = payment_response.get('pay_amount')
+                        transaction.crypto_currency = payment_response.get('pay_currency')
+                        transaction.save()
+                        
                         messages.success(request, f'Payment initiated for ${amount}. Please complete the payment.')
                         return redirect('investments:payment-status', transaction_id=transaction.id)
                     else:
@@ -371,14 +387,29 @@ def add_funds(request):
 def payment_status(request, transaction_id):
     """Check payment status for a transaction"""
     try:
-        transaction = get_object_or_404(InvestmentTransaction, id=transaction_id, user=request.user)
+        # Try to find the transaction in both models
+        from .models import PaymentTransaction, InvestmentTransaction
+        
+        # First try PaymentTransaction (for add funds, membership)
+        try:
+            transaction = PaymentTransaction.objects.get(id=transaction_id, user=request.user)
+            transaction_type = 'payment'
+        except PaymentTransaction.DoesNotExist:
+            # Then try InvestmentTransaction
+            try:
+                transaction = InvestmentTransaction.objects.get(id=transaction_id, user=request.user)
+                transaction_type = 'investment'
+            except InvestmentTransaction.DoesNotExist:
+                messages.error(request, 'Transaction not found.')
+                return redirect('investments:user-portfolio')
         
         if transaction.nowpayments_payment_id:
-            status_response = nowpayments_service.get_payment_status_minimal(
+            status_response = nowpayments_service.get_payment_status(
                 transaction.nowpayments_payment_id
             )
             return render(request, 'investments/payment_status.html', {
                 'transaction': transaction,
+                'transaction_type': transaction_type,
                 'payment_status': status_response
             })
         else:

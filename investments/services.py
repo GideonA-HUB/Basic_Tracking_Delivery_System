@@ -118,6 +118,14 @@ class NOWPaymentsService:
             logger.error(f"Error getting payment status: {str(e)}")
             return None
     
+    def get_payment_url(self, payment_id):
+        """Get payment URL for a specific payment"""
+        try:
+            return f"https://nowpayments.io/payment/?iid={payment_id}"
+        except Exception as e:
+            logger.error(f"Error generating payment URL: {str(e)}")
+            return None
+    
     def verify_ipn_signature(self, payload, signature):
         """Verify IPN signature to ensure webhook authenticity"""
         try:
@@ -200,15 +208,37 @@ class NOWPaymentsService:
                         investment_transaction.nowpayments_payment_status = payment_status
                     
                     investment_transaction.save()
-                    logger.info(f"Investment payment {payment_id} status updated to {payment_status}")
+                    logger.info(f"Investment transaction {payment_id} status updated to {payment_status}")
                     return True
                     
                 except InvestmentTransaction.DoesNotExist:
-                    logger.warning(f"Payment transaction not found for NOWPayments ID: {payment_id}")
+                    logger.error(f"Payment {payment_id} not found in any transaction model")
                     return False
-                
+                    
         except Exception as e:
             logger.error(f"Error processing IPN data: {str(e)}")
+            return False
+    
+    def process_webhook(self, body, signature):
+        """Process webhook data from NOWPayments"""
+        try:
+            # Verify signature
+            if not self.verify_ipn_signature(body, signature):
+                logger.error("Webhook signature verification failed")
+                return False
+            
+            # Parse JSON data
+            try:
+                webhook_data = json.loads(body)
+            except json.JSONDecodeError as e:
+                logger.error(f"Invalid JSON in webhook: {e}")
+                return False
+            
+            # Process the webhook data
+            return self.process_ipn_data(webhook_data)
+            
+        except Exception as e:
+            logger.error(f"Error processing webhook: {str(e)}")
             return False
     
     def _activate_membership(self, transaction):
