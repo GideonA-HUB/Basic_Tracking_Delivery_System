@@ -157,6 +157,9 @@
             <a href="{% url 'investments:fix-production-db' %}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
                 <i class="fas fa-tools mr-2"></i> Fix Database
             </a>
+            <a href="{% url 'investments:nowpayments-config-status' %}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+                <i class="fas fa-credit-card mr-2"></i> NOWPayments Config
+            </a>
         </div>
     </div>
 
@@ -178,6 +181,13 @@
                 <i class="fas fa-check-circle text-3xl text-purple-600 dark:text-purple-400 mb-2"></i>
                 <p class="text-sm font-medium text-purple-800 dark:text-purple-200">Payments</p>
                 <p class="text-xs text-purple-600 dark:text-purple-300">Ready</p>
+            </div>
+            <div class="text-center p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                <a href="{% url 'investments:nowpayments-config-status' %}" class="block">
+                    <i class="fas fa-credit-card text-3xl text-orange-600 dark:text-orange-400 mb-2"></i>
+                    <p class="text-sm font-medium text-orange-800 dark:text-orange-200">NOWPayments</p>
+                    <p class="text-xs text-orange-600 dark:text-orange-300">Check Status</p>
+                </a>
             </div>
         </div>
     </div>

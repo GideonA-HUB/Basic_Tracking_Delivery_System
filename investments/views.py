@@ -824,12 +824,14 @@ def invest_in_item(request, item_id, investment_type):
             if payment_method == 'crypto':
                 # Check if NOWPayments service is properly configured
                 if not nowpayments_service.api_key or not nowpayments_service.api_key.strip():
-                    messages.error(request, 'Payment service not configured. Please contact support.')
+                    messages.error(request, '❌ NOWPayments API key not configured. Please contact support.')
                     transaction.delete()
                     return redirect('investments:investment-item-detail', item_id=item_id)
                 
                 if not nowpayments_service.ipn_callback_url:
-                    messages.error(request, 'Payment callback URL not configured. Please contact support.')
+                    messages.error(request, '❌ NOWPayments IPN callback URL not configured. This is required for payment processing.')
+                    messages.error(request, '🔧 Please add NOWPAYMENTS_IPN_URL to your Railway environment variables.')
+                    messages.error(request, '📋 Required value: https://meridianassetlogistics.com/investments/api/payments/ipn/')
                     transaction.delete()
                     return redirect('investments:investment-item-detail', item_id=item_id)
                 
@@ -1234,3 +1236,32 @@ def membership_payment_view(request):
         'user': request.user,
     }
     return render(request, 'investments/membership_payment.html', context)
+
+
+@login_required
+def nowpayments_config_status(request):
+    """Debug view to show NOWPayments configuration status"""
+    if not request.user.is_staff:
+        messages.error(request, 'Access denied. Staff only.')
+        return redirect('investments:investment-marketplace')
+    
+    config_status = {
+        'api_key': '✅ Configured' if nowpayments_service.api_key and nowpayments_service.api_key.strip() else '❌ Missing',
+        'api_key_preview': nowpayments_service.api_key[:10] + '...' if nowpayments_service.api_key else 'None',
+        'ipn_secret': '✅ Configured' if nowpayments_service.ipn_secret else '❌ Missing',
+        'ipn_callback_url': '✅ Configured' if nowpayments_service.ipn_callback_url else '❌ Missing',
+        'ipn_url_value': nowpayments_service.ipn_callback_url or 'Not set',
+        'api_url': nowpayments_service.api_url,
+    }
+    
+    context = {
+        'config_status': config_status,
+        'required_vars': [
+            'NOWPAYMENTS_API_KEY',
+            'NOWPAYMENTS_IPN_SECRET', 
+            'NOWPAYMENTS_IPN_URL',
+            'NOWPAYMENTS_API_URL'
+        ]
+    }
+    
+    return render(request, 'investments/nowpayments_config_status.html', context)

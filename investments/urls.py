@@ -60,4 +60,7 @@ urlpatterns = [
     
     # Production database fix
     path('fix-production-db/', views.fix_production_database_view, name='fix-production-db'),
+    
+    # NOWPayments Configuration Status (Admin only)
+    path('admin/nowpayments-config/', views.nowpayments_config_status, name='nowpayments-config-status'),
 ]

@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+
+{% block title %}NOWPayments Configuration Status{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+            <div class="px-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600">
+                <h1 class="text-2xl font-bold text-white">🔧 NOWPayments Configuration Status</h1>
+                <p class="text-blue-100 mt-2">Check the status of your NOWPayments integration</p>
+            </div>
+            
+            <div class="p-6">
+                <!-- Configuration Status -->
+                <div class="mb-8">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Configuration Status</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="flex items-center justify-between">
+                                <span class="font-medium text-gray-700">API Key:</span>
+                                <span class="text-sm">{{ config_status.api_key }}</span>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">{{ config_status.api_key_preview }}</div>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="flex items-center justify-between">
+                                <span class="font-medium text-gray-700">IPN Secret:</span>
+                                <span class="text-sm">{{ config_status.ipn_secret }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="flex items-center justify-between">
+                                <span class="font-medium text-gray-700">IPN Callback URL:</span>
+                                <span class="text-sm">{{ config_status.ipn_callback_url }}</span>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1 break-all">{{ config_status.ipn_url_value }}</div>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="flex items-center justify-between">
+                                <span class="font-medium text-gray-700">API URL:</span>
+                                <span class="text-sm text-green-600">{{ config_status.api_url }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Required Environment Variables -->
+                <div class="mb-8">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Required Environment Variables</h2>
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-yellow-800">Missing Configuration</h3>
+                                <div class="mt-2 text-sm text-yellow-700">
+                                    <p>The following environment variables need to be added to Railway:</p>
+                                    <ul class="list-disc list-inside mt-2 space-y-1">
+                                        {% for var in required_vars %}
+                                            <li><code class="bg-yellow-100 px-2 py-1 rounded">{{ var }}</code></li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Fix Instructions -->
+                <div class="mb-8">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">🚀 Quick Fix Instructions</h2>
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <ol class="list-decimal list-inside space-y-2 text-sm text-blue-800">
+                            <li>Go to your <a href="https://railway.app" target="_blank" class="underline font-medium">Railway Dashboard</a></li>
+                            <li>Select your project: <strong>meridianassetlogistics.com</strong></li>
+                            <li>Go to <strong>Variables</strong> tab</li>
+                            <li>Add these variables:</li>
+                        </ol>
+                        
+                        <div class="mt-4 bg-white p-4 rounded border">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <strong>NOWPAYMENTS_API_KEY</strong><br>
+                                    <code class="text-xs bg-gray-100 px-2 py-1 rounded">797805N-33XMQ9H-QXP14HW-669TRNH</code>
+                                </div>
+                                <div>
+                                    <strong>NOWPAYMENTS_IPN_SECRET</strong><br>
+                                    <code class="text-xs bg-gray-100 px-2 py-1 rounded">your_generated_secret</code>
+                                </div>
+                                <div>
+                                    <strong>NOWPAYMENTS_IPN_URL</strong><br>
+                                    <code class="text-xs bg-gray-100 px-2 py-1 rounded">https://meridianassetlogistics.com/investments/api/payments/ipn/</code>
+                                </div>
+                                <div>
+                                    <strong>NOWPAYMENTS_API_URL</strong><br>
+                                    <code class="text-xs bg-gray-100 px-2 py-1 rounded">https://api.nowpayments.io/v1</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Test Investment Form -->
+                <div class="mb-8">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">🧪 Test Investment Form</h2>
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <p class="text-sm text-green-800 mb-3">
+                            Once you've added the environment variables, test the investment form:
+                        </p>
+                        <div class="space-y-2">
+                            <a href="{% url 'investments:investment-marketplace' %}" 
+                               class="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700">
+                                🏪 Go to Marketplace
+                            </a>
+                            <p class="text-xs text-green-600">→ Click on any investment item → Click "Invest Now" → Fill form → Click "Proceed to Payment"</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Current Issues -->
+                <div class="mb-8">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">⚠️ Current Issues</h2>
+                    <div class="space-y-3">
+                        {% if config_status.ipn_callback_url == '❌ Missing' %}
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-red-800">Investment Form Not Working</h3>
+                                    <p class="mt-1 text-sm text-red-700">
+                                        The "Proceed to Payment" button redirects back to the item detail page because NOWPayments can't create payments without the IPN callback URL.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if config_status.api_key == '❌ Missing' %}
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-red-800">API Key Missing</h3>
+                                    <p class="mt-1 text-sm text-red-700">
+                                        NOWPayments API key is not configured. This prevents any payment creation.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Back to Admin -->
+                <div class="text-center">
+                    <a href="{% url 'investments:investment-marketplace' %}" 
+                       class="inline-flex items-center px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-700">
+                        ← Back to Marketplace
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
