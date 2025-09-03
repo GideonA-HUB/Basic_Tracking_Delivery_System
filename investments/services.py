@@ -25,14 +25,30 @@ class NOWPaymentsService:
     
     def _get_headers(self):
         """Get headers for API requests"""
+        # Clean the API key by removing any whitespace or newlines
+        clean_api_key = self.api_key.strip() if self.api_key else None
+        
+        if not clean_api_key:
+            logger.error("NOWPAYMENTS_API_KEY is empty or None")
+            return {}
+            
         return {
-            'x-api-key': self.api_key,
+            'x-api-key': clean_api_key,
             'Content-Type': 'application/json'
         }
     
     def create_payment(self, amount_usd, currency_from='USD', currency_to='SOL', order_id=None, order_description=None):
         """Create a new payment request"""
         try:
+            # Validate API key
+            if not self.api_key or not self.api_key.strip():
+                logger.error("NOWPAYMENTS_API_KEY is not configured or empty")
+                return None
+            
+            # Clean API key
+            clean_api_key = self.api_key.strip()
+            logger.info(f"Creating payment with API key: {clean_api_key[:10]}...")
+            
             payload = {
                 'price_amount': float(amount_usd),
                 'price_currency': currency_from,
@@ -44,12 +60,24 @@ class NOWPaymentsService:
                 'is_fixed_pay_currency': True
             }
             
+            headers = self._get_headers()
+            if not headers:
+                logger.error("Failed to get valid headers")
+                return None
+            
+            logger.info(f"Sending request to NOWPayments API: {self.api_url}/payment")
+            logger.info(f"Payload: {payload}")
+            logger.info(f"Headers: {headers}")
+            
             response = requests.post(
                 f"{self.api_url}/payment",
-                headers=self._get_headers(),
+                headers=headers,
                 json=payload,
                 timeout=30
             )
+            
+            logger.info(f"NOWPayments API response status: {response.status_code}")
+            logger.info(f"NOWPayments API response: {response.text}")
             
             if response.status_code == 200:
                 data = response.json()

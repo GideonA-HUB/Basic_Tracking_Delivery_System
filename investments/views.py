@@ -35,6 +35,7 @@ from .serializers import (
     InvestmentChartDataSerializer, InvestmentSummarySerializer
 )
 from .services import nowpayments_service
+from .price_services import price_service
 
 logger = logging.getLogger(__name__)
 
@@ -1010,6 +1011,12 @@ def create_membership_payment(request):
         
         # Create membership payment
         from .services import nowpayments_service
+        
+        # Check if NOWPayments service is properly configured
+        if not nowpayments_service.api_key or not nowpayments_service.api_key.strip():
+            logger.error("NOWPayments API key not configured")
+            return JsonResponse({'error': 'Payment service not configured. Please contact support.'}, status=500)
+        
         transaction = nowpayments_service.create_membership_payment(request.user, amount)
         
         if transaction:
@@ -1026,7 +1033,8 @@ def create_membership_payment(request):
             }
             return JsonResponse(response_data)
         else:
-            return JsonResponse({'error': 'Failed to create payment'}, status=500)
+            logger.error("NOWPayments service returned None for membership payment")
+            return JsonResponse({'error': 'Failed to create payment. Please try again or contact support.'}, status=500)
             
     except Exception as e:
         logger.error(f"Error creating membership payment: {str(e)}")
