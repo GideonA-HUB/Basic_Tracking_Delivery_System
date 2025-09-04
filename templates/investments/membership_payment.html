@@ -262,18 +262,22 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function copyToClipboard(text) {
-        // Try to use the modern clipboard API first
+        // Try multiple methods in order of preference
+        
+        // Method 1: Modern clipboard API (preferred)
         if (navigator.clipboard && window.isSecureContext) {
             navigator.clipboard.writeText(text).then(function() {
                 showCopySuccess();
             }).catch(function(err) {
                 console.error('Clipboard API failed:', err);
+                // Try fallback method
                 fallbackCopy(text);
             });
-        } else {
-            // Fallback for older browsers or non-secure contexts
-            fallbackCopy(text);
+            return;
         }
+        
+        // Method 2: Legacy execCommand (fallback)
+        fallbackCopy(text);
     }
 
     function showCopySuccess() {
@@ -283,6 +287,9 @@ document.addEventListener('DOMContentLoaded', function() {
             button.innerHTML = '<i class="fas fa-check"></i>';
             button.classList.add('text-green-600', 'dark:text-green-400');
             
+            // Show a subtle notification
+            showCopyNotification('Copied to clipboard!');
+            
             setTimeout(function() {
                 button.innerHTML = originalIcon;
                 button.classList.remove('text-green-600', 'dark:text-green-400');
@@ -290,32 +297,145 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function fallbackCopy(text) {
-        // Create a temporary textarea element
-        const textArea = document.createElement('textarea');
-        textArea.value = text;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-999999px';
-        textArea.style.top = '-999999px';
-        document.body.appendChild(textArea);
+    function showCopyNotification(message) {
+        // Create a simple notification toast
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all duration-300';
+        notification.textContent = message;
+        notification.style.transform = 'translateX(100%)';
+        document.body.appendChild(notification);
         
+        // Animate in
+        setTimeout(() => {
+            notification.style.transform = 'translateX(0)';
+        }, 100);
+        
+        // Auto-remove after 3 seconds
+        setTimeout(() => {
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 300);
+        }, 3000);
+    }
+
+    function fallbackCopy(text) {
+        // Try multiple fallback methods before showing manual copy modal
+        
+        // Method 1: Try execCommand with textarea
+        if (tryExecCommandCopy(text)) {
+            return;
+        }
+        
+        // Method 2: Try selecting the text in a visible element
+        if (trySelectAndCopy(text)) {
+            return;
+        }
+        
+        // Method 3: Try with a different approach
+        if (tryAlternativeCopy(text)) {
+            return;
+        }
+        
+        // Only show manual copy modal as last resort
+        showManualCopyInstructions(text);
+    }
+
+    function tryExecCommandCopy(text) {
         try {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            textArea.style.opacity = '0';
+            textArea.style.pointerEvents = 'none';
+            document.body.appendChild(textArea);
+            
             textArea.focus();
             textArea.select();
+            textArea.setSelectionRange(0, 99999); // For mobile devices
+            
             const successful = document.execCommand('copy');
+            document.body.removeChild(textArea);
             
             if (successful) {
                 showCopySuccess();
-            } else {
-                // If execCommand fails, show manual copy instructions
-                showManualCopyInstructions(text);
+                return true;
             }
         } catch (err) {
-            console.error('Fallback copy failed:', err);
-            showManualCopyInstructions(text);
-        } finally {
-            document.body.removeChild(textArea);
+            console.error('execCommand copy failed:', err);
         }
+        return false;
+    }
+
+    function trySelectAndCopy(text) {
+        try {
+            // Create a temporary div with the text
+            const tempDiv = document.createElement('div');
+            tempDiv.textContent = text;
+            tempDiv.style.position = 'fixed';
+            tempDiv.style.left = '-999999px';
+            tempDiv.style.top = '-999999px';
+            tempDiv.style.opacity = '0';
+            document.body.appendChild(tempDiv);
+            
+            // Select the text
+            const range = document.createRange();
+            range.selectNodeContents(tempDiv);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            
+            // Try to copy
+            const successful = document.execCommand('copy');
+            selection.removeAllRanges();
+            document.body.removeChild(tempDiv);
+            
+            if (successful) {
+                showCopySuccess();
+                return true;
+            }
+        } catch (err) {
+            console.error('Select and copy failed:', err);
+        }
+        return false;
+    }
+
+    function tryAlternativeCopy(text) {
+        try {
+            // Try with a different textarea approach
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'absolute';
+            textArea.style.left = '50%';
+            textArea.style.top = '50%';
+            textArea.style.transform = 'translate(-50%, -50%)';
+            textArea.style.width = '1px';
+            textArea.style.height = '1px';
+            textArea.style.opacity = '0';
+            textArea.style.border = 'none';
+            textArea.style.outline = 'none';
+            textArea.style.boxShadow = 'none';
+            textArea.style.background = 'transparent';
+            document.body.appendChild(textArea);
+            
+            textArea.focus();
+            textArea.select();
+            
+            const successful = document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            if (successful) {
+                showCopySuccess();
+                return true;
+            }
+        } catch (err) {
+            console.error('Alternative copy failed:', err);
+        }
+        return false;
     }
 
     function showManualCopyInstructions(text) {
@@ -328,27 +448,33 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 dark:bg-yellow-900 mb-4">
                         <i class="fas fa-exclamation-triangle text-yellow-600 dark:text-yellow-400 text-xl"></i>
                     </div>
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Manual Copy Required</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Please manually copy the address below:</p>
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Copy Failed</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Automatic copy failed. Please try again or copy manually:</p>
                     <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg mb-4">
                         <code class="text-sm font-mono break-all text-gray-800 dark:text-gray-200">${text}</code>
                     </div>
-                    <button onclick="this.closest('.fixed').remove()" 
-                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                        Close
-                    </button>
+                    <div class="space-x-2">
+                        <button onclick="copyToClipboard('${text}'); this.closest('.fixed').remove();" 
+                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                            Try Again
+                        </button>
+                        <button onclick="this.closest('.fixed').remove()" 
+                                class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                            Close
+                        </button>
+                    </div>
                 </div>
             </div>
         `;
         
         document.body.appendChild(modal);
         
-        // Auto-remove modal after 10 seconds
+        // Auto-remove modal after 15 seconds
         setTimeout(() => {
             if (modal.parentNode) {
                 modal.remove();
             }
-        }, 10000);
+        }, 15000);
     }
 });
 </script>
