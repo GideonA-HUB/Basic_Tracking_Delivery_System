@@ -262,21 +262,93 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(function() {
-            // Show success feedback
-            const button = event.target.closest('button');
+        // Try to use the modern clipboard API first
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(function() {
+                showCopySuccess();
+            }).catch(function(err) {
+                console.error('Clipboard API failed:', err);
+                fallbackCopy(text);
+            });
+        } else {
+            // Fallback for older browsers or non-secure contexts
+            fallbackCopy(text);
+        }
+    }
+
+    function showCopySuccess() {
+        const button = event.target.closest('button');
+        if (button) {
             const originalIcon = button.innerHTML;
             button.innerHTML = '<i class="fas fa-check"></i>';
-            button.classList.add('text-green-600');
+            button.classList.add('text-green-600', 'dark:text-green-400');
             
             setTimeout(function() {
                 button.innerHTML = originalIcon;
-                button.classList.remove('text-green-600');
+                button.classList.remove('text-green-600', 'dark:text-green-400');
             }, 2000);
-        }).catch(function(err) {
-            console.error('Failed to copy: ', err);
-            alert('Failed to copy to clipboard');
-        });
+        }
+    }
+
+    function fallbackCopy(text) {
+        // Create a temporary textarea element
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        
+        try {
+            textArea.focus();
+            textArea.select();
+            const successful = document.execCommand('copy');
+            
+            if (successful) {
+                showCopySuccess();
+            } else {
+                // If execCommand fails, show manual copy instructions
+                showManualCopyInstructions(text);
+            }
+        } catch (err) {
+            console.error('Fallback copy failed:', err);
+            showManualCopyInstructions(text);
+        } finally {
+            document.body.removeChild(textArea);
+        }
+    }
+
+    function showManualCopyInstructions(text) {
+        // Create a modal to show the address for manual copying
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50';
+        modal.innerHTML = `
+            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
+                <div class="mt-3 text-center">
+                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 dark:bg-yellow-900 mb-4">
+                        <i class="fas fa-exclamation-triangle text-yellow-600 dark:text-yellow-400 text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Manual Copy Required</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Please manually copy the address below:</p>
+                    <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg mb-4">
+                        <code class="text-sm font-mono break-all text-gray-800 dark:text-gray-200">${text}</code>
+                    </div>
+                    <button onclick="this.closest('.fixed').remove()" 
+                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        Close
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Auto-remove modal after 10 seconds
+        setTimeout(() => {
+            if (modal.parentNode) {
+                modal.remove();
+            }
+        }, 10000);
     }
 });
 </script>
