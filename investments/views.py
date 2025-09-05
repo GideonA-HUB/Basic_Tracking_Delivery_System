@@ -355,6 +355,47 @@ def enhanced_dashboard(request):
             'error_message': 'Failed to load enhanced dashboard'
         })
 
+@login_required
+def live_dashboard(request):
+    """Live real-time investment dashboard with live market data"""
+    try:
+        # Get featured items with real market prices
+        featured_items = InvestmentItem.objects.filter(
+            is_featured=True, 
+            is_active=True
+        ).order_by('-current_price_usd')[:12]
+        
+        # Get live price feeds
+        from .models import RealTimePriceFeed
+        live_prices = RealTimePriceFeed.objects.filter(is_active=True).order_by('-last_updated')[:20]
+        
+        # Get price movement statistics
+        from .models import PriceMovementStats
+        from django.db import models
+        from django.utils import timezone
+        
+        today_stats = PriceMovementStats.objects.filter(
+            date=timezone.now().date()
+        ).aggregate(
+            total_increases=models.Sum('increases_today'),
+            total_decreases=models.Sum('decreases_today'),
+            total_unchanged=models.Sum('unchanged_today')
+        )
+        
+        context = {
+            'featured_items': featured_items,
+            'live_prices': live_prices,
+            'price_stats': today_stats,
+        }
+        
+        return render(request, 'investments/live_dashboard.html', context)
+        
+    except Exception as e:
+        logger.error(f"Error loading live dashboard: {e}")
+        return render(request, 'investments/error.html', {
+            'error_message': 'Failed to load live dashboard'
+        })
+
 
 def investment_test(request):
     """Test page for investment system"""

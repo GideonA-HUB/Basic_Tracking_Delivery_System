@@ -23,6 +23,7 @@ urlpatterns = [
     path('', views.investment_marketplace, name='investment-marketplace'),
     path('dashboard/', views.investment_dashboard, name='investment-dashboard'),
     path('enhanced-dashboard/', views.enhanced_dashboard, name='enhanced-dashboard'),
+    path('live-dashboard/', views.live_dashboard, name='live-dashboard'),
     path('portfolio/', views.user_portfolio, name='user-portfolio'),
     path('item/<int:item_id>/', views.investment_item_detail, name='investment-item-detail'),
     
