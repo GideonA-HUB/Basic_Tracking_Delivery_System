@@ -287,13 +287,19 @@ class PriceFeedConsumer(AsyncWebsocketConsumer):
         """Handle price update events from channel layer"""
         try:
             logger.info(f"Broadcasting price update to {self.channel_name}")
-            await self.send(text_data=json.dumps({
+            
+            # Enhanced price update with movement stats
+            update_data = {
                 'type': 'price_update',
-                'price_data': event['price_data'],
+                'price_data': event.get('price_data', []),
+                'movement_stats': event.get('movement_stats', {}),
+                'update_count': event.get('update_count', 0),
                 'timestamp': timezone.now().isoformat(),
-                'total_items': len(event['price_data']) if event['price_data'] else 0
-            }))
-            logger.info(f"Successfully broadcasted price update")
+                'total_items': len(event.get('price_data', []))
+            }
+            
+            await self.send(text_data=json.dumps(update_data))
+            logger.info(f"Successfully broadcasted enhanced price update with {len(update_data['price_data'])} items")
         except Exception as e:
             logger.error(f"Error broadcasting price update: {e}")
     
