@@ -178,6 +178,7 @@ class UserInvestmentViewSet(viewsets.ModelViewSet):
         values = []
         
         # Generate sample data for the last 30 days
+        from django.db import models
         base_value = float(request.user.investments.aggregate(
             total=models.Sum('investment_amount_usd')
         )['total'] or 0)
