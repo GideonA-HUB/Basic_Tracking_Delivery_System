@@ -286,13 +286,28 @@ class PriceFeedConsumer(AsyncWebsocketConsumer):
     async def price_update(self, event):
         """Handle price update events from channel layer"""
         try:
-            logger.info(f"Broadcasting price update: {event}")
+            logger.info(f"Broadcasting price update to {self.channel_name}")
             await self.send(text_data=json.dumps({
                 'type': 'price_update',
-                'price_data': event['price_data']
+                'price_data': event['price_data'],
+                'timestamp': timezone.now().isoformat(),
+                'total_items': len(event['price_data']) if event['price_data'] else 0
             }))
+            logger.info(f"Successfully broadcasted price update")
         except Exception as e:
             logger.error(f"Error broadcasting price update: {e}")
+    
+    async def portfolio_update(self, event):
+        """Handle portfolio update events"""
+        try:
+            logger.info(f"Broadcasting portfolio update to {self.channel_name}")
+            await self.send(text_data=json.dumps({
+                'type': 'portfolio_update',
+                'portfolio_data': event['portfolio_data'],
+                'timestamp': timezone.now().isoformat()
+            }))
+        except Exception as e:
+            logger.error(f"Error broadcasting portfolio update: {e}")
     
     @classmethod
     async def broadcast_price_update(cls, price_data):

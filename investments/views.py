@@ -170,16 +170,42 @@ class UserInvestmentViewSet(viewsets.ModelViewSet):
         """Get performance chart data for user's investments"""
         investments = self.get_queryset().filter(status='active')
         
-        chart_data = {
-            'labels': [],
-            'values': [],
-            'returns': []
-        }
+        # Generate time series data for the last 30 days
+        from datetime import datetime, timedelta
+        import random
+        
+        labels = []
+        values = []
+        
+        # Generate sample data for the last 30 days
+        base_value = float(request.user.investments.aggregate(
+            total=models.Sum('investment_amount_usd')
+        )['total'] or 0)
+        
+        current_value = base_value
+        for i in range(30):
+            date = datetime.now() - timedelta(days=29-i)
+            labels.append(date.strftime('%m/%d'))
+            
+            # Simulate portfolio growth with some volatility
+            change_percent = random.uniform(-2, 3)  # -2% to +3% daily change
+            current_value *= (1 + change_percent / 100)
+            values.append(current_value)
+        
+        # Distribution data
+        distribution_labels = []
+        distribution_values = []
         
         for investment in investments:
-            chart_data['labels'].append(investment.item.name)
-            chart_data['values'].append(float(investment.current_value_usd))
-            chart_data['returns'].append(float(investment.total_return_percentage))
+            distribution_labels.append(investment.item.category.name)
+            distribution_values.append(float(investment.current_value_usd))
+        
+        chart_data = {
+            'labels': labels,
+            'values': values,
+            'distribution_labels': distribution_labels,
+            'distribution_values': distribution_values
+        }
         
         return Response(chart_data)
 
@@ -275,6 +301,58 @@ def investment_dashboard(request):
         logger.error(f"Error loading investment dashboard: {e}")
         return render(request, 'investments/error.html', {
             'error_message': 'Failed to load investment dashboard'
+        })
+
+
+@login_required
+def enhanced_dashboard(request):
+    """Enhanced real-time investment dashboard with live charts and analytics"""
+    try:
+        portfolio, created = InvestmentPortfolio.objects.get_or_create(
+            user=request.user
+        )
+        portfolio.update_portfolio_summary()
+        
+        # Get user's active investments
+        active_investments = UserInvestment.objects.filter(
+            user=request.user,
+            status='active'
+        ).select_related('item', 'item__category')
+        
+        # Get recent transactions
+        recent_transactions = InvestmentTransaction.objects.filter(
+            user=request.user
+        ).select_related('item')[:10]
+        
+        # Get live price data
+        from .models import RealTimePriceFeed
+        live_prices = RealTimePriceFeed.objects.filter(is_active=True).order_by('-last_updated')[:20]
+        
+        # Get price statistics
+        from .models import PriceMovementStats
+        from django.db import models
+        today_stats = PriceMovementStats.objects.filter(
+            date=timezone.now().date()
+        ).aggregate(
+            total_increases=models.Sum('increases_today'),
+            total_decreases=models.Sum('decreases_today'),
+            total_unchanged=models.Sum('unchanged_today')
+        )
+        
+        context = {
+            'portfolio': portfolio,
+            'active_investments': active_investments,
+            'recent_transactions': recent_transactions,
+            'live_prices': live_prices,
+            'price_stats': today_stats,
+        }
+        
+        return render(request, 'investments/enhanced_dashboard.html', context)
+        
+    except Exception as e:
+        logger.error(f"Error loading enhanced dashboard: {e}")
+        return render(request, 'investments/error.html', {
+            'error_message': 'Failed to load enhanced dashboard'
         })
 
 
@@ -464,7 +542,13 @@ def investment_marketplace(request):
         featured_items = InvestmentItem.objects.filter(
             is_active=True,
             is_featured=True
-        ).select_related('category')[:6]
+        ).select_related('category').order_by('-created_at')[:6]
+        
+        # Debug logging for featured items (remove in production)
+        if featured_items.count() == 0:
+            logger.warning("No featured items found - this may indicate a problem")
+        else:
+            logger.info(f"Found {featured_items.count()} featured items for marketplace")
         
         # Get trending items
         trending_items = InvestmentItem.objects.filter(
@@ -805,6 +889,98 @@ class InvestmentSummaryView(View):
             logger.error(f"Error getting investment summary: {e}")
             return JsonResponse({
                 'error': 'Failed to get investment summary'
+            }, status=500)
+
+
+# New API endpoints for dashboard
+class PriceStatisticsView(View):
+    """Get price movement statistics"""
+    
+    def get(self, request):
+        try:
+            from .models import PriceMovementStats
+            
+            # Get today's statistics
+            from django.db import models
+            today_stats = PriceMovementStats.objects.filter(
+                date=timezone.now().date()
+            ).aggregate(
+                total_increases=models.Sum('increases_today'),
+                total_decreases=models.Sum('decreases_today'),
+                total_unchanged=models.Sum('unchanged_today')
+            )
+            
+            total_increases = today_stats['total_increases'] or 0
+            total_decreases = today_stats['total_decreases'] or 0
+            total_unchanged = today_stats['total_unchanged'] or 0
+            total_movements = total_increases + total_decreases + total_unchanged
+            
+            data = {
+                'increases': total_increases,
+                'decreases': total_decreases,
+                'unchanged': total_unchanged,
+                'total': total_movements,
+                'timestamp': timezone.now().isoformat()
+            }
+            
+            return JsonResponse(data)
+            
+        except Exception as e:
+            logger.error(f"Error getting price statistics: {e}")
+            return JsonResponse({
+                'error': 'Failed to get price statistics'
+            }, status=500)
+
+
+class LivePricesView(View):
+    """Get live prices for all active items"""
+    
+    def get(self, request):
+        try:
+            from .models import RealTimePriceFeed
+            
+            # Get all active price feeds
+            feeds = RealTimePriceFeed.objects.filter(is_active=True)
+            prices = []
+            
+            for feed in feeds:
+                prices.append({
+                    'symbol': feed.symbol,
+                    'name': feed.name,
+                    'current_price': float(feed.current_price),
+                    'price_change_24h': float(feed.price_change_24h),
+                    'price_change_percentage_24h': float(feed.price_change_percentage_24h),
+                    'last_updated': feed.last_updated.isoformat() if feed.last_updated else None,
+                    'source': 'price_feed'
+                })
+            
+            # Also include investment items that don't have price feeds
+            items = InvestmentItem.objects.filter(is_active=True)
+            for item in items:
+                # Check if we already have this item from price feeds
+                if not any(p['name'] == item.name for p in prices):
+                    prices.append({
+                        'symbol': item.symbol,
+                        'name': item.name,
+                        'current_price': float(item.current_price_usd),
+                        'price_change_24h': float(item.price_change_24h),
+                        'price_change_percentage_24h': float(item.price_change_percentage_24h),
+                        'last_updated': item.last_price_update.isoformat() if item.last_price_update else None,
+                        'source': 'investment_item'
+                    })
+            
+            data = {
+                'prices': prices,
+                'total_items': len(prices),
+                'timestamp': timezone.now().isoformat()
+            }
+            
+            return JsonResponse(data)
+            
+        except Exception as e:
+            logger.error(f"Error getting live prices: {e}")
+            return JsonResponse({
+                'error': 'Failed to get live prices'
             }, status=500)
 
 

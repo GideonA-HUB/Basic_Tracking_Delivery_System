@@ -4,7 +4,7 @@ from django.utils.html import format_html
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from .models import (
-    InvestmentCategory, InvestmentItem, PriceHistory, 
+    InvestmentCategory, InvestmentItem, PriceHistory, PriceMovementStats,
     UserInvestment, InvestmentTransaction, InvestmentPortfolio,
     RealTimePriceFeed, RealTimePriceHistory, AutoInvestmentPlan,
     CurrencyConversion, CustomerCashoutRequest
@@ -67,8 +67,8 @@ class InvestmentItemAdmin(admin.ModelAdmin):
 
 @admin.register(PriceHistory)
 class PriceHistoryAdmin(admin.ModelAdmin):
-    list_display = ['item', 'price', 'change_amount', 'change_percentage', 'timestamp']
-    list_filter = ['timestamp', 'item__category']
+    list_display = ['item', 'price', 'change_amount', 'change_percentage', 'movement_type', 'timestamp']
+    list_filter = ['timestamp', 'item__category', 'movement_type']
     search_fields = ['item__name']
     ordering = ['-timestamp']
     readonly_fields = ['timestamp']
@@ -86,6 +86,29 @@ class PriceHistoryAdmin(admin.ModelAdmin):
             )
         return '$0.00'
     get_change_amount_display.short_description = 'Change Amount'
+
+
+@admin.register(PriceMovementStats)
+class PriceMovementStatsAdmin(admin.ModelAdmin):
+    list_display = ['item', 'date', 'increases_today', 'decreases_today', 'unchanged_today', 'total_movements_today', 'net_movement_today']
+    list_filter = ['date', 'item__category']
+    search_fields = ['item__name']
+    readonly_fields = ['date', 'last_updated']
+    ordering = ['-date']
+    
+    def total_movements_today(self, obj):
+        return obj.total_movements_today
+    total_movements_today.short_description = 'Total Movements'
+    
+    def net_movement_today(self, obj):
+        net = obj.net_movement_today
+        if net > 0:
+            return format_html('<span style="color: green;">+{}</span>', net)
+        elif net < 0:
+            return format_html('<span style="color: red;">{}</span>', net)
+        else:
+            return format_html('<span style="color: gray;">0</span>')
+    net_movement_today.short_description = 'Net Movement'
 
 
 @admin.register(UserInvestment)

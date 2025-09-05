@@ -87,26 +87,74 @@ class InvestmentItem(models.Model):
     def is_available_for_delivery(self):
         return self.investment_type in ['delivery_only', 'both'] and self.is_active
     
-    def update_price(self, new_price, price_change=None, price_change_percentage=None):
-        """Update the current price and calculate changes"""
-        if price_change is None:
-            price_change = new_price - self.current_price_usd
-        if price_change_percentage is None:
-            price_change_percentage = (price_change / self.current_price_usd) * 100
+    def update_price(self, new_price, price_change=None, price_change_percentage=None, volume_24h=None, market_cap=None):
+        """Update the current price and calculate changes with movement tracking"""
+        old_price = self.current_price_usd
         
+        if price_change is None:
+            price_change = new_price - old_price
+        if price_change_percentage is None:
+            price_change_percentage = (price_change / old_price) * 100 if old_price > 0 else 0
+        
+        # Determine movement type
+        if price_change > 0:
+            movement_type = 'increase'
+        elif price_change < 0:
+            movement_type = 'decrease'
+        else:
+            movement_type = 'unchanged'
+        
+        # Update item price
         self.current_price_usd = new_price
         self.price_change_24h = price_change
         self.price_change_percentage_24h = price_change_percentage
+        self.last_price_update = timezone.now()
         self.save()
         
-        # Create price history record
+        # Create price history record with movement tracking
         PriceHistory.objects.create(
             item=self,
             price=new_price,
             change_amount=price_change,
             change_percentage=price_change_percentage,
+            movement_type=movement_type,
+            volume_24h=volume_24h,
+            market_cap=market_cap,
             timestamp=timezone.now()
         )
+        
+        # Update movement statistics
+        try:
+            stats = PriceMovementStats.get_or_create_today_stats(self)
+            stats.increment_movement(movement_type)
+            
+            # Update 24h price statistics
+            if not stats.highest_price_24h or new_price > stats.highest_price_24h:
+                stats.highest_price_24h = new_price
+            if not stats.lowest_price_24h or new_price < stats.lowest_price_24h:
+                stats.lowest_price_24h = new_price
+            
+            # Calculate average price for 24h
+            from django.db.models import Avg
+            from datetime import timedelta
+            end_time = timezone.now()
+            start_time = end_time - timedelta(hours=24)
+            
+            avg_price = PriceHistory.objects.filter(
+                item=self,
+                timestamp__range=(start_time, end_time)
+            ).aggregate(avg=Avg('price'))['avg']
+            
+            if avg_price:
+                stats.average_price_24h = avg_price
+            
+            stats.save()
+            
+        except Exception as e:
+            # Log error but don't fail the price update
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error updating movement stats for {self.name}: {e}")
     
     def get_investment_type_display(self):
         """Get display text for investment type"""
@@ -126,9 +174,25 @@ class PriceHistory(models.Model):
     change_percentage = models.DecimalField(max_digits=6, decimal_places=2)
     timestamp = models.DateTimeField(auto_now_add=True)
     
+    # Price movement tracking
+    movement_type = models.CharField(max_length=10, choices=[
+        ('increase', 'Increase'),
+        ('decrease', 'Decrease'),
+        ('unchanged', 'Unchanged')
+    ], default='unchanged')
+    
+    # Volume and market data
+    volume_24h = models.DecimalField(max_digits=15, decimal_places=2, blank=True, null=True)
+    market_cap = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    
     class Meta:
         ordering = ['-timestamp']
         verbose_name_plural = 'Price History'
+        indexes = [
+            models.Index(fields=['item', 'timestamp']),
+            models.Index(fields=['timestamp']),
+            models.Index(fields=['movement_type']),
+        ]
     
     def __str__(self):
         return f"{self.item.name} - ${self.price} at {self.timestamp}"
@@ -142,6 +206,129 @@ class PriceHistory(models.Model):
             return 'text-red-600 dark:text-red-400'
         else:
             return 'text-gray-600 dark:text-gray-400'
+    
+    @classmethod
+    def get_price_movements_count(cls, item, days=1):
+        """Get count of price movements for an item"""
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        end_date = timezone.now()
+        start_date = end_date - timedelta(days=days)
+        
+        movements = cls.objects.filter(
+            item=item,
+            timestamp__range=(start_date, end_date)
+        ).values('movement_type').annotate(count=models.Count('id'))
+        
+        return {movement['movement_type']: movement['count'] for movement in movements}
+    
+    @classmethod
+    def get_daily_average(cls, item, days=7):
+        """Get daily average price for an item"""
+        from django.utils import timezone
+        from datetime import timedelta
+        from django.db.models import Avg
+        
+        end_date = timezone.now()
+        start_date = end_date - timedelta(days=days)
+        
+        return cls.objects.filter(
+            item=item,
+            timestamp__range=(start_date, end_date)
+        ).aggregate(avg_price=Avg('price'))['avg_price']
+    
+    @classmethod
+    def get_price_range(cls, item, days=30):
+        """Get highest and lowest prices for an item"""
+        from django.utils import timezone
+        from datetime import timedelta
+        from django.db.models import Max, Min
+        
+        end_date = timezone.now()
+        start_date = end_date - timedelta(days=days)
+        
+        return cls.objects.filter(
+            item=item,
+            timestamp__range=(start_date, end_date)
+        ).aggregate(
+            highest=Max('price'),
+            lowest=Min('price')
+        )
+
+
+class PriceMovementStats(models.Model):
+    """Statistics for price movements and counting"""
+    item = models.ForeignKey(InvestmentItem, on_delete=models.CASCADE, related_name='movement_stats')
+    
+    # Daily counters
+    increases_today = models.PositiveIntegerField(default=0)
+    decreases_today = models.PositiveIntegerField(default=0)
+    unchanged_today = models.PositiveIntegerField(default=0)
+    
+    # Weekly counters
+    increases_this_week = models.PositiveIntegerField(default=0)
+    decreases_this_week = models.PositiveIntegerField(default=0)
+    unchanged_this_week = models.PositiveIntegerField(default=0)
+    
+    # Monthly counters
+    increases_this_month = models.PositiveIntegerField(default=0)
+    decreases_this_month = models.PositiveIntegerField(default=0)
+    unchanged_this_month = models.PositiveIntegerField(default=0)
+    
+    # Price statistics
+    highest_price_24h = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
+    lowest_price_24h = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
+    average_price_24h = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
+    
+    # Last update
+    last_updated = models.DateTimeField(auto_now=True)
+    date = models.DateField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ['item', 'date']
+        ordering = ['-date']
+        verbose_name_plural = 'Price Movement Statistics'
+    
+    def __str__(self):
+        return f"{self.item.name} - {self.date} - ↑{self.increases_today} ↓{self.decreases_today}"
+    
+    @classmethod
+    def get_or_create_today_stats(cls, item):
+        """Get or create today's stats for an item"""
+        from django.utils import timezone
+        
+        today = timezone.now().date()
+        stats, created = cls.objects.get_or_create(
+            item=item,
+            date=today,
+            defaults={
+                'increases_today': 0,
+                'decreases_today': 0,
+                'unchanged_today': 0,
+            }
+        )
+        return stats
+    
+    def increment_movement(self, movement_type):
+        """Increment movement counter"""
+        if movement_type == 'increase':
+            self.increases_today += 1
+        elif movement_type == 'decrease':
+            self.decreases_today += 1
+        else:
+            self.unchanged_today += 1
+        self.save()
+    
+    @property
+    def total_movements_today(self):
+        """Total price movements today"""
+        return self.increases_today + self.decreases_today + self.unchanged_today
+    
+    @property
+    def net_movement_today(self):
+        """Net movement (positive = more increases, negative = more decreases)"""
+        return self.increases_today - self.decreases_today
 
 
 class UserInvestment(models.Model):
@@ -495,7 +682,7 @@ class RealTimePriceFeed(models.Model):
     def __str__(self):
         return f"{self.name} - {self.get_asset_type_display()} ({self.base_currency})"
     
-    def update_price(self, new_price, price_change_24h=None, price_change_percentage_24h=None):
+    def update_price(self, new_price, price_change_24h=None, price_change_percentage_24h=None, volume_24h=None, market_cap=None):
         """Update the current price and calculate changes"""
         if price_change_24h is None:
             price_change_24h = new_price - self.current_price
@@ -505,6 +692,13 @@ class RealTimePriceFeed(models.Model):
         self.current_price = new_price
         self.price_change_24h = price_change_24h
         self.price_change_percentage_24h = price_change_percentage_24h or 0
+        
+        # Update volume and market cap if provided
+        if volume_24h is not None:
+            self.volume_24h = volume_24h
+        if market_cap is not None:
+            self.market_cap = market_cap
+            
         self.save()
         
         # Create price history record

@@ -1,0 +1,362 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Investment Dashboard - Real-Time Analytics{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.css" rel="stylesheet">
+<style>
+    .price-card {
+        transition: all 0.3s ease;
+        border-left: 4px solid #3b82f6;
+    }
+    .price-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    .price-up {
+        color: #10b981;
+        border-left-color: #10b981;
+    }
+    .price-down {
+        color: #ef4444;
+        border-left-color: #ef4444;
+    }
+    .live-indicator {
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+    .chart-container {
+        position: relative;
+        height: 300px;
+        margin: 20px 0;
+    }
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 10px 0;
+    }
+    .counter {
+        font-size: 2.5rem;
+        font-weight: bold;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    .price-feed-item {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 10px;
+        padding: 15px;
+        margin: 10px 0;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    .connection-status {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        padding: 10px 15px;
+        border-radius: 25px;
+        font-weight: bold;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .status-connected {
+        background: linear-gradient(45deg, #10b981, #059669);
+        color: white;
+    }
+    .status-disconnected {
+        background: linear-gradient(45deg, #ef4444, #dc2626);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <!-- Connection Status -->
+    <div id="connectionStatus" class="connection-status status-disconnected">
+        <div class="flex items-center space-x-2">
+            <div class="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+            <span>Connecting...</span>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+                        📊 Real-Time Investment Dashboard
+                    </h1>
+                    <p class="mt-2 text-gray-600 dark:text-gray-400">
+                        Live market data, portfolio analytics, and investment insights
+                    </p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-right">
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Last Update</div>
+                        <div id="lastUpdateTime" class="text-lg font-semibold text-gray-900 dark:text-white">
+                            Loading...
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" id="autoRefreshToggle" class="rounded" checked>
+                        <label for="autoRefreshToggle" class="text-sm text-gray-600 dark:text-gray-400">
+                            Auto Refresh
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="stats-card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-sm opacity-90">Total Price Increases</div>
+                        <div id="totalIncreases" class="counter">0</div>
+                    </div>
+                    <div class="text-4xl">📈</div>
+                </div>
+            </div>
+            
+            <div class="stats-card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-sm opacity-90">Total Price Decreases</div>
+                        <div id="totalDecreases" class="counter">0</div>
+                    </div>
+                    <div class="text-4xl">📉</div>
+                </div>
+            </div>
+            
+            <div class="stats-card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-sm opacity-90">Total Movements</div>
+                        <div id="totalMovements" class="counter">0</div>
+                    </div>
+                    <div class="text-4xl">🔄</div>
+                </div>
+            </div>
+            
+            <div class="stats-card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-sm opacity-90">Live Updates</div>
+                        <div id="updateCount" class="counter">0</div>
+                    </div>
+                    <div class="text-4xl">⚡</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Performance Chart -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                    📈 Portfolio Performance
+                </h3>
+                <div class="chart-container">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Distribution Chart -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                    🥧 Investment Distribution
+                </h3>
+                <div class="chart-container">
+                    <canvas id="distributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Price Feed -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                    🔴 Live Price Feed
+                </h3>
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 bg-red-500 rounded-full live-indicator"></div>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">Live Updates</span>
+                </div>
+            </div>
+            
+            <div id="livePriceFeed" class="space-y-3">
+                <div class="text-center text-gray-500 dark:text-gray-400 py-8">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    Loading live prices...
+                </div>
+            </div>
+        </div>
+
+        <!-- Market Overview -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Top Gainers -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    🚀 Top Gainers
+                </h3>
+                <div id="topGainers" class="space-y-3">
+                    <div class="text-center text-gray-500 dark:text-gray-400 py-4">
+                        Loading...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Losers -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    📉 Top Losers
+                </h3>
+                <div id="topLosers" class="space-y-3">
+                    <div class="text-center text-gray-500 dark:text-gray-400 py-4">
+                        Loading...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Most Active -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    🔥 Most Active
+                </h3>
+                <div id="mostActive" class="space-y-3">
+                    <div class="text-center text-gray-500 dark:text-gray-400 py-4">
+                        Loading...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script src="{% static 'js/live_price_dashboard.js' %}"></script>
+
+<script>
+// Enhanced dashboard functionality
+class EnhancedDashboard extends LivePriceDashboard {
+    constructor() {
+        super();
+        this.updateCount = 0;
+        this.topGainers = [];
+        this.topLosers = [];
+        this.mostActive = [];
+    }
+
+    updateLivePriceFeed(prices) {
+        super.updateLivePriceFeed(prices);
+        this.updateCount++;
+        document.getElementById('updateCount').textContent = this.updateCount;
+        
+        // Update top gainers/losers
+        this.updateTopPerformers(prices);
+    }
+
+    updateTopPerformers(prices) {
+        // Sort by percentage change
+        const sortedPrices = [...prices].sort((a, b) => 
+            b.price_change_percentage_24h - a.price_change_percentage_24h
+        );
+
+        // Top gainers (positive changes)
+        this.topGainers = sortedPrices.filter(p => p.price_change_percentage_24h > 0).slice(0, 5);
+        
+        // Top losers (negative changes)
+        this.topLosers = sortedPrices.filter(p => p.price_change_percentage_24h < 0).slice(0, 5);
+        
+        // Most active (highest absolute change)
+        this.mostActive = sortedPrices
+            .sort((a, b) => Math.abs(b.price_change_percentage_24h) - Math.abs(a.price_change_percentage_24h))
+            .slice(0, 5);
+
+        this.renderTopPerformers();
+    }
+
+    renderTopPerformers() {
+        this.renderTopList('topGainers', this.topGainers, 'text-green-600');
+        this.renderTopList('topLosers', this.topLosers, 'text-red-600');
+        this.renderTopList('mostActive', this.mostActive, 'text-blue-600');
+    }
+
+    renderTopList(containerId, items, colorClass) {
+        const container = document.getElementById(containerId);
+        if (!container || !items.length) return;
+
+        container.innerHTML = items.map(item => `
+            <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                        <span class="text-xs font-bold text-blue-600 dark:text-blue-400">
+                            ${item.symbol || '?'}
+                        </span>
+                    </div>
+                    <div>
+                        <div class="font-medium text-gray-900 dark:text-white text-sm">
+                            ${item.name}
+                        </div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                            $${parseFloat(item.current_price).toFixed(2)}
+                        </div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm font-semibold ${colorClass}">
+                        ${item.price_change_percentage_24h >= 0 ? '+' : ''}${item.price_change_percentage_24h.toFixed(2)}%
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    updateConnectionStatus(connected) {
+        const statusElement = document.getElementById('connectionStatus');
+        if (statusElement) {
+            if (connected) {
+                statusElement.className = 'connection-status status-connected';
+                statusElement.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+                        <span>Live Connected</span>
+                    </div>
+                `;
+            } else {
+                statusElement.className = 'connection-status status-disconnected';
+                statusElement.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 bg-white rounded-full"></div>
+                        <span>Disconnected</span>
+                    </div>
+                `;
+            }
+        }
+    }
+}
+
+// Initialize enhanced dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    window.enhancedDashboard = new EnhancedDashboard();
+});
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', function() {
+    if (window.enhancedDashboard) {
+        window.enhancedDashboard.destroy();
+    }
+});
+</script>
+{% endblock %}

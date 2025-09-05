@@ -16,10 +16,13 @@ urlpatterns = [
     # API endpoints
     path('api/', include(router.urls)),
     path('api/summary/', views.InvestmentSummaryView.as_view(), name='investment-summary'),
+    path('api/price-statistics/', views.PriceStatisticsView.as_view(), name='price-statistics'),
+    path('api/live-prices/', views.LivePricesView.as_view(), name='live-prices'),
     
     # Frontend views
     path('', views.investment_marketplace, name='investment-marketplace'),
     path('dashboard/', views.investment_dashboard, name='investment-dashboard'),
+    path('enhanced-dashboard/', views.enhanced_dashboard, name='enhanced-dashboard'),
     path('portfolio/', views.user_portfolio, name='user-portfolio'),
     path('item/<int:item_id>/', views.investment_item_detail, name='investment-item-detail'),
     

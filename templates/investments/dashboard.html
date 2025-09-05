@@ -261,49 +261,159 @@
         </a>
     </div>
     {% endif %}
+
+    <!-- Enhanced Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+        <!-- Portfolio Performance Chart -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Portfolio Performance</h3>
+            <div class="h-64">
+                <canvas id="performanceChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Investment Distribution Pie Chart -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Investment Distribution</h3>
+            <div class="h-64">
+                <canvas id="distributionChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Price Movement Statistics -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mt-8">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Price Movement Statistics</h3>
+        <div id="priceStatsContainer">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <div class="text-2xl font-bold text-blue-600 dark:text-blue-400" id="totalIncreases">0</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">Price Increases Today</div>
+                </div>
+                <div class="text-center p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                    <div class="text-2xl font-bold text-red-600 dark:text-red-400" id="totalDecreases">0</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">Price Decreases Today</div>
+                </div>
+                <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <div class="text-2xl font-bold text-gray-600 dark:text-gray-400" id="totalMovements">0</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">Total Movements</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Price Feed -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mt-8">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Live Price Feed</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Last updated: <span id="lastUpdateTime">--:--:--</span>
+                </p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm text-gray-500 dark:text-gray-400">Auto-refresh:</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="autoRefreshToggle" class="sr-only peer" checked>
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    </label>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span class="text-sm text-green-600 dark:text-green-400">Live</span>
+                </div>
+            </div>
+        </div>
+        <div id="livePriceFeed" class="space-y-2 max-h-64 overflow-y-auto">
+            <!-- Live price updates will be inserted here -->
+        </div>
+    </div>
+
+    <!-- Real-time Market Statistics -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mt-8">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Real-time Market Statistics</h3>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                <div class="text-2xl font-bold text-green-600 dark:text-green-400" id="marketIncreases">0</div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">Market Increases</div>
+            </div>
+            <div class="text-center p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                <div class="text-2xl font-bold text-red-600 dark:text-red-400" id="marketDecreases">0</div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">Market Decreases</div>
+            </div>
+            <div class="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <div class="text-2xl font-bold text-blue-600 dark:text-blue-400" id="totalAssets">0</div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">Total Assets</div>
+            </div>
+            <div class="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                <div class="text-2xl font-bold text-purple-600 dark:text-purple-400" id="updateCount">0</div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">Updates Today</div>
+            </div>
+        </div>
+    </div>
 </div>
 
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Include the enhanced live price dashboard -->
+<script src="{% static 'js/live_price_dashboard.js' %}"></script>
+
 <script>
+// Additional dashboard enhancements
 document.addEventListener('DOMContentLoaded', function() {
-    // Create performance chart
-    const ctx = document.getElementById('performanceChart');
-    if (ctx) {
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                datasets: [{
-                    label: 'Portfolio Value',
-                    data: [10000, 10500, 11000, 10800, 11500, 12000],
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        grid: {
-                            color: 'rgba(156, 163, 175, 0.1)'
-                        }
-                    },
-                    x: {
-                        grid: {
-                            color: 'rgba(156, 163, 175, 0.1)'
-                        }
-                    }
-                }
+    // Update market statistics with live data
+    function updateMarketStatistics(prices) {
+        let increases = 0;
+        let decreases = 0;
+        
+        prices.forEach(price => {
+            if (price.price_change_percentage_24h > 0) {
+                increases++;
+            } else if (price.price_change_percentage_24h < 0) {
+                decreases++;
             }
         });
+        
+        // Animate counters
+        animateCounter('marketIncreases', increases);
+        animateCounter('marketDecreases', decreases);
+        animateCounter('totalAssets', prices.length);
+        
+        // Update counter
+        const updateCountElement = document.getElementById('updateCount');
+        if (updateCountElement) {
+            const currentCount = parseInt(updateCountElement.textContent) || 0;
+            updateCountElement.textContent = currentCount + 1;
+        }
+    }
+    
+    function animateCounter(elementId, targetValue) {
+        const element = document.getElementById(elementId);
+        if (!element) return;
+        
+        const currentValue = parseInt(element.textContent) || 0;
+        const increment = (targetValue - currentValue) / 10;
+        let current = currentValue;
+        
+        const timer = setInterval(() => {
+            current += increment;
+            if ((increment > 0 && current >= targetValue) || (increment < 0 && current <= targetValue)) {
+                current = targetValue;
+                clearInterval(timer);
+            }
+            element.textContent = Math.round(current);
+        }, 50);
+    }
+    
+    // Override the updateLivePriceFeed method to include market statistics
+    if (window.livePriceDashboard) {
+        const originalUpdateLivePriceFeed = window.livePriceDashboard.updateLivePriceFeed;
+        window.livePriceDashboard.updateLivePriceFeed = function(prices) {
+            originalUpdateLivePriceFeed.call(this, prices);
+            updateMarketStatistics(prices);
+        };
     }
 });
 </script>

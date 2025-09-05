@@ -21,15 +21,68 @@ def update_real_time_prices():
             # Get live price updates for broadcasting
             price_updates = get_live_price_updates()
             
-            # Broadcast updates via WebSocket
-            broadcast_price_updates(price_updates)
+            # Try to broadcast updates via WebSocket (non-blocking)
+            try:
+                broadcast_price_updates(price_updates)
+            except Exception as ws_error:
+                logger.warning(f"WebSocket broadcast failed: {ws_error}")
             
-            logger.info(f"Updated {updated_count} prices and broadcasted updates")
+            # Update user portfolio values
+            try:
+                update_user_portfolio_values.delay()
+            except Exception as portfolio_error:
+                logger.warning(f"Portfolio update failed: {portfolio_error}")
+            
+            logger.info(f"Updated {updated_count} prices")
         
         return updated_count
         
     except Exception as e:
         logger.error(f"Error updating real-time prices: {e}")
+        return 0
+
+
+@shared_task
+def update_user_portfolio_values():
+    """Update all user portfolio values based on current prices"""
+    try:
+        from .models import UserInvestment, InvestmentPortfolio
+        
+        # Get all active investments
+        active_investments = UserInvestment.objects.filter(status='active')
+        updated_count = 0
+        
+        for investment in active_investments:
+            try:
+                # Calculate current value based on latest item price
+                current_value = investment.quantity * investment.item.current_price_usd
+                total_return = current_value - investment.investment_amount_usd
+                total_return_percentage = (total_return / investment.investment_amount_usd * 100) if investment.investment_amount_usd > 0 else 0
+                
+                # Update investment values
+                investment.current_value_usd = current_value
+                investment.total_return_usd = total_return
+                investment.total_return_percentage = total_return_percentage
+                investment.save()
+                
+                updated_count += 1
+                
+            except Exception as e:
+                logger.error(f"Error updating investment {investment.id}: {e}")
+        
+        # Update portfolio summaries
+        portfolios = InvestmentPortfolio.objects.all()
+        for portfolio in portfolios:
+            try:
+                portfolio.update_portfolio_summary()
+            except Exception as e:
+                logger.error(f"Error updating portfolio {portfolio.id}: {e}")
+        
+        logger.info(f"Updated {updated_count} user investments")
+        return updated_count
+        
+    except Exception as e:
+        logger.error(f"Error updating user portfolio values: {e}")
         return 0
 
 @shared_task
@@ -38,19 +91,23 @@ def broadcast_price_updates(price_updates):
     try:
         channel_layer = get_channel_layer()
         
-        # Broadcast to price feeds group
-        async_to_sync(channel_layer.group_send)(
-            'price_feeds',
-            {
-                'type': 'price_update',
-                'price_data': price_updates
-            }
-        )
-        
-        logger.info(f"Broadcasted {len(price_updates)} price updates")
+        if channel_layer:
+            # Broadcast to price feeds group
+            async_to_sync(channel_layer.group_send)(
+                'price_feeds',
+                {
+                    'type': 'price_update',
+                    'price_data': price_updates
+                }
+            )
+            
+            logger.info(f"Broadcasted {len(price_updates)} price updates")
+        else:
+            logger.warning("Channel layer not available - skipping WebSocket broadcast")
         
     except Exception as e:
         logger.error(f"Error broadcasting price updates: {e}")
+        # Don't fail the entire task if WebSocket broadcasting fails
 
 @shared_task
 def update_investment_item_prices():
@@ -157,3 +214,88 @@ def health_check_price_feeds():
     except Exception as e:
         logger.error(f"Error in price feed health check: {e}")
         return {'error': str(e)}
+
+
+@shared_task
+def generate_price_alerts():
+    """Generate alerts for significant price movements"""
+    try:
+        from .models import PriceMovementStats, InvestmentItem
+        
+        alerts = []
+        
+        # Check for significant daily movements
+        items = InvestmentItem.objects.filter(is_active=True)
+        for item in items:
+            try:
+                stats = PriceMovementStats.get_or_create_today_stats(item)
+                
+                # Alert if more than 10 price changes in a day
+                if stats.total_movements_today > 10:
+                    alerts.append({
+                        'type': 'high_activity',
+                        'item': item.name,
+                        'movements': stats.total_movements_today,
+                        'message': f"{item.name} has had {stats.total_movements_today} price movements today"
+                    })
+                
+                # Alert if significant net movement
+                if abs(stats.net_movement_today) > 5:
+                    direction = "increased" if stats.net_movement_today > 0 else "decreased"
+                    alerts.append({
+                        'type': 'significant_movement',
+                        'item': item.name,
+                        'net_movement': stats.net_movement_today,
+                        'message': f"{item.name} has {direction} {abs(stats.net_movement_today)} times today"
+                    })
+                    
+            except Exception as e:
+                logger.error(f"Error checking alerts for {item.name}: {e}")
+        
+        if alerts:
+            logger.info(f"Generated {len(alerts)} price alerts")
+            # Here you could send notifications, emails, etc.
+        
+        return alerts
+        
+    except Exception as e:
+        logger.error(f"Error generating price alerts: {e}")
+        return []
+
+
+@shared_task
+def update_price_statistics():
+    """Update daily, weekly, and monthly price statistics"""
+    try:
+        from .models import PriceMovementStats, InvestmentItem
+        from datetime import timedelta
+        
+        items = InvestmentItem.objects.filter(is_active=True)
+        updated_count = 0
+        
+        for item in items:
+            try:
+                stats = PriceMovementStats.get_or_create_today_stats(item)
+                
+                # Update weekly and monthly counters
+                # This is a simplified version - in production you'd want more sophisticated logic
+                stats.increases_this_week = stats.increases_today
+                stats.decreases_this_week = stats.decreases_today
+                stats.unchanged_this_week = stats.unchanged_today
+                
+                stats.increases_this_month = stats.increases_today
+                stats.decreases_this_month = stats.decreases_today
+                stats.unchanged_this_month = stats.unchanged_today
+                
+                stats.save()
+                updated_count += 1
+                
+            except Exception as e:
+                logger.error(f"Error updating statistics for {item.name}: {e}")
+        
+        logger.info(f"Updated statistics for {updated_count} items")
+        return updated_count
+        
+    except Exception as e:
+        logger.error(f"Error updating price statistics: {e}")
+        return 0
