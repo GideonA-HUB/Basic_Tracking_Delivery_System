@@ -78,10 +78,10 @@
     
     /* Enhanced Card Styles */
     .info-card {
-        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-        border: 1px solid #e2e8f0;
+        background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+        border: 1px solid #374151;
         border-radius: 16px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
         transition: all 0.3s ease;
         position: relative;
         overflow: hidden;
@@ -99,7 +99,33 @@
     
     .info-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Dark theme text colors */
+    .info-card h3 {
+        color: #f9fafb !important;
+    }
+    
+    .info-card label {
+        color: #d1d5db !important;
+    }
+    
+    .info-card p {
+        color: #f3f4f6 !important;
+    }
+    
+    .info-card .bg-gray-50 {
+        background-color: #374151 !important;
+        border: 1px solid #4b5563;
+    }
+    
+    .info-card .bg-gray-50 label {
+        color: #9ca3af !important;
+    }
+    
+    .info-card .bg-gray-50 p {
+        color: #f9fafb !important;
     }
     
     /* Status Badge Enhancements */
@@ -295,6 +321,133 @@
     .status-returned {
         background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
         color: white;
+    }
+    
+    /* Timeline Card Dark Theme */
+    .timeline-item .bg-white {
+        background-color: #1f2937 !important;
+        border: 1px solid #374151 !important;
+    }
+    
+    .timeline-item .bg-white h4 {
+        color: #f9fafb !important;
+    }
+    
+    .timeline-item .bg-white p {
+        color: #d1d5db !important;
+    }
+    
+    .timeline-item .bg-white span {
+        color: #9ca3af !important;
+    }
+    
+    .timeline-item .bg-blue-50 {
+        background-color: #1e3a8a !important;
+        border: 1px solid #3b82f6 !important;
+    }
+    
+    .timeline-item .bg-blue-50 span {
+        color: #dbeafe !important;
+    }
+    
+    .timeline-item .bg-blue-50 i {
+        color: #60a5fa !important;
+    }
+    
+    /* Address Section Dark Theme */
+    .bg-green-50 {
+        background-color: #064e3b !important;
+        border-left: 4px solid #10b981 !important;
+    }
+    
+    .bg-green-50 p {
+        color: #d1fae5 !important;
+    }
+    
+    .bg-red-50 {
+        background-color: #7f1d1d !important;
+        border-left: 4px solid #ef4444 !important;
+    }
+    
+    .bg-red-50 p {
+        color: #fecaca !important;
+    }
+    
+    .bg-blue-50 {
+        background-color: #1e3a8a !important;
+        border-left: 4px solid #3b82f6 !important;
+    }
+    
+    .bg-blue-50 p {
+        color: #dbeafe !important;
+    }
+    
+    /* Estimated Delivery Dark Theme */
+    .bg-blue-50 .text-blue-900 {
+        color: #dbeafe !important;
+    }
+    
+    .bg-blue-50 .text-blue-700 {
+        color: #93c5fd !important;
+    }
+    
+    /* Progress Bar Dark Theme */
+    .progress-container {
+        background: #374151 !important;
+    }
+    
+    /* Status Badge Dark Theme */
+    .status-badge {
+        color: white !important;
+    }
+    
+    /* Global Dark Theme Text Fixes */
+    .text-gray-900 {
+        color: #f9fafb !important;
+    }
+    
+    .text-gray-600 {
+        color: #d1d5db !important;
+    }
+    
+    .text-gray-500 {
+        color: #9ca3af !important;
+    }
+    
+    .text-gray-700 {
+        color: #d1d5db !important;
+    }
+    
+    /* Ensure all text in cards is visible */
+    .info-card * {
+        color: inherit;
+    }
+    
+    /* Fix any remaining white text on dark backgrounds */
+    .bg-gray-100 {
+        background-color: #374151 !important;
+        color: #f9fafb !important;
+    }
+    
+    .bg-gray-100 span {
+        color: #f9fafb !important;
+    }
+    
+    /* Timeline specific fixes */
+    .timeline-item .text-gray-900 {
+        color: #f9fafb !important;
+    }
+    
+    .timeline-item .text-gray-600 {
+        color: #d1d5db !important;
+    }
+    
+    .timeline-item .text-gray-500 {
+        color: #9ca3af !important;
+    }
+    
+    .timeline-item .text-gray-700 {
+        color: #d1d5db !important;
     }
     
     /* Responsive Design */
