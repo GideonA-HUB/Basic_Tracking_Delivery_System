@@ -1,1 +1,1 @@
-# Management package for investments app
+# Management commands for investments app
