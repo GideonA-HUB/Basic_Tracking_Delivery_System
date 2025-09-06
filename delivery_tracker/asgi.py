@@ -20,13 +20,17 @@ django.setup()
 # Import WebSocket routing after Django is initialized
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
-from investments.routing import websocket_urlpatterns
+from investments.routing import websocket_urlpatterns as investment_websocket_urlpatterns
+from tracking.routing import websocket_urlpatterns as tracking_websocket_urlpatterns
+
+# Combine all WebSocket URL patterns
+all_websocket_urlpatterns = investment_websocket_urlpatterns + tracking_websocket_urlpatterns
 
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),
     "websocket": AuthMiddlewareStack(
         URLRouter(
-            websocket_urlpatterns
+            all_websocket_urlpatterns
         )
     ),
 })

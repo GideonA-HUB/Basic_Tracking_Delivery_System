@@ -28,6 +28,18 @@ class Delivery(models.Model):
     pickup_address = models.TextField()
     delivery_address = models.TextField()
     
+    # Geolocation information
+    pickup_latitude = models.DecimalField(max_digits=10, decimal_places=7, blank=True, null=True)
+    pickup_longitude = models.DecimalField(max_digits=10, decimal_places=7, blank=True, null=True)
+    delivery_latitude = models.DecimalField(max_digits=10, decimal_places=7, blank=True, null=True)
+    delivery_longitude = models.DecimalField(max_digits=10, decimal_places=7, blank=True, null=True)
+    
+    # Current location (updated in real-time)
+    current_latitude = models.DecimalField(max_digits=10, decimal_places=7, blank=True, null=True)
+    current_longitude = models.DecimalField(max_digits=10, decimal_places=7, blank=True, null=True)
+    current_location_name = models.CharField(max_length=200, blank=True, null=True)
+    last_location_update = models.DateTimeField(blank=True, null=True)
+    
     # Package information
     package_description = models.TextField()
     package_weight = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
@@ -103,6 +115,63 @@ class Delivery(models.Model):
             'tracking_number': self.tracking_number,
             'tracking_secret': self.tracking_secret
         })
+    
+    def has_geolocation(self):
+        """Check if delivery has geolocation data"""
+        return bool(self.current_latitude and self.current_longitude)
+    
+    def get_current_location_dict(self):
+        """Get current location as dictionary for API responses"""
+        if self.has_geolocation():
+            return {
+                'latitude': float(self.current_latitude),
+                'longitude': float(self.current_longitude),
+                'location_name': self.current_location_name,
+                'last_update': self.last_location_update.isoformat() if self.last_location_update else None
+            }
+        return None
+    
+    def get_pickup_location_dict(self):
+        """Get pickup location as dictionary"""
+        if self.pickup_latitude and self.pickup_longitude:
+            return {
+                'latitude': float(self.pickup_latitude),
+                'longitude': float(self.pickup_longitude),
+                'address': self.pickup_address
+            }
+        return None
+    
+    def get_delivery_location_dict(self):
+        """Get delivery location as dictionary"""
+        if self.delivery_latitude and self.delivery_longitude:
+            return {
+                'latitude': float(self.delivery_latitude),
+                'longitude': float(self.delivery_longitude),
+                'address': self.delivery_address
+            }
+        return None
+    
+    def update_current_location(self, latitude, longitude, location_name=None, accuracy=None):
+        """Update current location and create status update"""
+        from django.utils import timezone
+        
+        self.current_latitude = latitude
+        self.current_longitude = longitude
+        self.current_location_name = location_name
+        self.last_location_update = timezone.now()
+        self.save()
+        
+        # Create a location update status
+        DeliveryStatus.objects.create(
+            delivery=self,
+            status=self.current_status,
+            location=location_name or f"Lat: {latitude}, Lng: {longitude}",
+            description=f"Location updated: {location_name or 'GPS coordinates'}",
+            latitude=latitude,
+            longitude=longitude,
+            location_name=location_name,
+            accuracy=accuracy
+        )
 
 
 class DeliveryStatus(models.Model):
@@ -117,6 +186,12 @@ class DeliveryStatus(models.Model):
     location = models.CharField(max_length=200, blank=True, null=True)
     description = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
+    
+    # Geolocation for this status update
+    latitude = models.DecimalField(max_digits=10, decimal_places=7, blank=True, null=True)
+    longitude = models.DecimalField(max_digits=10, decimal_places=7, blank=True, null=True)
+    location_name = models.CharField(max_length=200, blank=True, null=True)
+    accuracy = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True, help_text="GPS accuracy in meters")
     
     class Meta:
         ordering = ['-timestamp']
