@@ -122,6 +122,9 @@ class PriceFeedConsumer(AsyncWebsocketConsumer):
             await self.accept()
             logger.info("WebSocket connection accepted successfully")
             
+            # FORCE UPDATE PRICES FROM APIs IMMEDIATELY
+            await self.force_update_prices_from_apis()
+            
             # Send initial price data immediately
             await self.send_price_data()
             
@@ -129,6 +132,34 @@ class PriceFeedConsumer(AsyncWebsocketConsumer):
             logger.error(f"Error in WebSocket connect: {e}")
             if hasattr(self, 'channel_name'):
                 await self.close()
+    
+    @database_sync_to_async
+    def force_update_prices_from_apis(self):
+        """Force update prices from APIs"""
+        try:
+            logger.info("🔄 FORCING PRICE UPDATE FROM APIs...")
+            from investments.price_services import price_service
+            
+            # Update all prices from APIs
+            updated_count = price_service.update_all_prices()
+            logger.info(f"✅ Updated {updated_count} prices from APIs successfully")
+            
+            # Log current major prices
+            major_cryptos = ['BTC', 'ETH', 'ADA', 'SOL']
+            logger.info("💰 Current LIVE API prices:")
+            for symbol in major_cryptos:
+                try:
+                    feed = RealTimePriceFeed.objects.filter(symbol=symbol).first()
+                    if feed:
+                        logger.info(f"   {feed.name}: ${feed.current_price:,.2f} ({feed.price_change_percentage_24h:+.2f}%)")
+                except Exception as e:
+                    logger.warning(f"Could not log price for {symbol}: {e}")
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Price update from APIs failed: {e}")
+            return False
     
     async def disconnect(self, close_code):
         """Handle WebSocket disconnection"""
@@ -151,6 +182,13 @@ class PriceFeedConsumer(AsyncWebsocketConsumer):
             
             if message_type == 'get_prices':
                 logger.info("Client requested price data")
+                # Force update prices from APIs before sending
+                await self.force_update_prices_from_apis()
+                await self.send_price_data()
+            elif message_type == 'force_update':
+                logger.info("Client requested force price update")
+                # Force update prices from APIs
+                await self.force_update_prices_from_apis()
                 await self.send_price_data()
             else:
                 logger.info(f"Unknown message type: {message_type}")

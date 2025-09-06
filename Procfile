@@ -1,4 +1,1 @@
 web: python manage.py migrate --settings=delivery_tracker.settings_production && python manage.py collectstatic --noinput --settings=delivery_tracker.settings_production && DJANGO_SETTINGS_MODULE=delivery_tracker.settings_production daphne -b 0.0.0.0 -p $PORT delivery_tracker.asgi:application
-worker: celery -A delivery_tracker worker --loglevel=info --settings=delivery_tracker.settings_production
-beat: celery -A delivery_tracker beat --loglevel=info --settings=delivery_tracker.settings_production
-price-service: python start_price_service_immediately.py
