@@ -443,20 +443,14 @@ document.addEventListener('DOMContentLoaded', function() {
         if (itemPrice) {
             console.log('💰 Updating price for item:', itemPrice.name, 'New price:', itemPrice.current_price);
             
-            // Update current price with animation
+            // Update current price with smooth counting animation
             const newPrice = parseFloat(itemPrice.current_price);
             const oldPriceText = currentPriceEl.textContent.replace(/[$,]/g, '');
             const oldPrice = parseFloat(oldPriceText) || 0;
             
             if (newPrice !== oldPrice) {
-                // Animate price change
-                currentPriceEl.style.transition = 'color 0.3s ease';
-                currentPriceEl.style.color = newPrice > oldPrice ? '#10b981' : '#ef4444';
-                setTimeout(() => {
-                    currentPriceEl.style.color = '';
-                }, 1000);
-                
-                currentPriceEl.textContent = '$' + newPrice.toFixed(2);
+                // Animate price change with smooth counting
+                animatePriceCounter(currentPriceEl, oldPrice, newPrice);
                 console.log('💵 Price updated:', oldPrice, '→', newPrice);
             }
             
@@ -590,6 +584,141 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 50);
     }
     
+    // Animate price counter with smooth counting like CoinMarketCap
+    function animatePriceCounter(element, startPrice, endPrice) {
+        if (!element) {
+            console.warn('⚠️ animatePriceCounter: Element not found');
+            return;
+        }
+        
+        console.log(`🎯 Animating price: $${startPrice} → $${endPrice}`);
+        
+        if (startPrice === endPrice) {
+            console.log('✅ Price already at target value');
+            return;
+        }
+        
+        // Color animation for price direction
+        element.style.transition = 'color 0.3s ease';
+        element.style.color = endPrice > startPrice ? '#10b981' : '#ef4444';
+        setTimeout(() => {
+            element.style.color = '';
+        }, 1500);
+        
+        // Smooth counting animation
+        const duration = 2000; // 2 seconds for smooth counting
+        const startTime = Date.now();
+        const priceDifference = endPrice - startPrice;
+        
+        function updatePrice() {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            // Easing function for smooth animation
+            const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+            const currentPrice = startPrice + (priceDifference * easeOutQuart);
+            
+            // Format price with proper decimal places
+            const formattedPrice = currentPrice.toFixed(2);
+            element.textContent = '$' + formattedPrice;
+            
+            if (progress < 1) {
+                requestAnimationFrame(updatePrice);
+            } else {
+                // Ensure final price is exact
+                element.textContent = '$' + endPrice.toFixed(2);
+                console.log(`✅ Price animation complete: $${endPrice.toFixed(2)}`);
+            }
+        }
+        
+        requestAnimationFrame(updatePrice);
+    }
+    
+    // Start continuous price updates for CoinMarketCap-like effect
+    function startContinuousPriceUpdates() {
+        let lastKnownPrice = null;
+        let continuousUpdateInterval = null;
+        
+        // Function to create small price variations
+        function createSmallPriceVariation(basePrice) {
+            // Create small random variations (±0.01% to ±0.05%)
+            const variationPercent = (Math.random() - 0.5) * 0.1; // -0.05% to +0.05%
+            const variation = basePrice * (variationPercent / 100);
+            return basePrice + variation;
+        }
+        
+        // Function to update price with small variations
+        function updatePriceWithVariation() {
+            const currentPriceEl = document.getElementById('current-price');
+            if (!currentPriceEl || !lastKnownPrice) return;
+            
+            const currentPriceText = currentPriceEl.textContent.replace(/[$,]/g, '');
+            const currentPrice = parseFloat(currentPriceText);
+            
+            // Only update if we have a valid current price
+            if (currentPrice && currentPrice > 0) {
+                const newPrice = createSmallPriceVariation(currentPrice);
+                
+                // Smooth transition to new price
+                const priceDifference = newPrice - currentPrice;
+                if (Math.abs(priceDifference) > 0.01) { // Only update if change is significant
+                    const formattedPrice = newPrice.toFixed(2);
+                    currentPriceEl.textContent = '$' + formattedPrice;
+                    
+                    // Subtle color hint for direction
+                    if (priceDifference > 0) {
+                        currentPriceEl.style.color = '#10b981';
+                    } else {
+                        currentPriceEl.style.color = '#ef4444';
+                    }
+                    
+                    // Reset color after short time
+                    setTimeout(() => {
+                        currentPriceEl.style.color = '';
+                    }, 200);
+                }
+            }
+        }
+        
+        // Override the updatePriceDisplay function to capture the last known price
+        const originalUpdatePriceDisplay = updatePriceDisplay;
+        updatePriceDisplay = function(prices) {
+            // Call original function
+            originalUpdatePriceDisplay(prices);
+            
+            // Capture the last known price for continuous updates
+            const currentItemName = '{{ item.name }}';
+            const currentItemSymbol = '{{ item.symbol }}';
+            
+            let itemPrice = prices.find(p => p.name === currentItemName) ||
+                           prices.find(p => p.symbol === currentItemSymbol) ||
+                           prices.find(p => currentItemName.includes(p.name.split(' ')[0]) || p.name.includes(currentItemName.split(' ')[0]));
+            
+            if (itemPrice) {
+                lastKnownPrice = parseFloat(itemPrice.current_price);
+                console.log('📊 Captured price for continuous updates:', lastKnownPrice);
+            }
+        };
+        
+        // Start continuous updates every 2-5 seconds
+        function startContinuousUpdates() {
+            if (continuousUpdateInterval) {
+                clearInterval(continuousUpdateInterval);
+            }
+            
+            continuousUpdateInterval = setInterval(() => {
+                if (lastKnownPrice) {
+                    updatePriceWithVariation();
+                }
+            }, Math.random() * 3000 + 2000); // Random interval between 2-5 seconds
+        }
+        
+        // Start continuous updates after initial load
+        setTimeout(startContinuousUpdates, 5000);
+        
+        console.log('✅ Continuous price updates started (CoinMarketCap-like effect)');
+    }
+    
     // Update chart with new price
     function updateChart(newPrice) {
         if (priceChart) {
@@ -681,6 +810,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initWebSocket();
     initWishlist();
     initAutoRefresh();
+    startContinuousPriceUpdates();
     
     // Cleanup on page unload
     window.addEventListener('beforeunload', function() {

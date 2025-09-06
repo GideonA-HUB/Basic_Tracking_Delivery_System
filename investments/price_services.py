@@ -21,6 +21,10 @@ class RealTimePriceService:
     def fetch_crypto_prices(self):
         """Fetch cryptocurrency prices from multiple APIs for better reliability"""
         try:
+            # Add delay to avoid rate limiting
+            import time
+            time.sleep(1)  # 1 second delay to respect rate limits
+            
             # Primary: CoinGecko API (free, reliable)
             url = "https://api.coingecko.com/api/v3/simple/price"
             params = {

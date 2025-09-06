@@ -166,13 +166,13 @@ class PriceFeedConsumer(AsyncWebsocketConsumer):
             return False
     
     async def start_periodic_updates(self):
-        """Start periodic price updates every 30 seconds"""
+        """Start periodic price updates every 60 seconds to avoid rate limits"""
         import asyncio
         
         async def periodic_update():
             while True:
                 try:
-                    await asyncio.sleep(30)  # Wait 30 seconds
+                    await asyncio.sleep(60)  # Wait 60 seconds (reduced from 30 to avoid rate limits)
                     logger.info("🔄 Running periodic price update...")
                     
                     # Force update prices from APIs
