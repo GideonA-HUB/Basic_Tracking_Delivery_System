@@ -314,8 +314,29 @@ class ProductionLiveDashboard {
         
         switch (data.type) {
             case 'price_data':
+                console.log('📊 Processing price_data message');
+                console.log('📊 Movement stats:', data.movement_stats);
+                console.log('📊 Update count:', data.update_count);
+                
                 this.updateLivePriceFeed(data.prices || []);
                 this.updatePriceCounters(data.prices || []);
+                
+                // Update movement statistics if provided
+                if (data.movement_stats) {
+                    console.log('📊 Updating movement statistics from price_data');
+                    this.updateMovementStatistics(data.movement_stats);
+                } else {
+                    console.warn('⚠️ No movement_stats in price_data message');
+                }
+                
+                // Update update count
+                if (data.update_count) {
+                    this.updateCount = data.update_count;
+                    this.updateUpdateCounter();
+                }
+                
+                this.lastUpdateTime = new Date();
+                this.updateLastUpdateTime();
                 break;
                 
             case 'price_update':
@@ -457,24 +478,40 @@ class ProductionLiveDashboard {
     }
     
     updateMovementStatistics(stats) {
-        // Update global movement statistics
+        console.log('📊 Updating movement statistics:', stats);
+        
+        // Update global movement statistics with current values (not cumulative)
         this.movementStats = {
-            increases: (this.movementStats.increases || 0) + (stats.increases || 0),
-            decreases: (this.movementStats.decreases || 0) + (stats.decreases || 0),
-            unchanged: (this.movementStats.unchanged || 0) + (stats.unchanged || 0),
-            total: (this.movementStats.total || 0) + (stats.total || 0)
+            increases: stats.increases || 0,
+            decreases: stats.decreases || 0,
+            unchanged: stats.unchanged || 0,
+            total: stats.total || 0
         };
         
-        // Update display
+        console.log('📊 New movement stats:', this.movementStats);
+        
+        // Update display with animation
         this.animateCounter(document.getElementById('totalIncreases'), this.movementStats.increases);
         this.animateCounter(document.getElementById('totalDecreases'), this.movementStats.decreases);
         this.animateCounter(document.getElementById('totalMovements'), this.movementStats.total);
+        
+        console.log('✅ Movement statistics updated and animated');
     }
     
     animateCounter(element, targetValue) {
-        if (!element) return;
+        if (!element) {
+            console.warn('⚠️ animateCounter: Element not found');
+            return;
+        }
         
         const currentValue = parseInt(element.textContent) || 0;
+        console.log(`🎯 Animating counter: ${currentValue} → ${targetValue}`);
+        
+        if (currentValue === targetValue) {
+            console.log('✅ Counter already at target value');
+            return;
+        }
+        
         const increment = (targetValue - currentValue) / 10;
         let current = currentValue;
         
@@ -483,6 +520,7 @@ class ProductionLiveDashboard {
             if ((increment > 0 && current >= targetValue) || (increment < 0 && current <= targetValue)) {
                 current = targetValue;
                 clearInterval(timer);
+                console.log(`✅ Counter animation complete: ${targetValue}`);
             }
             element.textContent = Math.round(current);
         }, 50);
