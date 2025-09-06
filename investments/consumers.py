@@ -128,6 +128,9 @@ class PriceFeedConsumer(AsyncWebsocketConsumer):
             # Send initial price data immediately
             await self.send_price_data()
             
+            # Start periodic updates every 30 seconds
+            await self.start_periodic_updates()
+            
         except Exception as e:
             logger.error(f"Error in WebSocket connect: {e}")
             if hasattr(self, 'channel_name'):
@@ -149,6 +152,7 @@ class PriceFeedConsumer(AsyncWebsocketConsumer):
             logger.info("💰 Current LIVE API prices:")
             for symbol in major_cryptos:
                 try:
+                    from investments.models import RealTimePriceFeed
                     feed = RealTimePriceFeed.objects.filter(symbol=symbol).first()
                     if feed:
                         logger.info(f"   {feed.name}: ${feed.current_price:,.2f} ({feed.price_change_percentage_24h:+.2f}%)")
@@ -160,6 +164,30 @@ class PriceFeedConsumer(AsyncWebsocketConsumer):
         except Exception as e:
             logger.error(f"❌ Price update from APIs failed: {e}")
             return False
+    
+    async def start_periodic_updates(self):
+        """Start periodic price updates every 30 seconds"""
+        import asyncio
+        
+        async def periodic_update():
+            while True:
+                try:
+                    await asyncio.sleep(30)  # Wait 30 seconds
+                    logger.info("🔄 Running periodic price update...")
+                    
+                    # Force update prices from APIs
+                    await self.force_update_prices_from_apis()
+                    
+                    # Send updated price data
+                    await self.send_price_data()
+                    
+                except Exception as e:
+                    logger.error(f"Error in periodic update: {e}")
+                    break
+        
+        # Start the periodic update task
+        asyncio.create_task(periodic_update())
+        logger.info("✅ Periodic updates started (every 30 seconds)")
     
     async def disconnect(self, close_code):
         """Handle WebSocket disconnection"""
@@ -207,21 +235,45 @@ class PriceFeedConsumer(AsyncWebsocketConsumer):
             }))
     
     async def send_price_data(self):
-        """Send current price data to client"""
+        """Send current price data to client with movement statistics"""
         try:
             logger.info("Fetching price data from database...")
             
             # Get price data using sync_to_async
             price_data = await self.get_price_data()
             
+            # Calculate movement statistics
+            increases = 0
+            decreases = 0
+            unchanged = 0
+            
+            for price in price_data:
+                change = price.get('price_change_percentage_24h', 0)
+                if change > 0:
+                    increases += 1
+                elif change < 0:
+                    decreases += 1
+                else:
+                    unchanged += 1
+            
+            movement_stats = {
+                'increases': increases,
+                'decreases': decreases,
+                'unchanged': unchanged,
+                'total': increases + decreases
+            }
+            
             response_data = {
                 'type': 'price_data',
                 'prices': price_data,
+                'movement_stats': movement_stats,
+                'update_count': len(price_data),
                 'timestamp': await self.get_current_timestamp(),
                 'total_items': len(price_data)
             }
             
             logger.info(f"Sending price data: {len(price_data)} items")
+            logger.info(f"Movement stats: {increases} increases, {decreases} decreases, {unchanged} unchanged")
             await self.send(text_data=json.dumps(response_data))
             logger.info("Price data sent successfully")
             
