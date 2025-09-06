@@ -350,7 +350,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (data.type === 'price_data' || data.type === 'price_update') {
                     console.log(`📈 Processing ${data.type} with ${data.prices ? data.prices.length : 0} prices`);
+                    console.log('📊 Movement stats:', data.movement_stats);
+                    console.log('📊 Update count:', data.update_count);
+                    
                     updatePriceDisplay(data.prices || []);
+                    
+                    // Update movement statistics if provided
+                    if (data.movement_stats) {
+                        updateMovementStatistics(data.movement_stats);
+                    }
                 } else if (data.type === 'error') {
                     console.error('❌ WebSocket error:', data.message);
                     updateConnectionStatus(false, data.message);
@@ -393,6 +401,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update price display
     function updatePriceDisplay(prices) {
         console.log('🔄 Updating price display with', prices.length, 'prices');
+        
+        // Update Live Price Feed sidebar
+        updateLivePriceFeed(prices);
         
         const currentPriceEl = document.getElementById('current-price');
         const priceChangeEl = document.getElementById('price-change');
@@ -471,6 +482,112 @@ document.addEventListener('DOMContentLoaded', function() {
             console.warn('⚠️ No matching price found for item:', currentItemName);
             console.log('📊 Available prices:', prices.map(p => `${p.name} (${p.symbol}): $${p.current_price}`));
         }
+    }
+    
+    // Update Live Price Feed sidebar
+    function updateLivePriceFeed(prices) {
+        console.log('📊 Updating Live Price Feed with', prices.length, 'prices');
+        
+        const livePriceFeedEl = document.getElementById('live-price-feed');
+        if (!livePriceFeedEl) {
+            console.error('❌ Live Price Feed element not found');
+            return;
+        }
+        
+        // Show top 8 prices in the sidebar
+        const topPrices = prices.slice(0, 8);
+        
+        livePriceFeedEl.innerHTML = topPrices.map(price => {
+            const changeAmount = parseFloat(price.price_change_24h) || 0;
+            const changePercent = parseFloat(price.price_change_percentage_24h) || 0;
+            const changeClass = changeAmount >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
+            const changeIcon = changeAmount >= 0 ? '▲' : '▼';
+            
+            return `
+                <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200">
+                    <div class="flex-1">
+                        <div class="font-semibold text-gray-900 dark:text-white text-sm">${price.name}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">${price.symbol}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-bold text-gray-900 dark:text-white text-sm">$${parseFloat(price.current_price).toFixed(2)}</div>
+                        <div class="text-xs ${changeClass}">
+                            ${changeIcon} ${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}%
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        console.log('✅ Live Price Feed updated with', topPrices.length, 'items');
+    }
+    
+    // Update movement statistics
+    function updateMovementStatistics(stats) {
+        console.log('📊 Updating movement statistics:', stats);
+        
+        // Create or update movement statistics display
+        let statsContainer = document.getElementById('movement-stats');
+        if (!statsContainer) {
+            // Create movement statistics container if it doesn't exist
+            const livePriceFeedEl = document.getElementById('live-price-feed');
+            if (livePriceFeedEl && livePriceFeedEl.parentNode) {
+                const statsHTML = `
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Market Statistics</h3>
+                        <div id="movement-stats" class="grid grid-cols-2 gap-4">
+                            <div class="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                                <div class="text-2xl font-bold text-green-600 dark:text-green-400" id="totalIncreases">0</div>
+                                <div class="text-sm text-gray-600 dark:text-gray-400">Increases</div>
+                            </div>
+                            <div class="text-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                                <div class="text-2xl font-bold text-red-600 dark:text-red-400" id="totalDecreases">0</div>
+                                <div class="text-sm text-gray-600 dark:text-gray-400">Decreases</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                livePriceFeedEl.parentNode.insertAdjacentHTML('beforebegin', statsHTML);
+                statsContainer = document.getElementById('movement-stats');
+            }
+        }
+        
+        if (statsContainer) {
+            // Animate counters
+            animateCounter(document.getElementById('totalIncreases'), stats.increases || 0);
+            animateCounter(document.getElementById('totalDecreases'), stats.decreases || 0);
+            
+            console.log('✅ Movement statistics updated and animated');
+        }
+    }
+    
+    // Animate counter function
+    function animateCounter(element, targetValue) {
+        if (!element) {
+            console.warn('⚠️ animateCounter: Element not found');
+            return;
+        }
+        
+        const currentValue = parseInt(element.textContent) || 0;
+        console.log(`🎯 Animating counter: ${currentValue} → ${targetValue}`);
+        
+        if (currentValue === targetValue) {
+            console.log('✅ Counter already at target value');
+            return;
+        }
+        
+        const increment = (targetValue - currentValue) / 10;
+        let current = currentValue;
+        
+        const timer = setInterval(() => {
+            current += increment;
+            if ((increment > 0 && current >= targetValue) || (increment < 0 && current <= targetValue)) {
+                current = targetValue;
+                clearInterval(timer);
+                console.log(`✅ Counter animation complete: ${targetValue}`);
+            }
+            element.textContent = Math.round(current);
+        }, 50);
     }
     
     // Update chart with new price
