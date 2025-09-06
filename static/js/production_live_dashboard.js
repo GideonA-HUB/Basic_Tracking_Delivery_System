@@ -116,22 +116,30 @@ class ProductionLiveDashboard {
             });
         }
         
-        // Enhanced Distribution Chart
+        // Enhanced Distribution Chart - Beautiful and Eye-catching
         const distributionCtx = document.getElementById('distributionChart');
         if (distributionCtx) {
             this.charts.distribution = new Chart(distributionCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Cryptocurrencies', 'Precious Metals', 'Real Estate', 'Other'],
+                    labels: ['Cryptocurrencies', 'Precious Metals', 'Real Estate', 'Stocks & ETFs', 'Commodities'],
                     datasets: [{
-                        data: [60, 25, 10, 5],
+                        data: [45, 20, 15, 12, 8],
                         backgroundColor: [
-                            '#3b82f6', '#f59e0b', '#10b981', '#ef4444'
+                            'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                            'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                            'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                            'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
                         ],
                         borderColor: '#ffffff',
-                        borderWidth: 3,
-                        hoverOffset: 8,
-                        hoverBorderWidth: 4
+                        borderWidth: 4,
+                        hoverOffset: 15,
+                        hoverBorderWidth: 6,
+                        shadowOffsetX: 0,
+                        shadowOffsetY: 4,
+                        shadowBlur: 8,
+                        shadowColor: 'rgba(0, 0, 0, 0.1)'
                     }]
                 },
                 options: {
@@ -141,37 +149,87 @@ class ProductionLiveDashboard {
                         legend: {
                             position: 'bottom',
                             labels: {
-                                padding: 20,
+                                padding: 25,
                                 usePointStyle: true,
+                                pointStyle: 'circle',
                                 font: {
-                                    size: 12,
-                                    weight: '500'
+                                    size: 13,
+                                    weight: '600',
+                                    family: "'Inter', sans-serif"
+                                },
+                                color: '#374151',
+                                generateLabels: function(chart) {
+                                    const data = chart.data;
+                                    if (data.labels.length && data.datasets.length) {
+                                        return data.labels.map((label, i) => {
+                                            const dataset = data.datasets[0];
+                                            const value = dataset.data[i];
+                                            const total = dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = ((value / total) * 100).toFixed(1);
+                                            
+                                            return {
+                                                text: `${label} (${percentage}%)`,
+                                                fillStyle: dataset.backgroundColor[i],
+                                                strokeStyle: dataset.borderColor,
+                                                lineWidth: dataset.borderWidth,
+                                                pointStyle: 'circle',
+                                                hidden: false,
+                                                index: i
+                                            };
+                                        });
+                                    }
+                                    return [];
                                 }
                             }
                         },
                         tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
                             titleColor: '#ffffff',
                             bodyColor: '#ffffff',
                             borderColor: '#3b82f6',
-                            borderWidth: 1,
-                            cornerRadius: 8,
+                            borderWidth: 2,
+                            cornerRadius: 12,
+                            titleFont: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            padding: 12,
                             callbacks: {
+                                title: function(context) {
+                                    return context[0].label;
+                                },
                                 label: function(context) {
-                                    const label = context.label || '';
                                     const value = context.parsed;
                                     const total = context.dataset.data.reduce((a, b) => a + b, 0);
                                     const percentage = ((value / total) * 100).toFixed(1);
-                                    return `${label}: ${percentage}%`;
+                                    return `Value: $${value.toLocaleString()} (${percentage}%)`;
+                                },
+                                afterLabel: function(context) {
+                                    return 'Click to view details';
                                 }
                             }
                         }
                     },
-                    cutout: '65%',
+                    cutout: '70%',
+                    radius: '85%',
                     animation: {
                         animateRotate: true,
                         animateScale: true,
-                        duration: 1000
+                        duration: 1500,
+                        easing: 'easeInOutQuart',
+                        delay: (context) => {
+                            return context.dataIndex * 200;
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    onHover: (event, activeElements) => {
+                        event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
                     }
                 }
             });
