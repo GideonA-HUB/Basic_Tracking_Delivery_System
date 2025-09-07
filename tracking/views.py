@@ -3,15 +3,17 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.conf import settings
 from .models import Delivery, DeliveryStatus
 from .serializers import (
     DeliverySerializer, DeliveryCreateSerializer, DeliveryStatusSerializer,
     DeliveryStatusCreateSerializer, TrackingResponseSerializer
 )
+from .email_utils import test_email_configuration
 from django.db import models
 
 
@@ -204,3 +206,61 @@ class DeliveryStatsAPIView(APIView):
             'failed_deliveries': failed_deliveries,
             'recent_deliveries': recent_deliveries,
         })
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class EmailTestView(APIView):
+    """Test email configuration endpoint for production"""
+    
+    def get(self, request):
+        """Test email configuration"""
+        try:
+            # Test email configuration
+            success = test_email_configuration()
+            
+            return JsonResponse({
+                'status': 'success' if success else 'failed',
+                'message': 'Email test completed',
+                'email_settings': {
+                    'host': settings.EMAIL_HOST,
+                    'port': settings.EMAIL_PORT,
+                    'user': settings.EMAIL_HOST_USER,
+                    'from_email': settings.DEFAULT_FROM_EMAIL,
+                    'use_tls': settings.EMAIL_USE_TLS,
+                    'use_ssl': settings.EMAIL_USE_SSL,
+                }
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': f'Email test failed: {str(e)}',
+                'email_settings': {
+                    'host': getattr(settings, 'EMAIL_HOST', 'Not configured'),
+                    'port': getattr(settings, 'EMAIL_PORT', 'Not configured'),
+                    'user': getattr(settings, 'EMAIL_HOST_USER', 'Not configured'),
+                    'from_email': getattr(settings, 'DEFAULT_FROM_EMAIL', 'Not configured'),
+                }
+            }, status=500)
+
+
+# Function-based view for easier URL routing
+def test_email_endpoint(request):
+    """Simple function-based email test endpoint"""
+    try:
+        success = test_email_configuration()
+        
+        return JsonResponse({
+            'status': 'success' if success else 'failed',
+            'message': 'Email configuration test completed',
+            'timestamp': timezone.now().isoformat(),
+            'site_url': settings.SITE_URL,
+            'email_from': settings.DEFAULT_FROM_EMAIL,
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': f'Email test failed: {str(e)}',
+            'timestamp': timezone.now().isoformat(),
+        }, status=500)

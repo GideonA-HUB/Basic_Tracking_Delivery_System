@@ -155,8 +155,8 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 # CSRF settings for external access
-CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://localhost:8000,http://127.0.0.1:8000', cast=lambda v: [s.strip() for s in v.split(',')])
-CSRF_COOKIE_SECURE = False
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://localhost:8000,http://127.0.0.1:8000,https://meridianassetlogistics.com', cast=lambda v: [s.strip() for s in v.split(',')])
+CSRF_COOKIE_SECURE = not DEBUG  # True in production, False in development
 CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_USE_SESSIONS = True
 
@@ -175,7 +175,7 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 # Investment System Settings
-SITE_URL = config('SITE_URL', default='http://localhost:8000')
+SITE_URL = config('SITE_URL', default='https://meridianassetlogistics.com')
 
 # Google Maps API Key for live tracking
 GOOGLE_MAPS_API_KEY = config('GOOGLE_MAPS_API_KEY', default='')
@@ -184,3 +184,20 @@ GOOGLE_MAPS_API_KEY = config('GOOGLE_MAPS_API_KEY', default='')
 NOWPAYMENTS_API_KEY = config('NOWPAYMENTS_API_KEY', default='')
 NOWPAYMENTS_IPN_SECRET = config('NOWPAYMENTS_IPN_SECRET', default='')
 NOWPAYMENTS_IPN_URL = config('NOWPAYMENTS_IPN_URL', default='https://meridianassetlogistics.com/investments/api/payments/ipn/')
+
+# Email Configuration for Namecheap
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = config('EMAIL_HOST', default='mail.meridianassetlogistics.com')
+EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
+EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=False, cast=bool)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='meridian@meridianassetlogistics.com')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='meridian@meridianassetlogistics.com')
+SERVER_EMAIL = config('SERVER_EMAIL', default='meridian@meridianassetlogistics.com')
+
+# Email settings for notifications
+ADMINS = [
+    ('Meridian Admin', 'meridian@meridianassetlogistics.com'),
+]
+MANAGERS = ADMINS

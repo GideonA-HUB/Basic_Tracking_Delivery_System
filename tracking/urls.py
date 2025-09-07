@@ -20,4 +20,7 @@ urlpatterns = [
     # Search and stats endpoints
     path('search/', views.DeliverySearchAPIView.as_view(), name='search_deliveries'),
     path('stats/', views.DeliveryStatsAPIView.as_view(), name='delivery_stats'),
+    
+    # Email test endpoint (for production testing)
+    path('test-email/', views.test_email_endpoint, name='test_email'),
 ]
