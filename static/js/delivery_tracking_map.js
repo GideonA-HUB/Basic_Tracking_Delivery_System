@@ -32,7 +32,7 @@ function initMap() {
 // WebSocket connection for real-time updates
 function initWebSocket() {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}/ws/track/{{ tracking_number }}/{{ tracking_secret }}/`;
+    const wsUrl = `${protocol}//${window.location.host}/ws/track/${TRACKING_NUMBER}/${TRACKING_SECRET}/`;
     
     console.log('🔌 Connecting to WebSocket:', wsUrl);
     

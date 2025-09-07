@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from django.conf import settings
 from .models import Delivery
 import json
 
@@ -31,7 +32,8 @@ def tracking_page(request, tracking_number, tracking_secret):
         return render(request, 'tracking/tracking_page.html', {
             'delivery': delivery,
             'tracking_number': tracking_number,
-            'tracking_secret': tracking_secret
+            'tracking_secret': tracking_secret,
+            'GOOGLE_MAPS_API_KEY': getattr(settings, 'GOOGLE_MAPS_API_KEY', '')
         })
         
     except Delivery.DoesNotExist:

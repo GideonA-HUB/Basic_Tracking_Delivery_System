@@ -177,6 +177,9 @@ LOGOUT_REDIRECT_URL = '/accounts/login/'
 # Investment System Settings
 SITE_URL = config('SITE_URL', default='http://localhost:8000')
 
+# Google Maps API Key for live tracking
+GOOGLE_MAPS_API_KEY = config('GOOGLE_MAPS_API_KEY', default='')
+
 # NOWPayments Configuration
 NOWPAYMENTS_API_KEY = config('NOWPAYMENTS_API_KEY', default='')
 NOWPAYMENTS_IPN_SECRET = config('NOWPAYMENTS_IPN_SECRET', default='')
