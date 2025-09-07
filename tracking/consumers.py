@@ -202,6 +202,25 @@ class DeliveryTrackingConsumer(AsyncWebsocketConsumer):
                 }
                 status_updates.append(status_data)
             
+            # Get checkpoints
+            checkpoints = []
+            for checkpoint in delivery.checkpoints.all()[:10]:  # Last 10 checkpoints
+                checkpoint_data = {
+                    'id': checkpoint.id,
+                    'checkpoint_type': checkpoint.checkpoint_type,
+                    'checkpoint_type_display': checkpoint.get_checkpoint_type_display(),
+                    'location_name': checkpoint.location_name,
+                    'description': checkpoint.description,
+                    'latitude': float(checkpoint.latitude) if checkpoint.latitude else None,
+                    'longitude': float(checkpoint.longitude) if checkpoint.longitude else None,
+                    'accuracy': float(checkpoint.accuracy) if checkpoint.accuracy else None,
+                    'timestamp': checkpoint.timestamp.isoformat(),
+                    'formatted_timestamp': checkpoint.timestamp.strftime('%B %d, %Y at %I:%M %p'),
+                    'courier_notes': checkpoint.courier_notes,
+                    'customer_notified': checkpoint.customer_notified
+                }
+                checkpoints.append(checkpoint_data)
+            
             # Calculate progress percentage
             status_order = {
                 'pending': 0,
@@ -238,11 +257,15 @@ class DeliveryTrackingConsumer(AsyncWebsocketConsumer):
                     'updated_at': delivery.updated_at.isoformat(),
                     'progress_percentage': round(progress_percentage, 1),
                     'has_geolocation': delivery.has_geolocation(),
+                    'is_gps_active': delivery.is_gps_active(),
+                    'gps_tracking_enabled': delivery.gps_tracking_enabled,
                     'current_location': delivery.get_current_location_dict(),
                     'pickup_location': delivery.get_pickup_location_dict(),
-                    'delivery_location': delivery.get_delivery_location_dict()
+                    'delivery_location': delivery.get_delivery_location_dict(),
+                    'courier_info': delivery.get_courier_info()
                 },
-                'status_updates': status_updates
+                'status_updates': status_updates,
+                'checkpoints': checkpoints
             }
             
         except Delivery.DoesNotExist:

@@ -3,6 +3,7 @@
 {% block title %}Track Your Delivery - Meridian Asset Logistics - {{ delivery.tracking_number }}{% endblock %}
 
 {% block extra_head %}
+<script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY|default:'YOUR_API_KEY' }}&libraries=geometry"></script>
 <style>
     /* Enhanced Timeline Styles */
     .timeline-item {
@@ -670,6 +671,28 @@
                         </h4>
                         <p id="eta-display" class="text-gray-700">Calculating...</p>
                         <p id="distance-display" class="text-sm text-gray-500 mt-1">--</p>
+                    </div>
+                    
+                    <!-- Courier Information -->
+                    <div class="bg-purple-50 rounded-lg p-6 border-l-4 border-purple-500">
+                        <h4 class="text-lg font-semibold text-gray-900 mb-2 flex items-center">
+                            <i class="fas fa-user-tie text-purple-500 mr-2"></i>
+                            Courier Information
+                        </h4>
+                        <div id="courier-info">
+                            <p class="text-gray-700">Loading courier details...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- GPS Status -->
+                    <div class="bg-orange-50 rounded-lg p-6 border-l-4 border-orange-500">
+                        <h4 class="text-lg font-semibold text-gray-900 mb-2 flex items-center">
+                            <i class="fas fa-satellite-dish text-orange-500 mr-2"></i>
+                            GPS Tracking Status
+                        </h4>
+                        <div id="gps-status">
+                            <p class="text-gray-700">Loading GPS status...</p>
+                        </div>
                     </div>
                     
                     <!-- Live Status -->

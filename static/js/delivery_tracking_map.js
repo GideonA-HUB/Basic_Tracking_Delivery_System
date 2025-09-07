@@ -108,6 +108,12 @@ function handleTrackingData(data) {
     
     // Update location details
     updateLocationDetails();
+    
+    // Update courier information
+    updateCourierInfo();
+    
+    // Update GPS status
+    updateGPSStatus();
 }
 
 // Handle location updates from WebSocket
@@ -379,6 +385,64 @@ function calculateETA(currentLocation) {
         const hours = Math.floor(estimatedMinutes / 60);
         const minutes = estimatedMinutes % 60;
         document.getElementById('eta-display').textContent = `~${hours}h ${minutes}m`;
+    }
+}
+
+// Update courier information
+function updateCourierInfo() {
+    const delivery = window.trackingData?.delivery;
+    const courierInfoElement = document.getElementById('courier-info');
+    
+    if (!courierInfoElement || !delivery) return;
+    
+    const courierInfo = delivery.courier_info;
+    
+    if (courierInfo && courierInfo.name) {
+        courierInfoElement.innerHTML = `
+            <p class="text-gray-700"><strong>Name:</strong> ${courierInfo.name}</p>
+            ${courierInfo.phone ? `<p class="text-gray-700"><strong>Phone:</strong> ${courierInfo.phone}</p>` : ''}
+            ${courierInfo.vehicle_type ? `<p class="text-gray-700"><strong>Vehicle:</strong> ${courierInfo.vehicle_type}</p>` : ''}
+            ${courierInfo.vehicle_number ? `<p class="text-gray-700"><strong>Vehicle Number:</strong> ${courierInfo.vehicle_number}</p>` : ''}
+        `;
+    } else {
+        courierInfoElement.innerHTML = '<p class="text-gray-700">No courier assigned yet</p>';
+    }
+}
+
+// Update GPS status
+function updateGPSStatus() {
+    const delivery = window.trackingData?.delivery;
+    const gpsStatusElement = document.getElementById('gps-status');
+    
+    if (!gpsStatusElement || !delivery) return;
+    
+    const isGPSActive = delivery.is_gps_active;
+    const gpsTrackingEnabled = delivery.gps_tracking_enabled;
+    
+    if (isGPSActive) {
+        gpsStatusElement.innerHTML = `
+            <div class="flex items-center">
+                <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse mr-2"></div>
+                <span class="text-green-700 font-semibold">Live GPS Active</span>
+            </div>
+            <p class="text-sm text-gray-600 mt-1">Real-time location tracking is active</p>
+        `;
+    } else if (gpsTrackingEnabled) {
+        gpsStatusElement.innerHTML = `
+            <div class="flex items-center">
+                <div class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
+                <span class="text-yellow-700 font-semibold">GPS Enabled</span>
+            </div>
+            <p class="text-sm text-gray-600 mt-1">GPS tracking is enabled but not currently active</p>
+        `;
+    } else {
+        gpsStatusElement.innerHTML = `
+            <div class="flex items-center">
+                <div class="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                <span class="text-red-700 font-semibold">GPS Disabled</span>
+            </div>
+            <p class="text-sm text-gray-600 mt-1">GPS tracking is not enabled for this delivery</p>
+        `;
     }
 }
 

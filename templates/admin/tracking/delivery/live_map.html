@@ -1,0 +1,431 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY|default:'YOUR_API_KEY' }}&libraries=geometry"></script>
+    <style>
+        .map-container {
+            height: 600px;
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .delivery-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-pending { background: #ffc107; color: #000; }
+        .status-confirmed { background: #17a2b8; color: #fff; }
+        .status-in_transit { background: #007bff; color: #fff; }
+        .status-out_for_delivery { background: #fd7e14; color: #fff; }
+        .status-delivered { background: #28a745; color: #fff; }
+        .status-failed { background: #dc3545; color: #fff; }
+        .status-returned { background: #6c757d; color: #fff; }
+        .live-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: #28a745;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        .location-update-form {
+            background: #fff;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .btn-update-location {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-update-location:hover {
+            background: #0056b3;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="delivery-info">
+    <h1>{{ title }}</h1>
+    
+    <div class="delivery-details">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Delivery Information</h3>
+                <p><strong>Tracking Number:</strong> {{ delivery.tracking_number }}</p>
+                <p><strong>Order Number:</strong> {{ delivery.order_number }}</p>
+                <p><strong>Customer:</strong> {{ delivery.customer_name }}</p>
+                <p><strong>Status:</strong> 
+                    <span class="status-badge status-{{ delivery.current_status }}">
+                        {{ delivery.get_current_status_display }}
+                    </span>
+                </p>
+                <p><strong>GPS Status:</strong> 
+                    {% if delivery.is_gps_active %}
+                        <span class="live-indicator"></span> Live GPS Active
+                    {% elif delivery.gps_tracking_enabled %}
+                        <span style="color: orange;">🟡 GPS Enabled</span>
+                    {% else %}
+                        <span style="color: red;">🔴 GPS Off</span>
+                    {% endif %}
+                </p>
+            </div>
+            <div class="col-md-6">
+                <h3>Courier Information</h3>
+                {% if delivery.courier_name %}
+                    <p><strong>Courier:</strong> {{ delivery.courier_name }}</p>
+                    <p><strong>Phone:</strong> {{ delivery.courier_phone|default:"Not provided" }}</p>
+                    <p><strong>Vehicle:</strong> {{ delivery.courier_vehicle_type|default:"Not specified" }}</p>
+                    <p><strong>Vehicle Number:</strong> {{ delivery.courier_vehicle_number|default:"Not provided" }}</p>
+                {% else %}
+                    <p><em>No courier assigned</em></p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Pickup Location</h3>
+                <p><strong>Address:</strong> {{ delivery.pickup_address }}</p>
+                {% if delivery.pickup_latitude and delivery.pickup_longitude %}
+                    <p><strong>Coordinates:</strong> {{ delivery.pickup_latitude }}, {{ delivery.pickup_longitude }}</p>
+                {% endif %}
+            </div>
+            <div class="col-md-6">
+                <h3>Delivery Location</h3>
+                <p><strong>Address:</strong> {{ delivery.delivery_address }}</p>
+                {% if delivery.delivery_latitude and delivery.delivery_longitude %}
+                    <p><strong>Coordinates:</strong> {{ delivery.delivery_latitude }}, {{ delivery.delivery_longitude }}</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if delivery.current_location_name %}
+        <div class="row">
+            <div class="col-12">
+                <h3>Current Location</h3>
+                <p><strong>Location:</strong> {{ delivery.current_location_name }}</p>
+                {% if delivery.current_latitude and delivery.current_longitude %}
+                    <p><strong>Coordinates:</strong> {{ delivery.current_latitude }}, {{ delivery.current_longitude }}</p>
+                {% endif %}
+                {% if delivery.last_location_update %}
+                    <p><strong>Last Update:</strong> {{ delivery.last_location_update|date:"M d, Y H:i:s" }}</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="location-update-form">
+    <h3>Update Location</h3>
+    <form id="location-update-form">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-4">
+                <label for="latitude">Latitude:</label>
+                <input type="number" id="latitude" name="latitude" step="any" class="form-control" 
+                       value="{{ delivery.current_latitude|default:'' }}" required>
+            </div>
+            <div class="col-md-4">
+                <label for="longitude">Longitude:</label>
+                <input type="number" id="longitude" name="longitude" step="any" class="form-control" 
+                       value="{{ delivery.current_longitude|default:'' }}" required>
+            </div>
+            <div class="col-md-4">
+                <label for="location_name">Location Name:</label>
+                <input type="text" id="location_name" name="location_name" class="form-control" 
+                       value="{{ delivery.current_location_name|default:'' }}" placeholder="e.g., Main Street, City">
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <label for="accuracy">GPS Accuracy (meters):</label>
+                <input type="number" id="accuracy" name="accuracy" step="any" class="form-control" 
+                       placeholder="Optional">
+            </div>
+            <div class="col-md-6 d-flex align-items-end">
+                <button type="submit" class="btn-update-location">Update Location</button>
+                <button type="button" id="get-current-location" class="btn-update-location" style="margin-left: 10px; background: #28a745;">
+                    Use Current Location
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="map-container" id="admin-delivery-map"></div>
+
+<div class="delivery-info">
+    <h3>Recent Checkpoints</h3>
+    <div id="checkpoints-list">
+        {% for checkpoint in delivery.checkpoints.all|slice:":10" %}
+        <div class="checkpoint-item" style="border-left: 3px solid #007bff; padding-left: 15px; margin: 10px 0;">
+            <strong>{{ checkpoint.get_checkpoint_type_display }}</strong> - {{ checkpoint.location_name }}
+            <br>
+            <small class="text-muted">
+                {{ checkpoint.timestamp|date:"M d, Y H:i:s" }}
+                {% if checkpoint.latitude and checkpoint.longitude %}
+                    | {{ checkpoint.latitude }}, {{ checkpoint.longitude }}
+                {% endif %}
+            </small>
+            {% if checkpoint.description %}
+                <br><em>{{ checkpoint.description }}</em>
+            {% endif %}
+        </div>
+        {% empty %}
+        <p><em>No checkpoints recorded yet.</em></p>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+let adminMap = null;
+let currentMarker = null;
+let pickupMarker = null;
+let deliveryMarker = null;
+let deliveryPath = null;
+let websocket = null;
+
+// Initialize Google Maps
+function initAdminMap() {
+    console.log('🗺️ Initializing Admin Google Maps...');
+    
+    // Default center
+    const defaultCenter = { lat: 40.7128, lng: -74.0060 };
+    
+    adminMap = new google.maps.Map(document.getElementById('admin-delivery-map'), {
+        zoom: 12,
+        center: defaultCenter,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+    });
+    
+    // Add markers for existing locations
+    updateAdminMap();
+    
+    console.log('✅ Admin Google Maps initialized');
+}
+
+// Update map with delivery locations
+function updateAdminMap() {
+    if (!adminMap) return;
+    
+    // Clear existing markers and path
+    if (currentMarker) currentMarker.setMap(null);
+    if (pickupMarker) pickupMarker.setMap(null);
+    if (deliveryMarker) deliveryMarker.setMap(null);
+    if (deliveryPath) deliveryPath.setMap(null);
+    
+    const bounds = new google.maps.LatLngBounds();
+    let hasLocations = false;
+    
+    // Add pickup marker
+    {% if delivery.pickup_latitude and delivery.pickup_longitude %}
+    const pickupPos = new google.maps.LatLng({{ delivery.pickup_latitude }}, {{ delivery.pickup_longitude }});
+    pickupMarker = new google.maps.Marker({
+        position: pickupPos,
+        map: adminMap,
+        title: 'Pickup Location',
+        icon: {
+            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="#10B981" stroke="white" stroke-width="2"/>
+                    <path d="M12 6v6l4 2" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            `),
+            scaledSize: new google.maps.Size(24, 24),
+            anchor: new google.maps.Point(12, 12)
+        }
+    });
+    bounds.extend(pickupPos);
+    hasLocations = true;
+    {% endif %}
+    
+    // Add delivery marker
+    {% if delivery.delivery_latitude and delivery.delivery_longitude %}
+    const deliveryPos = new google.maps.LatLng({{ delivery.delivery_latitude }}, {{ delivery.delivery_longitude }});
+    deliveryMarker = new google.maps.Marker({
+        position: deliveryPos,
+        map: adminMap,
+        title: 'Delivery Location',
+        icon: {
+            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="#EF4444" stroke="white" stroke-width="2"/>
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="white"/>
+                </svg>
+            `),
+            scaledSize: new google.maps.Size(24, 24),
+            anchor: new google.maps.Point(12, 12)
+        }
+    });
+    bounds.extend(deliveryPos);
+    hasLocations = true;
+    {% endif %}
+    
+    // Add current location marker
+    {% if delivery.current_latitude and delivery.current_longitude %}
+    const currentPos = new google.maps.LatLng({{ delivery.current_latitude }}, {{ delivery.current_longitude }});
+    currentMarker = new google.maps.Marker({
+        position: currentPos,
+        map: adminMap,
+        title: '{{ delivery.current_location_name|default:"Current Location" }}',
+        icon: {
+            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="16" cy="16" r="12" fill="#3B82F6" stroke="white" stroke-width="3"/>
+                    <circle cx="16" cy="16" r="6" fill="white"/>
+                    <circle cx="16" cy="16" r="2" fill="#3B82F6"/>
+                </svg>
+            `),
+            scaledSize: new google.maps.Size(32, 32),
+            anchor: new google.maps.Point(16, 16)
+        },
+        animation: google.maps.Animation.BOUNCE
+    });
+    bounds.extend(currentPos);
+    hasLocations = true;
+    {% endif %}
+    
+    // Fit map to show all markers
+    if (hasLocations) {
+        adminMap.fitBounds(bounds);
+        
+        // Ensure minimum zoom level
+        google.maps.event.addListenerOnce(adminMap, 'bounds_changed', function() {
+            if (adminMap.getZoom() > 15) {
+                adminMap.setZoom(15);
+            }
+        });
+    }
+}
+
+// Handle location update form
+document.getElementById('location-update-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const latitude = document.getElementById('latitude').value;
+    const longitude = document.getElementById('longitude').value;
+    const locationName = document.getElementById('location_name').value;
+    const accuracy = document.getElementById('accuracy').value;
+    
+    if (!latitude || !longitude) {
+        alert('Please provide both latitude and longitude');
+        return;
+    }
+    
+    // Send update to server
+    fetch('{% url "admin:tracking_delivery_update_location" delivery.pk %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: new URLSearchParams({
+            'latitude': latitude,
+            'longitude': longitude,
+            'location_name': locationName,
+            'accuracy': accuracy
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update map
+            updateCurrentLocationMarker(latitude, longitude, locationName);
+            alert('Location updated successfully!');
+        } else {
+            alert('Error updating location: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error updating location');
+    });
+});
+
+// Get current location
+document.getElementById('get-current-location').addEventListener('click', function() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            document.getElementById('latitude').value = position.coords.latitude;
+            document.getElementById('longitude').value = position.coords.longitude;
+            document.getElementById('accuracy').value = position.coords.accuracy;
+        });
+    } else {
+        alert('Geolocation is not supported by this browser.');
+    }
+});
+
+// Update current location marker
+function updateCurrentLocationMarker(latitude, longitude, locationName) {
+    if (!adminMap) return;
+    
+    const position = new google.maps.LatLng(latitude, longitude);
+    
+    // Remove existing current marker
+    if (currentMarker) {
+        currentMarker.setMap(null);
+    }
+    
+    // Create new current marker
+    currentMarker = new google.maps.Marker({
+        position: position,
+        map: adminMap,
+        title: locationName || 'Current Location',
+        icon: {
+            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="16" cy="16" r="12" fill="#3B82F6" stroke="white" stroke-width="3"/>
+                    <circle cx="16" cy="16" r="6" fill="white"/>
+                    <circle cx="16" cy="16" r="2" fill="#3B82F6"/>
+                </svg>
+            `),
+            scaledSize: new google.maps.Size(32, 32),
+            anchor: new google.maps.Point(16, 16)
+        },
+        animation: google.maps.Animation.BOUNCE
+    });
+    
+    // Stop animation after 2 seconds
+    setTimeout(() => {
+        if (currentMarker) {
+            currentMarker.setAnimation(null);
+        }
+    }, 2000);
+    
+    // Center map on current location
+    adminMap.panTo(position);
+}
+
+// Initialize map when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initAdminMap();
+});
+</script>
+{% endblock %}

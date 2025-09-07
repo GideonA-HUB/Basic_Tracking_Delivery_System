@@ -1,5 +1,5 @@
 """
-Simple verification script for the live tracking system
+Simple test for the live tracking system
 """
 
 import os
@@ -14,17 +14,9 @@ from tracking.models import Delivery, DeliveryCheckpoint
 from tracking.gps_service import gps_service
 from django.contrib.auth.models import User
 
-def verify_system():
-    """Verify the live tracking system components"""
-    print("🔍 Verifying Live Tracking System...")
+def test_system():
+    print("Testing Live Tracking System...")
     
-    # Check models
-    print("✅ Models imported successfully")
-    
-    # Check GPS service
-    print("✅ GPS service imported successfully")
-    
-    # Check if we can create a test delivery
     try:
         # Create a test user
         user, created = User.objects.get_or_create(
@@ -34,7 +26,7 @@ def verify_system():
         
         # Create a test delivery
         delivery = Delivery.objects.create(
-            order_number='VERIFY-001',
+            order_number='TEST-001',
             customer_name='Test Customer',
             pickup_address='123 Test St',
             delivery_address='456 Test Ave',
@@ -42,16 +34,16 @@ def verify_system():
             created_by=user
         )
         
-        print(f"✅ Test delivery created: {delivery.tracking_number}")
+        print(f"Test delivery created: {delivery.tracking_number}")
         
         # Test GPS service
         gps_service.enable_gps_tracking(delivery.id)
-        print("✅ GPS tracking enabled")
+        print("GPS tracking enabled")
         
         gps_service.update_delivery_location(
             delivery.id, 40.7128, -74.0060, "Test Location"
         )
-        print("✅ Location updated via GPS service")
+        print("Location updated via GPS service")
         
         # Test checkpoint creation
         checkpoint = DeliveryCheckpoint.objects.create(
@@ -61,30 +53,19 @@ def verify_system():
             latitude=40.7128,
             longitude=-74.0060
         )
-        print("✅ Checkpoint created")
+        print("Checkpoint created")
         
         # Cleanup
         delivery.delete()
         user.delete()
-        print("✅ Test data cleaned up")
+        print("Test data cleaned up")
         
-        print("\n🎉 System verification successful!")
-        print("\n📋 Live Tracking System Features:")
-        print("✅ Enhanced Delivery model with GPS tracking")
-        print("✅ DeliveryCheckpoint model for location history")
-        print("✅ GPS service for automatic location updates")
-        print("✅ Admin interface with live map views")
-        print("✅ WebSocket consumers for real-time updates")
-        print("✅ Customer-facing live map tracking")
-        print("✅ Global admin dashboard")
-        print("✅ Courier information tracking")
-        print("✅ GPS status monitoring")
-        
+        print("System test successful!")
         return True
         
     except Exception as e:
-        print(f"❌ Verification failed: {e}")
+        print(f"Test failed: {e}")
         return False
 
 if __name__ == '__main__':
-    verify_system()
+    test_system()

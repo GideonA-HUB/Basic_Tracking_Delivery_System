@@ -1,0 +1,401 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY|default:'YOUR_API_KEY' }}&libraries=geometry"></script>
+    <style>
+        .checkpoint-form {
+            background: #fff;
+            padding: 30px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin: 20px 0;
+            max-width: 800px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-control:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+            color: white;
+            text-decoration: none;
+        }
+        .delivery-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .map-preview {
+            height: 300px;
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .coordinates-display {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+        .checkpoint-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .checkpoint-type {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .checkpoint-type:hover {
+            border-color: #007bff;
+            background: #f8f9ff;
+        }
+        .checkpoint-type.selected {
+            border-color: #007bff;
+            background: #007bff;
+            color: white;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="delivery-info">
+    <h1>{{ title }}</h1>
+    <p><strong>Tracking Number:</strong> {{ delivery.tracking_number }}</p>
+    <p><strong>Customer:</strong> {{ delivery.customer_name }}</p>
+    <p><strong>Current Status:</strong> {{ delivery.get_current_status_display }}</p>
+    <p><strong>Package:</strong> {{ delivery.package_description }}</p>
+</div>
+
+<div class="checkpoint-form">
+    <h2>Add Delivery Checkpoint</h2>
+    
+    <form method="post" id="checkpoint-form">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label>Checkpoint Type:</label>
+            <div class="checkpoint-types">
+                <div class="checkpoint-type" data-type="pickup">
+                    <strong>📦 Pickup</strong><br>
+                    <small>Package picked up</small>
+                </div>
+                <div class="checkpoint-type" data-type="warehouse">
+                    <strong>🏭 Warehouse</strong><br>
+                    <small>At warehouse</small>
+                </div>
+                <div class="checkpoint-type" data-type="hub">
+                    <strong>🚚 Distribution Hub</strong><br>
+                    <small>At distribution hub</small>
+                </div>
+                <div class="checkpoint-type" data-type="transit">
+                    <strong>🚛 In Transit</strong><br>
+                    <small>On the way</small>
+                </div>
+                <div class="checkpoint-type" data-type="out_for_delivery">
+                    <strong>🚚 Out for Delivery</strong><br>
+                    <small>Out for delivery</small>
+                </div>
+                <div class="checkpoint-type" data-type="delivered">
+                    <strong>✅ Delivered</strong><br>
+                    <small>Package delivered</small>
+                </div>
+                <div class="checkpoint-type" data-type="custom">
+                    <strong>📍 Custom</strong><br>
+                    <small>Custom location</small>
+                </div>
+            </div>
+            <input type="hidden" id="checkpoint_type" name="checkpoint_type" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="location_name">Location Name:</label>
+            <input type="text" id="location_name" name="location_name" class="form-control" 
+                   placeholder="e.g., Main Street, City Center" required>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="latitude">Latitude:</label>
+                    <input type="number" id="latitude" name="latitude" step="any" class="form-control" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="longitude">Longitude:</label>
+                    <input type="number" id="longitude" name="longitude" step="any" class="form-control" required>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" class="form-control" rows="3" 
+                      placeholder="Optional description of this checkpoint"></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="courier_notes">Courier Notes:</label>
+            <textarea id="courier_notes" name="courier_notes" class="form-control" rows="2" 
+                      placeholder="Optional notes from courier"></textarea>
+        </div>
+        
+        <div class="form-group">
+            <button type="button" id="get-current-location" class="btn-secondary">
+                📍 Use My Current Location
+            </button>
+            <button type="button" id="get-address-location" class="btn-secondary">
+                🏠 Get Coordinates from Address
+            </button>
+        </div>
+        
+        <div class="coordinates-display" id="coordinates-display">
+            No coordinates set
+        </div>
+        
+        <div class="map-preview" id="checkpoint-preview-map"></div>
+        
+        <div class="form-group">
+            <button type="submit" class="btn-primary">Add Checkpoint</button>
+            <a href="{% url 'admin:tracking_delivery_change' delivery.pk %}" class="btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+let previewMap = null;
+let checkpointMarker = null;
+
+// Initialize preview map
+function initPreviewMap() {
+    console.log('🗺️ Initializing checkpoint preview map...');
+    
+    // Default center
+    const defaultCenter = { lat: 40.7128, lng: -74.0060 };
+    
+    previewMap = new google.maps.Map(document.getElementById('checkpoint-preview-map'), {
+        zoom: 12,
+        center: defaultCenter,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+    });
+    
+    console.log('✅ Checkpoint preview map initialized');
+}
+
+// Handle checkpoint type selection
+document.querySelectorAll('.checkpoint-type').forEach(type => {
+    type.addEventListener('click', function() {
+        // Remove previous selection
+        document.querySelectorAll('.checkpoint-type').forEach(t => t.classList.remove('selected'));
+        
+        // Select current type
+        this.classList.add('selected');
+        document.getElementById('checkpoint_type').value = this.dataset.type;
+        
+        // Auto-fill location name based on type
+        const typeNames = {
+            'pickup': 'Pickup Location',
+            'warehouse': 'Warehouse',
+            'hub': 'Distribution Hub',
+            'transit': 'In Transit',
+            'out_for_delivery': 'Out for Delivery',
+            'delivered': 'Delivery Location',
+            'custom': 'Custom Location'
+        };
+        
+        if (!document.getElementById('location_name').value) {
+            document.getElementById('location_name').value = typeNames[this.dataset.type];
+        }
+    });
+});
+
+// Update coordinates display
+function updateCoordinatesDisplay() {
+    const lat = document.getElementById('latitude').value;
+    const lng = document.getElementById('longitude').value;
+    
+    if (lat && lng) {
+        document.getElementById('coordinates-display').textContent = 
+            `Coordinates: ${lat}, ${lng}`;
+    } else {
+        document.getElementById('coordinates-display').textContent = 'No coordinates set';
+    }
+}
+
+// Update map marker
+function updateMapMarker() {
+    const lat = parseFloat(document.getElementById('latitude').value);
+    const lng = parseFloat(document.getElementById('longitude').value);
+    
+    if (isNaN(lat) || isNaN(lng)) return;
+    
+    const position = new google.maps.LatLng(lat, lng);
+    
+    // Remove existing marker
+    if (checkpointMarker) {
+        checkpointMarker.setMap(null);
+    }
+    
+    // Add new marker
+    checkpointMarker = new google.maps.Marker({
+        position: position,
+        map: previewMap,
+        title: 'Checkpoint Location'
+    });
+    
+    // Center map on new location
+    previewMap.setCenter(position);
+}
+
+// Get current location
+document.getElementById('get-current-location').addEventListener('click', function() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            document.getElementById('latitude').value = position.coords.latitude;
+            document.getElementById('longitude').value = position.coords.longitude;
+            
+            updateCoordinatesDisplay();
+            updateMapMarker();
+        }, function(error) {
+            alert('Error getting location: ' + error.message);
+        });
+    } else {
+        alert('Geolocation is not supported by this browser.');
+    }
+});
+
+// Get coordinates from address
+document.getElementById('get-address-location').addEventListener('click', function() {
+    const address = prompt('Enter address to get coordinates:');
+    if (!address) return;
+    
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ address: address }, function(results, status) {
+        if (status === 'OK' && results[0]) {
+            const location = results[0].geometry.location;
+            document.getElementById('latitude').value = location.lat();
+            document.getElementById('longitude').value = location.lng();
+            
+            updateCoordinatesDisplay();
+            updateMapMarker();
+        } else {
+            alert('Geocoding failed: ' + status);
+        }
+    });
+});
+
+// Update display when coordinates change
+document.getElementById('latitude').addEventListener('input', function() {
+    updateCoordinatesDisplay();
+    updateMapMarker();
+});
+
+document.getElementById('longitude').addEventListener('input', function() {
+    updateCoordinatesDisplay();
+    updateMapMarker();
+});
+
+// Form validation
+document.getElementById('checkpoint-form').addEventListener('submit', function(e) {
+    const checkpointType = document.getElementById('checkpoint_type').value;
+    const locationName = document.getElementById('location_name').value;
+    const lat = document.getElementById('latitude').value;
+    const lng = document.getElementById('longitude').value;
+    
+    if (!checkpointType) {
+        e.preventDefault();
+        alert('Please select a checkpoint type');
+        return;
+    }
+    
+    if (!locationName) {
+        e.preventDefault();
+        alert('Please provide a location name');
+        return;
+    }
+    
+    if (!lat || !lng) {
+        e.preventDefault();
+        alert('Please provide both latitude and longitude');
+        return;
+    }
+    
+    if (isNaN(parseFloat(lat)) || isNaN(parseFloat(lng))) {
+        e.preventDefault();
+        alert('Please provide valid numeric coordinates');
+        return;
+    }
+    
+    if (parseFloat(lat) < -90 || parseFloat(lat) > 90) {
+        e.preventDefault();
+        alert('Latitude must be between -90 and 90');
+        return;
+    }
+    
+    if (parseFloat(lng) < -180 || parseFloat(lng) > 180) {
+        e.preventDefault();
+        alert('Longitude must be between -180 and 180');
+        return;
+    }
+});
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initPreviewMap();
+    updateCoordinatesDisplay();
+});
+</script>
+{% endblock %}
