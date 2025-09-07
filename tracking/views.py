@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.conf import settings
+import os
 from .models import Delivery, DeliveryStatus
 from .serializers import (
     DeliverySerializer, DeliveryCreateSerializer, DeliveryStatusSerializer,
@@ -256,11 +257,80 @@ def test_email_endpoint(request):
             'timestamp': timezone.now().isoformat(),
             'site_url': settings.SITE_URL,
             'email_from': settings.DEFAULT_FROM_EMAIL,
+            'debug_info': {
+                'email_host': getattr(settings, 'EMAIL_HOST', 'NOT_SET'),
+                'email_port': getattr(settings, 'EMAIL_PORT', 'NOT_SET'),
+                'email_user': getattr(settings, 'EMAIL_HOST_USER', 'NOT_SET'),
+                'email_password_set': bool(getattr(settings, 'EMAIL_HOST_PASSWORD', '')),
+                'email_use_tls': getattr(settings, 'EMAIL_USE_TLS', 'NOT_SET'),
+                'email_use_ssl': getattr(settings, 'EMAIL_USE_SSL', 'NOT_SET'),
+                'default_from_email': getattr(settings, 'DEFAULT_FROM_EMAIL', 'NOT_SET'),
+                'server_email': getattr(settings, 'SERVER_EMAIL', 'NOT_SET'),
+            }
         })
         
     except Exception as e:
         return JsonResponse({
             'status': 'error',
             'message': f'Email test failed: {str(e)}',
+            'timestamp': timezone.now().isoformat(),
+            'debug_info': {
+                'email_host': getattr(settings, 'EMAIL_HOST', 'NOT_SET'),
+                'email_port': getattr(settings, 'EMAIL_PORT', 'NOT_SET'),
+                'email_user': getattr(settings, 'EMAIL_HOST_USER', 'NOT_SET'),
+                'email_password_set': bool(getattr(settings, 'EMAIL_HOST_PASSWORD', '')),
+                'email_use_tls': getattr(settings, 'EMAIL_USE_TLS', 'NOT_SET'),
+                'email_use_ssl': getattr(settings, 'EMAIL_USE_SSL', 'NOT_SET'),
+                'default_from_email': getattr(settings, 'DEFAULT_FROM_EMAIL', 'NOT_SET'),
+                'server_email': getattr(settings, 'SERVER_EMAIL', 'NOT_SET'),
+            }
+        }, status=500)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+def debug_environment(request):
+    """Debug endpoint to check environment variables and settings"""
+    try:
+        # Check environment variables directly
+        env_vars = {
+            'EMAIL_HOST': os.environ.get('EMAIL_HOST', 'NOT_SET'),
+            'EMAIL_PORT': os.environ.get('EMAIL_PORT', 'NOT_SET'),
+            'EMAIL_HOST_USER': os.environ.get('EMAIL_HOST_USER', 'NOT_SET'),
+            'EMAIL_HOST_PASSWORD': 'SET' if os.environ.get('EMAIL_HOST_PASSWORD') else 'NOT_SET',
+            'EMAIL_USE_TLS': os.environ.get('EMAIL_USE_TLS', 'NOT_SET'),
+            'EMAIL_USE_SSL': os.environ.get('EMAIL_USE_SSL', 'NOT_SET'),
+            'DEFAULT_FROM_EMAIL': os.environ.get('DEFAULT_FROM_EMAIL', 'NOT_SET'),
+            'SERVER_EMAIL': os.environ.get('SERVER_EMAIL', 'NOT_SET'),
+            'SITE_URL': os.environ.get('SITE_URL', 'NOT_SET'),
+            'DEBUG': os.environ.get('DEBUG', 'NOT_SET'),
+        }
+        
+        # Check Django settings
+        django_settings = {
+            'EMAIL_HOST': getattr(settings, 'EMAIL_HOST', 'NOT_SET'),
+            'EMAIL_PORT': getattr(settings, 'EMAIL_PORT', 'NOT_SET'),
+            'EMAIL_HOST_USER': getattr(settings, 'EMAIL_HOST_USER', 'NOT_SET'),
+            'EMAIL_HOST_PASSWORD': 'SET' if getattr(settings, 'EMAIL_HOST_PASSWORD', '') else 'NOT_SET',
+            'EMAIL_USE_TLS': getattr(settings, 'EMAIL_USE_TLS', 'NOT_SET'),
+            'EMAIL_USE_SSL': getattr(settings, 'EMAIL_USE_SSL', 'NOT_SET'),
+            'DEFAULT_FROM_EMAIL': getattr(settings, 'DEFAULT_FROM_EMAIL', 'NOT_SET'),
+            'SERVER_EMAIL': getattr(settings, 'SERVER_EMAIL', 'NOT_SET'),
+            'SITE_URL': getattr(settings, 'SITE_URL', 'NOT_SET'),
+            'DEBUG': getattr(settings, 'DEBUG', 'NOT_SET'),
+        }
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Environment debug information',
+            'timestamp': timezone.now().isoformat(),
+            'environment_variables': env_vars,
+            'django_settings': django_settings,
+            'all_env_vars': dict(os.environ) if request.GET.get('show_all') == 'true' else 'Use ?show_all=true to see all environment variables'
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': f'Debug failed: {str(e)}',
             'timestamp': timezone.now().isoformat(),
         }, status=500)

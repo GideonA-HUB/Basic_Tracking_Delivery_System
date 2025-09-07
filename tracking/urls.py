@@ -23,4 +23,7 @@ urlpatterns = [
     
     # Email test endpoint (for production testing)
     path('test-email/', views.test_email_endpoint, name='test_email'),
+    
+    # Debug endpoint to check environment variables
+    path('debug-env/', views.debug_environment, name='debug_env'),
 ]
