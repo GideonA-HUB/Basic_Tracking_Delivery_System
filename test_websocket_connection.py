@@ -1,113 +1,76 @@
 #!/usr/bin/env python3
 """
-WebSocket Connection Test
-This script tests the WebSocket connection to verify real-time price updates work.
+Test WebSocket connection for delivery tracking
 """
-
+import os
+import sys
+import django
 import asyncio
 import websockets
 import json
-import logging
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Setup Django
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'delivery_tracker.settings')
+django.setup()
+
+from tracking.models import Delivery
 
 async def test_websocket_connection():
-    """Test WebSocket connection to price feeds"""
+    """Test WebSocket connection to delivery tracking"""
     
-    # WebSocket URL (adjust for your domain)
-    websocket_url = "wss://meridian-asset-logistics.up.railway.app/ws/price-feeds/"
-    
+    # Get a test delivery
     try:
-        logger.info(f"🔌 Connecting to WebSocket: {websocket_url}")
+        delivery = Delivery.objects.first()
+        if not delivery:
+            print("❌ No deliveries found in database")
+            return False
+            
+        print(f"📦 Testing with delivery: {delivery.tracking_number}")
         
-        # Connect to WebSocket
-        async with websockets.connect(websocket_url) as websocket:
-            logger.info("✅ WebSocket connection established!")
-            
-            # Wait for initial price data
-            logger.info("⏳ Waiting for initial price data...")
-            
-            # Listen for messages for 30 seconds
-            timeout = 30
-            start_time = asyncio.get_event_loop().time()
-            
-            while (asyncio.get_event_loop().time() - start_time) < timeout:
-                try:
-                    # Wait for message with timeout
-                    message = await asyncio.wait_for(websocket.recv(), timeout=5.0)
-                    
-                    # Parse JSON message
-                    data = json.loads(message)
-                    
-                    logger.info("📊 Received price data:")
-                    logger.info(f"   Type: {data.get('type', 'unknown')}")
-                    
-                    if 'prices' in data:
-                        prices = data['prices']
-                        logger.info(f"   Number of prices: {len(prices)}")
-                        
-                        # Show first few prices
-                        for i, price in enumerate(prices[:3]):
-                            symbol = price.get('symbol', 'Unknown')
-                            current_price = price.get('current_price', 0)
-                            change_24h = price.get('change_24h', 0)
-                            
-                            logger.info(f"   {symbol}: ${current_price:,.2f} ({change_24h:+.2f}%)")
-                    
-                    logger.info("✅ WebSocket is working! Real-time price updates are active.")
-                    
-                except asyncio.TimeoutError:
-                    logger.info("⏳ Waiting for price updates...")
-                    continue
-                except json.JSONDecodeError as e:
-                    logger.warning(f"⚠️  Invalid JSON received: {e}")
-                    continue
-                except Exception as e:
-                    logger.error(f"❌ Error receiving message: {e}")
-                    break
-            
-            logger.info("🎉 WebSocket test completed successfully!")
-            
-    except websockets.exceptions.ConnectionClosed as e:
-        logger.error(f"❌ WebSocket connection closed: {e}")
-    except websockets.exceptions.InvalidURI as e:
-        logger.error(f"❌ Invalid WebSocket URI: {e}")
-    except Exception as e:
-        logger.error(f"❌ WebSocket connection failed: {e}")
-        logger.info("💡 Make sure the server is running and WebSocket endpoint is accessible")
-
-async def test_local_websocket():
-    """Test WebSocket connection locally"""
-    
-    # Local WebSocket URL
-    websocket_url = "ws://localhost:8000/ws/price-feeds/"
-    
-    try:
-        logger.info(f"🔌 Testing local WebSocket: {websocket_url}")
+        # WebSocket URL
+        ws_url = f"wss://meridianassetlogistics.com/ws/track/{delivery.tracking_number}/{delivery.tracking_secret}/"
+        print(f"🔌 Connecting to: {ws_url}")
         
-        async with websockets.connect(websocket_url) as websocket:
-            logger.info("✅ Local WebSocket connection established!")
-            
-            # Wait for message
-            message = await asyncio.wait_for(websocket.recv(), timeout=10.0)
-            data = json.loads(message)
-            
-            logger.info("📊 Local WebSocket test successful!")
-            logger.info(f"   Received: {data.get('type', 'unknown')}")
+        try:
+            async with websockets.connect(ws_url) as websocket:
+                print("✅ WebSocket connected successfully!")
+                
+                # Send request for tracking data
+                message = {"type": "get_tracking_data"}
+                await websocket.send(json.dumps(message))
+                print("📤 Sent tracking data request")
+                
+                # Wait for response
+                response = await asyncio.wait_for(websocket.recv(), timeout=10.0)
+                data = json.loads(response)
+                print(f"📨 Received response: {data.get('type', 'unknown')}")
+                
+                if data.get('type') == 'tracking_data':
+                    print("✅ Successfully received tracking data!")
+                    return True
+                else:
+                    print(f"❌ Unexpected response type: {data.get('type')}")
+                    return False
+                    
+        except websockets.exceptions.ConnectionClosed as e:
+            print(f"❌ WebSocket connection closed: {e}")
+            return False
+        except asyncio.TimeoutError:
+            print("❌ WebSocket connection timeout")
+            return False
+        except Exception as e:
+            print(f"❌ WebSocket connection error: {e}")
+            return False
             
     except Exception as e:
-        logger.error(f"❌ Local WebSocket test failed: {e}")
+        print(f"❌ Test setup error: {e}")
+        return False
 
 if __name__ == "__main__":
-    print("🧪 WebSocket Connection Test")
-    print("=" * 50)
-    
-    # Test production WebSocket
-    print("\n🌐 Testing Production WebSocket...")
-    asyncio.run(test_websocket_connection())
-    
-    print("\n" + "=" * 50)
-    print("💡 If the test fails, wait 2-3 minutes for Railway to redeploy")
-    print("💡 Then run this test again to verify WebSocket connection")
+    print("🧪 Testing WebSocket connection...")
+    result = asyncio.run(test_websocket_connection())
+    if result:
+        print("🎉 WebSocket test passed!")
+    else:
+        print("💥 WebSocket test failed!")

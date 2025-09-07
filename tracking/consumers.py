@@ -13,45 +13,63 @@ class DeliveryTrackingConsumer(AsyncWebsocketConsumer):
     
     async def connect(self):
         """Handle WebSocket connection"""
-        self.tracking_number = self.scope['url_route']['kwargs']['tracking_number']
-        self.tracking_secret = self.scope['url_route']['kwargs']['tracking_secret']
-        self.room_group_name = f'delivery_tracking_{self.tracking_number}'
-        
-        # Verify tracking credentials
-        delivery = await self.get_delivery()
-        if not delivery:
+        try:
+            self.tracking_number = self.scope['url_route']['kwargs']['tracking_number']
+            self.tracking_secret = self.scope['url_route']['kwargs']['tracking_secret']
+            self.room_group_name = f'delivery_tracking_{self.tracking_number}'
+            
+            logger.info(f"🔌 Attempting WebSocket connection for tracking: {self.tracking_number}")
+            
+            # Verify tracking credentials
+            delivery = await self.get_delivery()
+            if not delivery:
+                logger.warning(f"❌ Delivery not found for tracking: {self.tracking_number}")
+                await self.close()
+                return
+            
+            # Check if tracking link is expired
+            if delivery.is_tracking_link_expired():
+                logger.warning(f"❌ Tracking link expired for: {self.tracking_number}")
+                await self.send(text_data=json.dumps({
+                    'type': 'error',
+                    'message': 'This tracking link has expired'
+                }))
+                await self.close()
+                return
+            
+            # Join room group
+            try:
+                await self.channel_layer.group_add(
+                    self.room_group_name,
+                    self.channel_name
+                )
+                logger.info(f"✅ Joined room group: {self.room_group_name}")
+            except Exception as e:
+                logger.error(f"❌ Failed to join room group: {e}")
+                # Continue anyway - WebSocket can still work without channel layer
+            
+            await self.accept()
+            
+            # Send initial tracking data
+            await self.send_initial_data()
+            
+            logger.info(f"✅ Delivery tracking WebSocket connected: {self.tracking_number}")
+            
+        except Exception as e:
+            logger.error(f"❌ Error in WebSocket connect: {e}")
             await self.close()
-            return
-        
-        # Check if tracking link is expired
-        if delivery.is_tracking_link_expired():
-            await self.send(text_data=json.dumps({
-                'type': 'error',
-                'message': 'This tracking link has expired'
-            }))
-            await self.close()
-            return
-        
-        # Join room group
-        await self.channel_layer.group_add(
-            self.room_group_name,
-            self.channel_name
-        )
-        
-        await self.accept()
-        
-        # Send initial tracking data
-        await self.send_initial_data()
-        
-        logger.info(f"✅ Delivery tracking WebSocket connected: {self.tracking_number}")
     
     async def disconnect(self, close_code):
         """Handle WebSocket disconnection"""
-        await self.channel_layer.group_discard(
-            self.room_group_name,
-            self.channel_name
-        )
-        logger.info(f"❌ Delivery tracking WebSocket disconnected: {self.tracking_number}")
+        try:
+            await self.channel_layer.group_discard(
+                self.room_group_name,
+                self.channel_name
+            )
+        except Exception as e:
+            logger.error(f"❌ Error disconnecting from room group: {e}")
+        
+        logger.info(f"❌ Delivery tracking WebSocket disconnected: {self.tracking_number} (code: {close_code})")
     
     async def receive(self, text_data):
         """Handle WebSocket messages"""
