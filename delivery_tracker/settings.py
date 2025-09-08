@@ -188,15 +188,15 @@ NOWPAYMENTS_IPN_URL = config('NOWPAYMENTS_IPN_URL', default='https://meridianass
 # Email Configuration for Namecheap
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-# Use os.environ directly as fallback since decouple might not work in Railway
-EMAIL_HOST = os.environ.get('EMAIL_HOST', config('EMAIL_HOST', default='mail.meridianassetlogistics.com'))
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', config('EMAIL_PORT', default=587, cast=int)))
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() == 'true' if os.environ.get('EMAIL_USE_TLS') else config('EMAIL_USE_TLS', default=True, cast=bool)
-EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False').lower() == 'true' if os.environ.get('EMAIL_USE_SSL') else config('EMAIL_USE_SSL', default=False, cast=bool)
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', config('EMAIL_HOST_USER', default='meridian@meridianassetlogistics.com'))
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', config('EMAIL_HOST_PASSWORD', default=''))
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', config('DEFAULT_FROM_EMAIL', default='meridian@meridianassetlogistics.com'))
-SERVER_EMAIL = os.environ.get('SERVER_EMAIL', config('SERVER_EMAIL', default='meridian@meridianassetlogistics.com'))
+# Use os.environ directly since decouple is not working in Railway
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'mail.meridianassetlogistics.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() == 'true'
+EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False').lower() == 'true'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'meridian@meridianassetlogistics.com')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'meridian@meridianassetlogistics.com')
+SERVER_EMAIL = os.environ.get('SERVER_EMAIL', 'meridian@meridianassetlogistics.com')
 
 # Email settings for notifications
 ADMINS = [
