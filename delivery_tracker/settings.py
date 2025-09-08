@@ -188,15 +188,21 @@ NOWPAYMENTS_IPN_URL = config('NOWPAYMENTS_IPN_URL', default='https://meridianass
 # Email Configuration for Namecheap
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-# Use os.environ directly since decouple is not working in Railway
-EMAIL_HOST = os.environ.get('EMAIL_HOST', 'mail.meridianassetlogistics.com')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() == 'true'
-EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False').lower() == 'true'
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'meridian@meridianassetlogistics.com')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'meridian@meridianassetlogistics.com')
-SERVER_EMAIL = os.environ.get('SERVER_EMAIL', 'meridian@meridianassetlogistics.com')
+# Email Configuration - Multiple fallback strategies for Railway
+# Strategy 1: Direct environment variable access
+EMAIL_HOST = os.environ.get('EMAIL_HOST') or os.environ.get('SMTP_HOST') or 'mail.privateemail.com'
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT') or os.environ.get('SMTP_PORT') or '587')
+EMAIL_USE_TLS = (os.environ.get('EMAIL_USE_TLS') or 'True').lower() == 'true'
+EMAIL_USE_SSL = (os.environ.get('EMAIL_USE_SSL') or 'False').lower() == 'true'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER') or os.environ.get('SMTP_USER') or 'meridian@meridianassetlogistics.com'
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD') or os.environ.get('SMTP_PASSWORD') or ''
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL') or 'meridian@meridianassetlogistics.com'
+SERVER_EMAIL = os.environ.get('SERVER_EMAIL') or 'meridian@meridianassetlogistics.com'
+
+# Debug logging for email configuration
+import logging
+logger = logging.getLogger(__name__)
+logger.info(f"Email configuration loaded - HOST: {EMAIL_HOST}, PORT: {EMAIL_PORT}, USER: {EMAIL_HOST_USER}, TLS: {EMAIL_USE_TLS}")
 
 # Email settings for notifications
 ADMINS = [

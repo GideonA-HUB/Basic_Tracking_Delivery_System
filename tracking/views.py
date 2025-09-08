@@ -325,6 +325,11 @@ def debug_environment(request):
             'timestamp': timezone.now().isoformat(),
             'environment_variables': env_vars,
             'django_settings': django_settings,
+            'railway_detection': {
+                'railway_environment': os.environ.get('RAILWAY_ENVIRONMENT', 'NOT_SET'),
+                'railway_project_id': os.environ.get('RAILWAY_PROJECT_ID', 'NOT_SET'),
+                'railway_service_id': os.environ.get('RAILWAY_SERVICE_ID', 'NOT_SET'),
+            },
             'all_env_vars': dict(os.environ) if request.GET.get('show_all') == 'true' else 'Use ?show_all=true to see all environment variables'
         })
         
