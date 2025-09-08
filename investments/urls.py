@@ -70,4 +70,20 @@ urlpatterns = [
     
     # Meridian Quick Access
     path('meridian-quick-access/', views.meridian_quick_access, name='meridian-quick-access'),
+    
+    # News System URLs
+    path('news/', views.news_dashboard, name='news-dashboard'),
+    path('news/article/<uuid:article_id>/', views.news_article_detail, name='news-article-detail'),
+    
+    # News API URLs
+    path('api/news/', views.NewsAPIView.as_view(), name='news-api'),
+    path('api/news/refresh/', views.NewsRefreshAPIView.as_view(), name='news-refresh'),
+    path('api/news/refresh/public/', views.PublicNewsRefreshAPIView.as_view(), name='news-refresh-public'),
+    path('api/news/widget/', views.NewsWidgetAPIView.as_view(), name='news-widget'),
+    path('api/news/preferences/', views.NewsPreferencesAPIView.as_view(), name='news-preferences'),
+    path('api/news/articles/', views.NewsArticleViewSet.as_view({'get': 'list'}), name='news-articles-list'),
+    path('api/news/articles/<uuid:pk>/', views.NewsArticleViewSet.as_view({'get': 'retrieve'}), name='news-articles-detail'),
+    path('api/news/articles/<uuid:pk>/track_view/', views.NewsArticleViewSet.as_view({'post': 'track_view'}), name='news-articles-track-view'),
+    path('api/news/articles/<uuid:pk>/track_click/', views.NewsArticleViewSet.as_view({'post': 'track_click'}), name='news-articles-track-click'),
+    path('api/news/categories/', views.NewsCategoryViewSet.as_view({'get': 'list'}), name='news-categories-list'),
 ]

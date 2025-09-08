@@ -1,0 +1,249 @@
+{% extends 'investments/base.html' %}
+{% load static %}
+
+{% block title %}Investment News - Meridian Asset Logistics{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'investments/css/news.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-newspaper"></i>
+                    Investment News
+                </h1>
+                <p class="page-subtitle">Stay updated with the latest market news and insights</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- News Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="news-filters">
+                <div class="filter-group">
+                    <label for="category-filter">Category:</label>
+                    <select id="category-filter" class="form-control">
+                        <option value="">All Categories</option>
+                        {% for category in categories %}
+                        <option value="{{ category.name }}">{{ category.display_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="featured-filter">Show:</label>
+                    <select id="featured-filter" class="form-control">
+                        <option value="">All News</option>
+                        <option value="featured">Featured Only</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="search-filter">Search:</label>
+                    <input type="text" id="search-filter" class="form-control" placeholder="Search news...">
+                </div>
+                
+                <div class="filter-group">
+                    <button id="refresh-news" class="btn btn-primary">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Featured News Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="featured-news-section">
+                <h2 class="section-title">
+                    <i class="fas fa-star"></i>
+                    Featured News
+                </h2>
+                <div id="featured-news" class="featured-news-grid">
+                    <!-- Featured news will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main News Content -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="main-news-section">
+                <h2 class="section-title">
+                    <i class="fas fa-list"></i>
+                    Latest News
+                </h2>
+                <div id="main-news" class="news-list">
+                    <!-- Main news will be loaded here -->
+                </div>
+                <div id="load-more-container" class="text-center mt-4">
+                    <button id="load-more-news" class="btn btn-outline-primary">
+                        <i class="fas fa-plus"></i> Load More News
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="sidebar">
+                <!-- Category News Widgets -->
+                <div class="news-widget" data-widget-type="crypto" data-limit="5">
+                    <div class="news-widget-header">
+                        <h3 class="news-widget-title">
+                            <i class="fab fa-bitcoin"></i>
+                            Crypto News
+                        </h3>
+                    </div>
+                    <div class="news-widget-content">
+                        <div class="news-loading">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="news-list"></div>
+                    </div>
+                </div>
+
+                <div class="news-widget" data-widget-type="stocks" data-limit="5">
+                    <div class="news-widget-header">
+                        <h3 class="news-widget-title">
+                            <i class="fas fa-chart-line"></i>
+                            Stock Market
+                        </h3>
+                    </div>
+                    <div class="news-widget-content">
+                        <div class="news-loading">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="news-list"></div>
+                    </div>
+                </div>
+
+                <div class="news-widget" data-widget-type="real_estate" data-limit="5">
+                    <div class="news-widget-header">
+                        <h3 class="news-widget-title">
+                            <i class="fas fa-home"></i>
+                            Real Estate
+                        </h3>
+                    </div>
+                    <div class="news-widget-content">
+                        <div class="news-loading">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="news-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- News Article Modal -->
+<div class="modal fade" id="newsModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newsModalTitle">News Article</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="newsModalBody">
+                <!-- Article content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <a href="#" id="newsModalLink" target="_blank" class="btn btn-primary">
+                    <i class="fas fa-external-link-alt"></i> Read Full Article
+                </a>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- News Settings Modal -->
+<div class="modal fade" id="newsSettingsModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">News Preferences</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="newsPreferencesForm">
+                    <div class="form-group">
+                        <label>Preferred Categories:</label>
+                        {% for category in categories %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" 
+                                   name="preferred_categories" value="{{ category.name }}" 
+                                   id="cat_{{ category.name }}">
+                            <label class="form-check-label" for="cat_{{ category.name }}">
+                                {{ category.display_name }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" 
+                                   name="auto_refresh_enabled" id="autoRefresh">
+                            <label class="form-check-label" for="autoRefresh">
+                                Enable Auto Refresh
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="refreshInterval">Refresh Interval (minutes):</label>
+                        <select class="form-control" name="refresh_interval_minutes" id="refreshInterval">
+                            <option value="5">5 minutes</option>
+                            <option value="15" selected>15 minutes</option>
+                            <option value="30">30 minutes</option>
+                            <option value="60">1 hour</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" 
+                                   name="show_featured_only" id="showFeaturedOnly">
+                            <label class="form-check-label" for="showFeaturedOnly">
+                                Show Featured News Only
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveNewsPreferences">Save Preferences</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'investments/js/news-dashboard.js' %}"></script>
+{% endblock %}

@@ -185,6 +185,13 @@ NOWPAYMENTS_API_KEY = config('NOWPAYMENTS_API_KEY', default='')
 NOWPAYMENTS_IPN_SECRET = config('NOWPAYMENTS_IPN_SECRET', default='')
 NOWPAYMENTS_IPN_URL = config('NOWPAYMENTS_IPN_URL', default='https://meridianassetlogistics.com/investments/api/payments/ipn/')
 
+# News API Configuration
+NEWSAPI_KEY = config('NEWSAPI_KEY', default='')
+FINNHUB_API_KEY = config('FINNHUB_API_KEY', default='')
+CRYPTOPANIC_API_KEY = config('CRYPTOPANIC_API_KEY', default='')
+COINDESK_API_KEY = config('COINDESK_API_KEY', default='')
+NEWS_REFRESH_TOKEN = config('NEWS_REFRESH_TOKEN', default='meridian-news-refresh-2025')
+
 # Email Configuration for Namecheap
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 

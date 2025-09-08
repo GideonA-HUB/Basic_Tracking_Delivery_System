@@ -8,6 +8,9 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.db.models import Q, Count, Sum
 from django.utils import timezone
+
+# Import news views
+from .news_views import *
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response

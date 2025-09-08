@@ -5,6 +5,9 @@ from django.utils import timezone
 from decimal import Decimal
 import uuid
 
+# Import news models
+from .news_models import *
+
 
 class InvestmentCategory(models.Model):
     """Categories for investment items"""

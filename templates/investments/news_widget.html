@@ -1,0 +1,503 @@
+<!-- News Widget Template -->
+<div class="news-widget" data-widget-type="{{ widget_type|default:'dashboard' }}" data-limit="{{ limit|default:10 }}">
+    <div class="news-widget-header">
+        <h3 class="news-widget-title">
+            <i class="fas fa-newspaper"></i>
+            {{ title|default:"Latest News" }}
+        </h3>
+        <div class="news-widget-controls">
+            <button class="btn btn-sm btn-outline-primary news-refresh-btn" title="Refresh News">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-secondary news-settings-btn" title="News Settings">
+                <i class="fas fa-cog"></i>
+            </button>
+        </div>
+    </div>
+    
+    <div class="news-widget-content">
+        <div class="news-loading" style="display: none;">
+            <div class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading news...</span>
+                </div>
+                <p class="mt-2 text-muted">Loading latest news...</p>
+            </div>
+        </div>
+        
+        <div class="news-list">
+            <!-- News articles will be loaded here -->
+        </div>
+        
+        <div class="news-error" style="display: none;">
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Unable to load news</strong>
+                <p class="mb-0">Please try refreshing the page or check your connection.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="news-widget-footer">
+        <a href="{% url 'investments:news-dashboard' %}" class="btn btn-sm btn-link">
+            View All News <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+</div>
+
+<!-- News Article Item Template -->
+<template id="news-article-template">
+    <div class="news-article-item" data-article-id="">
+        <div class="news-article-content">
+            <div class="news-article-image">
+                <img src="" alt="" class="img-fluid" onerror="this.style.display='none'">
+            </div>
+            <div class="news-article-text">
+                <div class="news-article-meta">
+                    <span class="news-source"></span>
+                    <span class="news-category"></span>
+                    <span class="news-time"></span>
+                </div>
+                <h4 class="news-article-title">
+                    <a href="" target="_blank" class="news-article-link">
+                        <!-- Article title will be inserted here -->
+                    </a>
+                </h4>
+                <p class="news-article-summary"></p>
+                <div class="news-article-actions">
+                    <a href="" target="_blank" class="btn btn-sm btn-primary news-read-more">
+                        Read More <i class="fas fa-external-link-alt"></i>
+                    </a>
+                    <button class="btn btn-sm btn-outline-secondary news-share-btn" title="Share">
+                        <i class="fas fa-share"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="news-article-featured-badge" style="display: none;">
+            <i class="fas fa-star"></i> Featured
+        </div>
+    </div>
+</template>
+
+<style>
+.news-widget {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.news-widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 20px 0;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 20px;
+}
+
+.news-widget-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.news-widget-title i {
+    color: #3498db;
+    margin-right: 8px;
+}
+
+.news-widget-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.news-widget-content {
+    padding: 0 20px;
+}
+
+.news-list {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.news-article-item {
+    position: relative;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 20px 0;
+    transition: all 0.3s ease;
+}
+
+.news-article-item:last-child {
+    border-bottom: none;
+}
+
+.news-article-item:hover {
+    background: #f8f9fa;
+    margin: 0 -20px;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.news-article-content {
+    display: flex;
+    gap: 15px;
+}
+
+.news-article-image {
+    flex-shrink: 0;
+    width: 120px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f8f9fa;
+}
+
+.news-article-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.news-article-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.news-article-meta {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.news-source {
+    font-weight: 500;
+    color: #3498db;
+}
+
+.news-category {
+    background: #e9ecef;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.news-time {
+    color: #6c757d;
+}
+
+.news-article-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.news-article-title a {
+    color: #2c3e50;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.news-article-title a:hover {
+    color: #3498db;
+}
+
+.news-article-summary {
+    color: #6c757d;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.news-article-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.news-read-more {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+}
+
+.news-share-btn {
+    padding: 6px 8px;
+    font-size: 0.85rem;
+}
+
+.news-article-featured-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.news-widget-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #eee;
+    text-align: center;
+}
+
+.news-widget-footer a {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.news-widget-footer a:hover {
+    color: #2980b9;
+}
+
+/* Dark theme support */
+.dark-theme .news-widget {
+    background: #2c3e50;
+    color: #ecf0f1;
+}
+
+.dark-theme .news-widget-title {
+    color: #ecf0f1;
+}
+
+.dark-theme .news-article-item:hover {
+    background: #34495e;
+}
+
+.dark-theme .news-article-title a {
+    color: #ecf0f1;
+}
+
+.dark-theme .news-article-title a:hover {
+    color: #3498db;
+}
+
+.dark-theme .news-article-summary {
+    color: #bdc3c7;
+}
+
+.dark-theme .news-article-meta {
+    color: #95a5a6;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .news-article-content {
+        flex-direction: column;
+    }
+    
+    .news-article-image {
+        width: 100%;
+        height: 200px;
+    }
+    
+    .news-widget-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    
+    .news-widget-controls {
+        align-self: flex-end;
+    }
+}
+</style>
+
+<script>
+class NewsWidget {
+    constructor(element) {
+        this.element = element;
+        this.widgetType = element.dataset.widgetType || 'dashboard';
+        this.limit = parseInt(element.dataset.limit) || 10;
+        this.refreshInterval = 15 * 60 * 1000; // 15 minutes
+        this.isLoading = false;
+        
+        this.init();
+    }
+    
+    init() {
+        this.loadNews();
+        this.setupEventListeners();
+        this.startAutoRefresh();
+    }
+    
+    setupEventListeners() {
+        // Refresh button
+        const refreshBtn = this.element.querySelector('.news-refresh-btn');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => this.loadNews());
+        }
+        
+        // Settings button
+        const settingsBtn = this.element.querySelector('.news-settings-btn');
+        if (settingsBtn) {
+            settingsBtn.addEventListener('click', () => this.showSettings());
+        }
+    }
+    
+    async loadNews() {
+        if (this.isLoading) return;
+        
+        this.isLoading = true;
+        this.showLoading();
+        
+        try {
+            const response = await fetch(`/investments/api/news/widget/?type=${this.widgetType}&limit=${this.limit}`);
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                this.renderNews(data.articles);
+                this.hideError();
+            } else {
+                this.showError(data.message || 'Failed to load news');
+            }
+        } catch (error) {
+            console.error('Error loading news:', error);
+            this.showError('Network error. Please check your connection.');
+        } finally {
+            this.isLoading = false;
+            this.hideLoading();
+        }
+    }
+    
+    renderNews(articles) {
+        const newsList = this.element.querySelector('.news-list');
+        const template = document.getElementById('news-article-template');
+        
+        if (!newsList || !template) return;
+        
+        newsList.innerHTML = '';
+        
+        articles.forEach(article => {
+            const clone = template.content.cloneNode(true);
+            const item = clone.querySelector('.news-article-item');
+            
+            // Set article data
+            item.dataset.articleId = article.id;
+            
+            // Image
+            const img = clone.querySelector('.news-article-image img');
+            if (article.image_url) {
+                img.src = article.image_url;
+                img.alt = article.title;
+            } else {
+                img.style.display = 'none';
+            }
+            
+            // Meta information
+            clone.querySelector('.news-source').textContent = article.source_name;
+            clone.querySelector('.news-category').textContent = article.category_name;
+            clone.querySelector('.news-time').textContent = article.time_ago;
+            
+            // Title and link
+            const titleLink = clone.querySelector('.news-article-title a');
+            titleLink.textContent = article.title;
+            titleLink.href = article.url;
+            
+            // Summary
+            clone.querySelector('.news-article-summary').textContent = article.summary;
+            
+            // Read more link
+            const readMoreLink = clone.querySelector('.news-read-more');
+            readMoreLink.href = article.url;
+            
+            // Featured badge
+            if (article.is_featured) {
+                clone.querySelector('.news-article-featured-badge').style.display = 'block';
+            }
+            
+            // Track click events
+            this.setupArticleTracking(clone, article);
+            
+            newsList.appendChild(clone);
+        });
+    }
+    
+    setupArticleTracking(element, article) {
+        const links = element.querySelectorAll('a[href]');
+        links.forEach(link => {
+            link.addEventListener('click', () => {
+                this.trackClick(article.id);
+            });
+        });
+    }
+    
+    async trackClick(articleId) {
+        try {
+            await fetch(`/investments/api/news/articles/${articleId}/track_click/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': this.getCSRFToken(),
+                    'Content-Type': 'application/json',
+                },
+            });
+        } catch (error) {
+            console.error('Error tracking click:', error);
+        }
+    }
+    
+    showLoading() {
+        const loading = this.element.querySelector('.news-loading');
+        if (loading) loading.style.display = 'block';
+    }
+    
+    hideLoading() {
+        const loading = this.element.querySelector('.news-loading');
+        if (loading) loading.style.display = 'none';
+    }
+    
+    showError(message) {
+        const error = this.element.querySelector('.news-error');
+        if (error) {
+            error.querySelector('p').textContent = message;
+            error.style.display = 'block';
+        }
+    }
+    
+    hideError() {
+        const error = this.element.querySelector('.news-error');
+        if (error) error.style.display = 'none';
+    }
+    
+    showSettings() {
+        // TODO: Implement news settings modal
+        console.log('Show news settings');
+    }
+    
+    startAutoRefresh() {
+        setInterval(() => {
+            this.loadNews();
+        }, this.refreshInterval);
+    }
+    
+    getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+               document.querySelector('meta[name="csrf-token"]')?.content || '';
+    }
+}
+
+// Initialize news widgets when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    const newsWidgets = document.querySelectorAll('.news-widget');
+    newsWidgets.forEach(widget => {
+        new NewsWidget(widget);
+    });
+});
+</script>
