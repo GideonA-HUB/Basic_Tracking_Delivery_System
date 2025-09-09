@@ -192,7 +192,7 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
-# Static files storage
+# Static files storage - Use simple storage to avoid manifest issues
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # Media files

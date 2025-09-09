@@ -13,24 +13,30 @@ class Command(BaseCommand):
             call_command('collectstatic', '--noinput', '--clear')
             self.stdout.write(self.style.SUCCESS('✅ Static files collected successfully'))
             
-            # Check if delivery_tracking_map.js exists
+            # Check if required JS files exist
             static_root = os.path.join(os.getcwd(), 'staticfiles')
-            js_file = os.path.join(static_root, 'js', 'delivery_tracking_map.js')
+            required_js_files = [
+                'js/delivery_tracking_map.js',
+                'js/live_price_dashboard.js'
+            ]
             
-            if os.path.exists(js_file):
-                self.stdout.write(self.style.SUCCESS('✅ delivery_tracking_map.js found in staticfiles'))
-            else:
-                self.stdout.write(self.style.WARNING('⚠️ delivery_tracking_map.js not found in staticfiles'))
+            for js_file_path in required_js_files:
+                js_file = os.path.join(static_root, js_file_path)
                 
-                # Try to copy it manually
-                source_file = os.path.join(os.getcwd(), 'static', 'js', 'delivery_tracking_map.js')
-                if os.path.exists(source_file):
-                    import shutil
-                    os.makedirs(os.path.dirname(js_file), exist_ok=True)
-                    shutil.copy2(source_file, js_file)
-                    self.stdout.write(self.style.SUCCESS('✅ Copied delivery_tracking_map.js to staticfiles'))
+                if os.path.exists(js_file):
+                    self.stdout.write(self.style.SUCCESS(f'✅ {js_file_path} found in staticfiles'))
                 else:
-                    self.stdout.write(self.style.ERROR('❌ delivery_tracking_map.js not found in source'))
+                    self.stdout.write(self.style.WARNING(f'⚠️ {js_file_path} not found in staticfiles'))
+                    
+                    # Try to copy it manually
+                    source_file = os.path.join(os.getcwd(), 'static', js_file_path)
+                    if os.path.exists(source_file):
+                        import shutil
+                        os.makedirs(os.path.dirname(js_file), exist_ok=True)
+                        shutil.copy2(source_file, js_file)
+                        self.stdout.write(self.style.SUCCESS(f'✅ Copied {js_file_path} to staticfiles'))
+                    else:
+                        self.stdout.write(self.style.ERROR(f'❌ {js_file_path} not found in source'))
             
         except Exception as e:
             self.stdout.write(self.style.ERROR(f'❌ Error collecting static files: {e}'))
