@@ -192,12 +192,12 @@ CRYPTOPANIC_API_KEY = config('CRYPTOPANIC_API_KEY', default='')
 COINDESK_API_KEY = config('COINDESK_API_KEY', default='')
 NEWS_REFRESH_TOKEN = config('NEWS_REFRESH_TOKEN', default='meridian-news-refresh-2025')
 
-# Email Configuration for Namecheap
+# Email Configuration for Google Workspace (Gmail for Business)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # Email Configuration - Multiple fallback strategies for Railway
 # Strategy 1: Direct environment variable access
-EMAIL_HOST = os.environ.get('EMAIL_HOST') or os.environ.get('SMTP_HOST') or 'mail.privateemail.com'
+EMAIL_HOST = os.environ.get('EMAIL_HOST') or os.environ.get('SMTP_HOST') or 'smtp.gmail.com'
 EMAIL_PORT = int(os.environ.get('EMAIL_PORT') or os.environ.get('SMTP_PORT') or '587')
 EMAIL_USE_TLS = (os.environ.get('EMAIL_USE_TLS') or 'True').lower() == 'true'
 EMAIL_USE_SSL = (os.environ.get('EMAIL_USE_SSL') or 'False').lower() == 'true'

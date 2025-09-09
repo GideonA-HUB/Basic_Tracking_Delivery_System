@@ -213,6 +213,11 @@
     </div>
     {% endif %}
 
+    <!-- Market News Widget -->
+    <div class="mb-8">
+        {% include 'investments/dashboard_news_widget.html' %}
+    </div>
+
     <!-- Empty State -->
     {% if not active_investments and not completed_investments %}
     <div class="text-center py-12">
