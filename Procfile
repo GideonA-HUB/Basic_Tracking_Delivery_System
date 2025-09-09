@@ -1,1 +1,1 @@
-web: gunicorn delivery_tracker.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120 --keep-alive 2 --max-requests 1000 --max-requests-jitter 100 --preload --access-logfile - --error-logfile -
+web: daphne -b 0.0.0.0 -p 8000 delivery_tracker.asgi:application

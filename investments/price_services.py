@@ -610,9 +610,21 @@ class RealTimePriceService:
             }
             
             for record in history:
-                chart_data['labels'].append(record.timestamp.strftime('%Y-%m-%d'))
-                chart_data['prices'].append(float(record.price))
-                chart_data['changes'].append(float(record.change_percentage))
+                # Handle both model instances and dictionary records
+                if hasattr(record, 'timestamp'):
+                    # Real database record
+                    timestamp = record.timestamp
+                    price = record.price
+                    change = record.change_percentage
+                else:
+                    # Simulated dictionary record
+                    timestamp = record['timestamp']
+                    price = record['price']
+                    change = record['change_percentage']
+                
+                chart_data['labels'].append(timestamp.strftime('%Y-%m-%d'))
+                chart_data['prices'].append(float(price))
+                chart_data['changes'].append(float(change))
             
             return chart_data
             
