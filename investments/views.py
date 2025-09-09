@@ -293,10 +293,22 @@ def investment_dashboard(request):
             user=request.user
         ).select_related('item')[:10]
         
+        # Get news data for the dashboard
+        try:
+            from .news_models import NewsArticle
+            dashboard_news = NewsArticle.objects.filter(
+                is_active=True,
+                category__name__in=['crypto', 'stocks', 'real_estate', 'general']
+            ).order_by('-published_at')[:8]
+        except Exception as e:
+            logger.warning(f"Could not load news for dashboard: {e}")
+            dashboard_news = []
+
         context = {
             'portfolio': portfolio,
             'active_investments': active_investments,
             'recent_transactions': recent_transactions,
+            'dashboard_news': dashboard_news,
         }
         
         return render(request, 'investments/dashboard.html', context)
@@ -605,6 +617,17 @@ def investment_marketplace(request):
         
         # Debug logging removed
         
+        # Get news data for the marketplace
+        try:
+            from .news_models import NewsArticle
+            marketplace_news = NewsArticle.objects.filter(
+                is_active=True,
+                category__name__in=['crypto', 'stocks', 'real_estate', 'general']
+            ).order_by('-published_at')[:6]
+        except Exception as e:
+            logger.warning(f"Could not load news for marketplace: {e}")
+            marketplace_news = []
+
         context = {
             'categories': categories,
             'featured_items': featured_items,
@@ -613,6 +636,7 @@ def investment_marketplace(request):
             'selected_category': selected_category,
             'search_query': search_query,
             'sort_by': sort_by,
+            'marketplace_news': marketplace_news,
         }
         
         return render(request, 'investments/marketplace.html', context)
@@ -704,10 +728,22 @@ def user_portfolio(request):
         active_investments = investments.filter(status='active')
         completed_investments = investments.filter(status__in=['sold', 'delivered'])
         
+        # Get news data for the portfolio
+        try:
+            from .news_models import NewsArticle
+            portfolio_news = NewsArticle.objects.filter(
+                is_active=True,
+                category__name__in=['crypto', 'stocks', 'real_estate', 'general']
+            ).order_by('-published_at')[:8]
+        except Exception as e:
+            logger.warning(f"Could not load news for portfolio: {e}")
+            portfolio_news = []
+
         context = {
             'portfolio': portfolio,
             'active_investments': active_investments,
             'completed_investments': completed_investments,
+            'portfolio_news': portfolio_news,
         }
         
         return render(request, 'investments/portfolio.html', context)

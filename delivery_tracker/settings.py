@@ -85,11 +85,11 @@ CHANNEL_LAYERS = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME', default='tracking_db'),
-        'USER': config('DB_USER', default='tracking_app'),
-        'PASSWORD': config('DB_PASSWORD', default='gN9zM5pQ#W4vY2@r!C8tL6xD'),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default='5432'),
+        'NAME': os.environ.get('DB_NAME') or config('DB_NAME', default='tracking_db'),
+        'USER': os.environ.get('DB_USER') or config('DB_USER', default='tracking_app'),
+        'PASSWORD': os.environ.get('DB_PASSWORD') or config('DB_PASSWORD', default='gN9zM5pQ#W4vY2@r!C8tL6xD'),
+        'HOST': os.environ.get('DB_HOST') or config('DB_HOST', default='localhost'),
+        'PORT': os.environ.get('DB_PORT') or config('DB_PORT', default='5432'),
     }
 }
 
