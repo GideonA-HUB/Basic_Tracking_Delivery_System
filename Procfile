@@ -1,1 +1,1 @@
-web: daphne -b 0.0.0.0 -p 8000 delivery_tracker.asgi:application
+web: daphne -b 0.0.0.0 -p $PORT delivery_tracker.asgi:application

@@ -26,6 +26,11 @@ from tracking.routing import websocket_urlpatterns as tracking_websocket_urlpatt
 # Combine all WebSocket URL patterns
 all_websocket_urlpatterns = investment_websocket_urlpatterns + tracking_websocket_urlpatterns
 
+# Debug: Print WebSocket patterns
+print("🔌 WebSocket URL patterns configured:")
+for pattern in all_websocket_urlpatterns:
+    print(f"  - {pattern.pattern}")
+
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),
     "websocket": AuthMiddlewareStack(
