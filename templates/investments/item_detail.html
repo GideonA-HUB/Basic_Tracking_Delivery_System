@@ -492,13 +492,17 @@ document.addEventListener('DOMContentLoaded', function() {
     function initPriceChart() {
         const ctx = document.getElementById('livePriceChart');
         if (ctx) {
+            // Start with current price as initial data point
+            const currentPrice = parseFloat('{{ item.current_price_usd }}');
+            const now = new Date();
+            
             priceChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: {{ chart_data.labels|safe }},
+                    labels: [now.toLocaleTimeString()],
                     datasets: [{
                         label: 'Price (USD)',
-                        data: {{ chart_data.prices|safe }},
+                        data: [currentPrice],
                         borderColor: '#3b82f6',
                         backgroundColor: 'rgba(59, 130, 246, 0.1)',
                         tension: 0.4,
@@ -552,6 +556,33 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             });
+        }
+    }
+    
+    // Load historical price data for the chart
+    async function loadHistoricalData() {
+        try {
+            const response = await fetch(`/investments/api/items/{{ item.id }}/price-history/`);
+            const data = await response.json();
+            
+            if (data.success && data.history && data.history.length > 0) {
+                console.log('📊 Loading historical data:', data.history.length, 'points');
+                
+                // Update chart with historical data
+                const labels = data.history.map(h => new Date(h.timestamp).toLocaleTimeString());
+                const prices = data.history.map(h => parseFloat(h.price));
+                
+                if (priceChart) {
+                    priceChart.data.labels = labels;
+                    priceChart.data.datasets[0].data = prices;
+                    priceChart.update();
+                    console.log('✅ Chart updated with historical data');
+                }
+            } else {
+                console.log('📊 No historical data available, using current price only');
+            }
+        } catch (error) {
+            console.error('❌ Error loading historical data:', error);
         }
     }
     
@@ -702,8 +733,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const now = new Date();
             lastUpdatedEl.textContent = `Last updated: ${now.toLocaleTimeString()}`;
             
-            // Update chart
-            updateChart(newPrice);
+            // Update the chart with new price data
+            updatePriceChart(itemPrice);
             
             console.log('✅ Price display updated successfully');
         } else {
@@ -1041,6 +1072,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize everything
     initPriceChart();
+    loadHistoricalData(); // Load historical data for the chart
     initWebSocket();
     initWishlist();
     initAutoRefresh();
@@ -1189,6 +1221,37 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Auto-refresh every 15 minutes
         setInterval(loadNews, 15 * 60 * 1000);
+    }
+    
+    // Update price chart with new data
+    function updatePriceChart(itemPrice) {
+        if (!priceChart) {
+            console.log('❌ Price chart not initialized');
+            return;
+        }
+        
+        console.log('📊 Updating chart with new price:', itemPrice.current_price);
+        
+        // Get current chart data
+        const chartData = priceChart.data;
+        const newPrice = parseFloat(itemPrice.current_price);
+        const now = new Date();
+        
+        // Add new data point
+        chartData.labels.push(now.toLocaleTimeString());
+        chartData.datasets[0].data.push(newPrice);
+        
+        // Keep only last 20 data points to prevent chart from getting too crowded
+        if (chartData.labels.length > 20) {
+            chartData.labels.shift();
+            chartData.datasets[0].data.shift();
+        }
+        
+        // Update chart with animation
+        priceChart.update('active');
+        
+        console.log('✅ Chart updated with new price data - Labels:', chartData.labels.length, 'Data points:', chartData.datasets[0].data.length);
+        console.log('📊 Latest data:', chartData.labels[chartData.labels.length - 1], '→ $' + chartData.datasets[0].data[chartData.datasets[0].data.length - 1]);
     }
     
     // Cleanup on page unload
