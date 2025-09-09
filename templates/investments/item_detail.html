@@ -92,8 +92,8 @@
                         <input type="checkbox" id="auto-refresh-toggle" class="sr-only peer" checked>
                         <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                     </label>
-                    <button id="test-chart-btn" class="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
-                        Test Chart
+                    <button id="force-update-btn" class="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition-colors">
+                        Force Update
                     </button>
                 </div>
                 </div>
@@ -625,6 +625,15 @@ document.addEventListener('DOMContentLoaded', function() {
             };
             console.log('📤 Sending message:', message);
             ws.send(JSON.stringify(message));
+            
+            // Also request a force update to ensure we get fresh data
+            setTimeout(() => {
+                if (ws.readyState === WebSocket.OPEN) {
+                    const forceMessage = { type: 'force_update' };
+                    console.log('📤 Sending force update message:', forceMessage);
+                    ws.send(JSON.stringify(forceMessage));
+                }
+            }, 1000);
         };
         
         ws.onmessage = function(event) {
@@ -1126,12 +1135,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize news widget
     initNewsWidget();
     
-    // Add test chart button event listener
-    const testChartBtn = document.getElementById('test-chart-btn');
-    if (testChartBtn) {
-        testChartBtn.addEventListener('click', () => {
-            console.log('🧪 Manual test chart button clicked');
-            addTestPriceVariations();
+    // Add force update button event listener
+    const forceUpdateBtn = document.getElementById('force-update-btn');
+    if (forceUpdateBtn) {
+        forceUpdateBtn.addEventListener('click', () => {
+            console.log('🔄 Force update button clicked');
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'force_update' }));
+                console.log('📤 Sent force update request to WebSocket');
+            } else {
+                console.log('❌ WebSocket not connected, trying to reconnect...');
+                initWebSocket();
+            }
         });
     }
     

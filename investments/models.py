@@ -46,7 +46,7 @@ class InvestmentItem(models.Model):
     # Investment details
     current_price_usd = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(Decimal('0.01'))])
     price_change_24h = models.DecimalField(max_digits=8, decimal_places=2, default=0)
-    price_change_percentage_24h = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+    price_change_percentage_24h = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     
     # Item specifications
     weight = models.DecimalField(max_digits=8, decimal_places=3, blank=True, null=True)
@@ -98,6 +98,12 @@ class InvestmentItem(models.Model):
             price_change = new_price - old_price
         if price_change_percentage is None:
             price_change_percentage = (price_change / old_price) * 100 if old_price > 0 else 0
+        
+        # Safety check: Limit percentage to prevent database overflow
+        if price_change_percentage > 999999.99:
+            price_change_percentage = 999999.99
+        elif price_change_percentage < -999999.99:
+            price_change_percentage = -999999.99
         
         # Determine movement type
         if price_change > 0:
@@ -174,7 +180,7 @@ class PriceHistory(models.Model):
     item = models.ForeignKey(InvestmentItem, on_delete=models.CASCADE, related_name='price_history')
     price = models.DecimalField(max_digits=12, decimal_places=2)
     change_amount = models.DecimalField(max_digits=8, decimal_places=2)
-    change_percentage = models.DecimalField(max_digits=6, decimal_places=2)
+    change_percentage = models.DecimalField(max_digits=10, decimal_places=2)
     timestamp = models.DateTimeField(auto_now_add=True)
     
     # Price movement tracking
@@ -691,6 +697,12 @@ class RealTimePriceFeed(models.Model):
             price_change_24h = new_price - self.current_price
         if price_change_percentage_24h is None and self.current_price > 0:
             price_change_percentage_24h = (price_change_24h / self.current_price) * 100
+        
+        # Safety check: Limit percentage to prevent database overflow
+        if price_change_percentage_24h and price_change_percentage_24h > 999999.99:
+            price_change_percentage_24h = 999999.99
+        elif price_change_percentage_24h and price_change_percentage_24h < -999999.99:
+            price_change_percentage_24h = -999999.99
         
         self.current_price = new_price
         self.price_change_24h = price_change_24h
