@@ -82,29 +82,78 @@ CHANNEL_LAYERS = {
 }
 
 # Database Configuration for Railway
-# Railway provides DATABASE_URL environment variable
+# Railway provides database variables in different formats
 import dj_database_url
 
-# Try to get DATABASE_URL from Railway first
-DATABASE_URL = os.environ.get('DATABASE_URL')
+# Try multiple Railway database variable formats
+DATABASE_URL = (
+    os.environ.get('DATABASE_URL') or  # Most common Railway format
+    os.environ.get('PGDATABASE_URL') or  # Alternative Railway format
+    os.environ.get('POSTGRES_URL') or  # Another Railway format
+    None
+)
 
 if DATABASE_URL:
     # Railway provides DATABASE_URL
-    DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL)
-    }
-else:
-    # Fallback to individual environment variables
+    try:
+        DATABASES = {
+            'default': dj_database_url.parse(DATABASE_URL)
+        }
+        print(f"✅ Using DATABASE_URL: {DATABASE_URL[:50]}...")
+    except Exception as e:
+        print(f"❌ Error parsing DATABASE_URL: {e}")
+        DATABASE_URL = None
+
+if not DATABASE_URL:
+    # Try individual PostgreSQL environment variables (Railway format)
+    db_name = (
+        os.environ.get('PGDATABASE') or
+        os.environ.get('DB_NAME') or
+        'tracking_db'
+    )
+    
+    db_user = (
+        os.environ.get('PGUSER') or
+        os.environ.get('DB_USER') or
+        'tracking_app'
+    )
+    
+    db_password = (
+        os.environ.get('PGPASSWORD') or
+        os.environ.get('DB_PASSWORD') or
+        'gN9zM5pQ#W4vY2@r!C8tL6xD'
+    )
+    
+    db_host = (
+        os.environ.get('PGHOST') or
+        os.environ.get('DB_HOST') or
+        'localhost'
+    )
+    
+    db_port = (
+        os.environ.get('PGPORT') or
+        os.environ.get('DB_PORT') or
+        '5432'
+    )
+    
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ.get('DB_NAME', 'tracking_db'),
-            'USER': os.environ.get('DB_USER', 'tracking_app'),
-            'PASSWORD': os.environ.get('DB_PASSWORD', 'gN9zM5pQ#W4vY2@r!C8tL6xD'),
-            'HOST': os.environ.get('DB_HOST', 'localhost'),
-            'PORT': os.environ.get('DB_PORT', '5432'),
+            'NAME': db_name,
+            'USER': db_user,
+            'PASSWORD': db_password,
+            'HOST': db_host,
+            'PORT': db_port,
         }
     }
+    
+    print(f"✅ Using individual DB vars - HOST: {db_host}, PORT: {db_port}, NAME: {db_name}, USER: {db_user}")
+
+# Debug: Print all database-related environment variables
+print("🔍 Database environment variables:")
+for key, value in os.environ.items():
+    if any(db_key in key.upper() for db_key in ['DATABASE', 'PG', 'DB_']):
+        print(f"  {key}: {value[:20]}..." if len(str(value)) > 20 else f"  {key}: {value}")
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

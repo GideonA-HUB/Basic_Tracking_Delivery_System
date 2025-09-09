@@ -1,6 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from . import views
+from . import debug_views
 
 app_name = 'investments'
 
@@ -86,4 +87,7 @@ urlpatterns = [
     path('api/news/articles/<uuid:pk>/track_view/', views.NewsArticleViewSet.as_view({'post': 'track_view'}), name='news-articles-track-view'),
     path('api/news/articles/<uuid:pk>/track_click/', views.NewsArticleViewSet.as_view({'post': 'track_click'}), name='news-articles-track-click'),
     path('api/news/categories/', views.NewsCategoryViewSet.as_view({'get': 'list'}), name='news-categories-list'),
+    
+    # Debug endpoints
+    path('api/debug/database/', debug_views.debug_database, name='debug-database'),
 ]
