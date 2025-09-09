@@ -46,6 +46,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'delivery_tracker.static_middleware.EmergencyStaticMiddleware',  # Emergency static files
 ]
 
 ROOT_URLCONF = 'delivery_tracker.urls'
