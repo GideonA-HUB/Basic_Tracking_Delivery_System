@@ -2,26 +2,6 @@
 builder = "nixpacks"
 
 [deploy]
-startCommand = "python manage.py migrate --settings=delivery_tracker.settings_production && python manage.py collectstatic --noinput --settings=delivery_tracker.settings_production && DJANGO_SETTINGS_MODULE=delivery_tracker.settings_production daphne -b 0.0.0.0 -p $PORT delivery_tracker.asgi:application"
+startCommand = "python start_web_clean.py"
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
-
-[[services]]
-name = "web"
-source = "."
-
-[services.build]
-builder = "nixpacks"
-
-[services.deploy]
-startCommand = "python manage.py migrate --settings=delivery_tracker.settings_production && python manage.py collectstatic --noinput --settings=delivery_tracker.settings_production && DJANGO_SETTINGS_MODULE=delivery_tracker.settings_production daphne -b 0.0.0.0 -p $PORT delivery_tracker.asgi:application"
-
-[[services]]
-name = "price-service"
-source = "."
-
-[services.build]
-builder = "nixpacks"
-
-[services.deploy]
-startCommand = "python RAILWAY_STARTUP_FIX.py"

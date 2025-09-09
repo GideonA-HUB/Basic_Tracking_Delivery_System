@@ -130,18 +130,26 @@ CELERY_BEAT_SCHEDULE = {
 
 # Database
 # Railway provides DATABASE_URL environment variable
-# Force use of DATABASE_URL for Railway deployment
+# Use DATABASE_URL if available, otherwise fall back to local SQLite
 DATABASE_URL = os.environ.get('DATABASE_URL')
-if not DATABASE_URL:
-    raise ValueError("DATABASE_URL environment variable is required for Railway deployment")
+if DATABASE_URL:
+    # Production database (Railway)
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+else:
+    # Development database (SQLite)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=DATABASE_URL,
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
-}
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
