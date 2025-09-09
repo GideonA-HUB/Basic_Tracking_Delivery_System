@@ -192,8 +192,11 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
-# Static files storage - Use simple storage to avoid manifest issues
+# Static files storage - Force simple storage to avoid manifest issues
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+
+# Disable static files manifest completely
+STATICFILES_USE_HASHING = False
 
 # Media files
 MEDIA_URL = '/media/'
