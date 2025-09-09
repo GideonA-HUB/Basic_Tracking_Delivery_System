@@ -1,1 +1,1 @@
-web: daphne -b 0.0.0.0 -p $PORT delivery_tracker.asgi:application
+web: gunicorn delivery_tracker.wsgi:application --bind 0.0.0.0:$PORT --workers 3 --timeout 120

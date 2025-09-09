@@ -2,6 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from . import views
 from . import debug_views
+from . import debug_env
 
 app_name = 'investments'
 
@@ -90,4 +91,5 @@ urlpatterns = [
     
     # Debug endpoints
     path('api/debug/database/', debug_views.debug_database, name='debug-database'),
+    path('api/debug/environment/', debug_env.debug_environment, name='debug-environment'),
 ]

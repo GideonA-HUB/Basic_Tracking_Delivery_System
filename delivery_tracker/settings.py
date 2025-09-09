@@ -72,14 +72,18 @@ WSGI_APPLICATION = 'delivery_tracker.wsgi.application'
 ASGI_APPLICATION = 'delivery_tracker.asgi.application'
 
 # Channel Layers for WebSocket support
+# Channels Configuration
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+            "hosts": [os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379')],
         },
     },
 }
+
+# Debug Redis configuration
+print(f"🔍 Redis URL: {os.environ.get('REDIS_URL', 'Not set')}")
 
 # Database Configuration for Railway
 # Railway provides database variables in different formats

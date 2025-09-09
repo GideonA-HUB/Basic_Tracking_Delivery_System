@@ -15,8 +15,12 @@ def main():
         print(f"✅ Django settings module set to: {os.environ['DJANGO_SETTINGS_MODULE']}")
         
         # Get port from environment (Railway provides this)
-        port = os.environ.get('PORT', '8000')
+        port = os.environ.get('PORT', '8080')
         print(f"✅ Using port: {port}")
+        
+        # Debug environment variables
+        print(f"🔍 PORT: {os.environ.get('PORT', 'Not set')}")
+        print(f"🔍 REDIS_URL: {os.environ.get('REDIS_URL', 'Not set')}")
         
         # Import Django
         import django
