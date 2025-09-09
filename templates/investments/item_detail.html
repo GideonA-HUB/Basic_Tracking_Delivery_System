@@ -86,13 +86,16 @@
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Live Price Chart</h3>
-                    <div class="flex items-center space-x-2">
-                        <span class="text-sm text-gray-500">Auto-refresh:</span>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="auto-refresh-toggle" class="sr-only peer" checked>
-                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                        </label>
-                    </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-500">Auto-refresh:</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="auto-refresh-toggle" class="sr-only peer" checked>
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    </label>
+                    <button id="test-chart-btn" class="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+                        Test Chart
+                    </button>
+                </div>
                 </div>
                 <div class="chart-container" style="height: 400px;">
                     <canvas id="livePriceChart"></canvas>
@@ -496,13 +499,28 @@ document.addEventListener('DOMContentLoaded', function() {
             const currentPrice = parseFloat('{{ item.current_price_usd }}');
             const now = new Date();
             
+            // Create some initial historical data points for better visualization
+            const initialLabels = [];
+            const initialData = [];
+            
+            // Generate 5 data points over the last 5 minutes
+            for (let i = 4; i >= 0; i--) {
+                const time = new Date(now.getTime() - (i * 60000)); // 1 minute intervals
+                initialLabels.push(time.toLocaleTimeString());
+                
+                // Add some realistic price variation (±0.5%)
+                const variation = (Math.random() - 0.5) * 0.01; // ±0.5% variation
+                const price = currentPrice * (1 + variation);
+                initialData.push(price);
+            }
+            
             priceChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: [now.toLocaleTimeString()],
+                    labels: initialLabels,
                     datasets: [{
                         label: 'Price (USD)',
-                        data: [currentPrice],
+                        data: initialData,
                         borderColor: '#3b82f6',
                         backgroundColor: 'rgba(59, 130, 246, 0.1)',
                         tension: 0.4,
@@ -1078,8 +1096,23 @@ document.addEventListener('DOMContentLoaded', function() {
     initAutoRefresh();
     startContinuousPriceUpdates();
     
+    // Add some test price variations for demonstration
+    setTimeout(() => {
+        console.log('🧪 Adding test price variations for demonstration...');
+        addTestPriceVariations();
+    }, 10000); // Wait 10 seconds after page load
+    
     // Initialize news widget
     initNewsWidget();
+    
+    // Add test chart button event listener
+    const testChartBtn = document.getElementById('test-chart-btn');
+    if (testChartBtn) {
+        testChartBtn.addEventListener('click', () => {
+            console.log('🧪 Manual test chart button clicked');
+            addTestPriceVariations();
+        });
+    }
     
     // News Widget Functionality
     function initNewsWidget() {
@@ -1223,6 +1256,65 @@ document.addEventListener('DOMContentLoaded', function() {
         setInterval(loadNews, 15 * 60 * 1000);
     }
     
+    // Add test price variations for demonstration
+    function addTestPriceVariations() {
+        if (!priceChart) {
+            console.log('❌ Chart not initialized for test variations');
+            return;
+        }
+        
+        console.log('🧪 Adding test price variations...');
+        
+        const currentPrice = parseFloat('{{ item.current_price_usd }}');
+        const variations = [
+            { change: 0.02, label: '+2%' },   // +2%
+            { change: -0.015, label: '-1.5%' }, // -1.5%
+            { change: 0.03, label: '+3%' },   // +3%
+            { change: -0.01, label: '-1%' },  // -1%
+            { change: 0.025, label: '+2.5%' } // +2.5%
+        ];
+        
+        let index = 0;
+        const addVariation = () => {
+            if (index < variations.length) {
+                const variation = variations[index];
+                const newPrice = currentPrice * (1 + variation.change);
+                const now = new Date();
+                
+                // Simulate a price update
+                const mockItemPrice = {
+                    current_price: newPrice,
+                    price_change_24h: currentPrice * variation.change,
+                    price_change_percentage_24h: variation.change * 100
+                };
+                
+                console.log(`🧪 Test variation ${index + 1}: ${variation.label} → $${newPrice.toFixed(2)}`);
+                
+                // Update both chart and price display
+                updatePriceChart(mockItemPrice);
+                
+                // Also update the price display elements
+                const currentPriceEl = document.getElementById('current-price');
+                const priceChangeEl = document.getElementById('price-change');
+                const lastUpdatedEl = document.getElementById('last-updated');
+                
+                if (currentPriceEl) currentPriceEl.textContent = '$' + newPrice.toFixed(2);
+                if (priceChangeEl) {
+                    const changeClass = variation.change >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
+                    const changeIcon = variation.change >= 0 ? '▲' : '▼';
+                    priceChangeEl.className = `text-sm ${changeClass}`;
+                    priceChangeEl.innerHTML = `${changeIcon} $${Math.abs(currentPrice * variation.change).toFixed(2)} (${variation.change >= 0 ? '+' : ''}${(variation.change * 100).toFixed(2)}%)`;
+                }
+                if (lastUpdatedEl) lastUpdatedEl.textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+                
+                index++;
+                setTimeout(addVariation, 5000); // Add next variation in 5 seconds
+            }
+        };
+        
+        addVariation();
+    }
+    
     // Update price chart with new data
     function updatePriceChart(itemPrice) {
         if (!priceChart) {
@@ -1237,21 +1329,32 @@ document.addEventListener('DOMContentLoaded', function() {
         const newPrice = parseFloat(itemPrice.current_price);
         const now = new Date();
         
-        // Add new data point
-        chartData.labels.push(now.toLocaleTimeString());
-        chartData.datasets[0].data.push(newPrice);
+        // Check if this is a significant price change (avoid adding identical prices)
+        const lastPrice = chartData.datasets[0].data.length > 0 ? 
+            chartData.datasets[0].data[chartData.datasets[0].data.length - 1] : null;
         
-        // Keep only last 20 data points to prevent chart from getting too crowded
-        if (chartData.labels.length > 20) {
-            chartData.labels.shift();
-            chartData.datasets[0].data.shift();
+        // Only add new data point if price has changed or if it's the first data point
+        if (lastPrice === null || Math.abs(newPrice - lastPrice) > 0.01) {
+            console.log('📈 Price changed significantly:', lastPrice, '→', newPrice);
+            
+            // Add new data point
+            chartData.labels.push(now.toLocaleTimeString());
+            chartData.datasets[0].data.push(newPrice);
+            
+            // Keep only last 20 data points to prevent chart from getting too crowded
+            if (chartData.labels.length > 20) {
+                chartData.labels.shift();
+                chartData.datasets[0].data.shift();
+            }
+            
+            // Update chart with animation
+            priceChart.update('active');
+            
+            console.log('✅ Chart updated with new price data - Labels:', chartData.labels.length, 'Data points:', chartData.datasets[0].data.length);
+            console.log('📊 Latest data:', chartData.labels[chartData.labels.length - 1], '→ $' + chartData.datasets[0].data[chartData.datasets[0].data.length - 1]);
+        } else {
+            console.log('📊 Price unchanged, skipping chart update:', newPrice);
         }
-        
-        // Update chart with animation
-        priceChart.update('active');
-        
-        console.log('✅ Chart updated with new price data - Labels:', chartData.labels.length, 'Data points:', chartData.datasets[0].data.length);
-        console.log('📊 Latest data:', chartData.labels[chartData.labels.length - 1], '→ $' + chartData.datasets[0].data[chartData.datasets[0].data.length - 1]);
     }
     
     // Cleanup on page unload
