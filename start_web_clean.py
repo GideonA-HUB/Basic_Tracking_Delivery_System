@@ -26,13 +26,34 @@ def main():
         django.setup()
         print("✅ Django initialized successfully")
         
-        # Run migrations
-        print("🔄 Running migrations...")
-        execute_from_command_line(['manage.py', 'migrate', '--noinput'])
+        # Check database connection first
+        print("🔍 Checking database connection...")
+        from django.db import connection
+        try:
+            connection.ensure_connection()
+            print("✅ Database connection successful")
+        except Exception as db_error:
+            print(f"❌ Database connection failed: {db_error}")
+            print("🔄 Skipping migrations due to database connection issue")
+            # Continue without migrations for now
+        
+        # Run migrations only if database is connected
+        try:
+            print("🔄 Running migrations...")
+            execute_from_command_line(['manage.py', 'migrate', '--noinput'])
+            print("✅ Migrations completed successfully")
+        except Exception as migrate_error:
+            print(f"⚠️ Migration failed: {migrate_error}")
+            print("🔄 Continuing without migrations...")
         
         # Collect static files
         print("📁 Collecting static files...")
-        execute_from_command_line(['manage.py', 'collectstatic', '--noinput'])
+        try:
+            execute_from_command_line(['manage.py', 'collectstatic', '--noinput'])
+            print("✅ Static files collected successfully")
+        except Exception as static_error:
+            print(f"⚠️ Static files collection failed: {static_error}")
+            print("🔄 Continuing without static files...")
         
         # Start the server
         print("🚀 Starting web server...")

@@ -81,17 +81,30 @@ CHANNEL_LAYERS = {
     },
 }
 
-# Database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME') or config('DB_NAME', default='tracking_db'),
-        'USER': os.environ.get('DB_USER') or config('DB_USER', default='tracking_app'),
-        'PASSWORD': os.environ.get('DB_PASSWORD') or config('DB_PASSWORD', default='gN9zM5pQ#W4vY2@r!C8tL6xD'),
-        'HOST': os.environ.get('DB_HOST') or config('DB_HOST', default='localhost'),
-        'PORT': os.environ.get('DB_PORT') or config('DB_PORT', default='5432'),
+# Database Configuration for Railway
+# Railway provides DATABASE_URL environment variable
+import dj_database_url
+
+# Try to get DATABASE_URL from Railway first
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL:
+    # Railway provides DATABASE_URL
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL)
     }
-}
+else:
+    # Fallback to individual environment variables
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('DB_NAME', 'tracking_db'),
+            'USER': os.environ.get('DB_USER', 'tracking_app'),
+            'PASSWORD': os.environ.get('DB_PASSWORD', 'gN9zM5pQ#W4vY2@r!C8tL6xD'),
+            'HOST': os.environ.get('DB_HOST', 'localhost'),
+            'PORT': os.environ.get('DB_PORT', '5432'),
+        }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

@@ -2,6 +2,6 @@
 builder = "nixpacks"
 
 [deploy]
-startCommand = "python start_web_clean.py"
+startCommand = "python start_web_simple.py"
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
