@@ -9,6 +9,7 @@ from .models import (
     RealTimePriceFeed, RealTimePriceHistory, AutoInvestmentPlan,
     CurrencyConversion, CustomerCashoutRequest
 )
+from .news_models import NewsArticle, NewsCategory, NewsSource
 from django.utils import timezone
 from django.http import HttpResponseRedirect
 from django.urls import path
@@ -390,3 +391,77 @@ class CustomerCashoutRequestAdmin(admin.ModelAdmin):
                 obj.approved_by = request.user
                 obj.approved_at = timezone.now()
         super().save_model(request, obj, form, change)
+
+
+# News Admin Classes
+@admin.register(NewsCategory)
+class NewsCategoryAdmin(admin.ModelAdmin):
+    list_display = ['name', 'display_name', 'description', 'is_active', 'sort_order']
+    list_filter = ['is_active']
+    search_fields = ['name', 'display_name', 'description']
+    ordering = ['sort_order', 'name']
+    list_editable = ['is_active', 'sort_order']
+
+
+@admin.register(NewsSource)
+class NewsSourceAdmin(admin.ModelAdmin):
+    list_display = ['name', 'base_url', 'is_active', 'created_at']
+    list_filter = ['is_active', 'created_at']
+    search_fields = ['name', 'base_url']
+    ordering = ['name']
+    list_editable = ['is_active']
+
+
+@admin.register(NewsArticle)
+class NewsArticleAdmin(admin.ModelAdmin):
+    list_display = [
+        'title', 'category', 'source', 'is_featured', 'is_active', 
+        'published_at', 'created_at'
+    ]
+    list_filter = [
+        'category', 'source', 'is_featured', 'is_active', 
+        'published_at', 'created_at'
+    ]
+    search_fields = ['title', 'summary', 'content']
+    ordering = ['-published_at', '-created_at']
+    list_editable = ['is_featured', 'is_active']
+    readonly_fields = ['created_at', 'updated_at']
+    
+    fieldsets = (
+        ('Article Information', {
+            'fields': ('title', 'summary', 'content', 'url', 'image_url')
+        }),
+        ('Categorization', {
+            'fields': ('category', 'source', 'tags')
+        }),
+        ('Status & Visibility', {
+            'fields': ('is_featured', 'is_active', 'featured_until')
+        }),
+        ('Publishing', {
+            'fields': ('published_at', 'author')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        })
+    )
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('category', 'source')
+    
+    def get_list_display(self, request):
+        """Add image preview to list display"""
+        display = list(super().get_list_display(request))
+        if 'image_url' not in display:
+            display.insert(-2, 'image_preview')
+        return display
+    
+    def image_preview(self, obj):
+        """Show image preview in admin list"""
+        if obj.image_url:
+            return format_html(
+                '<img src="{}" style="width: 50px; height: 30px; object-fit: cover; border-radius: 4px;" />',
+                obj.image_url
+            )
+        return '-'
+    image_preview.short_description = 'Image'

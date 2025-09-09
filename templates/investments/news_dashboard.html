@@ -66,7 +66,41 @@
                     Featured News
                 </h2>
                 <div id="featured-news" class="featured-news-grid">
-                    <!-- Featured news will be loaded here -->
+                    {% if featured_news %}
+                        {% for article in featured_news %}
+                        <div class="featured-news-item">
+                            <div class="featured-news-image">
+                                <img src="{{ article.image_url|default:'/static/images/news-placeholder.svg' }}" 
+                                     alt="{{ article.title }}" 
+                                     onerror="this.src='/static/images/news-placeholder.svg'">
+                                <div class="featured-badge">
+                                    <i class="fas fa-star"></i> Featured
+                                </div>
+                            </div>
+                            <div class="featured-news-content">
+                                <div class="featured-news-meta">
+                                    <span class="news-source">{{ article.source.name }}</span>
+                                    <span class="news-time">{{ article.published_at|timesince }} ago</span>
+                                </div>
+                                <h3 class="featured-news-title">
+                                    <a href="{{ article.url }}" target="_blank">
+                                        {{ article.title }}
+                                    </a>
+                                </h3>
+                                <p class="featured-news-summary">{{ article.summary|truncatewords:20 }}</p>
+                                <div class="featured-news-actions">
+                                    <a href="{{ article.url }}" target="_blank" class="btn btn-sm btn-primary">
+                                        Read More <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <p class="text-muted">No featured news available at the moment.</p>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -81,7 +115,47 @@
                     Latest News
                 </h2>
                 <div id="main-news" class="news-list">
-                    <!-- Main news will be loaded here -->
+                    {% if latest_news %}
+                        {% for article in latest_news %}
+                        <div class="main-news-item">
+                            <div class="main-news-content">
+                                <div class="main-news-image">
+                                    <img src="{{ article.image_url|default:'/static/images/news-placeholder.svg' }}" 
+                                         alt="{{ article.title }}"
+                                         onerror="this.src='/static/images/news-placeholder.svg'">
+                                </div>
+                                <div class="main-news-text">
+                                    <div class="main-news-meta">
+                                        <span class="news-source">{{ article.source.name }}</span>
+                                        <span class="news-category">{{ article.category.display_name }}</span>
+                                        <span class="news-time">{{ article.published_at|timesince }} ago</span>
+                                    </div>
+                                    <h4 class="main-news-title">
+                                        <a href="{{ article.url }}" target="_blank">
+                                            {{ article.title }}
+                                        </a>
+                                    </h4>
+                                    <p class="main-news-summary">{{ article.summary|truncatewords:25 }}</p>
+                                    <div class="main-news-actions">
+                                        <a href="{{ article.url }}" target="_blank" class="btn btn-sm btn-primary">
+                                            Read More <i class="fas fa-external-link-alt"></i>
+                                        </a>
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="shareArticle('{{ article.id }}', '{{ article.title|escapejs }}', '{{ article.url }}')">
+                                            <i class="fas fa-share"></i> Share
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if article.is_featured %}
+                            <div class="featured-badge"><i class="fas fa-star"></i> Featured</div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <p class="text-muted">No news articles available at the moment.</p>
+                        </div>
+                    {% endif %}
                 </div>
                 <div id="load-more-container" class="text-center mt-4">
                     <button id="load-more-news" class="btn btn-outline-primary">
@@ -102,14 +176,28 @@
                         </h3>
                     </div>
                     <div class="news-widget-content">
-                        <div class="news-loading">
-                            <div class="text-center py-4">
-                                <div class="spinner-border text-primary" role="status">
-                                    <span class="sr-only">Loading...</span>
+                        <div class="news-list">
+                            {% if crypto_news %}
+                                {% for article in crypto_news %}
+                                <div class="news-widget-item">
+                                    <div class="news-widget-meta">
+                                        <span class="news-source">{{ article.source.name }}</span>
+                                        <span class="news-time">{{ article.published_at|timesince }} ago</span>
+                                    </div>
+                                    <h5 class="news-widget-title">
+                                        <a href="{{ article.url }}" target="_blank">
+                                            {{ article.title|truncatewords:8 }}
+                                        </a>
+                                    </h5>
+                                    <p class="news-widget-summary">{{ article.summary|truncatewords:12 }}</p>
                                 </div>
-                            </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center py-3">
+                                    <p class="text-muted small">No crypto news available</p>
+                                </div>
+                            {% endif %}
                         </div>
-                        <div class="news-list"></div>
                     </div>
                 </div>
 
@@ -121,14 +209,28 @@
                         </h3>
                     </div>
                     <div class="news-widget-content">
-                        <div class="news-loading">
-                            <div class="text-center py-4">
-                                <div class="spinner-border text-primary" role="status">
-                                    <span class="sr-only">Loading...</span>
+                        <div class="news-list">
+                            {% if stocks_news %}
+                                {% for article in stocks_news %}
+                                <div class="news-widget-item">
+                                    <div class="news-widget-meta">
+                                        <span class="news-source">{{ article.source.name }}</span>
+                                        <span class="news-time">{{ article.published_at|timesince }} ago</span>
+                                    </div>
+                                    <h5 class="news-widget-title">
+                                        <a href="{{ article.url }}" target="_blank">
+                                            {{ article.title|truncatewords:8 }}
+                                        </a>
+                                    </h5>
+                                    <p class="news-widget-summary">{{ article.summary|truncatewords:12 }}</p>
                                 </div>
-                            </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center py-3">
+                                    <p class="text-muted small">No stock news available</p>
+                                </div>
+                            {% endif %}
                         </div>
-                        <div class="news-list"></div>
                     </div>
                 </div>
 
@@ -140,14 +242,28 @@
                         </h3>
                     </div>
                     <div class="news-widget-content">
-                        <div class="news-loading">
-                            <div class="text-center py-4">
-                                <div class="spinner-border text-primary" role="status">
-                                    <span class="sr-only">Loading...</span>
+                        <div class="news-list">
+                            {% if real_estate_news %}
+                                {% for article in real_estate_news %}
+                                <div class="news-widget-item">
+                                    <div class="news-widget-meta">
+                                        <span class="news-source">{{ article.source.name }}</span>
+                                        <span class="news-time">{{ article.published_at|timesince }} ago</span>
+                                    </div>
+                                    <h5 class="news-widget-title">
+                                        <a href="{{ article.url }}" target="_blank">
+                                            {{ article.title|truncatewords:8 }}
+                                        </a>
+                                    </h5>
+                                    <p class="news-widget-summary">{{ article.summary|truncatewords:12 }}</p>
                                 </div>
-                            </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center py-3">
+                                    <p class="text-muted small">No real estate news available</p>
+                                </div>
+                            {% endif %}
                         </div>
-                        <div class="news-list"></div>
                     </div>
                 </div>
             </div>

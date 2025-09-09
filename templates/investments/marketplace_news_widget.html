@@ -23,7 +23,34 @@
         </div>
         
         <div class="news-list">
-            <!-- News articles will be loaded here -->
+            {% if marketplace_news %}
+                {% for article in marketplace_news %}
+                <div class="news-item {% if article.is_featured %}news-item-featured{% endif %}">
+                    <div class="news-item-content">
+                        <div class="news-item-image">
+                            <img src="{{ article.image_url|default:'/static/images/news-placeholder.svg' }}" 
+                                 alt="{{ article.title }}"
+                                 onerror="this.src='/static/images/news-placeholder.svg'">
+                        </div>
+                        <div class="news-item-text">
+                            <div class="news-item-meta">
+                                <span class="news-item-source">{{ article.source.name }}</span>
+                                <span class="news-item-category">{{ article.category.display_name }}</span>
+                                <span class="news-item-time">{{ article.published_at|timesince }} ago</span>
+                            </div>
+                            <h4 class="news-item-title">
+                                <a href="{{ article.url }}" target="_blank">{{ article.title|truncatewords:10 }}</a>
+                            </h4>
+                            <p class="news-item-summary">{{ article.summary|truncatewords:15 }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-3">
+                    <p class="text-muted small">No news available</p>
+                </div>
+            {% endif %}
         </div>
         
         <div class="news-error" style="display: none;">
@@ -279,7 +306,7 @@ class MarketplaceNewsWidget {
     
     init() {
         this.setupEventListeners();
-        this.loadNews();
+        // Content is already loaded from template context
         this.startAutoRefresh();
     }
     
@@ -340,9 +367,9 @@ class MarketplaceNewsWidget {
         div.innerHTML = `
             <div class="news-item-content">
                 <div class="news-item-image">
-                    <img src="${article.image_url || '/static/images/news-placeholder.jpg'}" 
+                    <img src="${article.image_url || '/static/images/news-placeholder.svg'}" 
                          alt="${article.title}"
-                         onerror="this.src='/static/images/news-placeholder.jpg'">
+                         onerror="this.src='/static/images/news-placeholder.svg'">
                 </div>
                 <div class="news-item-text">
                     <div class="news-item-meta">

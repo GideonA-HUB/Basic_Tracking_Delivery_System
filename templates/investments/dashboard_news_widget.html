@@ -34,7 +34,129 @@
             </div>
             
             <div class="news-list">
-                <!-- News articles will be loaded here -->
+                <!-- Featured News Tab Content -->
+                <div class="news-tab-content" data-tab="featured">
+                    {% if featured_news %}
+                        {% for article in featured_news %}
+                        <div class="news-item {% if article.is_featured %}news-item-featured{% endif %}">
+                            <div class="news-item-content">
+                                <div class="news-item-image">
+                                    <img src="{{ article.image_url|default:'/static/images/news-placeholder.svg' }}" 
+                                         alt="{{ article.title }}"
+                                         onerror="this.src='/static/images/news-placeholder.svg'">
+                                </div>
+                                <div class="news-item-text">
+                                    <div class="news-item-meta">
+                                        <span class="news-item-source">{{ article.source.name }}</span>
+                                        <span class="news-item-time">{{ article.published_at|timesince }} ago</span>
+                                    </div>
+                                    <h4 class="news-item-title">
+                                        <a href="{{ article.url }}" target="_blank">{{ article.title|truncatewords:10 }}</a>
+                                    </h4>
+                                    <p class="news-item-summary">{{ article.summary|truncatewords:15 }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-3">
+                            <p class="text-muted small">No featured news available</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Crypto News Tab Content -->
+                <div class="news-tab-content" data-tab="crypto" style="display: none;">
+                    {% if crypto_news %}
+                        {% for article in crypto_news %}
+                        <div class="news-item">
+                            <div class="news-item-content">
+                                <div class="news-item-image">
+                                    <img src="{{ article.image_url|default:'/static/images/news-placeholder.svg' }}" 
+                                         alt="{{ article.title }}"
+                                         onerror="this.src='/static/images/news-placeholder.svg'">
+                                </div>
+                                <div class="news-item-text">
+                                    <div class="news-item-meta">
+                                        <span class="news-item-source">{{ article.source.name }}</span>
+                                        <span class="news-item-time">{{ article.published_at|timesince }} ago</span>
+                                    </div>
+                                    <h4 class="news-item-title">
+                                        <a href="{{ article.url }}" target="_blank">{{ article.title|truncatewords:10 }}</a>
+                                    </h4>
+                                    <p class="news-item-summary">{{ article.summary|truncatewords:15 }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-3">
+                            <p class="text-muted small">No crypto news available</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Stocks News Tab Content -->
+                <div class="news-tab-content" data-tab="stocks" style="display: none;">
+                    {% if stocks_news %}
+                        {% for article in stocks_news %}
+                        <div class="news-item">
+                            <div class="news-item-content">
+                                <div class="news-item-image">
+                                    <img src="{{ article.image_url|default:'/static/images/news-placeholder.svg' }}" 
+                                         alt="{{ article.title }}"
+                                         onerror="this.src='/static/images/news-placeholder.svg'">
+                                </div>
+                                <div class="news-item-text">
+                                    <div class="news-item-meta">
+                                        <span class="news-item-source">{{ article.source.name }}</span>
+                                        <span class="news-item-time">{{ article.published_at|timesince }} ago</span>
+                                    </div>
+                                    <h4 class="news-item-title">
+                                        <a href="{{ article.url }}" target="_blank">{{ article.title|truncatewords:10 }}</a>
+                                    </h4>
+                                    <p class="news-item-summary">{{ article.summary|truncatewords:15 }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-3">
+                            <p class="text-muted small">No stock news available</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Real Estate News Tab Content -->
+                <div class="news-tab-content" data-tab="real_estate" style="display: none;">
+                    {% if real_estate_news %}
+                        {% for article in real_estate_news %}
+                        <div class="news-item">
+                            <div class="news-item-content">
+                                <div class="news-item-image">
+                                    <img src="{{ article.image_url|default:'/static/images/news-placeholder.svg' }}" 
+                                         alt="{{ article.title }}"
+                                         onerror="this.src='/static/images/news-placeholder.svg'">
+                                </div>
+                                <div class="news-item-text">
+                                    <div class="news-item-meta">
+                                        <span class="news-item-source">{{ article.source.name }}</span>
+                                        <span class="news-item-time">{{ article.published_at|timesince }} ago</span>
+                                    </div>
+                                    <h4 class="news-item-title">
+                                        <a href="{{ article.url }}" target="_blank">{{ article.title|truncatewords:10 }}</a>
+                                    </h4>
+                                    <p class="news-item-summary">{{ article.summary|truncatewords:15 }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-3">
+                            <p class="text-muted small">No real estate news available</p>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
             
             <div class="news-error" style="display: none;">
@@ -319,7 +441,7 @@ class DashboardNewsWidget {
     
     init() {
         this.setupEventListeners();
-        this.loadNews();
+        // Content is already loaded from template context
         this.startAutoRefresh();
     }
     
@@ -346,8 +468,13 @@ class DashboardNewsWidget {
             tab.classList.toggle('active', tab.dataset.category === category);
         });
         
+        // Show/hide tab content
+        const tabContents = this.element.querySelectorAll('.news-tab-content');
+        tabContents.forEach(content => {
+            content.style.display = content.dataset.tab === category ? 'block' : 'none';
+        });
+        
         this.currentCategory = category;
-        this.loadNews();
     }
     
     async loadNews() {
@@ -399,9 +526,9 @@ class DashboardNewsWidget {
         div.innerHTML = `
             <div class="news-item-content">
                 <div class="news-item-image">
-                    <img src="${article.image_url || '/static/images/news-placeholder.jpg'}" 
+                    <img src="${article.image_url || '/static/images/news-placeholder.svg'}" 
                          alt="${article.title}"
-                         onerror="this.src='/static/images/news-placeholder.jpg'">
+                         onerror="this.src='/static/images/news-placeholder.svg'">
                 </div>
                 <div class="news-item-text">
                     <div class="news-item-meta">

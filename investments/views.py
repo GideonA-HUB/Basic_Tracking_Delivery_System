@@ -296,6 +296,11 @@ def investment_dashboard(request):
         
         # Get news data for the dashboard (with better error handling)
         dashboard_news = []
+        featured_news = []
+        crypto_news = []
+        stocks_news = []
+        real_estate_news = []
+        
         try:
             from .news_models import NewsArticle, NewsCategory
             # First check if news tables exist
@@ -303,6 +308,27 @@ def investment_dashboard(request):
                 dashboard_news = NewsArticle.objects.filter(
                     is_active=True
                 ).order_by('-published_at')[:8]
+                
+                featured_news = NewsArticle.objects.filter(
+                    is_active=True, 
+                    is_featured=True
+                ).order_by('-published_at')[:4]
+                
+                crypto_news = NewsArticle.objects.filter(
+                    is_active=True,
+                    category__name__in=['crypto', 'bitcoin', 'ethereum', 'altcoins']
+                ).order_by('-published_at')[:4]
+                
+                stocks_news = NewsArticle.objects.filter(
+                    is_active=True,
+                    category__name='stocks'
+                ).order_by('-published_at')[:4]
+                
+                real_estate_news = NewsArticle.objects.filter(
+                    is_active=True,
+                    category__name='real_estate'
+                ).order_by('-published_at')[:4]
+                
                 logger.info(f"Loaded {len(dashboard_news)} news articles for dashboard")
             else:
                 logger.warning("News tables don't exist yet, skipping news loading")
@@ -315,6 +341,10 @@ def investment_dashboard(request):
             'active_investments': active_investments,
             'recent_transactions': recent_transactions,
             'dashboard_news': dashboard_news,
+            'featured_news': featured_news,
+            'crypto_news': crypto_news,
+            'stocks_news': stocks_news,
+            'real_estate_news': real_estate_news,
         }
         
         return render(request, 'investments/dashboard.html', context)
@@ -701,10 +731,43 @@ def investment_item_detail(request, item_id):
         # Get price history for chart
         chart_data = price_service.get_price_chart_data(item, days=30)
         
+        # Get related news based on item category
+        related_news = []
+        try:
+            from .news_models import NewsArticle
+            if NewsArticle._meta.db_table in connection.introspection.table_names():
+                # Determine news category based on item category
+                if item.category.name == 'Cryptocurrency':
+                    related_news = NewsArticle.objects.filter(
+                        is_active=True,
+                        category__name__in=['crypto', 'bitcoin', 'ethereum', 'altcoins']
+                    ).order_by('-published_at')[:6]
+                elif item.category.name == 'Real Estate':
+                    related_news = NewsArticle.objects.filter(
+                        is_active=True,
+                        category__name='real_estate'
+                    ).order_by('-published_at')[:6]
+                elif item.category.name == 'Stocks':
+                    related_news = NewsArticle.objects.filter(
+                        is_active=True,
+                        category__name='stocks'
+                    ).order_by('-published_at')[:6]
+                else:
+                    # General news for other categories
+                    related_news = NewsArticle.objects.filter(
+                        is_active=True
+                    ).order_by('-published_at')[:6]
+                
+                logger.info(f"Loaded {len(related_news)} related news articles for item {item.name}")
+        except Exception as e:
+            logger.warning(f"Could not load related news for item {item.name}: {e}")
+            related_news = []
+        
         context = {
             'item': item,
             'similar_items': similar_items,
             'chart_data': chart_data,
+            'related_news': related_news,
         }
         
         return render(request, 'investments/item_detail.html', context)

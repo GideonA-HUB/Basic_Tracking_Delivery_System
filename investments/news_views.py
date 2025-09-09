@@ -21,7 +21,7 @@ from .news_models import (
     NewsArticle, NewsCategory, NewsSource, NewsCache, 
     UserNewsPreference, NewsAnalytics
 )
-from .news_services import NewsAggregatorService
+from .news_services import NewsAggregator
 from .news_serializers import NewsArticleSerializer, NewsCategorySerializer
 
 logger = logging.getLogger(__name__)
@@ -391,14 +391,73 @@ class NewsPreferencesAPIView(APIView):
 @login_required
 def news_dashboard(request):
     """News dashboard page"""
-    categories = NewsCategory.objects.filter(is_active=True)
-    
-    context = {
-        'categories': categories,
-        'user_preferences': UserNewsPreference.objects.filter(user=request.user).first()
-    }
-    
-    return render(request, 'investments/news_dashboard.html', context)
+    try:
+        # Check if we need to fetch fresh news
+        total_articles = NewsArticle.objects.filter(is_active=True).count()
+        
+        # If we have less than 20 articles, try to fetch fresh news
+        if total_articles < 20:
+            logger.info("Low article count, fetching fresh news from APIs")
+            try:
+                aggregator = NewsAggregator()
+                aggregator.fetch_all_news(['crypto', 'bitcoin', 'stocks', 'real_estate'], 10)
+            except Exception as e:
+                logger.warning(f"Could not fetch fresh news: {e}")
+        
+        categories = NewsCategory.objects.filter(is_active=True)
+        
+        # Get featured news
+        featured_news = NewsArticle.objects.filter(
+            is_active=True, 
+            is_featured=True
+        ).order_by('-published_at')[:6]
+        
+        # Get latest news
+        latest_news = NewsArticle.objects.filter(
+            is_active=True
+        ).order_by('-published_at')[:20]
+        
+        # Get category-specific news
+        crypto_news = NewsArticle.objects.filter(
+            is_active=True,
+            category__name__in=['crypto', 'bitcoin', 'ethereum', 'altcoins']
+        ).order_by('-published_at')[:5]
+        
+        stocks_news = NewsArticle.objects.filter(
+            is_active=True,
+            category__name='stocks'
+        ).order_by('-published_at')[:5]
+        
+        real_estate_news = NewsArticle.objects.filter(
+            is_active=True,
+            category__name='real_estate'
+        ).order_by('-published_at')[:5]
+        
+        context = {
+            'categories': categories,
+            'user_preferences': UserNewsPreference.objects.filter(user=request.user).first(),
+            'featured_news': featured_news,
+            'latest_news': latest_news,
+            'crypto_news': crypto_news,
+            'stocks_news': stocks_news,
+            'real_estate_news': real_estate_news,
+        }
+        
+        return render(request, 'investments/news_dashboard.html', context)
+        
+    except Exception as e:
+        logger.error(f"Error in news_dashboard: {e}")
+        context = {
+            'categories': [],
+            'user_preferences': None,
+            'featured_news': [],
+            'latest_news': [],
+            'crypto_news': [],
+            'stocks_news': [],
+            'real_estate_news': [],
+            'error': str(e)
+        }
+        return render(request, 'investments/news_dashboard.html', context)
 
 
 @login_required
