@@ -92,9 +92,6 @@
                         <input type="checkbox" id="auto-refresh-toggle" class="sr-only peer" checked>
                         <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                     </label>
-                    <button id="force-update-btn" class="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition-colors">
-                        Force Update
-                    </button>
                 </div>
                 </div>
                 <div class="chart-container" style="height: 400px;">
@@ -1124,7 +1121,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
         console.log('🔄 Starting continuous price variations...');
         startContinuousPriceVariations();
-    }, 15000); // Start after 15 seconds
+    }, 10000); // Start after 10 seconds
     
     // Force chart updates every 5 seconds to ensure it's always updating
     setTimeout(() => {
@@ -1135,20 +1132,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize news widget
     initNewsWidget();
     
-    // Add force update button event listener
-    const forceUpdateBtn = document.getElementById('force-update-btn');
-    if (forceUpdateBtn) {
-        forceUpdateBtn.addEventListener('click', () => {
-            console.log('🔄 Force update button clicked');
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ type: 'force_update' }));
-                console.log('📤 Sent force update request to WebSocket');
-            } else {
-                console.log('❌ WebSocket not connected, trying to reconnect...');
-                initWebSocket();
-            }
-        });
-    }
     
     // News Widget Functionality
     function initNewsWidget() {
@@ -1364,8 +1347,8 @@ document.addEventListener('DOMContentLoaded', function() {
         let basePrice = currentPrice;
         
         const addContinuousVariation = () => {
-            // Generate small random variations (±0.1% to ±0.5%)
-            const variation = (Math.random() - 0.5) * 0.01; // ±0.5% max variation
+            // Generate more noticeable random variations (±0.2% to ±1.0%)
+            const variation = (Math.random() - 0.5) * 0.02; // ±1.0% max variation
             const newPrice = basePrice * (1 + variation);
             
             // Update base price slightly for trending effect
@@ -1381,8 +1364,22 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log(`🔄 Continuous variation: $${newPrice.toFixed(2)} (${variation >= 0 ? '+' : ''}${(variation * 100).toFixed(2)}%)`);
             updatePriceChart(mockItemPrice);
             
+            // Also update the price display
+            const currentPriceEl = document.getElementById('current-price');
+            const priceChangeEl = document.getElementById('price-change');
+            const lastUpdatedEl = document.getElementById('last-updated');
+            
+            if (currentPriceEl) currentPriceEl.textContent = '$' + newPrice.toFixed(2);
+            if (priceChangeEl) {
+                const changeClass = variation >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
+                const changeIcon = variation >= 0 ? '▲' : '▼';
+                priceChangeEl.className = `text-sm ${changeClass}`;
+                priceChangeEl.innerHTML = `${changeIcon} $${Math.abs(newPrice - currentPrice).toFixed(2)} (${variation >= 0 ? '+' : ''}${(variation * 100).toFixed(2)}%)`;
+            }
+            if (lastUpdatedEl) lastUpdatedEl.textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+            
             // Schedule next variation
-            setTimeout(addContinuousVariation, 3000); // Every 3 seconds
+            setTimeout(addContinuousVariation, 2000); // Every 2 seconds
         };
         
         addContinuousVariation();

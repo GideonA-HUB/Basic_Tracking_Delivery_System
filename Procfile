@@ -1,1 +1,1 @@
-web: python collect_static.py && daphne -b 0.0.0.0 -p $PORT delivery_tracker.asgi:application
+web: python start_with_migrations.py

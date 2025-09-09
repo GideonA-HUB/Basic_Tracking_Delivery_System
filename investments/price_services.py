@@ -583,6 +583,17 @@ class RealTimePriceService:
                             
                 except Exception as e:
                     logger.error(f"Error updating {item_name}: {e}")
+                    # Try emergency update with safe values
+                    try:
+                        logger.info(f"🔄 Attempting emergency update for {item_name}...")
+                        item.current_price_usd = new_price
+                        item.price_change_24h = Decimal('0.00')  # Safe value
+                        item.price_change_percentage_24h = Decimal('0.00')  # Safe value
+                        item.last_price_update = timezone.now()
+                        item.save()
+                        logger.info(f"✅ Emergency update successful for {item_name}")
+                    except Exception as emergency_error:
+                        logger.error(f"❌ Emergency update failed for {item_name}: {emergency_error}")
                     
         except Exception as e:
             logger.error(f"Error updating investment item prices: {e}")
