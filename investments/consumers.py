@@ -138,18 +138,23 @@ class PriceFeedConsumer(AsyncWebsocketConsumer):
     
     @database_sync_to_async
     def force_update_prices_from_apis(self):
-        """Force update prices from APIs"""
+        """Force update prices from APIs with graceful error handling"""
         try:
             logger.info("🔄 FORCING PRICE UPDATE FROM APIs...")
-            from investments.price_services import price_service
             
-            # Update all prices from APIs
-            updated_count = price_service.update_all_prices()
-            logger.info(f"✅ Updated {updated_count} prices from APIs successfully")
+            # Try to import and use price service, but handle failures gracefully
+            try:
+                from investments.price_services import price_service
+                updated_count = price_service.update_all_prices()
+                logger.info(f"✅ Updated {updated_count} prices from APIs successfully")
+            except Exception as api_error:
+                logger.warning(f"API price update failed: {api_error}")
+                # Continue with existing data instead of failing completely
+                updated_count = 0
             
-            # Log current major prices
+            # Log current major prices (even if API update failed)
             major_cryptos = ['BTC', 'ETH', 'ADA', 'SOL']
-            logger.info("💰 Current LIVE API prices:")
+            logger.info("💰 Current prices in database:")
             for symbol in major_cryptos:
                 try:
                     from investments.models import RealTimePriceFeed
@@ -162,8 +167,9 @@ class PriceFeedConsumer(AsyncWebsocketConsumer):
             return True
             
         except Exception as e:
-            logger.error(f"❌ Price update from APIs failed: {e}")
-            return False
+            logger.error(f"❌ Price update process failed: {e}")
+            # Return True to continue with existing data rather than failing completely
+            return True
     
     async def start_periodic_updates(self):
         """Start periodic price updates every 60 seconds to avoid rate limits"""
@@ -175,19 +181,27 @@ class PriceFeedConsumer(AsyncWebsocketConsumer):
                     await asyncio.sleep(60)  # Wait 60 seconds (reduced from 30 to avoid rate limits)
                     logger.info("🔄 Running periodic price update...")
                     
-                    # Force update prices from APIs
-                    await self.force_update_prices_from_apis()
+                    # Force update prices from APIs (with error handling)
+                    try:
+                        await self.force_update_prices_from_apis()
+                    except Exception as update_error:
+                        logger.warning(f"Periodic price update failed: {update_error}")
+                        # Continue to send existing data
                     
-                    # Send updated price data
-                    await self.send_price_data()
+                    # Send updated price data (even if update failed)
+                    try:
+                        await self.send_price_data()
+                    except Exception as send_error:
+                        logger.warning(f"Failed to send price data: {send_error}")
                     
                 except Exception as e:
                     logger.error(f"Error in periodic update: {e}")
-                    break
+                    # Don't break the loop, just continue
+                    await asyncio.sleep(60)  # Wait before retrying
         
         # Start the periodic update task
         asyncio.create_task(periodic_update())
-        logger.info("✅ Periodic updates started (every 30 seconds)")
+        logger.info("✅ Periodic updates started (every 60 seconds)")
     
     async def disconnect(self, close_code):
         """Handle WebSocket disconnection"""

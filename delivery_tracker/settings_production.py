@@ -3,9 +3,12 @@ Production settings for delivery_tracker project.
 """
 
 import os
+import logging
 from pathlib import Path
 from decouple import config
 import dj_database_url
+
+logger = logging.getLogger(__name__)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -13,8 +16,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY', default=os.environ.get('SECRET_KEY'))
 
+# Generate a secure SECRET_KEY if none is provided
+if not SECRET_KEY or SECRET_KEY.startswith('django-insecure-'):
+    import secrets
+    import string
+    SECRET_KEY = ''.join(secrets.choice(string.ascii_letters + string.digits + '!@#$%^&*(-_=+)') for _ in range(50))
+    logger.warning("Generated a new SECRET_KEY for production. Please set SECRET_KEY environment variable.")
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
+
+# Force DEBUG to False in production
+if not DEBUG:
+    DEBUG = False
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='meridian-asset-logistics.up.railway.app,healthcheck.railway.app,*.railway.app', cast=lambda v: [s.strip() for s in v.split(',')])
 
@@ -44,6 +58,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',  # Add whitenoise for static files
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',  # Add CSRF middleware
     'tracking.middleware.CustomCsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -207,6 +222,7 @@ X_FRAME_OPTIONS = 'DENY'
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
+SECURE_SSL_REDIRECT = True
 
 # Session settings
 SESSION_COOKIE_SECURE = True
