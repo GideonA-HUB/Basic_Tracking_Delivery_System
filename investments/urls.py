@@ -3,6 +3,7 @@ from rest_framework.routers import DefaultRouter
 from . import views
 from . import debug_views
 from . import debug_env
+from . import websocket_test
 
 app_name = 'investments'
 
@@ -92,4 +93,5 @@ urlpatterns = [
     # Debug endpoints
     path('api/debug/database/', debug_views.debug_database, name='debug-database'),
     path('api/debug/environment/', debug_env.debug_environment, name='debug-environment'),
+    path('api/debug/websocket/', websocket_test.websocket_test, name='websocket-test'),
 ]

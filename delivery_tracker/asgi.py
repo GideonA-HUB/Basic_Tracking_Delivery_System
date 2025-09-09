@@ -31,6 +31,9 @@ print("🔌 WebSocket URL patterns configured:")
 for pattern in all_websocket_urlpatterns:
     print(f"  - {pattern.pattern}")
 
+print("🔌 ASGI application configured for WebSocket support")
+print("🔌 Redis channel layer configured for message handling")
+
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),
     "websocket": AuthMiddlewareStack(

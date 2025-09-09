@@ -83,7 +83,9 @@ CHANNEL_LAYERS = {
 }
 
 # Debug Redis configuration
-print(f"🔍 Redis URL: {os.environ.get('REDIS_URL', 'Not set')}")
+redis_url = os.environ.get('REDIS_URL', 'Not set')
+print(f"🔍 Redis URL: {redis_url}")
+print(f"🔍 Using Redis for WebSocket channels: {redis_url != 'Not set'}")
 
 # Database Configuration for Railway
 # Railway provides database variables in different formats
