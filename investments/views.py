@@ -7,6 +7,7 @@ from django.http import JsonResponse, HttpResponse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.db.models import Q, Count, Sum
+from django.db import connection
 from django.utils import timezone
 
 # Import news views
@@ -293,13 +294,18 @@ def investment_dashboard(request):
             user=request.user
         ).select_related('item')[:10]
         
-        # Get news data for the dashboard
+        # Get news data for the dashboard (with better error handling)
+        dashboard_news = []
         try:
-            from .news_models import NewsArticle
-            dashboard_news = NewsArticle.objects.filter(
-                is_active=True,
-                category__name__in=['crypto', 'stocks', 'real_estate', 'general']
-            ).order_by('-published_at')[:8]
+            from .news_models import NewsArticle, NewsCategory
+            # First check if news tables exist
+            if NewsArticle._meta.db_table in connection.introspection.table_names():
+                dashboard_news = NewsArticle.objects.filter(
+                    is_active=True
+                ).order_by('-published_at')[:8]
+                logger.info(f"Loaded {len(dashboard_news)} news articles for dashboard")
+            else:
+                logger.warning("News tables don't exist yet, skipping news loading")
         except Exception as e:
             logger.warning(f"Could not load news for dashboard: {e}")
             dashboard_news = []

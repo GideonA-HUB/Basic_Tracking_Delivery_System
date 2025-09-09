@@ -42,8 +42,13 @@ def main():
         # Collect static files
         print("📁 Collecting static files...")
         try:
-            execute_from_command_line(['manage.py', 'collectstatic', '--noinput'])
+            execute_from_command_line(['manage.py', 'collectstatic', '--noinput', '--clear'])
             print("✅ Static files collected successfully")
+            
+            # Fix static files issue
+            print("🔧 Fixing static files...")
+            execute_from_command_line(['manage.py', 'collect_static_fix'])
+            print("✅ Static files fixed successfully")
         except Exception as static_error:
             print(f"⚠️ Static files collection failed: {static_error}")
             print("🔄 Continuing without static files...")
