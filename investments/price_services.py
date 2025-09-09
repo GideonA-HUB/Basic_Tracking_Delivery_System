@@ -566,11 +566,15 @@ class RealTimePriceService:
                             price_change = new_price - old_price
                             price_change_percentage = (price_change / old_price * 100) if old_price > 0 else 0
                             
-                            # Update item price using enhanced method
+                            # Update item price using enhanced method (round to 2 decimal places)
+                            rounded_price = Decimal(str(round(float(new_price), 2)))
+                            rounded_change = Decimal(str(round(float(price_change), 2)))
+                            rounded_percentage = Decimal(str(round(float(price_change_percentage), 2)))
+                            
                             item.update_price(
-                                new_price,
-                                price_change,
-                                price_change_percentage,
+                                rounded_price,
+                                rounded_change,
+                                rounded_percentage,
                                 volume_24h=feed.volume_24h if hasattr(feed, 'volume_24h') else None,
                                 market_cap=feed.market_cap if hasattr(feed, 'market_cap') else None
                             )
