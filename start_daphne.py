@@ -39,8 +39,8 @@ def main():
             print(f"⚠️ Migration failed: {migate_error}")
             print("🔄 Continuing without migrations...")
         
-        # NUCLEAR OPTION: FORCE STATIC FILES TO WORK
-        print("🚨 NUCLEAR OPTION: FORCING STATIC FILES TO WORK...")
+        # DEFINITIVE FIX: FORCE STATIC FILES TO WORK
+        print("🚨 DEFINITIVE FIX: FORCING STATIC FILES TO WORK...")
         import os
         import shutil
         
@@ -152,7 +152,7 @@ alert("Static files are working!");
             else:
                 print(f"❌ {file_path} missing")
         
-        print("🚨 NUCLEAR STATIC FILES FIX COMPLETED!")
+        print("🚨 DEFINITIVE STATIC FILES FIX COMPLETED!")
         
         # Start Daphne ASGI server
         print(f"🚀 Starting Daphne ASGI server on port {port}...")
