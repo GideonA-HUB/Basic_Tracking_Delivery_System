@@ -1,1 +1,1 @@
-web: python manage.py migrate --settings=delivery_tracker.settings_production && python manage.py collectstatic --noinput --settings=delivery_tracker.settings_production && DJANGO_SETTINGS_MODULE=delivery_tracker.settings_production daphne -b 0.0.0.0 -p $PORT delivery_tracker.asgi:application
+web: gunicorn delivery_tracker.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120 --keep-alive 2 --max-requests 1000 --max-requests-jitter 100 --preload --access-logfile - --error-logfile -

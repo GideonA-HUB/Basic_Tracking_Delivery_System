@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 """
-Simple web server startup script for Railway deployment
+Production web server startup script for Railway deployment
 """
 
 import os
 import sys
+import subprocess
 
 def main():
-    """Start the web application"""
+    """Start the web application in production mode"""
     try:
         # Set Django settings module
         os.environ['DJANGO_SETTINGS_MODULE'] = 'delivery_tracker.settings'
@@ -21,10 +22,26 @@ def main():
         django.setup()
         print("✅ Django initialized successfully")
         
+        # Run migrations first
+        print("🔄 Running migrations...")
+        try:
+            execute_from_command_line(['manage.py', 'migrate', '--noinput'])
+            print("✅ Migrations completed successfully")
+        except Exception as migrate_error:
+            print(f"⚠️ Migration failed: {migrate_error}")
+            print("🔄 Continuing without migrations...")
+        
+        # Collect static files
+        print("📁 Collecting static files...")
+        try:
+            execute_from_command_line(['manage.py', 'collectstatic', '--noinput'])
+            print("✅ Static files collected successfully")
+        except Exception as static_error:
+            print(f"⚠️ Static files collection failed: {static_error}")
+            print("🔄 Continuing without static files...")
+        
         # Start the server using Gunicorn (production server)
-        print("🚀 Starting production web server...")
-        import subprocess
-        import sys
+        print("🚀 Starting production web server with Gunicorn...")
         
         # Use Gunicorn for production
         gunicorn_cmd = [
@@ -36,6 +53,8 @@ def main():
             '--max-requests', '1000',
             '--max-requests-jitter', '100',
             '--preload',
+            '--access-logfile', '-',
+            '--error-logfile', '-',
             'delivery_tracker.wsgi:application'
         ]
         
