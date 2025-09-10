@@ -272,10 +272,8 @@ NOWPAYMENTS_IPN_URL = config('NOWPAYMENTS_IPN_URL', default='https://meridianass
 # Removed NewsAPI, CoinDesk, CryptoPanic, Finnhub - using only MarketAux
 
 # MarketAux API (FREE - works in production)
-MARKETAUX_API_KEY = (
-    os.environ.get('MARKETAUX_API_KEY', '') or 
-    config('MARKETAUX_API_KEY', default='')
-)
+# Try environment variable first, then config file
+MARKETAUX_API_KEY = os.environ.get('MARKETAUX_API_KEY') or config('MARKETAUX_API_KEY', default='')
 
 # Remove all other APIs
 NEWSAPI_KEY = None
@@ -292,10 +290,15 @@ print(f"   MARKETAUX_API_KEY: {'✅ Set' if MARKETAUX_API_KEY else '❌ Not Set'
 if MARKETAUX_API_KEY:
     print(f"   MARKETAUX_API_KEY length: {len(MARKETAUX_API_KEY)}")
     print(f"   MARKETAUX_API_KEY preview: {MARKETAUX_API_KEY[:8]}...")
+else:
+    print(f"   MARKETAUX_API_KEY: Empty or not found")
 
 # Check environment variables directly
-import os
 print(f"   ENV MARKETAUX_API_KEY: {'✅ Set' if os.environ.get('MARKETAUX_API_KEY') else '❌ Not Set'}")
+if os.environ.get('MARKETAUX_API_KEY'):
+    env_key = os.environ.get('MARKETAUX_API_KEY')
+    print(f"   ENV key length: {len(env_key)}")
+    print(f"   ENV key preview: {env_key[:8]}...")
 
 # Show all environment variables that contain 'API' or 'KEY'
 print(f"\n🔍 ALL API/KEY ENVIRONMENT VARIABLES:")
@@ -310,7 +313,7 @@ for key, value in api_vars.items():
 print(f"\n🔍 ALL ENVIRONMENT VARIABLES:")
 all_vars = dict(os.environ)
 for key, value in sorted(all_vars.items()):
-    if any(keyword in key.upper() for keyword in ['NEWS', 'FINN', 'CRYPTO', 'COIN', 'API', 'KEY']):
+    if any(keyword in key.upper() for keyword in ['NEWS', 'FINN', 'CRYPTO', 'COIN', 'API', 'KEY', 'MARKET']):
         print(f"   {key}: {'✅ Set' if value else '❌ Empty'}")
 
 NEWS_REFRESH_TOKEN = config('NEWS_REFRESH_TOKEN', default='meridian-news-refresh-2025')
