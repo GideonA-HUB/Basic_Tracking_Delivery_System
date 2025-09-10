@@ -4,6 +4,7 @@ from . import views
 from . import debug_views
 from . import debug_env
 from . import websocket_test
+from . import management_views
 
 app_name = 'investments'
 
@@ -94,4 +95,9 @@ urlpatterns = [
     path('api/debug/database/', debug_views.debug_database, name='debug-database'),
     path('api/debug/environment/', debug_env.debug_environment, name='debug-environment'),
     path('api/debug/websocket/', websocket_test.websocket_test, name='websocket-test'),
+    
+    # Management endpoints
+    path('admin/fix-news/', management_views.fix_news_system, name='fix-news'),
+    path('admin/news-status/', management_views.news_system_status, name='news-status'),
+    path('api/fix-news/', management_views.api_fix_news, name='api-fix-news'),
 ]

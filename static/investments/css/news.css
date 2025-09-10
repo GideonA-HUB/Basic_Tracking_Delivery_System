@@ -7,6 +7,44 @@
     color: #e2e8f0 !important;
 }
 
+/* Force text visibility in dark mode */
+.dark-theme .news-widget-item,
+.dark-theme .news-item {
+    color: #e2e8f0 !important;
+}
+
+.dark-theme .news-widget-title,
+.dark-theme .news-item-title {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+.dark-theme .news-widget-summary,
+.dark-theme .news-item-summary {
+    color: #a0aec0 !important;
+}
+
+.dark-theme .news-widget-meta,
+.dark-theme .news-item-meta {
+    color: #718096 !important;
+}
+
+/* Fix "No news available" text visibility */
+.dark-theme .no-news-message {
+    color: #a0aec0 !important;
+    background: #4a5568 !important;
+    padding: 20px !important;
+    border-radius: 8px !important;
+    text-align: center !important;
+}
+
+/* Force visibility for all news text elements */
+.dark-theme .news-content,
+.dark-theme .news-text,
+.dark-theme .news-description {
+    color: #e2e8f0 !important;
+}
+
 .dark-theme .widget-header {
     background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%) !important;
     border-bottom-color: #4a5568 !important;

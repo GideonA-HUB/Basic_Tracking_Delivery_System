@@ -27,6 +27,27 @@ def main():
         execute_from_command_line(['manage.py', 'collectstatic', '--noinput', '--clear'])
         print("✅ Static files collected successfully")
         
+        # Fix news system
+        print("📰 Checking news system...")
+        try:
+            from investments.news_models import NewsArticle
+            article_count = NewsArticle.objects.count()
+            
+            if article_count < 10:
+                print("🔄 Low article count, fetching news...")
+                execute_from_command_line(['manage.py', 'force_news_update', '--count=30', '--verbosity=0'])
+                print("✅ News system updated successfully")
+            else:
+                print(f"✅ News system has {article_count} articles")
+        except Exception as e:
+            print(f"⚠️  News system check failed: {e}")
+            # Try to create sample data as fallback
+            try:
+                execute_from_command_line(['manage.py', 'create_sample_news', '--count=20', '--verbosity=0'])
+                print("✅ Sample news created as fallback")
+            except Exception as e2:
+                print(f"⚠️  Sample news creation failed: {e2}")
+        
         # Start the server
         print("🚀 Starting Daphne server...")
         import subprocess
