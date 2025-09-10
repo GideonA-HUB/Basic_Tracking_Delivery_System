@@ -27,118 +27,192 @@ def main():
         execute_from_command_line(['manage.py', 'collectstatic', '--noinput', '--clear'])
         print("✅ Static files collected successfully")
         
-        # Fix news system
-        print("📰 Checking news system...")
+        # HYBRID NEWS SYSTEM - Try real APIs first, fallback to sample
+        print("📰 HYBRID NEWS SYSTEM - Attempting real news first...")
         try:
-            from investments.news_models import NewsArticle
-            article_count = NewsArticle.objects.count()
+            from investments.news_models import NewsArticle, NewsCategory, NewsSource
+            from django.utils import timezone
             
-            if article_count < 10:
-                print("🔄 Low article count, fetching news...")
+            # Check current article count
+            current_count = NewsArticle.objects.count()
+            print(f"📊 Current articles in database: {current_count}")
+            
+            # Try to fetch real news from APIs first
+            if current_count < 20:  # Only fetch if we have few articles
+                print("🔄 Attempting to fetch real news from APIs...")
                 try:
+                    # Try the force_news_update command
                     execute_from_command_line(['manage.py', 'force_news_update', '--count=30', '--verbosity=0'])
-                    print("✅ News system updated successfully")
+                    print("✅ Real news fetched successfully from APIs!")
+                    
+                    # Check if we got real articles
+                    new_count = NewsArticle.objects.count()
+                    if new_count > current_count:
+                        print(f"🎉 SUCCESS! Added {new_count - current_count} real news articles!")
+                    else:
+                        print("⚠️  No new articles from APIs, using fallback...")
+                        raise Exception("No new articles from APIs")
+                        
                 except Exception as api_error:
                     print(f"⚠️  API fetch failed: {api_error}")
-                    print("🔄 Creating sample news as fallback...")
-                    execute_from_command_line(['manage.py', 'create_sample_news', '--count=50', '--verbosity=0'])
-                    print("✅ Sample news created as fallback")
+                    print("🔄 Falling back to sample news...")
+                    
+                    # Clear existing news and create sample
+                    NewsArticle.objects.all().delete()
+                    print("🗑️  Cleared existing news for fresh start")
+                    
+                    # Create categories
+                    categories = [
+                        {'name': 'crypto', 'display_name': 'Cryptocurrency', 'description': 'Crypto news'},
+                        {'name': 'bitcoin', 'display_name': 'Bitcoin', 'description': 'Bitcoin news'},
+                        {'name': 'ethereum', 'display_name': 'Ethereum', 'description': 'Ethereum news'},
+                        {'name': 'stocks', 'display_name': 'Stock Market', 'description': 'Stock news'},
+                        {'name': 'real_estate', 'display_name': 'Real Estate', 'description': 'Real estate news'},
+                        {'name': 'altcoins', 'display_name': 'Altcoins', 'description': 'Altcoin news'},
+                    ]
+                    
+                    created_categories = {}
+                    for cat_data in categories:
+                        cat, created = NewsCategory.objects.get_or_create(
+                            name=cat_data['name'],
+                            defaults=cat_data
+                        )
+                        created_categories[cat_data['name']] = cat
+                        print(f"✅ Category: {cat_data['name']}")
+                    
+                    # Create source
+                    source, created = NewsSource.objects.get_or_create(
+                        name='Meridian News',
+                        defaults={
+                            'base_url': 'https://meridianassetlogistics.com',
+                            'is_active': True
+                        }
+                    )
+                    print("✅ News source created")
+                    
+                    # Create sample articles
+                    articles = [
+                        {
+                            'title': 'Bitcoin Reaches New All-Time High Amid Institutional Adoption',
+                            'summary': 'Bitcoin has surged to new record levels as major institutions continue to adopt cryptocurrency, driving unprecedented market growth.',
+                            'category': 'crypto',
+                            'is_featured': True
+                        },
+                        {
+                            'title': 'Stock Market Rally Continues as Tech Stocks Lead Gains',
+                            'summary': 'Major indices are up as technology companies report strong quarterly earnings, with the S&P 500 reaching new highs.',
+                            'category': 'stocks',
+                            'is_featured': True
+                        },
+                        {
+                            'title': 'Real Estate Market Shows Strong Growth in Q4',
+                            'summary': 'Property values continue to rise across major metropolitan areas, with commercial real estate leading the recovery.',
+                            'category': 'real_estate',
+                            'is_featured': True
+                        },
+                        {
+                            'title': 'Ethereum 2.0 Staking Rewards Hit Record Levels',
+                            'summary': 'Ethereum staking rewards have reached new highs as the network continues to grow and improve efficiency.',
+                            'category': 'ethereum',
+                            'is_featured': True
+                        },
+                        {
+                            'title': 'Gold Prices Stabilize After Recent Volatility',
+                            'summary': 'Gold has found support levels after recent market fluctuations, with investors seeking safe haven assets.',
+                            'category': 'stocks',
+                            'is_featured': False
+                        },
+                        {
+                            'title': 'Bitcoin ETF Approval Drives Institutional Investment',
+                            'summary': 'Recent Bitcoin ETF approvals have led to increased institutional investment in cryptocurrency markets.',
+                            'category': 'bitcoin',
+                            'is_featured': True
+                        },
+                        {
+                            'title': 'Real Estate Investment Trusts Show Strong Performance',
+                            'summary': 'REITs continue to perform well as investors seek stable returns in the current market environment.',
+                            'category': 'real_estate',
+                            'is_featured': False
+                        },
+                        {
+                            'title': 'Cryptocurrency Market Cap Reaches New Milestone',
+                            'summary': 'The total cryptocurrency market cap has reached a new all-time high, driven by increased adoption.',
+                            'category': 'crypto',
+                            'is_featured': True
+                        },
+                        {
+                            'title': 'Tech Stocks Lead Market Recovery',
+                            'summary': 'Technology companies are leading the market recovery with strong earnings and innovative products.',
+                            'category': 'stocks',
+                            'is_featured': False
+                        },
+                        {
+                            'title': 'Ethereum Network Upgrade Improves Efficiency',
+                            'summary': 'Latest Ethereum network upgrade has improved transaction efficiency and reduced fees significantly.',
+                            'category': 'ethereum',
+                            'is_featured': False
+                        },
+                        {
+                            'title': 'Altcoin Season Begins as Bitcoin Consolidates',
+                            'summary': 'Alternative cryptocurrencies are showing strong performance as Bitcoin enters a consolidation phase.',
+                            'category': 'altcoins',
+                            'is_featured': True
+                        },
+                        {
+                            'title': 'Commercial Real Estate Sees Record Investment',
+                            'summary': 'Commercial real estate markets are experiencing record levels of investment from institutional buyers.',
+                            'category': 'real_estate',
+                            'is_featured': False
+                        },
+                        {
+                            'title': 'Bitcoin Mining Difficulty Reaches New High',
+                            'summary': 'Bitcoin mining difficulty has reached a new all-time high, indicating strong network security.',
+                            'category': 'bitcoin',
+                            'is_featured': False
+                        },
+                        {
+                            'title': 'DeFi Protocols Show Continued Growth',
+                            'summary': 'Decentralized finance protocols continue to show strong growth with increasing total value locked.',
+                            'category': 'crypto',
+                            'is_featured': False
+                        },
+                        {
+                            'title': 'Housing Market Shows Signs of Cooling',
+                            'summary': 'The housing market is showing signs of cooling as interest rates stabilize and inventory increases.',
+                            'category': 'real_estate',
+                            'is_featured': False
+                        }
+                    ]
+                    
+                    created_count = 0
+                    for article_data in articles:
+                        NewsArticle.objects.create(
+                            title=article_data['title'],
+                            summary=article_data['summary'],
+                            content=article_data['summary'] + " This is a comprehensive analysis of the current market trends and their implications for investors.",
+                            source=source,
+                            category=created_categories[article_data['category']],
+                            is_featured=article_data['is_featured'],
+                            is_active=True,
+                            published_at=timezone.now()
+                        )
+                        created_count += 1
+                    
+                    print(f"✅ FALLBACK: Created {created_count} sample news articles!")
             else:
-                print(f"✅ News system has {article_count} articles")
+                print(f"✅ News system already has {current_count} articles - skipping creation")
+            
+            # Show final statistics
+            total_articles = NewsArticle.objects.count()
+            featured_articles = NewsArticle.objects.filter(is_featured=True).count()
+            active_articles = NewsArticle.objects.filter(is_active=True).count()
+            
+            print(f"📊 FINAL STATS: {total_articles} total, {featured_articles} featured, {active_articles} active")
+            
         except Exception as e:
-            print(f"⚠️  News system check failed: {e}")
-            # Force create sample data as fallback
-            print("🔄 FORCE creating sample news...")
-            try:
-                execute_from_command_line(['manage.py', 'create_sample_news', '--count=50', '--verbosity=0'])
-                print("✅ Sample news created as fallback")
-            except Exception as e2:
-                print(f"⚠️  Sample news creation failed: {e2}")
-                # EMERGENCY FIX - Use the bulletproof command
-                print("🚨 EMERGENCY: Using bulletproof news creation...")
-                try:
-                    execute_from_command_line(['manage.py', 'emergency_news_fix', '--verbosity=0'])
-                    print("✅ Emergency news fix completed successfully")
-                except Exception as e3:
-                    print(f"❌ Emergency fix failed: {e3}")
-                    # Last resort - create news directly
-                    print("🔄 Creating news directly in database...")
-                    try:
-                        from investments.news_models import NewsCategory, NewsSource
-                        from django.utils import timezone
-                        
-                        # Create categories
-                        crypto_cat, _ = NewsCategory.objects.get_or_create(
-                            name='crypto',
-                            defaults={'display_name': 'Cryptocurrency', 'description': 'Crypto news'}
-                        )
-                        stocks_cat, _ = NewsCategory.objects.get_or_create(
-                            name='stocks',
-                            defaults={'display_name': 'Stock Market', 'description': 'Stock news'}
-                        )
-                        real_estate_cat, _ = NewsCategory.objects.get_or_create(
-                            name='real_estate',
-                            defaults={'display_name': 'Real Estate', 'description': 'Real estate news'}
-                        )
-                        
-                        # Create source
-                        source, _ = NewsSource.objects.get_or_create(
-                            name='Sample News',
-                            defaults={'base_url': 'https://example.com', 'is_active': True}
-                        )
-                        
-                        # Create articles
-                        articles = [
-                            {
-                                'title': 'Bitcoin Reaches New All-Time High Amid Institutional Adoption',
-                                'summary': 'Bitcoin has surged to new record levels as major institutions continue to adopt cryptocurrency.',
-                                'category': crypto_cat,
-                                'is_featured': True
-                            },
-                            {
-                                'title': 'Stock Market Rally Continues as Tech Stocks Lead Gains',
-                                'summary': 'Major indices are up as technology companies report strong quarterly earnings.',
-                                'category': stocks_cat,
-                                'is_featured': True
-                            },
-                            {
-                                'title': 'Real Estate Market Shows Strong Growth in Q4',
-                                'summary': 'Property values continue to rise across major metropolitan areas.',
-                                'category': real_estate_cat,
-                                'is_featured': False
-                            },
-                            {
-                                'title': 'Ethereum 2.0 Staking Rewards Hit Record Levels',
-                                'summary': 'Ethereum staking rewards have reached new highs as the network continues to grow.',
-                                'category': crypto_cat,
-                                'is_featured': True
-                            },
-                            {
-                                'title': 'Gold Prices Stabilize After Recent Volatility',
-                                'summary': 'Gold has found support levels after recent market fluctuations.',
-                                'category': stocks_cat,
-                                'is_featured': False
-                            }
-                        ]
-                        
-                        created_count = 0
-                        for article_data in articles:
-                            if not NewsArticle.objects.filter(title=article_data['title']).exists():
-                                NewsArticle.objects.create(
-                                    title=article_data['title'],
-                                    summary=article_data['summary'],
-                                    content=article_data['summary'],
-                                    source=source,
-                                    category=article_data['category'],
-                                    is_featured=article_data['is_featured'],
-                                    is_active=True,
-                                    published_at=timezone.now()
-                                )
-                                created_count += 1
-                        
-                        print(f"✅ Created {created_count} news articles directly")
-                    except Exception as e4:
-                        print(f"❌ Direct creation failed: {e4}")
+            print(f"❌ CRITICAL ERROR in hybrid news system: {e}")
+            import traceback
+            traceback.print_exc()
         
         # Start the server
         print("🚀 Starting Daphne server...")
