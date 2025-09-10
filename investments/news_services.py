@@ -27,12 +27,20 @@ class NewsAPIService:
             }
         )
         self.is_configured = bool(self.api_key)
+        
+        # Debug logging
+        logger.info(f"NewsAPI Service - API Key: {'✅ Set' if self.api_key else '❌ Not Set'}")
+        if self.api_key:
+            logger.info(f"NewsAPI Service - Key length: {len(self.api_key)}")
+            logger.info(f"NewsAPI Service - Key preview: {self.api_key[:8]}...")
     
     def fetch_news(self, category='business', count=20):
         """Fetch news from NewsAPI"""
         if not self.is_configured:
-            logger.info("NewsAPI key not configured, skipping")
+            logger.warning("NewsAPI key not configured, skipping")
             return []
+        
+        logger.info(f"NewsAPI Service - Attempting to fetch {count} articles for category: {category}")
         
         try:
             # Map our categories to NewsAPI categories
@@ -148,6 +156,12 @@ class FinnhubService:
             }
         )
         self.is_configured = bool(self.api_key)
+        
+        # Debug logging
+        logger.info(f"Finnhub Service - API Key: {'✅ Set' if self.api_key else '❌ Not Set'}")
+        if self.api_key:
+            logger.info(f"Finnhub Service - Key length: {len(self.api_key)}")
+            logger.info(f"Finnhub Service - Key preview: {self.api_key[:8]}...")
     
     def fetch_news(self, category='stocks', count=20):
         """Fetch news from Finnhub"""

@@ -281,6 +281,21 @@ print(f"   NEWSAPI_KEY: {'✅ Set' if NEWSAPI_KEY else '❌ Not Set'}")
 print(f"   FINNHUB_API_KEY: {'✅ Set' if FINNHUB_API_KEY else '❌ Not Set'}")
 print(f"   CRYPTOPANIC_API_KEY: {'✅ Set' if CRYPTOPANIC_API_KEY else '❌ Not Set'}")
 print(f"   COINDESK_API_KEY: {'✅ Set' if COINDESK_API_KEY else '❌ Not Set'}")
+
+# Additional debugging for API keys
+if NEWSAPI_KEY:
+    print(f"   NEWSAPI_KEY length: {len(NEWSAPI_KEY)}")
+    print(f"   NEWSAPI_KEY preview: {NEWSAPI_KEY[:8]}...")
+if FINNHUB_API_KEY:
+    print(f"   FINNHUB_API_KEY length: {len(FINNHUB_API_KEY)}")
+    print(f"   FINNHUB_API_KEY preview: {FINNHUB_API_KEY[:8]}...")
+
+# Check environment variables directly
+import os
+print(f"   ENV NEWSAPI_KEY: {'✅ Set' if os.environ.get('NEWSAPI_KEY') else '❌ Not Set'}")
+print(f"   ENV FINNHUB_API_KEY: {'✅ Set' if os.environ.get('FINNHUB_API_KEY') else '❌ Not Set'}")
+print(f"   ENV CRYPTOPANIC_API_KEY: {'✅ Set' if os.environ.get('CRYPTOPANIC_API_KEY') else '❌ Not Set'}")
+print(f"   ENV COINDESK_API_KEY: {'✅ Set' if os.environ.get('COINDESK_API_KEY') else '❌ Not Set'}")
 NEWS_REFRESH_TOKEN = config('NEWS_REFRESH_TOKEN', default='meridian-news-refresh-2025')
 
 # Email Configuration for Google Workspace (Gmail for Business)

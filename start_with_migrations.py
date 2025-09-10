@@ -41,9 +41,9 @@ def main():
             if current_count < 20:  # Only fetch if we have few articles
                 print("🔄 Attempting to fetch real news from APIs...")
                 try:
-                    # Try the force_news_update command
-                    execute_from_command_line(['manage.py', 'force_news_update', '--count=30', '--verbosity=0'])
-                    print("✅ Real news fetched successfully from APIs!")
+                    # Try the new force_api_news command with debugging
+                    execute_from_command_line(['manage.py', 'force_api_news', '--count=30', '--test-apis', '--verbosity=2'])
+                    print("✅ API news command completed!")
                     
                     # Check if we got real articles
                     new_count = NewsArticle.objects.count()
