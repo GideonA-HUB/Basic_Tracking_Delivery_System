@@ -19,11 +19,13 @@ def force_fetch_marketaux_news():
     # Get API keys directly from environment
     marketaux_key = os.environ.get('MARKETAUX_API_KEY')
     cryptonews_key = os.environ.get('CRYPTONEWS_API_KEY')
+    finnhub_key = os.environ.get('FINNHUB_API_KEY')
     
     print(f"MARKETAUX_API_KEY: {'✅ Set' if marketaux_key else '❌ Not Set'}")
     print(f"CRYPTONEWS_API_KEY: {'✅ Set' if cryptonews_key else '❌ Not Set'}")
+    print(f"FINNHUB_API_KEY: {'✅ Set' if finnhub_key else '❌ Not Set'}")
     
-    if not marketaux_key and not cryptonews_key:
+    if not marketaux_key and not cryptonews_key and not finnhub_key:
         print("❌ No API keys found in environment variables!")
         return False
     
@@ -34,6 +36,10 @@ def force_fetch_marketaux_news():
     if cryptonews_key:
         print(f"CryptoNews key length: {len(cryptonews_key)}")
         print(f"CryptoNews key preview: {cryptonews_key[:8]}...")
+    
+    if finnhub_key:
+        print(f"Finnhub key length: {len(finnhub_key)}")
+        print(f"Finnhub key preview: {finnhub_key[:8]}...")
     
     # Test API calls directly
     all_articles = []
@@ -86,25 +92,78 @@ def force_fetch_marketaux_news():
             }
             
             print(f"Making API request to CryptoNewsAPI...")
+            print(f"URL: {url}")
+            print(f"Params: {params}")
             response = requests.get(url, params=params, timeout=30)
             
             print(f"CryptoNews Response Status: {response.status_code}")
+            print(f"CryptoNews Response Headers: {dict(response.headers)}")
             
             if response.status_code == 200:
                 data = response.json()
+                print(f"CryptoNews Raw Response: {data}")
                 articles = data.get('data', [])
                 print(f"✅ CryptoNews Success: {len(articles)} articles returned")
                 
-                # Add source info to articles
-                for article in articles:
-                    article['source'] = 'CryptoNewsAPI'
-                all_articles.extend(articles)
+                if articles:
+                    # Add source info to articles
+                    for article in articles:
+                        article['source'] = 'CryptoNewsAPI'
+                    all_articles.extend(articles)
+                else:
+                    print("No articles in CryptoNews response - checking response structure...")
+                    print(f"Response keys: {list(data.keys())}")
             else:
                 print(f"❌ CryptoNews Error: {response.status_code}")
                 print(f"Error: {response.text[:200]}...")
                 
         except Exception as e:
             print(f"❌ CryptoNews Exception: {e}")
+            import traceback
+            traceback.print_exc()
+    
+    # Test Finnhub API
+    if finnhub_key:
+        try:
+            import requests
+            
+            # Test both general and crypto categories
+            for category in ['general', 'crypto']:
+                url = f"https://finnhub.io/api/v1/news"
+                params = {
+                    'category': category,
+                    'token': finnhub_key
+                }
+                
+                print(f"Making API request to Finnhub ({category})...")
+                print(f"URL: {url}")
+                print(f"Params: {params}")
+                response = requests.get(url, params=params, timeout=30)
+                
+                print(f"Finnhub ({category}) Response Status: {response.status_code}")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    print(f"Finnhub ({category}) Raw Response: {data[:2] if data else 'Empty'}")
+                    articles = data if isinstance(data, list) else []
+                    print(f"✅ Finnhub ({category}) Success: {len(articles)} articles returned")
+                    
+                    if articles:
+                        # Add source info to articles
+                        for article in articles:
+                            article['source'] = 'Finnhub'
+                            article['category'] = category
+                        all_articles.extend(articles)
+                    else:
+                        print(f"No articles in Finnhub ({category}) response")
+                else:
+                    print(f"❌ Finnhub ({category}) Error: {response.status_code}")
+                    print(f"Error: {response.text[:200]}...")
+                    
+        except Exception as e:
+            print(f"❌ Finnhub Exception: {e}")
+            import traceback
+            traceback.print_exc()
     
     if all_articles:
         print(f"✅ Total articles from all APIs: {len(all_articles)}")
@@ -191,6 +250,17 @@ def save_articles_to_database(articles):
                     image_url = article_data.get('image_url', '/static/images/news-placeholder.svg')
                     published_at_str = article_data.get('date', '')
                     
+                elif source_name == 'Finnhub':
+                    # Finnhub format
+                    related = article_data.get('related', '')
+                    symbol_names = [related] if related else []
+                    title = article_data.get('headline', '')
+                    summary = article_data.get('summary', '')
+                    content = article_data.get('summary', '')
+                    url = article_data.get('url', '')
+                    image_url = article_data.get('image', '/static/images/news-placeholder.svg')
+                    published_at_str = article_data.get('datetime', '')
+                    
                 else:
                     # Default format
                     symbols = article_data.get('entities', [])
@@ -229,10 +299,16 @@ def save_articles_to_database(articles):
                         published_at = timezone.now()
                 
                 # Get or create source
+                base_url_map = {
+                    'MarketAux': 'https://api.marketaux.com',
+                    'CryptoNewsAPI': 'https://cryptonewsapi.online',
+                    'Finnhub': 'https://finnhub.io'
+                }
+                
                 source, _ = NewsSource.objects.get_or_create(
                     name=source_name,
                     defaults={
-                        'base_url': 'https://api.marketaux.com' if source_name == 'MarketAux' else 'https://cryptonewsapi.online',
+                        'base_url': base_url_map.get(source_name, 'https://unknown.com'),
                         'is_active': True
                     }
                 )

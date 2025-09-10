@@ -297,17 +297,29 @@ except Exception as e:
     print(f"Warning: Error loading CryptoNews API key: {e}")
     CRYPTONEWS_API_KEY = ''
 
+# Finnhub.io API (for comprehensive financial news)
+FINNHUB_API_KEY = ''
+try:
+    # First try direct environment variable access
+    FINNHUB_API_KEY = os.environ.get('FINNHUB_API_KEY', '').strip()
+    if not FINNHUB_API_KEY:
+        # Fallback to decouple config
+        FINNHUB_API_KEY = config('FINNHUB_API_KEY', default='').strip()
+except Exception as e:
+    print(f"Warning: Error loading Finnhub API key: {e}")
+    FINNHUB_API_KEY = ''
+
 # Remove all other APIs
 NEWSAPI_KEY = None
-FINNHUB_API_KEY = None
 CRYPTOPANIC_API_KEY = None
 COINDESK_API_KEY = None
 ALPHA_VANTAGE_API_KEY = None
 
-# Debug API keys - MARKETAUX AND CRYPTONEWS
+# Debug API keys - MARKETAUX, CRYPTONEWS, AND FINNHUB
 print(f"🔑 NEWS API KEYS DEBUG:")
 print(f"   MARKETAUX_API_KEY: {'✅ Set' if MARKETAUX_API_KEY else '❌ Not Set'}")
 print(f"   CRYPTONEWS_API_KEY: {'✅ Set' if CRYPTONEWS_API_KEY else '❌ Not Set'}")
+print(f"   FINNHUB_API_KEY: {'✅ Set' if FINNHUB_API_KEY else '❌ Not Set'}")
 
 # Additional debugging for MarketAux API key
 if MARKETAUX_API_KEY:
@@ -323,17 +335,28 @@ if CRYPTONEWS_API_KEY:
 else:
     print(f"   CRYPTONEWS_API_KEY: Empty or not found")
 
+# Additional debugging for Finnhub API key
+if FINNHUB_API_KEY:
+    print(f"   FINNHUB_API_KEY length: {len(FINNHUB_API_KEY)}")
+    print(f"   FINNHUB_API_KEY preview: {FINNHUB_API_KEY[:8]}...")
+else:
+    print(f"   FINNHUB_API_KEY: Empty or not found")
+
 # Check environment variables directly
 env_marketaux = os.environ.get('MARKETAUX_API_KEY')
 env_cryptonews = os.environ.get('CRYPTONEWS_API_KEY')
+env_finnhub = os.environ.get('FINNHUB_API_KEY')
 print(f"   ENV MARKETAUX_API_KEY: {'✅ Set' if env_marketaux else '❌ Not Set'}")
 print(f"   ENV CRYPTONEWS_API_KEY: {'✅ Set' if env_cryptonews else '❌ Not Set'}")
+print(f"   ENV FINNHUB_API_KEY: {'✅ Set' if env_finnhub else '❌ Not Set'}")
 
 # Check if keys match
 if env_marketaux and MARKETAUX_API_KEY:
     print(f"   MarketAux keys match: {'✅ Yes' if env_marketaux == MARKETAUX_API_KEY else '❌ No'}")
 if env_cryptonews and CRYPTONEWS_API_KEY:
     print(f"   CryptoNews keys match: {'✅ Yes' if env_cryptonews == CRYPTONEWS_API_KEY else '❌ No'}")
+if env_finnhub and FINNHUB_API_KEY:
+    print(f"   Finnhub keys match: {'✅ Yes' if env_finnhub == FINNHUB_API_KEY else '❌ No'}")
 
 # Show all environment variables that contain 'API' or 'KEY'
 print(f"\n🔍 ALL API/KEY ENVIRONMENT VARIABLES:")

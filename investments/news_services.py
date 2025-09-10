@@ -167,6 +167,100 @@ class CryptoNewsAPIService:
             return timezone.now()
 
 
+class FinnhubService:
+    """Service for fetching news from Finnhub.io API"""
+    
+    def __init__(self):
+        self.api_key = getattr(settings, 'FINNHUB_API_KEY', '')
+        self.base_url = 'https://finnhub.io/api/v1'
+        self.source, _ = NewsSource.objects.get_or_create(
+            name='Finnhub',
+            defaults={
+                'base_url': self.base_url,
+                'api_key': self.api_key,
+                'rate_limit_per_hour': 60  # Finnhub free tier
+            }
+        )
+        self.is_configured = bool(self.api_key)
+        
+        # Debug logging
+        logger.info(f"Finnhub Service - API Key: {'✅ Set' if self.api_key else '❌ Not Set'}")
+        if self.api_key:
+            logger.info(f"Finnhub Service - Key length: {len(self.api_key)}")
+            logger.info(f"Finnhub Service - Key preview: {self.api_key[:8]}...")
+        else:
+            logger.warning("Finnhub Service - No API key found in settings")
+    
+    def fetch_news(self, category='general', count=20):
+        """Fetch news from Finnhub.io API"""
+        if not self.is_configured:
+            logger.warning("Finnhub key not configured, skipping")
+            return []
+        
+        logger.info(f"Finnhub Service - Attempting to fetch {count} articles for category: {category}")
+        
+        try:
+            # Map categories to Finnhub categories
+            category_mapping = {
+                'crypto': 'crypto',
+                'bitcoin': 'crypto',
+                'ethereum': 'crypto',
+                'altcoins': 'crypto',
+                'stocks': 'general',
+                'real_estate': 'general',
+                'general': 'general'
+            }
+            
+            finnhub_category = category_mapping.get(category, 'general')
+            
+            url = f"{self.base_url}/news"
+            params = {
+                'category': finnhub_category,
+                'token': self.api_key
+            }
+            
+            response = requests.get(url, params=params, timeout=15)
+            response.raise_for_status()
+            
+            data = response.json()
+            articles = []
+            
+            for item in data[:count]:
+                article = {
+                    'title': item.get('headline', ''),
+                    'summary': item.get('summary', ''),
+                    'content': item.get('summary', ''),
+                    'url': item.get('url', ''),
+                    'image_url': item.get('image', '/static/images/news-placeholder.svg'),
+                    'published_at': self._parse_date(item.get('datetime', '')),
+                    'source': 'Finnhub',
+                    'category': category,
+                    'symbols': item.get('related', '')  # Store related symbols
+                }
+                articles.append(article)
+            
+            logger.info(f"Finnhub Service - Fetched {len(articles)} articles for {category}")
+            return articles
+            
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Finnhub Service - Request error: {e}")
+            return []
+        except Exception as e:
+            logger.error(f"Finnhub Service - Error fetching news: {e}")
+            return []
+    
+    def _parse_date(self, timestamp):
+        """Parse timestamp from Finnhub"""
+        if not timestamp:
+            return timezone.now()
+        
+        try:
+            # Finnhub uses Unix timestamp
+            return datetime.fromtimestamp(timestamp, tz=timezone.utc)
+        except:
+            return timezone.now()
+
+
 class MarketAuxService:
     """Service for fetching news from MarketAux API"""
     
@@ -269,13 +363,14 @@ class MarketAuxService:
 
 
 class NewsAggregator:
-    """Main news aggregator that combines all services - MARKETAUX + CRYPTONEWS"""
+    """Main news aggregator that combines all services - MARKETAUX + CRYPTONEWS + FINNHUB"""
     
     def __init__(self):
         self.services = {
             'free_news': FreeNewsService(),
             'marketaux': MarketAuxService(),
-            'cryptonews': CryptoNewsAPIService()
+            'cryptonews': CryptoNewsAPIService(),
+            'finnhub': FinnhubService()
         }
         
         # Check which services are configured

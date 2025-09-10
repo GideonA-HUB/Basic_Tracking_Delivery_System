@@ -27,11 +27,13 @@ class Command(BaseCommand):
         # Get API keys directly from environment
         marketaux_key = os.environ.get('MARKETAUX_API_KEY')
         cryptonews_key = os.environ.get('CRYPTONEWS_API_KEY')
+        finnhub_key = os.environ.get('FINNHUB_API_KEY')
         
         self.stdout.write(f"MARKETAUX_API_KEY: {'✅ Set' if marketaux_key else '❌ Not Set'}")
         self.stdout.write(f"CRYPTONEWS_API_KEY: {'✅ Set' if cryptonews_key else '❌ Not Set'}")
+        self.stdout.write(f"FINNHUB_API_KEY: {'✅ Set' if finnhub_key else '❌ Not Set'}")
         
-        if not marketaux_key and not cryptonews_key:
+        if not marketaux_key and not cryptonews_key and not finnhub_key:
             self.stdout.write("❌ No API keys found!")
             return
         
@@ -42,6 +44,10 @@ class Command(BaseCommand):
         if cryptonews_key:
             self.stdout.write(f"CryptoNews key length: {len(cryptonews_key)}")
             self.stdout.write(f"CryptoNews key preview: {cryptonews_key[:8]}...")
+        
+        if finnhub_key:
+            self.stdout.write(f"Finnhub key length: {len(finnhub_key)}")
+            self.stdout.write(f"Finnhub key preview: {finnhub_key[:8]}...")
         
         # Test MarketAux API call
         if marketaux_key:
@@ -106,6 +112,38 @@ class Command(BaseCommand):
                     
             except Exception as e:
                 self.stdout.write(f"❌ CryptoNews Exception: {e}")
+        
+        # Test Finnhub API call
+        if finnhub_key:
+            self.stdout.write(f"\n🌐 TESTING FINNHUB API...")
+            try:
+                # Test both general and crypto categories
+                for category in ['general', 'crypto']:
+                    url = f"https://finnhub.io/api/v1/news"
+                    params = {
+                        'category': category,
+                        'token': finnhub_key
+                    }
+                    
+                    response = requests.get(url, params=params, timeout=30)
+                    self.stdout.write(f"Finnhub ({category}) Response Status: {response.status_code}")
+                    
+                    if response.status_code == 200:
+                        data = response.json()
+                        articles = data if isinstance(data, list) else []
+                        self.stdout.write(f"✅ Finnhub ({category}) Success: {len(articles)} articles returned")
+                        
+                        if articles:
+                            # Save articles to database
+                            self.save_finnhub_articles(articles, category)
+                        else:
+                            self.stdout.write(f"No articles in Finnhub ({category}) response")
+                    else:
+                        self.stdout.write(f"❌ Finnhub ({category}) Error: {response.status_code}")
+                        self.stdout.write(f"Error: {response.text[:200]}...")
+                        
+            except Exception as e:
+                self.stdout.write(f"❌ Finnhub Exception: {e}")
 
     def save_articles(self, articles):
         """Save articles to database"""
@@ -314,5 +352,99 @@ class Command(BaseCommand):
             
         except Exception as e:
             self.stdout.write(f"❌ Crypto database error: {e}")
+            import traceback
+            traceback.print_exc()
+
+    def save_finnhub_articles(self, articles, category):
+        """Save Finnhub articles to database"""
+        try:
+            from investments.news_models import NewsArticle, NewsCategory, NewsSource
+            from django.utils import timezone
+            from datetime import datetime
+            
+            # Create categories
+            categories = {
+                'crypto': NewsCategory.objects.get_or_create(
+                    name='crypto',
+                    defaults={'display_name': 'Cryptocurrency', 'description': 'Crypto news'}
+                )[0],
+                'stocks': NewsCategory.objects.get_or_create(
+                    name='stocks',
+                    defaults={'display_name': 'Stock Market', 'description': 'Stock news'}
+                )[0],
+                'real_estate': NewsCategory.objects.get_or_create(
+                    name='real_estate',
+                    defaults={'display_name': 'Real Estate', 'description': 'Real estate news'}
+                )[0],
+                'bitcoin': NewsCategory.objects.get_or_create(
+                    name='bitcoin',
+                    defaults={'display_name': 'Bitcoin', 'description': 'Bitcoin news'}
+                )[0],
+                'ethereum': NewsCategory.objects.get_or_create(
+                    name='ethereum',
+                    defaults={'display_name': 'Ethereum', 'description': 'Ethereum news'}
+                )[0],
+                'altcoins': NewsCategory.objects.get_or_create(
+                    name='altcoins',
+                    defaults={'display_name': 'Altcoins', 'description': 'Altcoin news'}
+                )[0],
+            }
+            
+            # Create source
+            source, _ = NewsSource.objects.get_or_create(
+                name='Finnhub',
+                defaults={
+                    'base_url': 'https://finnhub.io',
+                    'is_active': True
+                }
+            )
+            
+            # Save articles
+            saved_count = 0
+            for i, article_data in enumerate(articles):
+                try:
+                    # Determine category based on Finnhub category
+                    if category == 'crypto':
+                        article_category = categories['crypto']
+                    else:
+                        article_category = categories['stocks']  # Default to stocks for general
+                    
+                    # Parse published date
+                    published_at = timezone.now()
+                    if article_data.get('datetime'):
+                        try:
+                            published_at = datetime.fromtimestamp(
+                                article_data['datetime'], tz=timezone.utc
+                            )
+                        except:
+                            published_at = timezone.now()
+                    
+                    # Create article
+                    article = NewsArticle.objects.create(
+                        title=article_data.get('headline', ''),
+                        summary=article_data.get('summary', ''),
+                        content=article_data.get('summary', ''),
+                        url=article_data.get('url', ''),
+                        image_url=article_data.get('image', '/static/images/news-placeholder.svg'),
+                        published_at=published_at,
+                        source=source,
+                        category=article_category,
+                        is_featured=i < 5,  # First 5 are featured
+                        is_active=True,
+                        tags=article_data.get('related', '')
+                    )
+                    saved_count += 1
+                    
+                    if i < 3:  # Show first 3 articles
+                        self.stdout.write(f"  {i+1}. {article.title[:50]}...")
+                    
+                except Exception as e:
+                    self.stdout.write(f"Error saving Finnhub article {i+1}: {e}")
+                    continue
+            
+            self.stdout.write(f"✅ Saved {saved_count} Finnhub articles to database")
+            
+        except Exception as e:
+            self.stdout.write(f"❌ Finnhub database error: {e}")
             import traceback
             traceback.print_exc()
