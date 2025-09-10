@@ -65,6 +65,108 @@ class FreeNewsService:
         return sample_news[:count]
 
 
+class CryptoNewsAPIService:
+    """Service for fetching crypto news from CryptoNewsAPI.online"""
+    
+    def __init__(self):
+        self.api_key = getattr(settings, 'CRYPTONEWS_API_KEY', '')
+        self.base_url = 'https://cryptonewsapi.online/api/v1'
+        self.source, _ = NewsSource.objects.get_or_create(
+            name='CryptoNewsAPI',
+            defaults={
+                'base_url': self.base_url,
+                'api_key': self.api_key,
+                'rate_limit_per_hour': 1000  # CryptoNewsAPI free tier
+            }
+        )
+        self.is_configured = bool(self.api_key)
+        
+        # Debug logging
+        logger.info(f"CryptoNewsAPI Service - API Key: {'✅ Set' if self.api_key else '❌ Not Set'}")
+        if self.api_key:
+            logger.info(f"CryptoNewsAPI Service - Key length: {len(self.api_key)}")
+            logger.info(f"CryptoNewsAPI Service - Key preview: {self.api_key[:8]}...")
+        else:
+            logger.warning("CryptoNewsAPI Service - No API key found in settings")
+    
+    def fetch_news(self, category='crypto', count=20):
+        """Fetch crypto news from CryptoNewsAPI.online"""
+        if not self.is_configured:
+            logger.warning("CryptoNewsAPI key not configured, skipping")
+            return []
+        
+        logger.info(f"CryptoNewsAPI Service - Attempting to fetch {count} articles for category: {category}")
+        
+        try:
+            # Map categories to tickers
+            ticker_mapping = {
+                'crypto': 'BTC,ETH,ADA,SOL,MATIC,AVAX,DOT,LINK,UNI,AAVE',
+                'bitcoin': 'BTC',
+                'ethereum': 'ETH',
+                'altcoins': 'ADA,SOL,MATIC,AVAX,DOT,LINK,UNI,AAVE',
+                'stocks': 'AAPL,MSFT,GOOGL,AMZN,TSLA,META,NVDA,AMD,INTC,ORCL',
+                'real_estate': 'REIT,SPG,PLD,AMT,CCI,EQR,AVB,MAA,ESS,PSA',
+                'general': 'BTC,ETH,AAPL,MSFT,GOOGL,AMZN,TSLA'
+            }
+            
+            # Only fetch crypto-related news from CryptoNewsAPI
+            if category in ['crypto', 'bitcoin', 'ethereum', 'altcoins']:
+                tickers = ticker_mapping.get(category, 'BTC,ETH')
+                
+                url = f"{self.base_url}"
+                params = {
+                    'tickers': tickers,
+                    'items': min(count, 50),  # CryptoNewsAPI max is 50
+                    'token': self.api_key
+                }
+                
+                response = requests.get(url, params=params, timeout=15)
+                response.raise_for_status()
+                
+                data = response.json()
+                articles = []
+                
+                # CryptoNewsAPI returns data in 'data' field
+                for item in data.get('data', [])[:count]:
+                    article = {
+                        'title': item.get('title', ''),
+                        'summary': item.get('text', ''),
+                        'content': item.get('text', ''),
+                        'url': item.get('news_url', ''),
+                        'image_url': item.get('image_url', '/static/images/news-placeholder.svg'),
+                        'published_at': self._parse_date(item.get('date', '')),
+                        'source': 'CryptoNewsAPI',
+                        'category': category,
+                        'symbols': ','.join(item.get('tickers', [])[:5])  # First 5 tickers
+                    }
+                    articles.append(article)
+                
+                logger.info(f"CryptoNewsAPI Service - Fetched {len(articles)} articles for {category}")
+                return articles
+            else:
+                # For non-crypto categories, return empty (let MarketAux handle them)
+                logger.info(f"CryptoNewsAPI Service - Skipping non-crypto category: {category}")
+                return []
+                
+        except requests.exceptions.RequestException as e:
+            logger.error(f"CryptoNewsAPI Service - Request error: {e}")
+            return []
+        except Exception as e:
+            logger.error(f"CryptoNewsAPI Service - Error fetching news: {e}")
+            return []
+    
+    def _parse_date(self, date_str):
+        """Parse date string from CryptoNewsAPI"""
+        if not date_str:
+            return timezone.now()
+        
+        try:
+            # CryptoNewsAPI format: 2023-12-01T10:30:00Z
+            return datetime.fromisoformat(date_str.replace('Z', '+00:00'))
+        except:
+            return timezone.now()
+
+
 class MarketAuxService:
     """Service for fetching news from MarketAux API"""
     
@@ -167,12 +269,13 @@ class MarketAuxService:
 
 
 class NewsAggregator:
-    """Main news aggregator that combines all services - MARKETAUX ONLY"""
+    """Main news aggregator that combines all services - MARKETAUX + CRYPTONEWS"""
     
     def __init__(self):
         self.services = {
             'free_news': FreeNewsService(),
-            'marketaux': MarketAuxService()
+            'marketaux': MarketAuxService(),
+            'cryptonews': CryptoNewsAPIService()
         }
         
         # Check which services are configured

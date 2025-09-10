@@ -16,53 +16,102 @@ def force_fetch_marketaux_news():
     print("🚀 FORCE FETCHING MARKETAUX NEWS - GUARANTEED METHOD")
     print("=" * 60)
     
-    # Get API key directly from environment
+    # Get API keys directly from environment
     marketaux_key = os.environ.get('MARKETAUX_API_KEY')
-    print(f"MARKETAUX_API_KEY: {'✅ Set' if marketaux_key else '❌ Not Set'}")
+    cryptonews_key = os.environ.get('CRYPTONEWS_API_KEY')
     
-    if not marketaux_key:
-        print("❌ No MarketAux API key found in environment variables!")
+    print(f"MARKETAUX_API_KEY: {'✅ Set' if marketaux_key else '❌ Not Set'}")
+    print(f"CRYPTONEWS_API_KEY: {'✅ Set' if cryptonews_key else '❌ Not Set'}")
+    
+    if not marketaux_key and not cryptonews_key:
+        print("❌ No API keys found in environment variables!")
         return False
     
-    print(f"Key length: {len(marketaux_key)}")
-    print(f"Key preview: {marketaux_key[:8]}...")
+    if marketaux_key:
+        print(f"MarketAux key length: {len(marketaux_key)}")
+        print(f"MarketAux key preview: {marketaux_key[:8]}...")
     
-    # Test API call directly
-    try:
-        import requests
-        
-        url = "https://api.marketaux.com/v1/news/all"
-        params = {
-            'api_token': marketaux_key,
-            'symbols': 'BTC,ETH,AAPL,MSFT,GOOGL,TSLA,AMZN,META,NVDA,AMD',
-            'limit': 30,
-            'language': 'en',
-            'filter_entities': 'true'
-        }
-        
-        print(f"Making API request to MarketAux...")
-        response = requests.get(url, params=params, timeout=30)
-        
-        print(f"Response Status: {response.status_code}")
-        
-        if response.status_code == 200:
-            data = response.json()
-            articles = data.get('data', [])
-            print(f"✅ API Success: {len(articles)} articles returned")
+    if cryptonews_key:
+        print(f"CryptoNews key length: {len(cryptonews_key)}")
+        print(f"CryptoNews key preview: {cryptonews_key[:8]}...")
+    
+    # Test API calls directly
+    all_articles = []
+    
+    # Test MarketAux API
+    if marketaux_key:
+        try:
+            import requests
             
-            if articles:
-                # Save to database
-                return save_articles_to_database(articles)
+            url = "https://api.marketaux.com/v1/news/all"
+            params = {
+                'api_token': marketaux_key,
+                'symbols': 'BTC,ETH,AAPL,MSFT,GOOGL,TSLA,AMZN,META,NVDA,AMD',
+                'limit': 20,
+                'language': 'en',
+                'filter_entities': 'true'
+            }
+            
+            print(f"Making API request to MarketAux...")
+            response = requests.get(url, params=params, timeout=30)
+            
+            print(f"MarketAux Response Status: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                articles = data.get('data', [])
+                print(f"✅ MarketAux Success: {len(articles)} articles returned")
+                
+                # Add source info to articles
+                for article in articles:
+                    article['source'] = 'MarketAux'
+                all_articles.extend(articles)
             else:
-                print("No articles in response")
-                return False
-        else:
-            print(f"❌ API Error: {response.status_code}")
-            print(f"Error: {response.text[:200]}...")
-            return False
+                print(f"❌ MarketAux Error: {response.status_code}")
+                print(f"Error: {response.text[:200]}...")
+                
+        except Exception as e:
+            print(f"❌ MarketAux Exception: {e}")
+    
+    # Test CryptoNewsAPI
+    if cryptonews_key:
+        try:
+            import requests
             
-    except Exception as e:
-        print(f"❌ API Exception: {e}")
+            url = "https://cryptonewsapi.online/api/v1"
+            params = {
+                'tickers': 'BTC,ETH,ADA,SOL,MATIC,AVAX',
+                'items': 20,
+                'token': cryptonews_key
+            }
+            
+            print(f"Making API request to CryptoNewsAPI...")
+            response = requests.get(url, params=params, timeout=30)
+            
+            print(f"CryptoNews Response Status: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                articles = data.get('data', [])
+                print(f"✅ CryptoNews Success: {len(articles)} articles returned")
+                
+                # Add source info to articles
+                for article in articles:
+                    article['source'] = 'CryptoNewsAPI'
+                all_articles.extend(articles)
+            else:
+                print(f"❌ CryptoNews Error: {response.status_code}")
+                print(f"Error: {response.text[:200]}...")
+                
+        except Exception as e:
+            print(f"❌ CryptoNews Exception: {e}")
+    
+    if all_articles:
+        print(f"✅ Total articles from all APIs: {len(all_articles)}")
+        # Save to database
+        return save_articles_to_database(all_articles)
+    else:
+        print("❌ No articles from any API")
         return False
 
 def save_articles_to_database(articles):
@@ -117,12 +166,52 @@ def save_articles_to_database(articles):
         saved_count = 0
         for i, article_data in enumerate(articles):
             try:
+                source_name = article_data.get('source', 'Unknown')
+                
+                # Handle different API formats
+                if source_name == 'MarketAux':
+                    # MarketAux format
+                    symbols = article_data.get('entities', [])
+                    symbol_names = [s.get('symbol', '') for s in symbols] if symbols else []
+                    title = article_data.get('title', '')
+                    summary = article_data.get('description', '')
+                    content = article_data.get('description', '')
+                    url = article_data.get('url', '')
+                    image_url = article_data.get('image_url', '/static/images/news-placeholder.svg')
+                    published_at_str = article_data.get('published_at', '')
+                    
+                elif source_name == 'CryptoNewsAPI':
+                    # CryptoNewsAPI format
+                    tickers = article_data.get('tickers', [])
+                    symbol_names = tickers if tickers else []
+                    title = article_data.get('title', '')
+                    summary = article_data.get('text', '')
+                    content = article_data.get('text', '')
+                    url = article_data.get('news_url', '')
+                    image_url = article_data.get('image_url', '/static/images/news-placeholder.svg')
+                    published_at_str = article_data.get('date', '')
+                    
+                else:
+                    # Default format
+                    symbols = article_data.get('entities', [])
+                    symbol_names = [s.get('symbol', '') for s in symbols] if symbols else []
+                    title = article_data.get('title', '')
+                    summary = article_data.get('description', '')
+                    content = article_data.get('description', '')
+                    url = article_data.get('url', '')
+                    image_url = article_data.get('image_url', '/static/images/news-placeholder.svg')
+                    published_at_str = article_data.get('published_at', '')
+                
                 # Determine category based on symbols
                 category_name = 'crypto'  # Default
-                symbols = article_data.get('entities', [])
-                if symbols:
-                    symbol_names = [s.get('symbol', '') for s in symbols]
-                    if any(s in ['BTC', 'ETH', 'ADA', 'SOL', 'MATIC', 'AVAX'] for s in symbol_names):
+                if symbol_names:
+                    if any(s in ['BTC'] for s in symbol_names):
+                        category_name = 'bitcoin'
+                    elif any(s in ['ETH'] for s in symbol_names):
+                        category_name = 'ethereum'
+                    elif any(s in ['ADA', 'SOL', 'MATIC', 'AVAX', 'DOT', 'LINK', 'UNI', 'AAVE'] for s in symbol_names):
+                        category_name = 'altcoins'
+                    elif any(s in ['BTC', 'ETH', 'ADA', 'SOL', 'MATIC', 'AVAX'] for s in symbol_names):
                         category_name = 'crypto'
                     elif any(s in ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA', 'META', 'NVDA'] for s in symbol_names):
                         category_name = 'stocks'
@@ -131,32 +220,41 @@ def save_articles_to_database(articles):
                 
                 # Parse published date
                 published_at = timezone.now()
-                if article_data.get('published_at'):
+                if published_at_str:
                     try:
                         published_at = datetime.fromisoformat(
-                            article_data['published_at'].replace('Z', '+00:00')
+                            published_at_str.replace('Z', '+00:00')
                         )
                     except:
                         published_at = timezone.now()
                 
+                # Get or create source
+                source, _ = NewsSource.objects.get_or_create(
+                    name=source_name,
+                    defaults={
+                        'base_url': 'https://api.marketaux.com' if source_name == 'MarketAux' else 'https://cryptonewsapi.online',
+                        'is_active': True
+                    }
+                )
+                
                 # Create article
                 article = NewsArticle.objects.create(
-                    title=article_data.get('title', ''),
-                    summary=article_data.get('description', ''),
-                    content=article_data.get('description', ''),
-                    url=article_data.get('url', ''),
-                    image_url=article_data.get('image_url', '/static/images/news-placeholder.svg'),
+                    title=title,
+                    summary=summary,
+                    content=content,
+                    url=url,
+                    image_url=image_url,
                     published_at=published_at,
                     source=source,
                     category=categories[category_name],
                     is_featured=i < 5,  # First 5 are featured
                     is_active=True,
-                    tags=','.join([s.get('symbol', '') for s in symbols[:5]])
+                    tags=','.join(symbol_names[:5])
                 )
                 saved_count += 1
                 
                 if i < 3:  # Show first 3 articles
-                    print(f"  {i+1}. {article.title[:50]}...")
+                    print(f"  {i+1}. {article.title[:50]}... ({source_name})")
                 
             except Exception as e:
                 print(f"Error saving article {i+1}: {e}")

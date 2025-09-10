@@ -285,6 +285,18 @@ except Exception as e:
     print(f"Warning: Error loading MarketAux API key: {e}")
     MARKETAUX_API_KEY = ''
 
+# CryptoNewsAPI.online API (for comprehensive crypto news)
+CRYPTONEWS_API_KEY = ''
+try:
+    # First try direct environment variable access
+    CRYPTONEWS_API_KEY = os.environ.get('CRYPTONEWS_API_KEY', '').strip()
+    if not CRYPTONEWS_API_KEY:
+        # Fallback to decouple config
+        CRYPTONEWS_API_KEY = config('CRYPTONEWS_API_KEY', default='').strip()
+except Exception as e:
+    print(f"Warning: Error loading CryptoNews API key: {e}")
+    CRYPTONEWS_API_KEY = ''
+
 # Remove all other APIs
 NEWSAPI_KEY = None
 FINNHUB_API_KEY = None
@@ -292,35 +304,36 @@ CRYPTOPANIC_API_KEY = None
 COINDESK_API_KEY = None
 ALPHA_VANTAGE_API_KEY = None
 
-# Debug API keys - MARKETAUX ONLY
-print(f"🔑 MARKETAUX API Debug:")
+# Debug API keys - MARKETAUX AND CRYPTONEWS
+print(f"🔑 NEWS API KEYS DEBUG:")
 print(f"   MARKETAUX_API_KEY: {'✅ Set' if MARKETAUX_API_KEY else '❌ Not Set'}")
+print(f"   CRYPTONEWS_API_KEY: {'✅ Set' if CRYPTONEWS_API_KEY else '❌ Not Set'}")
 
 # Additional debugging for MarketAux API key
 if MARKETAUX_API_KEY:
     print(f"   MARKETAUX_API_KEY length: {len(MARKETAUX_API_KEY)}")
     print(f"   MARKETAUX_API_KEY preview: {MARKETAUX_API_KEY[:8]}...")
-    print(f"   MARKETAUX_API_KEY type: {type(MARKETAUX_API_KEY)}")
-    print(f"   MARKETAUX_API_KEY repr: {repr(MARKETAUX_API_KEY)}")
 else:
     print(f"   MARKETAUX_API_KEY: Empty or not found")
 
+# Additional debugging for CryptoNews API key
+if CRYPTONEWS_API_KEY:
+    print(f"   CRYPTONEWS_API_KEY length: {len(CRYPTONEWS_API_KEY)}")
+    print(f"   CRYPTONEWS_API_KEY preview: {CRYPTONEWS_API_KEY[:8]}...")
+else:
+    print(f"   CRYPTONEWS_API_KEY: Empty or not found")
+
 # Check environment variables directly
-env_key = os.environ.get('MARKETAUX_API_KEY')
-print(f"   ENV MARKETAUX_API_KEY: {'✅ Set' if env_key else '❌ Not Set'}")
-if env_key:
-    print(f"   ENV key length: {len(env_key)}")
-    print(f"   ENV key preview: {env_key[:8]}...")
-    print(f"   ENV key type: {type(env_key)}")
-    print(f"   ENV key repr: {repr(env_key)}")
+env_marketaux = os.environ.get('MARKETAUX_API_KEY')
+env_cryptonews = os.environ.get('CRYPTONEWS_API_KEY')
+print(f"   ENV MARKETAUX_API_KEY: {'✅ Set' if env_marketaux else '❌ Not Set'}")
+print(f"   ENV CRYPTONEWS_API_KEY: {'✅ Set' if env_cryptonews else '❌ Not Set'}")
 
 # Check if keys match
-if env_key and MARKETAUX_API_KEY:
-    print(f"   Keys match: {'✅ Yes' if env_key == MARKETAUX_API_KEY else '❌ No'}")
-elif not env_key and not MARKETAUX_API_KEY:
-    print(f"   Both empty: ✅ Yes")
-else:
-    print(f"   Mismatch: ❌ No")
+if env_marketaux and MARKETAUX_API_KEY:
+    print(f"   MarketAux keys match: {'✅ Yes' if env_marketaux == MARKETAUX_API_KEY else '❌ No'}")
+if env_cryptonews and CRYPTONEWS_API_KEY:
+    print(f"   CryptoNews keys match: {'✅ Yes' if env_cryptonews == CRYPTONEWS_API_KEY else '❌ No'}")
 
 # Show all environment variables that contain 'API' or 'KEY'
 print(f"\n🔍 ALL API/KEY ENVIRONMENT VARIABLES:")
