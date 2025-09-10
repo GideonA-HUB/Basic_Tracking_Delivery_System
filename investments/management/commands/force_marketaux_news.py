@@ -100,7 +100,7 @@ class Command(BaseCommand):
                 
                 if response.status_code == 200:
                     data = response.json()
-                    articles = data.get('data', [])
+                    articles = data.get('data', {}).get('articles', [])
                     self.stdout.write(f"✅ CryptoNews Success: {len(articles)} articles returned")
                     
                     if articles:
@@ -327,21 +327,21 @@ class Command(BaseCommand):
                     
                     # Parse published date
                     published_at = timezone.now()
-                    if article_data.get('date'):
+                    if article_data.get('pubDate'):
                         try:
                             published_at = datetime.fromisoformat(
-                                article_data['date'].replace('Z', '+00:00')
+                                article_data['pubDate'].replace('Z', '+00:00')
                             )
                         except:
                             published_at = timezone.now()
                     
                     # Truncate fields before database operation
                     title = article_data.get('title', '')[:200]
-                    summary = article_data.get('text', '')[:500]
-                    content = article_data.get('text', '')[:1000]
-                    url = article_data.get('news_url', '')[:500]
-                    image_url = article_data.get('image_url', '/static/images/news-placeholder.svg')[:500]
-                    tags = ','.join(tickers[:5])[:200]
+                    summary = article_data.get('description', '')[:500]
+                    content = article_data.get('description', '')[:1000]
+                    url = article_data.get('link', '')[:500]
+                    image_url = '/static/images/news-placeholder.svg'
+                    tags = 'BTC,ETH'  # Default crypto tags
                     
                     # Create article
                     article = NewsArticle.objects.create(

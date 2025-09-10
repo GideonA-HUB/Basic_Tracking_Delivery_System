@@ -128,18 +128,18 @@ class CryptoNewsAPIService:
                 data = response.json()
                 articles = []
                 
-                # CryptoNewsAPI returns data in 'data' field
-                for item in data.get('data', [])[:count]:
+                # CryptoNewsAPI returns data in 'data.articles' field
+                for item in data.get('data', {}).get('articles', [])[:count]:
                     article = {
                         'title': item.get('title', ''),
-                        'summary': item.get('text', ''),
-                        'content': item.get('text', ''),
-                        'url': item.get('news_url', ''),
-                        'image_url': item.get('image_url', '/static/images/news-placeholder.svg'),
-                        'published_at': self._parse_date(item.get('date', '')),
+                        'summary': item.get('description', ''),
+                        'content': item.get('description', ''),
+                        'url': item.get('link', ''),
+                        'image_url': '/static/images/news-placeholder.svg',
+                        'published_at': self._parse_date(item.get('pubDate', '')),
                         'source': 'CryptoNewsAPI',
                         'category': category,
-                        'symbols': ','.join(item.get('tickers', [])[:5])  # First 5 tickers
+                        'symbols': 'BTC,ETH'  # Default crypto symbols
                     }
                     articles.append(article)
                 

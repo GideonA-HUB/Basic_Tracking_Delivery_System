@@ -105,14 +105,24 @@ def force_fetch_marketaux_news():
             if response.status_code == 200:
                 data = response.json()
                 print(f"CryptoNews Raw Response: {data}")
-                articles = data.get('data', [])
+                articles = data.get('data', {}).get('articles', [])
                 print(f"✅ CryptoNews Success: {len(articles)} articles returned")
                 
                 if articles:
-                    # Add source info to articles
+                    # Convert CryptoNewsAPI format to our standard format
                     for article in articles:
-                        article['source'] = 'CryptoNewsAPI'
-                    all_articles.extend(articles)
+                        formatted_article = {
+                            'title': article.get('title', ''),
+                            'summary': article.get('description', ''),
+                            'content': article.get('description', ''),
+                            'url': article.get('link', ''),
+                            'image_url': '/static/images/news-placeholder.svg',
+                            'published_at': article.get('pubDate', ''),
+                            'source': 'CryptoNewsAPI',
+                            'category': 'crypto',
+                            'symbols': 'BTC,ETH'  # Default crypto symbols
+                        }
+                        all_articles.append(formatted_article)
                 else:
                     print("No articles in CryptoNews response - checking response structure...")
                     print(f"Response keys: {list(data.keys())}")
