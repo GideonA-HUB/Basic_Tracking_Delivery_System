@@ -113,7 +113,7 @@ class CryptoNewsAPIService:
             if category in ['crypto', 'bitcoin', 'ethereum', 'altcoins']:
                 tickers = ticker_mapping.get(category, 'BTC,ETH')
                 
-                url = f"{self.base_url}"
+                url = f"{self.base_url}/news"
                 params = {
                     'tickers': tickers,
                     'items': min(count, 50),  # CryptoNewsAPI max is 50

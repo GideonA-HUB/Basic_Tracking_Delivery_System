@@ -86,7 +86,7 @@ class Command(BaseCommand):
         if cryptonews_key:
             self.stdout.write(f"\n🌐 TESTING CRYPTONEWS API...")
             try:
-                url = "https://cryptonewsapi.online/api/v1"
+                url = "https://cryptonewsapi.online/api/v1/news"
                 params = {
                     'tickers': 'BTC,ETH,ADA,SOL,MATIC,AVAX',
                     'items': min(count, 50),
@@ -219,17 +219,17 @@ class Command(BaseCommand):
                     
                     # Create article
                     article = NewsArticle.objects.create(
-                        title=article_data.get('title', ''),
-                        summary=article_data.get('description', ''),
-                        content=article_data.get('description', ''),
-                        url=article_data.get('url', ''),
-                        image_url=article_data.get('image_url', '/static/images/news-placeholder.svg'),
+                        title=article_data.get('title', '')[:200],  # Truncate title
+                        summary=article_data.get('description', '')[:500],  # Truncate summary
+                        content=article_data.get('description', '')[:1000],  # Truncate content
+                        url=article_data.get('url', '')[:500],  # Truncate URL
+                        image_url=article_data.get('image_url', '/static/images/news-placeholder.svg')[:500],
                         published_at=published_at,
                         source=source,
                         category=categories[category_name],
                         is_featured=i < 5,  # First 5 are featured
                         is_active=True,
-                        tags=','.join([s.get('symbol', '') for s in symbols[:5]])
+                        tags=','.join([s.get('symbol', '') for s in symbols[:5]])[:200]  # Truncate tags
                     )
                     saved_count += 1
                     
@@ -327,17 +327,17 @@ class Command(BaseCommand):
                     
                     # Create article
                     article = NewsArticle.objects.create(
-                        title=article_data.get('title', ''),
-                        summary=article_data.get('text', ''),
-                        content=article_data.get('text', ''),
-                        url=article_data.get('news_url', ''),
-                        image_url=article_data.get('image_url', '/static/images/news-placeholder.svg'),
+                        title=article_data.get('title', '')[:200],  # Truncate title
+                        summary=article_data.get('text', '')[:500],  # Truncate summary
+                        content=article_data.get('text', '')[:1000],  # Truncate content
+                        url=article_data.get('news_url', '')[:500],  # Truncate URL
+                        image_url=article_data.get('image_url', '/static/images/news-placeholder.svg')[:500],
                         published_at=published_at,
                         source=source,
                         category=category,
                         is_featured=i < 5,  # First 5 are featured
                         is_active=True,
-                        tags=','.join(tickers[:5])
+                        tags=','.join(tickers[:5])[:200]  # Truncate tags
                     )
                     saved_count += 1
                     
@@ -421,17 +421,17 @@ class Command(BaseCommand):
                     
                     # Create article
                     article = NewsArticle.objects.create(
-                        title=article_data.get('headline', ''),
-                        summary=article_data.get('summary', ''),
-                        content=article_data.get('summary', ''),
-                        url=article_data.get('url', ''),
-                        image_url=article_data.get('image', '/static/images/news-placeholder.svg'),
+                        title=article_data.get('headline', '')[:200],  # Truncate title
+                        summary=article_data.get('summary', '')[:500],  # Truncate summary
+                        content=article_data.get('summary', '')[:1000],  # Truncate content
+                        url=article_data.get('url', '')[:500],  # Truncate URL
+                        image_url=article_data.get('image', '/static/images/news-placeholder.svg')[:500],
                         published_at=published_at,
                         source=source,
                         category=article_category,
                         is_featured=i < 5,  # First 5 are featured
                         is_active=True,
-                        tags=article_data.get('related', '')
+                        tags=article_data.get('related', '')[:200]  # Truncate tags
                     )
                     saved_count += 1
                     

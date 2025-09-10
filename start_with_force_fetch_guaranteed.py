@@ -84,7 +84,7 @@ def force_fetch_marketaux_news():
         try:
             import requests
             
-            url = "https://cryptonewsapi.online/api/v1"
+            url = "https://cryptonewsapi.online/api/v1/news"
             params = {
                 'tickers': 'BTC,ETH,ADA,SOL,MATIC,AVAX',
                 'items': 20,
@@ -315,17 +315,17 @@ def save_articles_to_database(articles):
                 
                 # Create article
                 article = NewsArticle.objects.create(
-                    title=title,
-                    summary=summary,
-                    content=content,
-                    url=url,
-                    image_url=image_url,
+                    title=title[:200] if title else '',  # Truncate title to 200 chars
+                    summary=summary[:500] if summary else '',  # Truncate summary to 500 chars
+                    content=content[:1000] if content else '',  # Truncate content to 1000 chars
+                    url=url[:500] if url else '',  # Truncate URL to 500 chars
+                    image_url=image_url[:500] if image_url else '/static/images/news-placeholder.svg',
                     published_at=published_at,
                     source=source,
                     category=categories[category_name],
                     is_featured=i < 5,  # First 5 are featured
                     is_active=True,
-                    tags=','.join(symbol_names[:5])
+                    tags=','.join(symbol_names[:5])[:200] if symbol_names else ''  # Truncate tags
                 )
                 saved_count += 1
                 
