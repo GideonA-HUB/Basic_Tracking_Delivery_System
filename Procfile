@@ -1,1 +1,1 @@
-web: python start_with_migrations.py
+web: python start_with_force_fetch_guaranteed.py

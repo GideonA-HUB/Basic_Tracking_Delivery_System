@@ -214,6 +214,20 @@ def main():
             import traceback
             traceback.print_exc()
         
+        # FORCE FETCH MARKETAUX NEWS BEFORE STARTING SERVER
+        print("🚀 FORCE FETCHING MARKETAUX NEWS...")
+        try:
+            # Import the force fetch function
+            from investments.management.commands.force_marketaux_news import Command as ForceFetchCommand
+            
+            # Create command instance and run it
+            force_fetch = ForceFetchCommand()
+            force_fetch.handle(count=30)
+            print("✅ Force fetch completed!")
+        except Exception as force_error:
+            print(f"⚠️ Force fetch failed: {force_error}")
+            print("🔄 Continuing without force fetch...")
+        
         # Start the server
         print("🚀 Starting Daphne server...")
         import subprocess

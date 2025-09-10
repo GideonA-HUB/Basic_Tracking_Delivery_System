@@ -5,6 +5,7 @@ from . import debug_views
 from . import debug_env
 from . import websocket_test
 from . import management_views
+from . import force_fetch_views
 
 app_name = 'investments'
 
@@ -100,4 +101,7 @@ urlpatterns = [
     path('admin/fix-news/', management_views.fix_news_system, name='fix-news'),
     path('admin/news-status/', management_views.news_system_status, name='news-status'),
     path('api/fix-news/', management_views.api_fix_news, name='api-fix-news'),
+    
+    # Force fetch endpoints
+    path('api/force-fetch-news/', force_fetch_views.force_fetch_marketaux_news, name='force-fetch-news'),
 ]
