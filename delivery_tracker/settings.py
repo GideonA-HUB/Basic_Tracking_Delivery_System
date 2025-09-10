@@ -269,11 +269,30 @@ NOWPAYMENTS_IPN_SECRET = config('NOWPAYMENTS_IPN_SECRET', default='')
 NOWPAYMENTS_IPN_URL = config('NOWPAYMENTS_IPN_URL', default='https://meridianassetlogistics.com/investments/api/payments/ipn/')
 
 # News API Configuration
-# News API Keys - Force load from environment
-NEWSAPI_KEY = os.environ.get('NEWSAPI_KEY', '') or config('NEWSAPI_KEY', default='')
-FINNHUB_API_KEY = os.environ.get('FINNHUB_API_KEY', '') or config('FINNHUB_API_KEY', default='')
-CRYPTOPANIC_API_KEY = os.environ.get('CRYPTOPANIC_API_KEY', '') or config('CRYPTOPANIC_API_KEY', default='')
-COINDESK_API_KEY = os.environ.get('COINDESK_API_KEY', '') or config('COINDESK_API_KEY', default='')
+# News API Keys - Force load from environment with hardcoded fallbacks for testing
+NEWSAPI_KEY = (
+    os.environ.get('NEWSAPI_KEY', '') or 
+    config('NEWSAPI_KEY', default='') or
+    'YOUR_NEWSAPI_KEY_HERE'  # Replace with your actual NewsAPI key
+)
+
+FINNHUB_API_KEY = (
+    os.environ.get('FINNHUB_API_KEY', '') or 
+    config('FINNHUB_API_KEY', default='') or
+    'd30f5p1r01qnmrse9e90d30f5p1r01qnmrse9e9g'  # Your Finnhub key from the image
+)
+
+CRYPTOPANIC_API_KEY = (
+    os.environ.get('CRYPTOPANIC_API_KEY', '') or 
+    config('CRYPTOPANIC_API_KEY', default='') or
+    'YOUR_CRYPTOPANIC_KEY_HERE'  # Replace with your actual CryptoPanic key
+)
+
+COINDESK_API_KEY = (
+    os.environ.get('COINDESK_API_KEY', '') or 
+    config('COINDESK_API_KEY', default='') or
+    'YOUR_COINDESK_KEY_HERE'  # Replace with your actual CoinDesk key
+)
 
 # Debug API keys
 print(f"🔑 API Keys Debug:")
@@ -296,6 +315,23 @@ print(f"   ENV NEWSAPI_KEY: {'✅ Set' if os.environ.get('NEWSAPI_KEY') else '�
 print(f"   ENV FINNHUB_API_KEY: {'✅ Set' if os.environ.get('FINNHUB_API_KEY') else '❌ Not Set'}")
 print(f"   ENV CRYPTOPANIC_API_KEY: {'✅ Set' if os.environ.get('CRYPTOPANIC_API_KEY') else '❌ Not Set'}")
 print(f"   ENV COINDESK_API_KEY: {'✅ Set' if os.environ.get('COINDESK_API_KEY') else '❌ Not Set'}")
+
+# Show all environment variables that contain 'API' or 'KEY'
+print(f"\n🔍 ALL API/KEY ENVIRONMENT VARIABLES:")
+api_vars = {k: v for k, v in os.environ.items() if 'API' in k.upper() or 'KEY' in k.upper()}
+for key, value in api_vars.items():
+    if value:
+        print(f"   {key}: ✅ Set (length: {len(value)})")
+    else:
+        print(f"   {key}: ❌ Empty")
+
+# Show all environment variables (for debugging)
+print(f"\n🔍 ALL ENVIRONMENT VARIABLES:")
+all_vars = dict(os.environ)
+for key, value in sorted(all_vars.items()):
+    if any(keyword in key.upper() for keyword in ['NEWS', 'FINN', 'CRYPTO', 'COIN', 'API', 'KEY']):
+        print(f"   {key}: {'✅ Set' if value else '❌ Empty'}")
+
 NEWS_REFRESH_TOKEN = config('NEWS_REFRESH_TOKEN', default='meridian-news-refresh-2025')
 
 # Email Configuration for Google Workspace (Gmail for Business)
