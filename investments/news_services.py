@@ -33,6 +33,8 @@ class NewsAPIService:
         if self.api_key:
             logger.info(f"NewsAPI Service - Key length: {len(self.api_key)}")
             logger.info(f"NewsAPI Service - Key preview: {self.api_key[:8]}...")
+        else:
+            logger.warning("NewsAPI Service - No API key found in settings")
     
     def fetch_news(self, category='business', count=20):
         """Fetch news from NewsAPI"""
@@ -162,6 +164,8 @@ class FinnhubService:
         if self.api_key:
             logger.info(f"Finnhub Service - Key length: {len(self.api_key)}")
             logger.info(f"Finnhub Service - Key preview: {self.api_key[:8]}...")
+        else:
+            logger.warning("Finnhub Service - No API key found in settings")
     
     def fetch_news(self, category='stocks', count=20):
         """Fetch news from Finnhub"""
@@ -263,6 +267,14 @@ class CryptoPanicService:
             }
         )
         self.is_configured = bool(self.api_key)
+        
+        # Debug logging
+        logger.info(f"CryptoPanic Service - API Key: {'✅ Set' if self.api_key else '❌ Not Set'}")
+        if self.api_key:
+            logger.info(f"CryptoPanic Service - Key length: {len(self.api_key)}")
+            logger.info(f"CryptoPanic Service - Key preview: {self.api_key[:8]}...")
+        else:
+            logger.warning("CryptoPanic Service - No API key found in settings")
     
     def fetch_news(self, category='crypto', count=20):
         """Fetch news from CryptoPanic"""
@@ -366,6 +378,14 @@ class CoinDeskService:
             }
         )
         self.is_configured = bool(self.api_key)
+        
+        # Debug logging
+        logger.info(f"CoinDesk Service - API Key: {'✅ Set' if self.api_key else '❌ Not Set'}")
+        if self.api_key:
+            logger.info(f"CoinDesk Service - Key length: {len(self.api_key)}")
+            logger.info(f"CoinDesk Service - Key preview: {self.api_key[:8]}...")
+        else:
+            logger.warning("CoinDesk Service - No API key found in settings")
     
     def fetch_news(self, category='bitcoin', count=20):
         """Fetch news from CoinDesk"""
