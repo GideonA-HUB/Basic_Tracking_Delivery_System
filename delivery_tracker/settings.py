@@ -269,10 +269,18 @@ NOWPAYMENTS_IPN_SECRET = config('NOWPAYMENTS_IPN_SECRET', default='')
 NOWPAYMENTS_IPN_URL = config('NOWPAYMENTS_IPN_URL', default='https://meridianassetlogistics.com/investments/api/payments/ipn/')
 
 # News API Configuration
-NEWSAPI_KEY = config('NEWSAPI_KEY', default='')
-FINNHUB_API_KEY = config('FINNHUB_API_KEY', default='')
-CRYPTOPANIC_API_KEY = config('CRYPTOPANIC_API_KEY', default='')
-COINDESK_API_KEY = config('COINDESK_API_KEY', default='')
+# News API Keys - Force load from environment
+NEWSAPI_KEY = os.environ.get('NEWSAPI_KEY', '') or config('NEWSAPI_KEY', default='')
+FINNHUB_API_KEY = os.environ.get('FINNHUB_API_KEY', '') or config('FINNHUB_API_KEY', default='')
+CRYPTOPANIC_API_KEY = os.environ.get('CRYPTOPANIC_API_KEY', '') or config('CRYPTOPANIC_API_KEY', default='')
+COINDESK_API_KEY = os.environ.get('COINDESK_API_KEY', '') or config('COINDESK_API_KEY', default='')
+
+# Debug API keys
+print(f"🔑 API Keys Debug:")
+print(f"   NEWSAPI_KEY: {'✅ Set' if NEWSAPI_KEY else '❌ Not Set'}")
+print(f"   FINNHUB_API_KEY: {'✅ Set' if FINNHUB_API_KEY else '❌ Not Set'}")
+print(f"   CRYPTOPANIC_API_KEY: {'✅ Set' if CRYPTOPANIC_API_KEY else '❌ Not Set'}")
+print(f"   COINDESK_API_KEY: {'✅ Set' if COINDESK_API_KEY else '❌ Not Set'}")
 NEWS_REFRESH_TOKEN = config('NEWS_REFRESH_TOKEN', default='meridian-news-refresh-2025')
 
 # Email Configuration for Google Workspace (Gmail for Business)
