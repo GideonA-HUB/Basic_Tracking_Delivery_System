@@ -273,7 +273,17 @@ NOWPAYMENTS_IPN_URL = config('NOWPAYMENTS_IPN_URL', default='https://meridianass
 
 # MarketAux API (FREE - works in production)
 # Try environment variable first, then config file
-MARKETAUX_API_KEY = os.environ.get('MARKETAUX_API_KEY') or config('MARKETAUX_API_KEY', default='')
+# Handle both direct environment access and decouple config
+MARKETAUX_API_KEY = ''
+try:
+    # First try direct environment variable access
+    MARKETAUX_API_KEY = os.environ.get('MARKETAUX_API_KEY', '').strip()
+    if not MARKETAUX_API_KEY:
+        # Fallback to decouple config
+        MARKETAUX_API_KEY = config('MARKETAUX_API_KEY', default='').strip()
+except Exception as e:
+    print(f"Warning: Error loading MarketAux API key: {e}")
+    MARKETAUX_API_KEY = ''
 
 # Remove all other APIs
 NEWSAPI_KEY = None
@@ -290,15 +300,27 @@ print(f"   MARKETAUX_API_KEY: {'✅ Set' if MARKETAUX_API_KEY else '❌ Not Set'
 if MARKETAUX_API_KEY:
     print(f"   MARKETAUX_API_KEY length: {len(MARKETAUX_API_KEY)}")
     print(f"   MARKETAUX_API_KEY preview: {MARKETAUX_API_KEY[:8]}...")
+    print(f"   MARKETAUX_API_KEY type: {type(MARKETAUX_API_KEY)}")
+    print(f"   MARKETAUX_API_KEY repr: {repr(MARKETAUX_API_KEY)}")
 else:
     print(f"   MARKETAUX_API_KEY: Empty or not found")
 
 # Check environment variables directly
-print(f"   ENV MARKETAUX_API_KEY: {'✅ Set' if os.environ.get('MARKETAUX_API_KEY') else '❌ Not Set'}")
-if os.environ.get('MARKETAUX_API_KEY'):
-    env_key = os.environ.get('MARKETAUX_API_KEY')
+env_key = os.environ.get('MARKETAUX_API_KEY')
+print(f"   ENV MARKETAUX_API_KEY: {'✅ Set' if env_key else '❌ Not Set'}")
+if env_key:
     print(f"   ENV key length: {len(env_key)}")
     print(f"   ENV key preview: {env_key[:8]}...")
+    print(f"   ENV key type: {type(env_key)}")
+    print(f"   ENV key repr: {repr(env_key)}")
+
+# Check if keys match
+if env_key and MARKETAUX_API_KEY:
+    print(f"   Keys match: {'✅ Yes' if env_key == MARKETAUX_API_KEY else '❌ No'}")
+elif not env_key and not MARKETAUX_API_KEY:
+    print(f"   Both empty: ✅ Yes")
+else:
+    print(f"   Mismatch: ❌ No")
 
 # Show all environment variables that contain 'API' or 'KEY'
 print(f"\n🔍 ALL API/KEY ENVIRONMENT VARIABLES:")
