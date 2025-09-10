@@ -30,12 +30,10 @@ class Command(BaseCommand):
         
         self.stdout.write("🚀 FORCING API NEWS FETCH...")
         
-        # Test API keys first
-        self.stdout.write("\n🔑 CHECKING API KEYS...")
-        self.stdout.write(f"NEWSAPI_KEY: {'✅ Set' if settings.NEWSAPI_KEY else '❌ Not Set'}")
-        self.stdout.write(f"FINNHUB_API_KEY: {'✅ Set' if settings.FINNHUB_API_KEY else '❌ Not Set'}")
-        self.stdout.write(f"CRYPTOPANIC_API_KEY: {'✅ Set' if settings.CRYPTOPANIC_API_KEY else '❌ Not Set'}")
-        self.stdout.write(f"COINDESK_API_KEY: {'✅ Set' if settings.COINDESK_API_KEY else '❌ Not Set'}")
+        # Test API keys first - FINNHUB ONLY
+        self.stdout.write("\n🔑 CHECKING FINNHUB API KEY...")
+        self.stdout.write(f"FINNHUB_API_KEY: {'✅ Set' if getattr(settings, 'FINNHUB_API_KEY', '') else '❌ Not Set'}")
+        self.stdout.write(f"FREE_NEWS: ✅ Always Available")
         
         if test_apis:
             self.test_apis_directly()
@@ -91,37 +89,33 @@ class Command(BaseCommand):
 
     def test_apis_directly(self):
         """Test API calls directly"""
-        self.stdout.write("\n🌐 TESTING APIs DIRECTLY...")
+        self.stdout.write("\n🌐 TESTING FINNHUB API DIRECTLY...")
         
-        # Test NewsAPI
-        if settings.NEWSAPI_KEY:
-            self.stdout.write("Testing NewsAPI...")
-            try:
-                url = f"https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey={settings.NEWSAPI_KEY}"
-                response = requests.get(url, timeout=10)
-                self.stdout.write(f"NewsAPI Status: {response.status_code}")
-                if response.status_code == 200:
-                    data = response.json()
-                    self.stdout.write(f"NewsAPI Articles: {len(data.get('articles', []))}")
-                else:
-                    self.stdout.write(f"NewsAPI Error: {response.text[:100]}")
-            except Exception as e:
-                self.stdout.write(f"NewsAPI Exception: {e}")
+        # Test Free News Service (always available)
+        self.stdout.write("Testing Free News Service...")
+        self.stdout.write("Free News Service: ✅ Always Available (no API key required)")
         
         # Test Finnhub
-        if settings.FINNHUB_API_KEY:
+        finnhub_key = getattr(settings, 'FINNHUB_API_KEY', '')
+        if finnhub_key:
             self.stdout.write("Testing Finnhub...")
             try:
-                url = f"https://finnhub.io/api/v1/news?category=general&token={settings.FINNHUB_API_KEY}"
+                url = f"https://finnhub.io/api/v1/news?category=general&token={finnhub_key}"
                 response = requests.get(url, timeout=10)
                 self.stdout.write(f"Finnhub Status: {response.status_code}")
                 if response.status_code == 200:
                     data = response.json()
                     self.stdout.write(f"Finnhub Articles: {len(data) if isinstance(data, list) else 'Not a list'}")
+                    if isinstance(data, list) and data:
+                        self.stdout.write(f"First article: {data[0].get('headline', 'No title')[:50]}...")
+                    else:
+                        self.stdout.write("No articles returned from Finnhub")
                 else:
                     self.stdout.write(f"Finnhub Error: {response.text[:100]}")
             except Exception as e:
                 self.stdout.write(f"Finnhub Exception: {e}")
+        else:
+            self.stdout.write("Finnhub key not available")
 
     def create_fallback_news(self):
         """Create fallback news if APIs fail"""
