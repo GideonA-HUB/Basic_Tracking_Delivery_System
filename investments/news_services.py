@@ -1,5 +1,5 @@
 """
-News API services for fetching real news from various sources - FINNHUB ONLY
+News API services for fetching real news from MarketAux API
 """
 import requests
 import logging
@@ -65,103 +65,114 @@ class FreeNewsService:
         return sample_news[:count]
 
 
-class FinnhubService:
-    """Service for fetching news from Finnhub"""
+class MarketAuxService:
+    """Service for fetching news from MarketAux API"""
     
     def __init__(self):
-        self.api_key = getattr(settings, 'FINNHUB_API_KEY', '')
-        self.base_url = 'https://finnhub.io/api/v1'
+        self.api_key = getattr(settings, 'MARKETAUX_API_KEY', '')
+        self.base_url = 'https://api.marketaux.com/v1'
         self.source, _ = NewsSource.objects.get_or_create(
-            name='Finnhub',
+            name='MarketAux',
             defaults={
                 'base_url': self.base_url,
                 'api_key': self.api_key,
-                'rate_limit_per_hour': 60  # Finnhub free tier limit
+                'rate_limit_per_hour': 1000  # MarketAux free tier
             }
         )
         self.is_configured = bool(self.api_key)
         
         # Debug logging
-        logger.info(f"Finnhub Service - API Key: {'✅ Set' if self.api_key else '❌ Not Set'}")
+        logger.info(f"MarketAux Service - API Key: {'✅ Set' if self.api_key else '❌ Not Set'}")
         if self.api_key:
-            logger.info(f"Finnhub Service - Key length: {len(self.api_key)}")
-            logger.info(f"Finnhub Service - Key preview: {self.api_key[:8]}...")
+            logger.info(f"MarketAux Service - Key length: {len(self.api_key)}")
+            logger.info(f"MarketAux Service - Key preview: {self.api_key[:8]}...")
         else:
-            logger.warning("Finnhub Service - No API key found in settings")
+            logger.warning("MarketAux Service - No API key found in settings")
     
-    def fetch_news(self, category='stocks', count=20):
-        """Fetch news from Finnhub"""
+    def fetch_news(self, category='crypto', count=20):
+        """Fetch news from MarketAux API"""
         if not self.is_configured:
-            logger.info("Finnhub API key not configured, skipping")
+            logger.warning("MarketAux API key not configured, skipping")
             return []
         
-        logger.info(f"Finnhub Service - Attempting to fetch {count} articles for category: {category}")
+        logger.info(f"MarketAux Service - Attempting to fetch {count} articles for category: {category}")
         
         try:
-            # Map our categories to Finnhub categories
-            category_mapping = {
-                'crypto': 'crypto',
-                'stocks': 'general',
-                'real_estate': 'general',
-                'bitcoin': 'crypto',
-                'ethereum': 'crypto',
-                'altcoins': 'crypto',
-                'general': 'general'
+            # Map our categories to MarketAux symbols
+            symbol_mapping = {
+                'crypto': 'BTC,ETH,ADA,SOL,MATIC,AVAX,DOT,LINK,UNI,AAVE',
+                'bitcoin': 'BTC',
+                'ethereum': 'ETH',
+                'altcoins': 'ADA,SOL,MATIC,AVAX,DOT,LINK,UNI,AAVE',
+                'stocks': 'AAPL,MSFT,GOOGL,AMZN,TSLA,META,NVDA,AMD,INTC,ORCL',
+                'real_estate': 'REIT,SPG,PLD,AMT,CCI,EQR,AVB,MAA,ESS,PSA',
+                'general': 'BTC,ETH,AAPL,MSFT,GOOGL,AMZN,TSLA'
             }
             
-            api_category = category_mapping.get(category, 'general')
+            symbols = symbol_mapping.get(category, 'BTC,ETH,AAPL,MSFT,GOOGL')
             
-            url = f"{self.base_url}/news"
+            url = f"{self.base_url}/news/all"
             params = {
-                'category': api_category,
-                'token': self.api_key
+                'api_token': self.api_key,
+                'symbols': symbols,
+                'limit': min(count, 100),  # MarketAux max is 100
+                'language': 'en',
+                'filter_entities': 'true'
             }
             
-            response = requests.get(url, params=params, timeout=10)
+            response = requests.get(url, params=params, timeout=15)
             response.raise_for_status()
             
             data = response.json()
             articles = []
             
-            for item in data[:count]:
+            for item in data.get('data', [])[:count]:
+                # Extract entities for better categorization
+                entities = item.get('entities', [])
+                entity_symbols = [entity.get('symbol', '') for entity in entities if entity.get('symbol')]
+                
                 article = {
-                    'title': item.get('headline', ''),
-                    'summary': item.get('summary', ''),
-                    'content': item.get('summary', ''),
+                    'title': item.get('title', ''),
+                    'summary': item.get('description', ''),
+                    'content': item.get('description', ''),
                     'url': item.get('url', ''),
-                    'image_url': item.get('image', ''),
-                    'published_at': self._parse_date(item.get('datetime', '')),
-                    'source': 'Finnhub',
-                    'category': category
+                    'image_url': item.get('image_url', '/static/images/news-placeholder.svg'),
+                    'published_at': self._parse_date(item.get('published_at', '')),
+                    'source': 'MarketAux',
+                    'category': category,
+                    'symbols': ','.join(entity_symbols[:5])  # First 5 symbols
                 }
                 articles.append(article)
             
-            logger.info(f"Finnhub Service - Fetched {len(articles)} articles")
+            logger.info(f"MarketAux Service - Fetched {len(articles)} articles for {category}")
             return articles
             
+        except requests.exceptions.RequestException as e:
+            logger.error(f"MarketAux Service - Request error: {e}")
+            return []
         except Exception as e:
-            logger.error(f"Finnhub Service - Error fetching news: {e}")
+            logger.error(f"MarketAux Service - Error fetching news: {e}")
             return []
     
-    def _parse_date(self, timestamp):
-        """Parse timestamp from Finnhub"""
-        if not timestamp:
+    def _parse_date(self, date_str):
+        """Parse date string from MarketAux"""
+        if not date_str:
             return timezone.now()
         
         try:
-            # Finnhub uses Unix timestamp
-            return datetime.fromtimestamp(timestamp, tz=timezone.utc)
+            # MarketAux format: 2023-12-01T10:30:00+00:00
+            return datetime.fromisoformat(date_str.replace('Z', '+00:00'))
         except:
             return timezone.now()
 
 
 class NewsAggregator:
-    """Main news aggregator that combines all services - FINNHUB ONLY"""
+    """Main news aggregator that combines all services - MARKETAUX ONLY"""
     
     def __init__(self):
         self.services = {
             'free_news': FreeNewsService(),
-            'finnhub': FinnhubService()
+            'marketaux': MarketAuxService()
         }
         
         # Check which services are configured
@@ -219,7 +230,7 @@ class NewsAggregator:
                 source, _ = NewsSource.objects.get_or_create(
                     name=source_name,
                     defaults={
-                        'base_url': 'https://example.com',
+                        'base_url': 'https://api.marketaux.com',
                         'is_active': True
                     }
                 )
@@ -231,12 +242,13 @@ class NewsAggregator:
                         'summary': article_data.get('summary', ''),
                         'content': article_data.get('content', ''),
                         'url': article_data.get('url', ''),
-                        'image_url': article_data.get('image_url', ''),
+                        'image_url': article_data.get('image_url', '/static/images/news-placeholder.svg'),
                         'published_at': self._parse_datetime(article_data.get('published_at', '')),
                         'source': source,
                         'category': category,
                         'is_featured': False,
-                        'is_active': True
+                        'is_active': True,
+                        'tags': article_data.get('symbols', '')  # Store symbols as tags
                     }
                 )
                 

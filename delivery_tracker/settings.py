@@ -268,34 +268,34 @@ NOWPAYMENTS_API_KEY = config('NOWPAYMENTS_API_KEY', default='')
 NOWPAYMENTS_IPN_SECRET = config('NOWPAYMENTS_IPN_SECRET', default='')
 NOWPAYMENTS_IPN_URL = config('NOWPAYMENTS_IPN_URL', default='https://meridianassetlogistics.com/investments/api/payments/ipn/')
 
-# News API Configuration - FINNHUB ONLY
-# Removed NewsAPI, CoinDesk, CryptoPanic - using only Finnhub
+# News API Configuration - MARKETAUX ONLY
+# Removed NewsAPI, CoinDesk, CryptoPanic, Finnhub - using only MarketAux
 
-# Finnhub API (FREE - works in production)
-FINNHUB_API_KEY = (
-    os.environ.get('FINNHUB_API_KEY', '') or 
-    config('FINNHUB_API_KEY', default='') or
-    'd30f5p1r01qnmrse9e90d30f5p1r01qnmrse9e9g'  # Your Finnhub key from the image
+# MarketAux API (FREE - works in production)
+MARKETAUX_API_KEY = (
+    os.environ.get('MARKETAUX_API_KEY', '') or 
+    config('MARKETAUX_API_KEY', default='')
 )
 
 # Remove all other APIs
 NEWSAPI_KEY = None
+FINNHUB_API_KEY = None
 CRYPTOPANIC_API_KEY = None
 COINDESK_API_KEY = None
 ALPHA_VANTAGE_API_KEY = None
 
-# Debug API keys - FINNHUB ONLY
-print(f"🔑 FINNHUB API Debug:")
-print(f"   FINNHUB_API_KEY: {'✅ Set' if FINNHUB_API_KEY else '❌ Not Set'}")
+# Debug API keys - MARKETAUX ONLY
+print(f"🔑 MARKETAUX API Debug:")
+print(f"   MARKETAUX_API_KEY: {'✅ Set' if MARKETAUX_API_KEY else '❌ Not Set'}")
 
-# Additional debugging for Finnhub API key
-if FINNHUB_API_KEY:
-    print(f"   FINNHUB_API_KEY length: {len(FINNHUB_API_KEY)}")
-    print(f"   FINNHUB_API_KEY preview: {FINNHUB_API_KEY[:8]}...")
+# Additional debugging for MarketAux API key
+if MARKETAUX_API_KEY:
+    print(f"   MARKETAUX_API_KEY length: {len(MARKETAUX_API_KEY)}")
+    print(f"   MARKETAUX_API_KEY preview: {MARKETAUX_API_KEY[:8]}...")
 
 # Check environment variables directly
 import os
-print(f"   ENV FINNHUB_API_KEY: {'✅ Set' if os.environ.get('FINNHUB_API_KEY') else '❌ Not Set'}")
+print(f"   ENV MARKETAUX_API_KEY: {'✅ Set' if os.environ.get('MARKETAUX_API_KEY') else '❌ Not Set'}")
 
 # Show all environment variables that contain 'API' or 'KEY'
 print(f"\n🔍 ALL API/KEY ENVIRONMENT VARIABLES:")

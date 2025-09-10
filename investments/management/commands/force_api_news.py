@@ -30,9 +30,9 @@ class Command(BaseCommand):
         
         self.stdout.write("🚀 FORCING API NEWS FETCH...")
         
-        # Test API keys first - FINNHUB ONLY
-        self.stdout.write("\n🔑 CHECKING FINNHUB API KEY...")
-        self.stdout.write(f"FINNHUB_API_KEY: {'✅ Set' if getattr(settings, 'FINNHUB_API_KEY', '') else '❌ Not Set'}")
+        # Test API keys first - MARKETAUX ONLY
+        self.stdout.write("\n🔑 CHECKING MARKETAUX API KEY...")
+        self.stdout.write(f"MARKETAUX_API_KEY: {'✅ Set' if getattr(settings, 'MARKETAUX_API_KEY', '') else '❌ Not Set'}")
         self.stdout.write(f"FREE_NEWS: ✅ Always Available")
         
         if test_apis:
@@ -89,33 +89,42 @@ class Command(BaseCommand):
 
     def test_apis_directly(self):
         """Test API calls directly"""
-        self.stdout.write("\n🌐 TESTING FINNHUB API DIRECTLY...")
+        self.stdout.write("\n🌐 TESTING MARKETAUX API DIRECTLY...")
         
         # Test Free News Service (always available)
         self.stdout.write("Testing Free News Service...")
         self.stdout.write("Free News Service: ✅ Always Available (no API key required)")
         
-        # Test Finnhub
-        finnhub_key = getattr(settings, 'FINNHUB_API_KEY', '')
-        if finnhub_key:
-            self.stdout.write("Testing Finnhub...")
+        # Test MarketAux
+        marketaux_key = getattr(settings, 'MARKETAUX_API_KEY', '')
+        if marketaux_key:
+            self.stdout.write("Testing MarketAux...")
             try:
-                url = f"https://finnhub.io/api/v1/news?category=general&token={finnhub_key}"
-                response = requests.get(url, timeout=10)
-                self.stdout.write(f"Finnhub Status: {response.status_code}")
+                url = f"https://api.marketaux.com/v1/news/all"
+                params = {
+                    'api_token': marketaux_key,
+                    'symbols': 'BTC,ETH,AAPL,MSFT',
+                    'limit': 5,
+                    'language': 'en'
+                }
+                response = requests.get(url, params=params, timeout=15)
+                self.stdout.write(f"MarketAux Status: {response.status_code}")
                 if response.status_code == 200:
                     data = response.json()
-                    self.stdout.write(f"Finnhub Articles: {len(data) if isinstance(data, list) else 'Not a list'}")
-                    if isinstance(data, list) and data:
-                        self.stdout.write(f"First article: {data[0].get('headline', 'No title')[:50]}...")
+                    articles = data.get('data', [])
+                    self.stdout.write(f"MarketAux Articles: {len(articles)}")
+                    if articles:
+                        first_article = articles[0]
+                        self.stdout.write(f"First article: {first_article.get('title', 'No title')[:50]}...")
+                        self.stdout.write(f"Article source: {first_article.get('source', 'Unknown')}")
                     else:
-                        self.stdout.write("No articles returned from Finnhub")
+                        self.stdout.write("No articles returned from MarketAux")
                 else:
-                    self.stdout.write(f"Finnhub Error: {response.text[:100]}")
+                    self.stdout.write(f"MarketAux Error: {response.text[:100]}")
             except Exception as e:
-                self.stdout.write(f"Finnhub Exception: {e}")
+                self.stdout.write(f"MarketAux Exception: {e}")
         else:
-            self.stdout.write("Finnhub key not available")
+            self.stdout.write("MarketAux key not available")
 
     def create_fallback_news(self):
         """Create fallback news if APIs fail"""
