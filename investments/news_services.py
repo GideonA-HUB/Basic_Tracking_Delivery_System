@@ -117,10 +117,12 @@ class CryptoNewsAPIService:
                 params = {
                     'tickers': tickers,
                     'items': min(count, 50),  # CryptoNewsAPI max is 50
-                    'token': self.api_key
+                }
+                headers = {
+                    'X-API-Key': self.api_key
                 }
                 
-                response = requests.get(url, params=params, timeout=15)
+                response = requests.get(url, params=params, headers=headers, timeout=15)
                 response.raise_for_status()
                 
                 data = response.json()

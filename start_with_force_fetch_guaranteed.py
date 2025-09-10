@@ -87,14 +87,17 @@ def force_fetch_marketaux_news():
             url = "https://cryptonewsapi.online/api/v1/news"
             params = {
                 'tickers': 'BTC,ETH,ADA,SOL,MATIC,AVAX',
-                'items': 20,
-                'token': cryptonews_key
+                'items': 20
+            }
+            headers = {
+                'X-API-Key': cryptonews_key
             }
             
             print(f"Making API request to CryptoNewsAPI...")
             print(f"URL: {url}")
             print(f"Params: {params}")
-            response = requests.get(url, params=params, timeout=30)
+            print(f"Headers: X-API-Key: {cryptonews_key[:8]}...")
+            response = requests.get(url, params=params, headers=headers, timeout=30)
             
             print(f"CryptoNews Response Status: {response.status_code}")
             print(f"CryptoNews Response Headers: {dict(response.headers)}")
@@ -313,19 +316,27 @@ def save_articles_to_database(articles):
                     }
                 )
                 
+                # Truncate fields before database operation
+                title = title[:200] if title else ''
+                summary = summary[:500] if summary else ''
+                content = content[:1000] if content else ''
+                url = url[:500] if url else ''
+                image_url = image_url[:500] if image_url else '/static/images/news-placeholder.svg'
+                tags = ','.join(symbol_names[:5])[:200] if symbol_names else ''
+                
                 # Create article
                 article = NewsArticle.objects.create(
-                    title=title[:200] if title else '',  # Truncate title to 200 chars
-                    summary=summary[:500] if summary else '',  # Truncate summary to 500 chars
-                    content=content[:1000] if content else '',  # Truncate content to 1000 chars
-                    url=url[:500] if url else '',  # Truncate URL to 500 chars
-                    image_url=image_url[:500] if image_url else '/static/images/news-placeholder.svg',
+                    title=title,
+                    summary=summary,
+                    content=content,
+                    url=url,
+                    image_url=image_url,
                     published_at=published_at,
                     source=source,
                     category=categories[category_name],
                     is_featured=i < 5,  # First 5 are featured
                     is_active=True,
-                    tags=','.join(symbol_names[:5])[:200] if symbol_names else ''  # Truncate tags
+                    tags=tags
                 )
                 saved_count += 1
                 
