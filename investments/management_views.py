@@ -30,8 +30,12 @@ def fix_news_system(request):
             except Exception as e:
                 logger.warning(f"API fetch failed: {e}, creating sample data...")
                 # Create sample data as fallback
-                call_command('create_sample_news', '--count=20', verbosity=0)
-                messages.success(request, f'✅ Created sample news as fallback!')
+                try:
+                    call_command('force_create_news', '--count=20', verbosity=0)
+                    messages.success(request, f'✅ Created sample news as fallback!')
+                except Exception as e2:
+                    logger.error(f"Force create failed: {e2}")
+                    messages.error(request, f'❌ Failed to create news: {str(e2)}')
         else:
             messages.info(request, f'✅ News system already has {article_count} articles')
         

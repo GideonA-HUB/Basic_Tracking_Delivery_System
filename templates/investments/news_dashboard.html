@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block investment_content %}
-<div class="container-fluid">
+<div class="container-fluid news-dashboard">
     <div class="row">
         <div class="col-12">
             <div class="page-header">
@@ -97,8 +97,11 @@
                         </div>
                         {% endfor %}
                     {% else %}
-                        <div class="text-center py-4">
-                            <p class="text-muted no-news-message">No featured news available at the moment.</p>
+                        <div class="text-center py-4 featured-news-section">
+                            <div class="no-news-message">
+                                <i class="fas fa-newspaper text-4xl mb-3" style="color: #718096;"></i>
+                                <p class="mb-0">No featured news available at the moment.</p>
+                            </div>
                         </div>
                     {% endif %}
                 </div>
@@ -193,8 +196,11 @@
                                 </div>
                                 {% endfor %}
                             {% else %}
-                                <div class="text-center py-3">
-                                    <p class="text-muted no-news-message small">No crypto news available</p>
+                                <div class="text-center py-3 crypto-news-section">
+                                    <div class="no-news-message">
+                                        <i class="fab fa-bitcoin text-2xl mb-2" style="color: #718096;"></i>
+                                        <p class="mb-0 small">No crypto news available</p>
+                                    </div>
                                 </div>
                             {% endif %}
                         </div>
@@ -226,8 +232,11 @@
                                 </div>
                                 {% endfor %}
                             {% else %}
-                                <div class="text-center py-3">
-                                    <p class="text-muted no-news-message small">No stock news available</p>
+                                <div class="text-center py-3 stocks-news-section">
+                                    <div class="no-news-message">
+                                        <i class="fas fa-chart-line text-2xl mb-2" style="color: #718096;"></i>
+                                        <p class="mb-0 small">No stock news available</p>
+                                    </div>
                                 </div>
                             {% endif %}
                         </div>
@@ -259,8 +268,11 @@
                                 </div>
                                 {% endfor %}
                             {% else %}
-                                <div class="text-center py-3">
-                                    <p class="text-muted no-news-message small">No real estate news available</p>
+                                <div class="text-center py-3 real-estate-news-section">
+                                    <div class="no-news-message">
+                                        <i class="fas fa-home text-2xl mb-2" style="color: #718096;"></i>
+                                        <p class="mb-0 small">No real estate news available</p>
+                                    </div>
                                 </div>
                             {% endif %}
                         </div>

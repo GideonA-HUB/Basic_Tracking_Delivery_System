@@ -47,8 +47,11 @@
                 </div>
                 {% endfor %}
             {% else %}
-                <div class="text-center py-3">
-                    <p class="text-muted small no-news-message">No news available</p>
+                <div class="text-center py-3 news-section">
+                    <div class="no-news-message">
+                        <i class="fas fa-newspaper text-xl mb-2" style="color: #718096;"></i>
+                        <p class="mb-0 small">No news available</p>
+                    </div>
                 </div>
             {% endif %}
         </div>
