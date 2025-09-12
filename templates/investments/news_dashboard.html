@@ -6,23 +6,58 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'investments/css/news.css' %}">
 <style>
-/* FORCE TEXT VISIBILITY - NUCLEAR OPTION */
-.dark-theme .text-muted,
-.dark-theme .text-muted.small,
-.dark-theme .no-news-message,
-.dark-theme p,
-.dark-theme div,
-.dark-theme span {
-    color: #ffffff !important;
-    background: #2d3748 !important;
-    padding: 20px !important;
-    border-radius: 10px !important;
-    border: 3px solid #4a5568 !important;
-    font-weight: 800 !important;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 1) !important;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7) !important;
-    font-size: 16px !important;
-    line-height: 1.5 !important;
+/* Clean dark theme for news dashboard */
+.dark-theme .news-dashboard {
+    background: #1a202c;
+    color: #e2e8f0;
+}
+
+.dark-theme .news-dashboard .page-title {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.dark-theme .news-dashboard .page-subtitle {
+    color: #a0aec0;
+}
+
+.dark-theme .news-dashboard .text-muted {
+    color: #a0aec0;
+}
+
+.dark-theme .news-dashboard .no-news-message {
+    color: #ffffff;
+    background: #4a5568;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 500;
+    border: 1px solid #718096;
+}
+
+/* Ensure all text in news sections is visible */
+.dark-theme .news-dashboard p,
+.dark-theme .news-dashboard div,
+.dark-theme .news-dashboard span {
+    color: #e2e8f0;
+}
+
+/* News cards in dark mode */
+.dark-theme .news-dashboard .card {
+    background: #2d3748;
+    border-color: #4a5568;
+    color: #e2e8f0;
+}
+
+.dark-theme .news-dashboard .card-header {
+    background: #4a5568;
+    border-bottom-color: #718096;
+    color: #ffffff;
+}
+
+.dark-theme .news-dashboard .card-body {
+    background: #2d3748;
+    color: #e2e8f0;
 }
 </style>
 {% endblock %}
