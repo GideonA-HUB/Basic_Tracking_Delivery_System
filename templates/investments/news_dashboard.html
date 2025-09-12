@@ -6,65 +6,93 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'investments/css/news.css' %}">
 <style>
-/* Clean dark theme for news dashboard - using .dark class to match base template */
-.dark .news-dashboard {
+/* NUCLEAR OPTION - Force all text to be white regardless of dark theme class */
+.news-dashboard,
+.news-dashboard *,
+.news-dashboard p,
+.news-dashboard div,
+.news-dashboard span,
+.news-dashboard h1,
+.news-dashboard h2,
+.news-dashboard h3,
+.news-dashboard h4,
+.news-dashboard h5,
+.news-dashboard h6,
+.news-dashboard a,
+.news-dashboard .text-muted,
+.news-dashboard .no-news-message {
+    color: #ffffff !important;
+    background: transparent !important;
+}
+
+/* Force news dashboard background to be dark */
+.news-dashboard {
     background: #1a202c !important;
-    color: #e2e8f0 !important;
-}
-
-.dark .news-dashboard .page-title {
     color: #ffffff !important;
-    font-weight: 700 !important;
 }
 
-.dark .news-dashboard .page-subtitle {
-    color: #a0aec0 !important;
-}
-
-.dark .news-dashboard .text-muted {
-    color: #a0aec0 !important;
-}
-
-.dark .news-dashboard .no-news-message {
+/* Force all news items to have white text */
+.news-item,
+.news-item *,
+.news-item-title,
+.news-item-summary,
+.news-item-meta,
+.news-item-source,
+.news-item-time {
     color: #ffffff !important;
-    background: #4a5568 !important;
-    padding: 20px !important;
-    border-radius: 8px !important;
-    text-align: center !important;
-    font-weight: 500 !important;
-    border: 1px solid #718096 !important;
 }
 
-/* Force all text in news sections to be white */
+/* Force all news widgets to have white text */
+.news-widget,
+.news-widget *,
+.news-widget-title,
+.news-widget-summary,
+.news-widget-meta {
+    color: #ffffff !important;
+}
+
+/* Force all cards to have white text */
+.card,
+.card *,
+.card-body,
+.card-header,
+.card-title,
+.card-text {
+    color: #ffffff !important;
+    background: #2d3748 !important;
+}
+
+/* Force all text elements to be white */
+body .news-dashboard * {
+    color: #ffffff !important;
+}
+
+/* Override any Tailwind classes that might be causing issues */
+.text-gray-900,
+.text-gray-800,
+.text-gray-700,
+.text-gray-600,
+.text-gray-500,
+.text-gray-400,
+.text-gray-300,
+.text-gray-200,
+.text-gray-100 {
+    color: #ffffff !important;
+}
+
+/* Force visibility for all text in dark backgrounds */
+[style*="background-color: #1a202c"],
+[style*="background-color: #2d3748"],
+[style*="background-color: #4a5568"] {
+    color: #ffffff !important;
+}
+
+/* Force all text to be white in dark mode */
+.dark .news-dashboard,
+.dark .news-dashboard *,
 .dark .news-dashboard p,
 .dark .news-dashboard div,
-.dark .news-dashboard span {
-    color: #ffffff !important;
-}
-
-/* News cards in dark mode */
-.dark .news-dashboard .card {
-    background: #2d3748 !important;
-    border-color: #4a5568 !important;
-    color: #e2e8f0 !important;
-}
-
-.dark .news-dashboard .card-header {
-    background: #4a5568 !important;
-    border-bottom-color: #718096 !important;
-    color: #ffffff !important;
-}
-
-.dark .news-dashboard .card-body {
-    background: #2d3748 !important;
-    color: #e2e8f0 !important;
-}
-
-/* Force all text elements to be white in dark mode */
-.dark .news-dashboard * {
-    color: #ffffff !important;
-}
-
+.dark .news-dashboard span,
 .dark .news-dashboard h1,
 .dark .news-dashboard h2,
 .dark .news-dashboard h3,
@@ -77,6 +105,41 @@
 {% endblock %}
 
 {% block investment_content %}
+<script>
+// Force dark theme and text visibility
+document.addEventListener('DOMContentLoaded', function() {
+    // Force dark theme class on body
+    document.body.classList.add('dark');
+    document.documentElement.classList.add('dark');
+    
+    // Force all text in news dashboard to be white
+    const newsDashboard = document.querySelector('.news-dashboard');
+    if (newsDashboard) {
+        const allElements = newsDashboard.querySelectorAll('*');
+        allElements.forEach(element => {
+            element.style.color = '#ffffff';
+            element.style.setProperty('color', '#ffffff', 'important');
+        });
+    }
+    
+    // Force all text in news items to be white
+    const newsItems = document.querySelectorAll('.news-item, .news-widget-item');
+    newsItems.forEach(item => {
+        const allElements = item.querySelectorAll('*');
+        allElements.forEach(element => {
+            element.style.color = '#ffffff';
+            element.style.setProperty('color', '#ffffff', 'important');
+        });
+    });
+    
+    // Override any Tailwind text color classes
+    const tailwindTextElements = document.querySelectorAll('.text-gray-900, .text-gray-800, .text-gray-700, .text-gray-600, .text-gray-500, .text-gray-400, .text-gray-300, .text-gray-200, .text-gray-100');
+    tailwindTextElements.forEach(element => {
+        element.style.color = '#ffffff';
+        element.style.setProperty('color', '#ffffff', 'important');
+    });
+});
+</script>
 <div class="container-fluid news-dashboard">
     <div class="row">
         <div class="col-12">

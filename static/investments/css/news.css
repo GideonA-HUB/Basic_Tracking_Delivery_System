@@ -1,5 +1,53 @@
 /* News Widget Styles for Dark Mode Support */
 
+/* NUCLEAR OPTION - Force all text to be white regardless of dark theme class */
+.news-dashboard,
+.news-dashboard *,
+.news-dashboard p,
+.news-dashboard div,
+.news-dashboard span,
+.news-dashboard h1,
+.news-dashboard h2,
+.news-dashboard h3,
+.news-dashboard h4,
+.news-dashboard h5,
+.news-dashboard h6 {
+    color: #ffffff !important;
+}
+
+/* Force all news items to have white text */
+.news-item,
+.news-item *,
+.news-item-title,
+.news-item-summary,
+.news-item-meta,
+.news-item-source,
+.news-item-time {
+    color: #ffffff !important;
+}
+
+/* Force all news widgets to have white text */
+.news-widget,
+.news-widget *,
+.news-widget-title,
+.news-widget-summary,
+.news-widget-meta {
+    color: #ffffff !important;
+}
+
+/* Override any Tailwind classes that might be causing issues */
+.text-gray-900,
+.text-gray-800,
+.text-gray-700,
+.text-gray-600,
+.text-gray-500,
+.text-gray-400,
+.text-gray-300,
+.text-gray-200,
+.text-gray-100 {
+    color: #ffffff !important;
+}
+
 /* Clean dark theme overrides - using .dark class to match base template */
 .dark .dashboard-news-widget,
 .dark .marketplace-news-widget {
