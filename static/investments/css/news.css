@@ -1,121 +1,149 @@
 /* News Widget Styles for Dark Mode Support */
 
-/* Clean dark theme overrides */
-.dark-theme .dashboard-news-widget,
-.dark-theme .marketplace-news-widget {
-    background: #2d3748;
-    color: #e2e8f0;
-    border: 1px solid #4a5568;
+/* Clean dark theme overrides - using .dark class to match base template */
+.dark .dashboard-news-widget,
+.dark .marketplace-news-widget {
+    background: #2d3748 !important;
+    color: #e2e8f0 !important;
+    border: 1px solid #4a5568 !important;
 }
 
 /* News widget items in dark mode */
-.dark-theme .news-widget-item,
-.dark-theme .news-item {
-    color: #e2e8f0;
-    border-bottom: 1px solid #4a5568;
+.dark .news-widget-item,
+.dark .news-item {
+    color: #e2e8f0 !important;
+    border-bottom: 1px solid #4a5568 !important;
 }
 
-.dark-theme .news-widget-item:hover,
-.dark-theme .news-item:hover {
-    background: #4a5568;
+.dark .news-widget-item:hover,
+.dark .news-item:hover {
+    background: #4a5568 !important;
 }
 
 /* News titles in dark mode */
-.dark-theme .news-widget-title,
-.dark-theme .news-item-title {
-    color: #ffffff;
-    font-weight: 600;
+.dark .news-widget-title,
+.dark .news-item-title {
+    color: #ffffff !important;
+    font-weight: 600 !important;
 }
 
 /* News summaries in dark mode */
-.dark-theme .news-widget-summary,
-.dark-theme .news-item-summary {
-    color: #a0aec0;
+.dark .news-widget-summary,
+.dark .news-item-summary {
+    color: #a0aec0 !important;
 }
 
 /* News metadata in dark mode */
-.dark-theme .news-widget-meta,
-.dark-theme .news-item-meta {
-    color: #718096;
+.dark .news-widget-meta,
+.dark .news-item-meta {
+    color: #718096 !important;
 }
 
 /* "No news available" message in dark mode */
-.dark-theme .no-news-message {
-    color: #ffffff;
-    background: #4a5568;
-    padding: 20px;
-    border-radius: 8px;
-    text-align: center;
-    font-weight: 500;
-    border: 1px solid #718096;
+.dark .no-news-message {
+    color: #ffffff !important;
+    background: #4a5568 !important;
+    padding: 20px !important;
+    border-radius: 8px !important;
+    text-align: center !important;
+    font-weight: 500 !important;
+    border: 1px solid #718096 !important;
 }
 
 /* Muted text in dark mode */
-.dark-theme .text-muted {
-    color: #a0aec0;
+.dark .text-muted {
+    color: #a0aec0 !important;
 }
 
-.dark-theme .text-muted.small {
-    color: #718096;
-    font-size: 0.9rem;
+.dark .text-muted.small {
+    color: #718096 !important;
+    font-size: 0.9rem !important;
 }
 
 /* News dashboard dark theme */
-.dark-theme .news-dashboard {
-    background: #1a202c;
-    color: #e2e8f0;
+.dark .news-dashboard {
+    background: #1a202c !important;
+    color: #e2e8f0 !important;
 }
 
-.dark-theme .news-dashboard .page-title,
-.dark-theme .news-dashboard .page-subtitle {
-    color: #ffffff;
+.dark .news-dashboard .page-title,
+.dark .news-dashboard .page-subtitle {
+    color: #ffffff !important;
 }
 
-.dark-theme .news-dashboard .card {
-    background: #2d3748;
-    border-color: #4a5568;
-    color: #e2e8f0;
+.dark .news-dashboard .card {
+    background: #2d3748 !important;
+    border-color: #4a5568 !important;
+    color: #e2e8f0 !important;
 }
 
-.dark-theme .news-dashboard .card-header {
-    background: #4a5568;
-    border-bottom-color: #718096;
-    color: #ffffff;
+.dark .news-dashboard .card-header {
+    background: #4a5568 !important;
+    border-bottom-color: #718096 !important;
+    color: #ffffff !important;
 }
 
-.dark-theme .news-dashboard .card-body {
-    background: #2d3748;
-    color: #e2e8f0;
+.dark .news-dashboard .card-body {
+    background: #2d3748 !important;
+    color: #e2e8f0 !important;
 }
 
 /* News content text in dark mode */
-.dark-theme .news-content p,
-.dark-theme .news-content div,
-.dark-theme .news-section p,
-.dark-theme .news-section div {
-    color: #e2e8f0;
+.dark .news-content p,
+.dark .news-content div,
+.dark .news-section p,
+.dark .news-section div {
+    color: #e2e8f0 !important;
 }
 
 /* News dashboard sections in dark mode */
-.dark-theme .featured-news-section .text-muted,
-.dark-theme .latest-news-section .text-muted,
-.dark-theme .crypto-news-section .text-muted,
-.dark-theme .stocks-news-section .text-muted,
-.dark-theme .real-estate-news-section .text-muted {
-    color: #a0aec0;
-    background: rgba(74, 85, 104, 0.3);
-    padding: 15px;
-    border-radius: 6px;
-    text-align: center;
-    font-weight: 500;
-    border: 1px solid #718096;
+.dark .featured-news-section .text-muted,
+.dark .latest-news-section .text-muted,
+.dark .crypto-news-section .text-muted,
+.dark .stocks-news-section .text-muted,
+.dark .real-estate-news-section .text-muted {
+    color: #a0aec0 !important;
+    background: rgba(74, 85, 104, 0.3) !important;
+    padding: 15px !important;
+    border-radius: 6px !important;
+    text-align: center !important;
+    font-weight: 500 !important;
+    border: 1px solid #718096 !important;
 }
 
 /* News content elements in dark mode */
-.dark-theme .news-content,
-.dark-theme .news-text,
-.dark-theme .news-description {
-    color: #e2e8f0;
+.dark .news-content,
+.dark .news-text,
+.dark .news-description {
+    color: #e2e8f0 !important;
+}
+
+/* Force all text in news dashboard to be white in dark mode */
+.dark .news-dashboard * {
+    color: #ffffff !important;
+}
+
+.dark .news-dashboard p,
+.dark .news-dashboard div,
+.dark .news-dashboard span,
+.dark .news-dashboard h1,
+.dark .news-dashboard h2,
+.dark .news-dashboard h3,
+.dark .news-dashboard h4,
+.dark .news-dashboard h5,
+.dark .news-dashboard h6 {
+    color: #ffffff !important;
+}
+
+/* Force all text in news widgets to be white in dark mode */
+.dark .news-widget * {
+    color: #ffffff !important;
+}
+
+.dark .news-widget p,
+.dark .news-widget div,
+.dark .news-widget span {
+    color: #ffffff !important;
 }
 
 .dark-theme .widget-header {

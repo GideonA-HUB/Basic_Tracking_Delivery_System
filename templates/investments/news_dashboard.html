@@ -6,58 +6,72 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'investments/css/news.css' %}">
 <style>
-/* Clean dark theme for news dashboard */
-.dark-theme .news-dashboard {
-    background: #1a202c;
-    color: #e2e8f0;
+/* Clean dark theme for news dashboard - using .dark class to match base template */
+.dark .news-dashboard {
+    background: #1a202c !important;
+    color: #e2e8f0 !important;
 }
 
-.dark-theme .news-dashboard .page-title {
-    color: #ffffff;
-    font-weight: 700;
+.dark .news-dashboard .page-title {
+    color: #ffffff !important;
+    font-weight: 700 !important;
 }
 
-.dark-theme .news-dashboard .page-subtitle {
-    color: #a0aec0;
+.dark .news-dashboard .page-subtitle {
+    color: #a0aec0 !important;
 }
 
-.dark-theme .news-dashboard .text-muted {
-    color: #a0aec0;
+.dark .news-dashboard .text-muted {
+    color: #a0aec0 !important;
 }
 
-.dark-theme .news-dashboard .no-news-message {
-    color: #ffffff;
-    background: #4a5568;
-    padding: 20px;
-    border-radius: 8px;
-    text-align: center;
-    font-weight: 500;
-    border: 1px solid #718096;
+.dark .news-dashboard .no-news-message {
+    color: #ffffff !important;
+    background: #4a5568 !important;
+    padding: 20px !important;
+    border-radius: 8px !important;
+    text-align: center !important;
+    font-weight: 500 !important;
+    border: 1px solid #718096 !important;
 }
 
-/* Ensure all text in news sections is visible */
-.dark-theme .news-dashboard p,
-.dark-theme .news-dashboard div,
-.dark-theme .news-dashboard span {
-    color: #e2e8f0;
+/* Force all text in news sections to be white */
+.dark .news-dashboard p,
+.dark .news-dashboard div,
+.dark .news-dashboard span {
+    color: #ffffff !important;
 }
 
 /* News cards in dark mode */
-.dark-theme .news-dashboard .card {
-    background: #2d3748;
-    border-color: #4a5568;
-    color: #e2e8f0;
+.dark .news-dashboard .card {
+    background: #2d3748 !important;
+    border-color: #4a5568 !important;
+    color: #e2e8f0 !important;
 }
 
-.dark-theme .news-dashboard .card-header {
-    background: #4a5568;
-    border-bottom-color: #718096;
-    color: #ffffff;
+.dark .news-dashboard .card-header {
+    background: #4a5568 !important;
+    border-bottom-color: #718096 !important;
+    color: #ffffff !important;
 }
 
-.dark-theme .news-dashboard .card-body {
-    background: #2d3748;
-    color: #e2e8f0;
+.dark .news-dashboard .card-body {
+    background: #2d3748 !important;
+    color: #e2e8f0 !important;
+}
+
+/* Force all text elements to be white in dark mode */
+.dark .news-dashboard * {
+    color: #ffffff !important;
+}
+
+.dark .news-dashboard h1,
+.dark .news-dashboard h2,
+.dark .news-dashboard h3,
+.dark .news-dashboard h4,
+.dark .news-dashboard h5,
+.dark .news-dashboard h6 {
+    color: #ffffff !important;
 }
 </style>
 {% endblock %}
