@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - Meridian Asset Logistics{% endblock %}
+
+{% block extra_css %}
+<style>
+    .withdrawal-card {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        color: white;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .withdrawal-item {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .withdrawal-name {
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    
+    .withdrawal-amount {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #10b981;
+    }
+    
+    .withdrawal-status {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .status-completed {
+        background: #10b981;
+        color: white;
+    }
+    
+    .status-processing {
+        background: #f59e0b;
+        color: white;
+    }
+    
+    .status-pending {
+        background: #6b7280;
+        color: white;
+    }
+    
+    .fast-track-badge {
+        background: #ef4444;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        margin-left: 8px;
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 30px;
+        gap: 10px;
+    }
+    
+    .pagination a, .pagination span {
+        padding: 8px 16px;
+        border-radius: 6px;
+        text-decoration: none;
+        color: white;
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .pagination .current {
+        background: rgba(255, 255, 255, 0.4);
+        font-weight: bold;
+    }
+    
+    .pagination a:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .back-button {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+    
+    .back-button:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+        text-decoration: none;
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="withdrawal-card">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold">{{ title }}</h1>
+            <a href="{% url 'investments:withdrawal-list' %}" class="back-button">
+                ← Back to Top 20
+            </a>
+        </div>
+        
+        <p class="text-center text-blue-100 mb-8">
+            Complete list of all crypto withdrawals processed by Meridian Asset Logistics.
+        </p>
+        
+        <div class="space-y-3">
+            {% for withdrawal in withdrawals %}
+            <div class="withdrawal-item">
+                <div class="flex items-center">
+                    <div class="text-sm text-blue-200 mr-3 font-semibold">
+                        {{ withdrawal.estimated_delivery_display }}
+                    </div>
+                    <div class="withdrawal-name">{{ withdrawal.name }}</div>
+                    {% if withdrawal.is_fast_track %}
+                    <span class="fast-track-badge">FAST TRACK</span>
+                    {% endif %}
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="withdrawal-amount">{{ withdrawal.display_amount }}</div>
+                    <div class="withdrawal-status status-{{ withdrawal.status }}">
+                        {{ withdrawal.status_display }}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center text-blue-100 py-8">
+                <p>No withdrawals to display at the moment.</p>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        {% if withdrawals.has_other_pages %}
+        <div class="pagination">
+            {% if withdrawals.has_previous %}
+                <a href="?page=1">&laquo; First</a>
+                <a href="?page={{ withdrawals.previous_page_number }}">Previous</a>
+            {% endif %}
+            
+            <span class="current">
+                Page {{ withdrawals.number }} of {{ withdrawals.paginator.num_pages }}
+            </span>
+            
+            {% if withdrawals.has_next %}
+                <a href="?page={{ withdrawals.next_page_number }}">Next</a>
+                <a href="?page={{ withdrawals.paginator.num_pages }}">Last &raquo;</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

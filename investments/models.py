@@ -953,3 +953,119 @@ class MembershipPayment(models.Model):
             if self.expires_at > now:
                 return (self.expires_at - now).days
         return 0
+
+
+class CryptoWithdrawal(models.Model):
+    """Model for crypto withdrawal list - shows people who have withdrawn"""
+    
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('processing', 'Processing'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+    
+    PRIORITY_CHOICES = [
+        ('normal', 'Normal'),
+        ('fast', 'Fast Track'),
+        ('urgent', 'Urgent'),
+    ]
+    
+    # Basic info
+    name = models.CharField(max_length=100, help_text="Full name of the person")
+    amount = models.DecimalField(max_digits=15, decimal_places=2, validators=[MinValueValidator(Decimal('0.01'))])
+    currency = models.CharField(max_length=10, default='USD')
+    crypto_currency = models.CharField(max_length=10, default='BTC')
+    
+    # Status and priority
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='normal')
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    processed_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    estimated_delivery = models.DateTimeField(null=True, blank=True, help_text="Estimated delivery date")
+    
+    # Payment info
+    payment_id = models.CharField(max_length=100, blank=True, help_text="NOWPayments transaction ID")
+    payment_address = models.CharField(max_length=200, blank=True, help_text="Crypto address for payment")
+    payment_amount = models.DecimalField(max_digits=15, decimal_places=8, null=True, blank=True, help_text="Amount in crypto")
+    
+    # Additional info
+    notes = models.TextField(blank=True, help_text="Internal notes")
+    is_public = models.BooleanField(default=True, help_text="Show in public withdrawal list")
+    order_position = models.PositiveIntegerField(default=0, help_text="Position in the list (0 = top)")
+    
+    class Meta:
+        ordering = ['order_position', '-created_at']
+        verbose_name = 'Crypto Withdrawal'
+        verbose_name_plural = 'Crypto Withdrawals'
+    
+    def __str__(self):
+        return f"{self.name} - ${self.amount} ({self.status})"
+    
+    def save(self, *args, **kwargs):
+        # Auto-set order position if not set
+        if self.order_position == 0:
+            max_pos = CryptoWithdrawal.objects.aggregate(
+                max_pos=models.Max('order_position')
+            )['max_pos'] or 0
+            self.order_position = max_pos + 1
+        super().save(*args, **kwargs)
+    
+    @property
+    def is_fast_track(self):
+        return self.priority == 'fast'
+    
+    @property
+    def display_amount(self):
+        return f"${self.amount:,.2f}"
+    
+    @property
+    def status_display(self):
+        return dict(self.STATUS_CHOICES)[self.status]
+    
+    @property
+    def priority_display(self):
+        return dict(self.PRIORITY_CHOICES)[self.priority]
+    
+    @property
+    def estimated_delivery_display(self):
+        """Display estimated delivery in a user-friendly format"""
+        if not self.estimated_delivery:
+            return "TBD"
+        
+        from django.utils import timezone
+        now = timezone.now()
+        delta = self.estimated_delivery - now
+        
+        if delta.days < 0:
+            return "Overdue"
+        elif delta.days == 0:
+            return "Today"
+        elif delta.days == 1:
+            return "Tomorrow"
+        elif delta.days < 7:
+            return f"{delta.days} days"
+        elif delta.days < 14:
+            weeks = delta.days // 7
+            remaining_days = delta.days % 7
+            if remaining_days == 0:
+                return f"{weeks} week{'s' if weeks > 1 else ''}"
+            else:
+                return f"{weeks} week{'s' if weeks > 1 else ''} {remaining_days} day{'s' if remaining_days > 1 else ''}"
+        elif delta.days < 30:
+            weeks = delta.days // 7
+            return f"{weeks} week{'s' if weeks > 1 else ''}"
+        else:
+            months = delta.days // 30
+            remaining_days = delta.days % 30
+            if remaining_days == 0:
+                return f"{months} month{'s' if months > 1 else ''}"
+            else:
+                weeks = remaining_days // 7
+                if weeks > 0:
+                    return f"{months} month{'s' if months > 1 else ''} {weeks} week{'s' if weeks > 1 else ''}"
+                else:
+                    return f"{months} month{'s' if months > 1 else ''} {remaining_days} day{'s' if remaining_days > 1 else ''}"

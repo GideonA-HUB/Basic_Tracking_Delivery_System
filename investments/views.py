@@ -29,7 +29,8 @@ from django.urls import reverse
 
 from .models import (
     InvestmentCategory, InvestmentItem, PriceHistory, 
-    UserInvestment, InvestmentTransaction, InvestmentPortfolio, RealTimePriceFeed
+    UserInvestment, InvestmentTransaction, InvestmentPortfolio, RealTimePriceFeed,
+    CryptoWithdrawal
 )
 from .serializers import (
     InvestmentCategorySerializer, InvestmentItemSerializer, 
@@ -336,6 +337,11 @@ def investment_dashboard(request):
             logger.warning(f"Could not load news for dashboard: {e}")
             dashboard_news = []
 
+        # Get recent withdrawals for dashboard widget
+        recent_withdrawals = CryptoWithdrawal.objects.filter(
+            is_public=True
+        ).order_by('order_position', '-created_at')[:5]
+        
         context = {
             'portfolio': portfolio,
             'active_investments': active_investments,
@@ -345,6 +351,7 @@ def investment_dashboard(request):
             'crypto_news': crypto_news,
             'stocks_news': stocks_news,
             'real_estate_news': real_estate_news,
+            'recent_withdrawals': recent_withdrawals,
         }
         
         return render(request, 'investments/dashboard.html', context)
@@ -1632,3 +1639,183 @@ def meridian_quick_access(request):
         'crypto_address': 'GkJr9Rrzc3eiuetdpAJonkkeBtRAf1UvcndbQJAF7PJk'
     }
     return render(request, 'investments/meridian_quick_access.html', context)
+
+
+def withdrawal_list(request):
+    """Display the crypto withdrawal list"""
+    # Get first 20 public withdrawals
+    withdrawals = CryptoWithdrawal.objects.filter(
+        is_public=True
+    ).order_by('order_position', '-created_at')[:20]
+    
+    # Get total count for "View More" button
+    total_count = CryptoWithdrawal.objects.filter(is_public=True).count()
+    
+    context = {
+        'withdrawals': withdrawals,
+        'total_count': total_count,
+        'show_more': total_count > 20,
+        'title': 'Crypto Withdrawal List'
+    }
+    
+    return render(request, 'investments/withdrawal_list.html', context)
+
+
+def withdrawal_list_all(request):
+    """Display all crypto withdrawals"""
+    withdrawals = CryptoWithdrawal.objects.filter(
+        is_public=True
+    ).order_by('order_position', '-created_at')
+    
+    # Paginate results
+    paginator = Paginator(withdrawals, 50)  # 50 per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'withdrawals': page_obj,
+        'title': 'All Crypto Withdrawals'
+    }
+    
+    return render(request, 'investments/withdrawal_list_all.html', context)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def create_fast_track_payment(request):
+    """Create a fast track payment for withdrawal priority"""
+    try:
+        data = json.loads(request.body)
+        customer_name = data.get('customer_name', '').strip()
+        amount = data.get('amount', 700)  # Default $700 for fast track
+        
+        if not customer_name:
+            return JsonResponse({
+                'success': False,
+                'error': 'Customer name is required'
+            })
+        
+        # Create withdrawal entry
+        withdrawal = CryptoWithdrawal.objects.create(
+            name=customer_name,
+            amount=Decimal(str(amount)),
+            currency='USD',
+            crypto_currency='BTC',
+            status='pending',
+            priority='fast',
+            is_public=True,
+            notes='Fast track payment - awaiting crypto payment'
+        )
+        
+        # Generate payment address using NOWPayments
+        try:
+            payment_data = nowpayments_service.create_payment(
+                price_amount=float(amount),
+                price_currency='usd',
+                pay_currency='btc',
+                order_id=f"fast_track_{withdrawal.id}",
+                order_description=f"Fast track withdrawal for {customer_name}"
+            )
+            
+            if payment_data and 'payment_address' in payment_data:
+                withdrawal.payment_id = payment_data.get('payment_id', '')
+                withdrawal.payment_address = payment_data['payment_address']
+                withdrawal.payment_amount = Decimal(str(payment_data.get('pay_amount', 0)))
+                withdrawal.save()
+                
+                return JsonResponse({
+                    'success': True,
+                    'withdrawal_id': withdrawal.id,
+                    'payment_address': withdrawal.payment_address,
+                    'payment_amount': str(withdrawal.payment_amount),
+                    'crypto_currency': withdrawal.crypto_currency,
+                    'message': 'Payment address generated successfully'
+                })
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Failed to generate payment address'
+                })
+                
+        except Exception as e:
+            logger.error(f"NOWPayments error: {str(e)}")
+            return JsonResponse({
+                'success': False,
+                'error': 'Payment service temporarily unavailable'
+            })
+            
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'success': False,
+            'error': 'Invalid JSON data'
+        })
+    except Exception as e:
+        logger.error(f"Fast track payment error: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'error': 'An error occurred while processing your request'
+        })
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def check_payment_status(request):
+    """Check payment status for a withdrawal"""
+    try:
+        data = json.loads(request.body)
+        withdrawal_id = data.get('withdrawal_id')
+        
+        if not withdrawal_id:
+            return JsonResponse({
+                'success': False,
+                'error': 'Withdrawal ID is required'
+            })
+        
+        withdrawal = get_object_or_404(CryptoWithdrawal, id=withdrawal_id)
+        
+        # Check payment status with NOWPayments
+        if withdrawal.payment_id:
+            try:
+                payment_status = nowpayments_service.get_payment_status(withdrawal.payment_id)
+                
+                if payment_status and payment_status.get('payment_status') == 'finished':
+                    withdrawal.status = 'processing'
+                    withdrawal.processed_at = timezone.now()
+                    withdrawal.save()
+                    
+                    return JsonResponse({
+                        'success': True,
+                        'status': 'paid',
+                        'message': 'Payment confirmed! Your withdrawal is now being processed.'
+                    })
+                else:
+                    return JsonResponse({
+                        'success': True,
+                        'status': 'pending',
+                        'message': 'Payment is still pending. Please complete the payment.'
+                    })
+                    
+            except Exception as e:
+                logger.error(f"Payment status check error: {str(e)}")
+                return JsonResponse({
+                    'success': True,
+                    'status': 'unknown',
+                    'message': 'Unable to verify payment status. Please contact support.'
+                })
+        else:
+            return JsonResponse({
+                'success': False,
+                'error': 'No payment ID found for this withdrawal'
+            })
+            
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'success': False,
+            'error': 'Invalid JSON data'
+        })
+    except Exception as e:
+        logger.error(f"Payment status check error: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'error': 'An error occurred while checking payment status'
+        })

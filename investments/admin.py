@@ -7,7 +7,7 @@ from .models import (
     InvestmentCategory, InvestmentItem, PriceHistory, PriceMovementStats,
     UserInvestment, InvestmentTransaction, InvestmentPortfolio,
     RealTimePriceFeed, RealTimePriceHistory, AutoInvestmentPlan,
-    CurrencyConversion, CustomerCashoutRequest
+    CurrencyConversion, CustomerCashoutRequest, CryptoWithdrawal
 )
 from .news_models import NewsArticle, NewsCategory, NewsSource
 from django.utils import timezone
@@ -465,3 +465,70 @@ class NewsArticleAdmin(admin.ModelAdmin):
             )
         return '-'
     image_preview.short_description = 'Image'
+
+
+@admin.register(CryptoWithdrawal)
+class CryptoWithdrawalAdmin(admin.ModelAdmin):
+    list_display = [
+        'name', 'display_amount', 'currency', 'crypto_currency', 
+        'status', 'priority', 'estimated_delivery_display', 'is_public', 'order_position', 'created_at'
+    ]
+    list_filter = ['status', 'priority', 'is_public', 'currency', 'crypto_currency', 'created_at']
+    search_fields = ['name', 'payment_id', 'notes']
+    list_editable = ['status', 'priority', 'is_public', 'order_position']
+    readonly_fields = ['created_at', 'processed_at', 'completed_at']
+    ordering = ['order_position', '-created_at']
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'amount', 'currency', 'crypto_currency')
+        }),
+        ('Status & Priority', {
+            'fields': ('status', 'priority', 'is_public', 'order_position')
+        }),
+        ('Payment Information', {
+            'fields': ('payment_id', 'payment_address', 'payment_amount')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'processed_at', 'completed_at', 'estimated_delivery'),
+            'classes': ('collapse',)
+        }),
+        ('Additional Information', {
+            'fields': ('notes',),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    actions = ['mark_as_processing', 'mark_as_completed', 'mark_as_fast_track', 'move_to_top']
+    
+    def mark_as_processing(self, request, queryset):
+        """Mark selected withdrawals as processing"""
+        updated = queryset.update(status='processing', processed_at=timezone.now())
+        self.message_user(request, f'{updated} withdrawals marked as processing.')
+    mark_as_processing.short_description = "Mark as Processing"
+    
+    def mark_as_completed(self, request, queryset):
+        """Mark selected withdrawals as completed"""
+        updated = queryset.update(status='completed', completed_at=timezone.now())
+        self.message_user(request, f'{updated} withdrawals marked as completed.')
+    mark_as_completed.short_description = "Mark as Completed"
+    
+    def mark_as_fast_track(self, request, queryset):
+        """Mark selected withdrawals as fast track"""
+        updated = queryset.update(priority='fast')
+        self.message_user(request, f'{updated} withdrawals marked as fast track.')
+    mark_as_fast_track.short_description = "Mark as Fast Track"
+    
+    def move_to_top(self, request, queryset):
+        """Move selected withdrawals to top of list"""
+        for obj in queryset:
+            obj.order_position = 0
+            obj.save()
+        self.message_user(request, f'{queryset.count()} withdrawals moved to top of list.')
+    move_to_top.short_description = "Move to Top of List"
+    
+    def display_amount(self, obj):
+        """Display formatted amount"""
+        return obj.display_amount
+    display_amount.short_description = 'Amount'
+    display_amount.admin_order_field = 'amount'

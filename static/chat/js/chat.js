@@ -132,6 +132,31 @@ class LiveChatWidget {
     }
     
     async startConversation() {
+        // Check if user is authenticated first
+        if (this.isUserAuthenticated()) {
+            // For authenticated users, try to get existing conversation or create one
+            try {
+                const response = await this.makeRequest('/chat/start-conversation/', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        subject: 'General Inquiry'
+                    })
+                });
+                
+                if (response.success) {
+                    this.conversationId = response.conversation_id;
+                    this.hideCustomerInfoForm();
+                    this.hideWelcomeMessage();
+                    this.startMessagePolling();
+                    this.addSystemMessage('Conversation started! A staff member will be with you shortly.');
+                    return true;
+                }
+            } catch (error) {
+                console.error('Error starting conversation for authenticated user:', error);
+            }
+        }
+        
+        // For non-authenticated users or if authenticated method failed
         const customerName = document.getElementById('customer-name').value.trim();
         const customerEmail = document.getElementById('customer-email').value.trim();
         const customerPhone = document.getElementById('customer-phone').value.trim();
@@ -188,8 +213,8 @@ class LiveChatWidget {
         
         if (!content) return;
         
-        // If no conversation exists and user is not authenticated, start one
-        if (!this.conversationId && !this.isUserAuthenticated()) {
+        // If no conversation exists, always try to start one
+        if (!this.conversationId) {
             const started = await this.startConversation();
             if (!started) return;
         }

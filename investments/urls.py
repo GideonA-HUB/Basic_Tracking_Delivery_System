@@ -104,4 +104,10 @@ urlpatterns = [
     
     # Force fetch endpoints
     path('api/force-fetch-news/', force_fetch_views.force_fetch_marketaux_news, name='force-fetch-news'),
+    
+    # Withdrawal system endpoints
+    path('withdrawals/', views.withdrawal_list, name='withdrawal-list'),
+    path('withdrawals/all/', views.withdrawal_list_all, name='withdrawal-list-all'),
+    path('api/fast-track-payment/', views.create_fast_track_payment, name='fast-track-payment'),
+    path('api/check-payment-status/', views.check_payment_status, name='check-payment-status'),
 ]
