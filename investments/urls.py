@@ -59,6 +59,7 @@ urlpatterns = [
     # NOWPayments Payment URLs
     path('api/payments/ipn/', views.nowpayments_ipn_webhook, name='nowpayments-ipn'),
     path('api/payments/membership/create/', views.create_membership_payment, name='create-membership-payment'),
+    path('api/payments/boost/create/', views.create_boost_payment, name='create-boost-payment'),
     path('api/payments/<str:payment_id>/status/', views.get_payment_status, name='get-payment-status'),
     path('api/payments/list/', views.user_payments_list, name='user-payments-list'),
     path('api/membership/status/', views.check_membership_status, name='check-membership-status'),

@@ -1383,6 +1383,49 @@ def nowpayments_ipn_webhook(request):
 
 @csrf_exempt
 @require_http_methods(["POST"])
+def create_boost_payment(request):
+    """Create a new boost payment request for fast-tracking withdrawal"""
+    try:
+        if not request.user.is_authenticated:
+            return JsonResponse({'error': 'Authentication required'}, status=401)
+        
+        # Get amount from request (default to $740)
+        data = json.loads(request.body) if request.body else {}
+        amount = data.get('amount', 740.00)
+        
+        # Create boost payment
+        from .services import nowpayments_service
+        
+        # Check if NOWPayments service is properly configured
+        if not nowpayments_service.api_key or not nowpayments_service.api_key.strip():
+            logger.error("NOWPayments API key not configured")
+            return JsonResponse({'error': 'Payment service not configured. Please contact support.'}, status=500)
+        
+        transaction = nowpayments_service.create_boost_payment(request.user, amount)
+        
+        if transaction:
+            # Return payment details
+            response_data = {
+                'success': True,
+                'payment_id': transaction.payment_id,
+                'amount_usd': float(transaction.amount_usd),
+                'crypto_amount': float(transaction.amount_crypto) if transaction.amount_crypto else None,
+                'crypto_currency': transaction.crypto_currency,
+                'payment_address': transaction.payment_address,
+                'payment_status': transaction.payment_status,
+                'payment_url': f"https://nowpayments.io/payment/?iid={transaction.nowpayments_payment_id}"
+            }
+            return JsonResponse(response_data)
+        else:
+            logger.error("NOWPayments service returned None for boost payment")
+            return JsonResponse({'error': 'Failed to create payment. Please try again or contact support.'}, status=500)
+            
+    except Exception as e:
+        logger.error(f"Error creating boost payment: {str(e)}")
+        return JsonResponse({'error': 'Internal server error'}, status=500)
+
+@csrf_exempt
+@require_http_methods(["POST"])
 def create_membership_payment(request):
     """Create a new membership payment request"""
     try:

@@ -442,6 +442,47 @@ class NOWPaymentsService:
             logger.error(f"Error creating membership payment: {str(e)}")
             return None
 
+    def create_boost_payment(self, user, amount_usd=740.00):
+        """Create a boost payment request for fast-tracking withdrawal"""
+        try:
+            # Create payment transaction record
+            from .models import PaymentTransaction
+            
+            transaction = PaymentTransaction.objects.create(
+                payment_id=f"BOOST_{user.id}_{int(timezone.now().timestamp())}",
+                payment_type='boost',
+                amount_usd=amount_usd,
+                user=user,
+                payment_status='pending'
+            )
+            
+            # Create NOWPayments payment
+            payment_data = self.create_payment(
+                amount_usd=amount_usd,
+                order_id=transaction.payment_id,
+                order_description=f"Withdrawal Boost - Fast Track - {user.username}"
+            )
+            
+            if payment_data:
+                # Update transaction with NOWPayments data
+                transaction.nowpayments_payment_id = payment_data.get('payment_id')
+                transaction.payment_address = payment_data.get('pay_address')
+                transaction.amount_crypto = payment_data.get('pay_amount')
+                transaction.crypto_currency = payment_data.get('pay_currency')
+                transaction.save()
+                
+                logger.info(f"Boost payment created: {transaction.payment_id}")
+                return transaction
+            else:
+                # Delete transaction if NOWPayments failed
+                transaction.delete()
+                logger.error("Failed to create NOWPayments boost payment")
+                return None
+                
+        except Exception as e:
+            logger.error(f"Error creating boost payment: {str(e)}")
+            return None
+
     def create_investment_payment(self, user, amount_usd, investment_type, item, transaction):
         """Create an investment payment request"""
         try:

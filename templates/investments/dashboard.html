@@ -54,10 +54,13 @@
                 {% endfor %}
             </div>
             
-            <div class="mt-4 text-center">
+            <div class="mt-4 text-center space-x-4">
                 <a href="{% url 'investments:withdrawal-list' %}" class="bg-white text-blue-600 px-6 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
                     View Complete List
                 </a>
+                <button id="boostButton" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                    🚀 Boost ($740)
+                </button>
             </div>
         </div>
     </div>
@@ -473,6 +476,147 @@ document.addEventListener('DOMContentLoaded', function() {
             originalUpdateLivePriceFeed.call(this, prices);
             updateMarketStatistics(prices);
         };
+    }
+    
+    // Boost button functionality
+    const boostButton = document.getElementById('boostButton');
+    if (boostButton) {
+        boostButton.addEventListener('click', function() {
+            // Show confirmation modal
+            if (confirm('🚀 Boost Your Withdrawal!\n\nPay $740 to fast-track your withdrawal to the top of the list for 4-day processing.\n\nDo you want to proceed with the payment?')) {
+                createBoostPayment();
+            }
+        });
+    }
+    
+    function createBoostPayment() {
+        const button = document.getElementById('boostButton');
+        const originalText = button.innerHTML;
+        
+        // Show loading state
+        button.innerHTML = '⏳ Processing...';
+        button.disabled = true;
+        
+        // Create boost payment
+        fetch('/investments/api/payments/boost/create/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                amount: 740.00
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show payment modal
+                showBoostPaymentModal(data);
+            } else {
+                alert('❌ Error: ' + (data.error || 'Failed to create payment. Please try again.'));
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error creating boost payment:', error);
+            alert('❌ Error: Failed to create payment. Please try again.');
+            button.innerHTML = originalText;
+            button.disabled = false;
+        });
+    }
+    
+    function showBoostPaymentModal(paymentData) {
+        // Create modal HTML
+        const modalHTML = `
+            <div id="boostPaymentModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-md w-full mx-4">
+                    <div class="text-center">
+                        <div class="text-6xl mb-4">🚀</div>
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Boost Your Withdrawal</h2>
+                        <p class="text-gray-600 dark:text-gray-300 mb-6">
+                            Pay $740 to fast-track your withdrawal to the top of the list for 4-day processing.
+                        </p>
+                        
+                        <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-4 mb-6">
+                            <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">Payment Address:</div>
+                            <div class="font-mono text-sm bg-white dark:bg-gray-800 p-2 rounded border break-all" id="paymentAddress">
+                                ${paymentData.payment_address}
+                            </div>
+                            <button onclick="copyPaymentAddress()" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
+                                📋 Copy Address
+                            </button>
+                        </div>
+                        
+                        <div class="bg-yellow-100 dark:bg-yellow-900 border border-yellow-400 dark:border-yellow-600 rounded-lg p-4 mb-6">
+                            <div class="text-sm text-yellow-800 dark:text-yellow-200">
+                                <strong>Amount to Send:</strong> ${paymentData.crypto_amount} ${paymentData.crypto_currency}<br>
+                                <strong>USD Value:</strong> $${paymentData.amount_usd}
+                            </div>
+                        </div>
+                        
+                        <div class="flex space-x-4">
+                            <button onclick="openNowPayments()" class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-300">
+                                💳 Pay with NOWPayments
+                            </button>
+                            <button onclick="closeBoostModal()" class="flex-1 bg-gray-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-600 transition-colors">
+                                Cancel
+                            </button>
+                        </div>
+                        
+                        <div class="mt-4 text-xs text-gray-500 dark:text-gray-400">
+                            Payment ID: ${paymentData.payment_id}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Add modal to page
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        
+        // Reset button
+        const button = document.getElementById('boostButton');
+        button.innerHTML = '🚀 Boost ($740)';
+        button.disabled = false;
+    }
+    
+    function copyPaymentAddress() {
+        const address = document.getElementById('paymentAddress').textContent;
+        navigator.clipboard.writeText(address).then(() => {
+            alert('✅ Payment address copied to clipboard!');
+        }).catch(() => {
+            alert('❌ Failed to copy address. Please copy manually.');
+        });
+    }
+    
+    function openNowPayments() {
+        // Open NOWPayments payment page
+        window.open('https://nowpayments.io/payment/?iid=4387313014&source=button', '_blank');
+    }
+    
+    function closeBoostModal() {
+        const modal = document.getElementById('boostPaymentModal');
+        if (modal) {
+            modal.remove();
+        }
+    }
+    
+    // Helper function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
     }
 });
 </script>
