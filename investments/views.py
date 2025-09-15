@@ -1667,13 +1667,9 @@ def withdrawal_list_all(request):
         is_public=True
     ).order_by('order_position', '-created_at')
     
-    # Paginate results
-    paginator = Paginator(withdrawals, 50)  # 50 per page
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    
+    # Show all withdrawals without pagination
     context = {
-        'withdrawals': page_obj,
+        'withdrawals': withdrawals,
         'title': 'All Crypto Withdrawals'
     }
     
