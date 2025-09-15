@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'tracking',
     'accounts',
     'investments',
+    'chat.apps.ChatConfig',  # Live chat system
 ]
 
 MIDDLEWARE = [
