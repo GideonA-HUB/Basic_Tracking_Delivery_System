@@ -5,14 +5,37 @@
 
 {% block extra_css %}
 <style>
-    /* Force dark mode for withdrawal pages */
-    html {
-        background-color: #0f172a !important;
+    /* Force proper dark/light mode handling */
+    :root {
+        --bg-primary: #0f172a;
+        --bg-secondary: #1e293b;
+        --text-primary: #ffffff;
+        --text-secondary: #e2e8f0;
+        --text-accent: #10b981;
+        --border-color: rgba(255, 255, 255, 0.1);
     }
     
-    body {
-        background-color: #0f172a !important;
-        color: white !important;
+    /* Light mode overrides */
+    @media (prefers-color-scheme: light) {
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-accent: #059669;
+            --border-color: rgba(0, 0, 0, 0.1);
+        }
+    }
+    
+    /* Force dark mode for withdrawal pages */
+    .withdrawal-page {
+        background-color: var(--bg-primary) !important;
+        color: var(--text-primary) !important;
+        min-height: 100vh;
+    }
+    
+    .withdrawal-page * {
+        color: var(--text-primary) !important;
     }
     
     .withdrawal-card {
@@ -82,7 +105,6 @@
         font-weight: 600;
         margin-left: 8px;
     }
-    
     
     .back-button {
         background: rgba(255, 255, 255, 0.2) !important;
@@ -187,7 +209,7 @@
         color: #6b7280;
     }
     
-    /* Override any dark mode text issues */
+    /* Ensure all text is visible */
     .text-blue-100 {
         color: #dbeafe !important;
     }
@@ -200,7 +222,7 @@
         color: white !important;
     }
     
-    /* Ensure all text is visible */
+    /* Override any conflicting styles */
     .withdrawal-item * {
         color: white !important;
     }
@@ -212,79 +234,119 @@
     .withdrawal-item .withdrawal-amount {
         color: #10b981 !important;
     }
+    
+    /* Hide any search elements */
+    .search-bar,
+    .search-input,
+    .search-form,
+    input[type="search"],
+    .form-control[placeholder*="search" i],
+    .form-control[placeholder*="Search" i] {
+        display: none !important;
+    }
+    
+    /* Scrollable container for all withdrawals */
+    .withdrawals-container {
+        max-height: 80vh;
+        overflow-y: auto;
+        padding-right: 10px;
+    }
+    
+    .withdrawals-container::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    .withdrawals-container::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+    }
+    
+    .withdrawals-container::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 4px;
+    }
+    
+    .withdrawals-container::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.5);
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <div class="withdrawal-card">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold text-white">{{ title }}</h1>
-            <a href="{% url 'investments:withdrawal-list' %}" class="back-button">
-                ← Back to Top 20
-            </a>
-        </div>
-        
-        <p class="text-center text-blue-100 mb-8">
-            Complete list of all crypto withdrawals processed by Meridian Asset Logistics.
-        </p>
-        
-        <div class="space-y-3">
-            {% for withdrawal in withdrawals %}
-            <div class="withdrawal-item">
-                <div class="flex items-center">
-                    <div class="text-sm text-blue-200 mr-3 font-semibold">
-                        {{ withdrawal.estimated_delivery_display }}
+<div class="withdrawal-page">
+    <div class="container mx-auto px-4 py-8">
+        <div class="withdrawal-card">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-bold text-white">{{ title }}</h1>
+                <a href="{% url 'investments:withdrawal-list' %}" class="back-button">
+                    ← Back to Top 20
+                </a>
+            </div>
+            
+            <p class="text-center text-blue-100 mb-8">
+                Complete list of all crypto withdrawals processed by Meridian Asset Logistics.
+            </p>
+            
+            <!-- Show total count -->
+            <div class="text-center text-blue-100 mb-6">
+                <p class="text-lg font-semibold">Total: {{ withdrawals|length }} Withdrawals</p>
+            </div>
+            
+            <!-- Scrollable container for all withdrawals -->
+            <div class="withdrawals-container">
+                <div class="space-y-3">
+                    {% for withdrawal in withdrawals %}
+                    <div class="withdrawal-item">
+                        <div class="flex items-center">
+                            <div class="text-sm text-blue-200 mr-3 font-semibold">
+                                {{ withdrawal.estimated_delivery_display }}
+                            </div>
+                            <div class="withdrawal-name text-white">{{ withdrawal.name }}</div>
+                            {% if withdrawal.is_fast_track %}
+                            <span class="fast-track-badge">FAST TRACK</span>
+                            {% endif %}
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="withdrawal-amount">{{ withdrawal.display_amount }}</div>
+                            <div class="withdrawal-status status-{{ withdrawal.status }}">
+                                {{ withdrawal.status_display }}
+                            </div>
+                        </div>
                     </div>
-                    <div class="withdrawal-name text-white">{{ withdrawal.name }}</div>
-                    {% if withdrawal.is_fast_track %}
-                    <span class="fast-track-badge">FAST TRACK</span>
-                    {% endif %}
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div class="withdrawal-amount">{{ withdrawal.display_amount }}</div>
-                    <div class="withdrawal-status status-{{ withdrawal.status }}">
-                        {{ withdrawal.status_display }}
+                    {% empty %}
+                    <div class="text-center text-blue-100 py-8">
+                        <p>No withdrawals to display at the moment.</p>
                     </div>
+                    {% endfor %}
                 </div>
             </div>
-            {% empty %}
-            <div class="text-center text-blue-100 py-8">
-                <p>No withdrawals to display at the moment.</p>
-            </div>
-            {% endfor %}
         </div>
         
-        <!-- Show total count -->
-        <div class="text-center text-blue-100 mt-6">
-            <p class="text-lg font-semibold">Total: {{ withdrawals|length }} Withdrawals</p>
+        <!-- Fast Track Section -->
+        <div class="fast-track-section">
+            <h2 class="text-2xl font-bold mb-4">🚀 Fast Track Your Withdrawal</h2>
+            <p class="text-lg mb-4">
+                Skip the queue and get your withdrawal processed in 24 hours!
+            </p>
+            <p class="text-sm mb-6">
+                Pay just $700 and move to the top of the withdrawal list.
+            </p>
+            
+            <form id="fast-track-form">
+                <div class="mb-4">
+                    <input 
+                        type="text" 
+                        id="customer-name" 
+                        placeholder="Enter your full name" 
+                        required
+                        class="w-full max-w-md px-4 py-3 rounded-lg border-0 text-gray-800"
+                    >
+                </div>
+                <button type="submit" class="fast-track-button">
+                    Pay $700 for Fast Track
+                </button>
+            </form>
         </div>
-    </div>
-    
-    <!-- Fast Track Section -->
-    <div class="fast-track-section">
-        <h2 class="text-2xl font-bold mb-4">🚀 Fast Track Your Withdrawal</h2>
-        <p class="text-lg mb-4">
-            Skip the queue and get your withdrawal processed in 24 hours!
-        </p>
-        <p class="text-sm mb-6">
-            Pay just $700 and move to the top of the withdrawal list.
-        </p>
-        
-        <form id="fast-track-form">
-            <div class="mb-4">
-                <input 
-                    type="text" 
-                    id="customer-name" 
-                    placeholder="Enter your full name" 
-                    required
-                    class="w-full max-w-md px-4 py-3 rounded-lg border-0 text-gray-800"
-                >
-            </div>
-            <button type="submit" class="fast-track-button">
-                Pay $700 for Fast Track
-            </button>
-        </form>
     </div>
 </div>
 
