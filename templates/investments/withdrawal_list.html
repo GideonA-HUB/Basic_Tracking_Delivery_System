@@ -6,110 +6,6 @@
 {% block extra_css %}
 <style>
     /* ULTRA-AGGRESSIVE DARK MODE FIXES */
-    * {
-        color: white !important;
-    }
-    
-    html, body {
-        background-color: #0f172a !important;
-        color: white !important;
-    }
-    
-    /* Override ALL possible text colors with ULTRA-AGGRESSIVE rules */
-    h1, h2, h3, h4, h5, h6, p, span, div, a, li, td, th, label, input, textarea, select, button {
-        color: white !important;
-    }
-    
-    /* Specific overrides for ALL text color classes */
-    .text-gray-800, .text-gray-700, .text-gray-600, .text-gray-500, .text-gray-400, .text-gray-300, .text-gray-200, .text-gray-100 {
-        color: white !important;
-    }
-    
-    .text-black, .text-slate-800, .text-slate-700, .text-slate-600, .text-slate-500, .text-slate-400, .text-slate-300, .text-slate-200, .text-slate-100 {
-        color: white !important;
-    }
-    
-    .text-blue-800, .text-blue-700, .text-blue-600, .text-blue-500, .text-blue-400, .text-blue-300, .text-blue-200, .text-blue-100 {
-        color: white !important;
-    }
-    
-    .text-green-800, .text-green-700, .text-green-600, .text-green-500, .text-green-400, .text-green-300, .text-green-200, .text-green-100 {
-        color: white !important;
-    }
-    
-    .text-red-800, .text-red-700, .text-red-600, .text-red-500, .text-red-400, .text-red-300, .text-red-200, .text-red-100 {
-        color: white !important;
-    }
-    
-    .text-yellow-800, .text-yellow-700, .text-yellow-600, .text-yellow-500, .text-yellow-400, .text-yellow-300, .text-yellow-200, .text-yellow-100 {
-        color: white !important;
-    }
-    
-    .text-orange-800, .text-orange-700, .text-orange-600, .text-orange-500, .text-orange-400, .text-orange-300, .text-orange-200, .text-orange-100 {
-        color: white !important;
-    }
-    
-    .text-purple-800, .text-purple-700, .text-purple-600, .text-purple-500, .text-purple-400, .text-purple-300, .text-purple-200, .text-purple-100 {
-        color: white !important;
-    }
-    
-    .text-pink-800, .text-pink-700, .text-pink-600, .text-pink-500, .text-pink-400, .text-pink-300, .text-pink-200, .text-pink-100 {
-        color: white !important;
-    }
-    
-    .text-indigo-800, .text-indigo-700, .text-indigo-600, .text-indigo-500, .text-indigo-400, .text-indigo-300, .text-indigo-200, .text-indigo-100 {
-        color: white !important;
-    }
-    
-    .text-cyan-800, .text-cyan-700, .text-cyan-600, .text-cyan-500, .text-cyan-400, .text-cyan-300, .text-cyan-200, .text-cyan-100 {
-        color: white !important;
-    }
-    
-    .text-teal-800, .text-teal-700, .text-teal-600, .text-teal-500, .text-teal-400, .text-teal-300, .text-teal-200, .text-teal-100 {
-        color: white !important;
-    }
-    
-    .text-emerald-800, .text-emerald-700, .text-emerald-600, .text-emerald-500, .text-emerald-400, .text-emerald-300, .text-emerald-200, .text-emerald-100 {
-        color: white !important;
-    }
-    
-    .text-lime-800, .text-lime-700, .text-lime-600, .text-lime-500, .text-lime-400, .text-lime-300, .text-lime-200, .text-lime-100 {
-        color: white !important;
-    }
-    
-    .text-amber-800, .text-amber-700, .text-amber-600, .text-amber-500, .text-amber-400, .text-amber-300, .text-amber-200, .text-amber-100 {
-        color: white !important;
-    }
-    
-    .text-rose-800, .text-rose-700, .text-rose-600, .text-rose-500, .text-rose-400, .text-rose-300, .text-rose-200, .text-rose-100 {
-        color: white !important;
-    }
-    
-    .text-fuchsia-800, .text-fuchsia-700, .text-fuchsia-600, .text-fuchsia-500, .text-fuchsia-400, .text-fuchsia-300, .text-fuchsia-200, .text-fuchsia-100 {
-        color: white !important;
-    }
-    
-    .text-violet-800, .text-violet-700, .text-violet-600, .text-violet-500, .text-violet-400, .text-violet-300, .text-violet-200, .text-violet-100 {
-        color: white !important;
-    }
-    
-    .text-sky-800, .text-sky-700, .text-sky-600, .text-sky-500, .text-sky-400, .text-sky-300, .text-sky-200, .text-sky-100 {
-        color: white !important;
-    }
-    
-    .text-stone-800, .text-stone-700, .text-stone-600, .text-stone-500, .text-stone-400, .text-stone-300, .text-stone-200, .text-stone-100 {
-        color: white !important;
-    }
-    
-    .text-neutral-800, .text-neutral-700, .text-neutral-600, .text-neutral-500, .text-neutral-400, .text-neutral-300, .text-neutral-200, .text-neutral-100 {
-        color: white !important;
-    }
-    
-    .text-zinc-800, .text-zinc-700, .text-zinc-600, .text-zinc-500, .text-zinc-400, .text-zinc-300, .text-zinc-200, .text-zinc-100 {
-        color: white !important;
-    }
-    
-    /* Force white text on all elements */
     .withdrawal-page {
         background-color: #0f172a !important;
         color: white !important;
@@ -198,32 +94,6 @@
         border: 1px solid #ef4444 !important;
     }
     
-    /* ULTRA-AGGRESSIVE overrides for specific elements */
-    .withdrawal-item .withdrawal-amount,
-    .withdrawal-item .withdrawal-status,
-    .withdrawal-item .status-completed,
-    .withdrawal-item .status-processing,
-    .withdrawal-item .status-pending {
-        color: white !important;
-        background: #10b981 !important;
-        border: 1px solid #10b981 !important;
-    }
-    
-    .withdrawal-item .status-completed {
-        background: #10b981 !important;
-        color: white !important;
-    }
-    
-    .withdrawal-item .status-processing {
-        background: #f59e0b !important;
-        color: white !important;
-    }
-    
-    .withdrawal-item .status-pending {
-        background: #6b7280 !important;
-        color: white !important;
-    }
-    
     /* REMOVE FAST TRACK SECTION COMPLETELY */
     .fast-track-section {
         display: none !important;
@@ -269,28 +139,6 @@
         background: rgba(255, 255, 255, 0.5);
     }
     
-    /* Force all text to be white */
-    .text-blue-100, .text-blue-200, .text-white, .text-gray-100, .text-gray-200, .text-gray-300, .text-gray-400, .text-gray-500, .text-gray-600, .text-gray-700, .text-gray-800, .text-gray-900 {
-        color: white !important;
-    }
-    
-    /* Override any conflicting styles */
-    .withdrawal-item * {
-        color: white !important;
-    }
-    
-    .withdrawal-item .text-blue-200 {
-        color: #bfdbfe !important;
-    }
-    
-    .withdrawal-item .withdrawal-amount {
-        color: #10b981 !important;
-        background: rgba(16, 185, 129, 0.2) !important;
-        padding: 4px 8px !important;
-        border-radius: 4px !important;
-        border: 1px solid #10b981 !important;
-    }
-    
     /* Hide payment modal */
     .payment-modal {
         display: none !important;
@@ -298,15 +146,6 @@
     
     /* LIGHT MODE OVERRIDES */
     @media (prefers-color-scheme: light) {
-        * {
-            color: #1f2937 !important;
-        }
-        
-        html, body {
-            background-color: #ffffff !important;
-            color: #1f2937 !important;
-        }
-        
         .withdrawal-page {
             background-color: #ffffff !important;
             color: #1f2937 !important;
@@ -370,43 +209,38 @@
 {% endblock %}
 
 {% block content %}
-<div class="withdrawal-page">
+<div class="withdrawal-page" style="background-color: #0f172a; color: white; min-height: 100vh;">
     <div class="container mx-auto px-4 py-8">
-        <div class="withdrawal-card">
-            <h1 class="text-3xl font-bold mb-6 text-center text-white">{{ title }}</h1>
-            <p class="text-center text-blue-100 mb-8">
+        <div class="withdrawal-card" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); border-radius: 12px; padding: 20px; margin-bottom: 20px; color: white; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1);">
+            <h1 class="text-3xl font-bold mb-6 text-center" style="color: white !important;">{{ title }}</h1>
+            <p class="text-center mb-8" style="color: #bfdbfe !important;">
                 See who has successfully withdrawn their crypto investments. 
                 Join thousands of satisfied customers who trust Meridian Asset Logistics.
             </p>
             
-            <!-- Show total count -->
-            <div class="text-center text-blue-100 mb-6">
-                <p class="text-lg font-semibold">Total: {{ total_count }} Withdrawals</p>
-            </div>
-            
             <!-- Scrollable container for all withdrawals -->
-            <div class="withdrawals-container">
+            <div class="withdrawals-container" style="max-height: 80vh; overflow-y: auto; padding-right: 10px;">
                 <div class="space-y-3">
                     {% for withdrawal in withdrawals %}
-                    <div class="withdrawal-item">
+                    <div class="withdrawal-item" style="background: rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); color: white;">
                         <div class="flex items-center">
-                            <div class="text-sm text-blue-200 mr-3 font-semibold">
+                            <div class="text-sm mr-3 font-semibold" style="color: #bfdbfe !important;">
                                 {{ withdrawal.estimated_delivery_display }}
                             </div>
-                            <div class="withdrawal-name text-white">{{ withdrawal.name }}</div>
+                            <div class="withdrawal-name" style="font-weight: 600; font-size: 1.1rem; color: white !important;">{{ withdrawal.name }}</div>
                             {% if withdrawal.is_fast_track %}
-                            <span class="fast-track-badge">FAST TRACK</span>
+                            <span class="fast-track-badge" style="background: #ef4444; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; margin-left: 8px; border: 1px solid #ef4444;">FAST TRACK</span>
                             {% endif %}
                         </div>
                         <div class="flex items-center space-x-4">
-                            <div class="withdrawal-amount">{{ withdrawal.display_amount }}</div>
-                            <div class="withdrawal-status status-{{ withdrawal.status }}">
+                            <div class="withdrawal-amount" style="font-size: 1.2rem; font-weight: bold; color: #10b981; background: rgba(16, 185, 129, 0.2); padding: 4px 8px; border-radius: 4px; border: 1px solid #10b981;">{{ withdrawal.display_amount }}</div>
+                            <div class="withdrawal-status status-{{ withdrawal.status }}" style="padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: white; background: #6b7280; border: 1px solid #6b7280;">
                                 {{ withdrawal.status_display }}
                             </div>
                         </div>
                     </div>
                     {% empty %}
-                    <div class="text-center text-blue-100 py-8">
+                    <div class="text-center py-8" style="color: #bfdbfe !important;">
                         <p>No withdrawals to display at the moment.</p>
                     </div>
                     {% endfor %}
@@ -415,4 +249,42 @@
         </div>
     </div>
 </div>
+
+<script>
+// Force dark mode styles
+document.addEventListener('DOMContentLoaded', function() {
+    // Apply dark mode styles to all elements
+    const allElements = document.querySelectorAll('*');
+    allElements.forEach(element => {
+        if (element.style.color === '' || element.style.color === 'rgb(0, 0, 0)' || element.style.color === 'black') {
+            element.style.color = 'white';
+        }
+    });
+    
+    // Force specific elements to be white
+    const withdrawalItems = document.querySelectorAll('.withdrawal-item');
+    withdrawalItems.forEach(item => {
+        const name = item.querySelector('.withdrawal-name');
+        const amount = item.querySelector('.withdrawal-amount');
+        const status = item.querySelector('.withdrawal-status');
+        
+        if (name) name.style.color = 'white';
+        if (amount) {
+            amount.style.color = '#10b981';
+            amount.style.background = 'rgba(16, 185, 129, 0.2)';
+            amount.style.border = '1px solid #10b981';
+        }
+        if (status) {
+            status.style.color = 'white';
+            if (status.classList.contains('status-completed')) {
+                status.style.background = '#10b981';
+            } else if (status.classList.contains('status-processing')) {
+                status.style.background = '#f59e0b';
+            } else if (status.classList.contains('status-pending')) {
+                status.style.background = '#6b7280';
+            }
+        }
+    });
+});
+</script>
 {% endblock %}
