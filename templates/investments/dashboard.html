@@ -539,15 +539,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             Pay $740 to fast-track your withdrawal to the top of the list for 4-day processing.
                         </p>
                         
-                        <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 mb-6 border-2 border-gray-300 dark:border-gray-600">
-                            <div class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Payment Address:</div>
-                            <div class="font-mono text-sm bg-white dark:bg-gray-900 p-3 rounded border-2 border-gray-400 dark:border-gray-500 break-all text-gray-900 dark:text-white" id="paymentAddress">
-                                ${paymentData.payment_address}
-                            </div>
-                            <button id="copyAddressBtn" class="mt-3 bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors shadow-lg">
-                                📋 Copy Address
-                            </button>
-                        </div>
                         
                         <div class="bg-yellow-100 dark:bg-yellow-900 border-2 border-yellow-400 dark:border-yellow-600 rounded-lg p-6 mb-8">
                             <div class="text-sm text-yellow-800 dark:text-yellow-200 font-semibold">
@@ -556,11 +547,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                         </div>
                         
-                        <div class="flex space-x-4 mb-6">
-                            <button id="nowPaymentsBtn" class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg">
+                        <div class="flex space-x-4 mb-8">
+                            <button id="nowPaymentsBtn" class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg text-lg">
                                 💳 Pay with NOWPayments
                             </button>
-                            <button id="cancelBtn" class="flex-1 bg-gray-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-600 transition-colors shadow-lg">
+                            <button id="cancelBtn" class="flex-1 bg-gray-500 text-white px-8 py-4 rounded-lg font-semibold hover:bg-gray-600 transition-colors shadow-lg text-lg">
                                 Cancel
                             </button>
                         </div>
@@ -579,7 +570,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.insertAdjacentHTML('beforeend', modalHTML);
         
         // Add event listeners for buttons
-        document.getElementById('copyAddressBtn').addEventListener('click', copyPaymentAddress);
         document.getElementById('nowPaymentsBtn').addEventListener('click', openNowPayments);
         document.getElementById('cancelBtn').addEventListener('click', closeBoostModal);
         
@@ -589,73 +579,6 @@ document.addEventListener('DOMContentLoaded', function() {
         button.disabled = false;
     }
     
-    function copyPaymentAddress() {
-        const addressElement = document.getElementById('paymentAddress');
-        if (!addressElement) {
-            alert('❌ Payment address not found!');
-            return;
-        }
-        
-        const address = addressElement.textContent.trim();
-        
-        // Try modern clipboard API first
-        if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(address).then(() => {
-                // Show success feedback
-                const button = document.getElementById('copyAddressBtn');
-                const originalText = button.innerHTML;
-                button.innerHTML = '✅ Copied!';
-                button.classList.add('bg-green-600');
-                button.classList.remove('bg-blue-600');
-                
-                setTimeout(() => {
-                    button.innerHTML = originalText;
-                    button.classList.remove('bg-green-600');
-                    button.classList.add('bg-blue-600');
-                }, 2000);
-            }).catch(() => {
-                // Fallback to old method
-                fallbackCopyTextToClipboard(address);
-            });
-        } else {
-            // Fallback for older browsers
-            fallbackCopyTextToClipboard(address);
-        }
-    }
-    
-    function fallbackCopyTextToClipboard(text) {
-        const textArea = document.createElement("textarea");
-        textArea.value = text;
-        textArea.style.position = "fixed";
-        textArea.style.left = "-999999px";
-        textArea.style.top = "-999999px";
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        
-        try {
-            const successful = document.execCommand('copy');
-            if (successful) {
-                const button = document.getElementById('copyAddressBtn');
-                const originalText = button.innerHTML;
-                button.innerHTML = '✅ Copied!';
-                button.classList.add('bg-green-600');
-                button.classList.remove('bg-blue-600');
-                
-                setTimeout(() => {
-                    button.innerHTML = originalText;
-                    button.classList.remove('bg-green-600');
-                    button.classList.add('bg-blue-600');
-                }, 2000);
-            } else {
-                alert('❌ Failed to copy address. Please copy manually.');
-            }
-        } catch (err) {
-            alert('❌ Failed to copy address. Please copy manually.');
-        }
-        
-        document.body.removeChild(textArea);
-    }
     
     function openNowPayments() {
         // Open NOWPayments payment page
