@@ -378,14 +378,11 @@ def main():
     # Set Django settings
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'delivery_tracker.settings')
     
-    # Initialize Django
-    django.setup()
-    
     print("🚀 STARTING APPLICATION WITH GUARANTEED MARKETAUX FETCH")
     print("=" * 80)
     
     try:
-        # Run migrations first
+        # Run migrations first (this will initialize Django properly)
         print("🔄 Running migrations...")
         execute_from_command_line(['manage.py', 'migrate', '--noinput'])
         print("✅ Migrations completed successfully")
@@ -394,6 +391,9 @@ def main():
         print("📁 Collecting static files...")
         execute_from_command_line(['manage.py', 'collectstatic', '--noinput', '--clear'])
         print("✅ Static files collected successfully")
+        
+        # Initialize Django after migrations are complete
+        django.setup()
         
         # FORCE FETCH MARKETAUX NEWS
         print("🚀 FORCE FETCHING MARKETAUX NEWS...")
