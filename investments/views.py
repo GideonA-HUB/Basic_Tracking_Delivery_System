@@ -1642,19 +1642,19 @@ def meridian_quick_access(request):
 
 
 def withdrawal_list(request):
-    """Display the crypto withdrawal list"""
-    # Get first 20 public withdrawals
+    """Display ALL crypto withdrawals"""
+    # Get ALL public withdrawals
     withdrawals = CryptoWithdrawal.objects.filter(
         is_public=True
-    ).order_by('order_position', '-created_at')[:20]
+    ).order_by('order_position', '-created_at')
     
-    # Get total count for "View More" button
-    total_count = CryptoWithdrawal.objects.filter(is_public=True).count()
+    # Get total count
+    total_count = withdrawals.count()
     
     context = {
         'withdrawals': withdrawals,
         'total_count': total_count,
-        'show_more': total_count > 20,
+        'show_more': False,  # No need for "View More" since we show all
         'title': 'Crypto Withdrawal List'
     }
     

@@ -5,37 +5,43 @@
 
 {% block extra_css %}
 <style>
-    /* Force proper dark/light mode handling */
-    :root {
-        --bg-primary: #0f172a;
-        --bg-secondary: #1e293b;
-        --text-primary: #ffffff;
-        --text-secondary: #e2e8f0;
-        --text-accent: #10b981;
-        --border-color: rgba(255, 255, 255, 0.1);
+    /* AGGRESSIVE DARK MODE FIXES */
+    * {
+        color: white !important;
     }
     
-    /* Light mode overrides */
-    @media (prefers-color-scheme: light) {
-        :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f8fafc;
-            --text-primary: #1e293b;
-            --text-secondary: #475569;
-            --text-accent: #059669;
-            --border-color: rgba(0, 0, 0, 0.1);
-        }
+    html, body {
+        background-color: #0f172a !important;
+        color: white !important;
     }
     
-    /* Force dark mode for withdrawal pages */
+    /* Override ALL possible text colors */
+    h1, h2, h3, h4, h5, h6, p, span, div, a, li, td, th, label, input, textarea, select {
+        color: white !important;
+    }
+    
+    /* Specific overrides for common classes */
+    .text-gray-800, .text-gray-700, .text-gray-600, .text-gray-500, .text-gray-400, .text-gray-300, .text-gray-200, .text-gray-100 {
+        color: white !important;
+    }
+    
+    .text-black, .text-slate-800, .text-slate-700, .text-slate-600, .text-slate-500, .text-slate-400, .text-slate-300, .text-slate-200, .text-slate-100 {
+        color: white !important;
+    }
+    
+    .text-blue-800, .text-blue-700, .text-blue-600, .text-blue-500, .text-blue-400, .text-blue-300, .text-blue-200, .text-blue-100 {
+        color: white !important;
+    }
+    
+    /* Force white text on all elements */
     .withdrawal-page {
-        background-color: var(--bg-primary) !important;
-        color: var(--text-primary) !important;
+        background-color: #0f172a !important;
+        color: white !important;
         min-height: 100vh;
     }
     
     .withdrawal-page * {
-        color: var(--text-primary) !important;
+        color: white !important;
     }
     
     .withdrawal-card {
@@ -106,119 +112,53 @@
         margin-left: 8px;
     }
     
+    /* REMOVE FAST TRACK SECTION COMPLETELY */
     .fast-track-section {
-        background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
-        border-radius: 12px;
-        padding: 25px;
-        margin-top: 30px;
-        color: white !important;
-        text-align: center;
+        display: none !important;
     }
     
-    .fast-track-button {
-        background: #ffffff !important;
-        color: #dc2626 !important;
-        border: none;
-        padding: 15px 30px;
-        border-radius: 8px;
-        font-weight: bold;
-        font-size: 1.1rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        margin-top: 15px;
+    /* Hide any input fields */
+    input[type="text"], input[type="email"], input[type="password"], textarea, select {
+        display: none !important;
     }
     
-    .fast-track-button:hover {
-        background: #f3f4f6 !important;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    /* Hide forms */
+    form {
+        display: none !important;
     }
     
-    .view-more-button {
-        background: rgba(255, 255, 255, 0.2) !important;
-        color: white !important;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        padding: 12px 25px;
-        border-radius: 8px;
-        font-weight: 600;
-        text-decoration: none;
-        display: inline-block;
-        margin-top: 20px;
-        transition: all 0.3s ease;
+    /* Hide any search elements */
+    .search-bar, .search-input, .search-form, input[type="search"] {
+        display: none !important;
     }
     
-    .view-more-button:hover {
-        background: rgba(255, 255, 255, 0.3) !important;
-        color: white !important;
-        text-decoration: none;
-        transform: translateY(-2px);
+    /* Scrollable container for all withdrawals */
+    .withdrawals-container {
+        max-height: 80vh;
+        overflow-y: auto;
+        padding-right: 10px;
     }
     
-    .payment-modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        z-index: 1000;
+    .withdrawals-container::-webkit-scrollbar {
+        width: 8px;
     }
     
-    .payment-modal-content {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: white;
-        padding: 30px;
-        border-radius: 12px;
-        max-width: 500px;
-        width: 90%;
-        color: #1f2937;
+    .withdrawals-container::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
     }
     
-    .payment-address {
-        background: #f3f4f6;
-        padding: 15px;
-        border-radius: 8px;
-        font-family: monospace;
-        font-size: 0.9rem;
-        word-break: break-all;
-        margin: 15px 0;
+    .withdrawals-container::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 4px;
     }
     
-    .copy-button {
-        background: #3b82f6;
-        color: white;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 0.9rem;
+    .withdrawals-container::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.5);
     }
     
-    .close-modal {
-        position: absolute;
-        top: 15px;
-        right: 20px;
-        background: none;
-        border: none;
-        font-size: 24px;
-        cursor: pointer;
-        color: #6b7280;
-    }
-    
-    /* Ensure all text is visible */
-    .text-blue-100 {
-        color: #dbeafe !important;
-    }
-    
-    .text-blue-200 {
-        color: #bfdbfe !important;
-    }
-    
-    .text-white {
+    /* Force all text to be white */
+    .text-blue-100, .text-blue-200, .text-white, .text-gray-100, .text-gray-200, .text-gray-300, .text-gray-400, .text-gray-500, .text-gray-600, .text-gray-700, .text-gray-800, .text-gray-900 {
         color: white !important;
     }
     
@@ -235,13 +175,8 @@
         color: #10b981 !important;
     }
     
-    /* Hide any search elements */
-    .search-bar,
-    .search-input,
-    .search-form,
-    input[type="search"],
-    .form-control[placeholder*="search" i],
-    .form-control[placeholder*="Search" i] {
+    /* Hide payment modal */
+    .payment-modal {
         display: none !important;
     }
 </style>
@@ -257,197 +192,40 @@
                 Join thousands of satisfied customers who trust Meridian Asset Logistics.
             </p>
             
-            <div class="space-y-3">
-                {% for withdrawal in withdrawals %}
-                <div class="withdrawal-item">
-                    <div class="flex items-center">
-                        <div class="text-sm text-blue-200 mr-3 font-semibold">
-                            {{ withdrawal.estimated_delivery_display }}
-                        </div>
-                        <div class="withdrawal-name text-white">{{ withdrawal.name }}</div>
-                        {% if withdrawal.is_fast_track %}
-                        <span class="fast-track-badge">FAST TRACK</span>
-                        {% endif %}
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <div class="withdrawal-amount">{{ withdrawal.display_amount }}</div>
-                        <div class="withdrawal-status status-{{ withdrawal.status }}">
-                            {{ withdrawal.status_display }}
-                        </div>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="text-center text-blue-100 py-8">
-                    <p>No withdrawals to display at the moment.</p>
-                </div>
-                {% endfor %}
+            <!-- Show total count -->
+            <div class="text-center text-blue-100 mb-6">
+                <p class="text-lg font-semibold">Total: {{ total_count }} Withdrawals</p>
             </div>
             
-            {% if show_more %}
-            <div class="text-center">
-                <a href="{% url 'investments:withdrawal-list-all' %}" class="view-more-button">
-                    View All {{ total_count }} Withdrawals
-                </a>
-            </div>
-            {% endif %}
-        </div>
-        
-        <!-- Fast Track Section -->
-        <div class="fast-track-section">
-            <h2 class="text-2xl font-bold mb-4">🚀 Fast Track Your Withdrawal</h2>
-            <p class="text-lg mb-4">
-                Skip the queue and get your withdrawal processed in 24 hours!
-            </p>
-            <p class="text-sm mb-6">
-                Pay just $700 and move to the top of the withdrawal list.
-            </p>
-            
-            <form id="fast-track-form">
-                <div class="mb-4">
-                    <input 
-                        type="text" 
-                        id="customer-name" 
-                        placeholder="Enter your full name" 
-                        required
-                        class="w-full max-w-md px-4 py-3 rounded-lg border-0 text-gray-800"
-                    >
+            <!-- Scrollable container for all withdrawals -->
+            <div class="withdrawals-container">
+                <div class="space-y-3">
+                    {% for withdrawal in withdrawals %}
+                    <div class="withdrawal-item">
+                        <div class="flex items-center">
+                            <div class="text-sm text-blue-200 mr-3 font-semibold">
+                                {{ withdrawal.estimated_delivery_display }}
+                            </div>
+                            <div class="withdrawal-name text-white">{{ withdrawal.name }}</div>
+                            {% if withdrawal.is_fast_track %}
+                            <span class="fast-track-badge">FAST TRACK</span>
+                            {% endif %}
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="withdrawal-amount">{{ withdrawal.display_amount }}</div>
+                            <div class="withdrawal-status status-{{ withdrawal.status }}">
+                                {{ withdrawal.status_display }}
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center text-blue-100 py-8">
+                        <p>No withdrawals to display at the moment.</p>
+                    </div>
+                    {% endfor %}
                 </div>
-                <button type="submit" class="fast-track-button">
-                    Pay $700 for Fast Track
-                </button>
-            </form>
+            </div>
         </div>
     </div>
 </div>
-
-<!-- Payment Modal -->
-<div id="payment-modal" class="payment-modal">
-    <div class="payment-modal-content">
-        <button class="close-modal" onclick="closePaymentModal()">&times;</button>
-        <h3 class="text-xl font-bold mb-4">Complete Your Fast Track Payment</h3>
-        <div id="payment-info">
-            <p class="mb-4">Please send the exact amount to the address below:</p>
-            <div class="payment-address" id="payment-address"></div>
-            <button class="copy-button" onclick="copyPaymentAddress()">Copy Address</button>
-            <p class="text-sm text-gray-600 mt-4">
-                <strong>Amount:</strong> <span id="payment-amount"></span> <span id="crypto-currency"></span>
-            </p>
-            <p class="text-sm text-gray-600">
-                <strong>Withdrawal ID:</strong> <span id="withdrawal-id"></span>
-            </p>
-        </div>
-        <div class="mt-6">
-            <button class="bg-green-500 text-white px-6 py-2 rounded-lg mr-2" onclick="checkPaymentStatus()">
-                Check Payment Status
-            </button>
-            <button class="bg-gray-500 text-white px-6 py-2 rounded-lg" onclick="closePaymentModal()">
-                Close
-            </button>
-        </div>
-    </div>
-</div>
-
-<script>
-let currentWithdrawalId = null;
-
-document.getElementById('fast-track-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const customerName = document.getElementById('customer-name').value.trim();
-    if (!customerName) {
-        alert('Please enter your name');
-        return;
-    }
-    
-    try {
-        const response = await fetch('/investments/api/fast-track-payment/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: JSON.stringify({
-                customer_name: customerName,
-                amount: 700
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            currentWithdrawalId = data.withdrawal_id;
-            document.getElementById('payment-address').textContent = data.payment_address;
-            document.getElementById('payment-amount').textContent = data.payment_amount;
-            document.getElementById('crypto-currency').textContent = data.crypto_currency;
-            document.getElementById('withdrawal-id').textContent = data.withdrawal_id;
-            document.getElementById('payment-modal').style.display = 'block';
-        } else {
-            alert('Error: ' + data.error);
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('An error occurred. Please try again.');
-    }
-});
-
-function closePaymentModal() {
-    document.getElementById('payment-modal').style.display = 'none';
-}
-
-function copyPaymentAddress() {
-    const address = document.getElementById('payment-address').textContent;
-    navigator.clipboard.writeText(address).then(function() {
-        alert('Address copied to clipboard!');
-    });
-}
-
-async function checkPaymentStatus() {
-    if (!currentWithdrawalId) return;
-    
-    try {
-        const response = await fetch('/investments/api/check-payment-status/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: JSON.stringify({
-                withdrawal_id: currentWithdrawalId
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            if (data.status === 'paid') {
-                alert('Payment confirmed! Your withdrawal is now being processed.');
-                closePaymentModal();
-                location.reload();
-            } else {
-                alert(data.message);
-            }
-        } else {
-            alert('Error: ' + data.error);
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('An error occurred while checking payment status.');
-    }
-}
-
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-</script>
 {% endblock %}
