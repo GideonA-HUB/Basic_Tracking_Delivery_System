@@ -340,7 +340,7 @@ def investment_dashboard(request):
         # Get recent withdrawals for dashboard widget
         recent_withdrawals = CryptoWithdrawal.objects.filter(
             is_public=True
-        ).order_by('order_position', '-created_at')[:5]
+        ).order_by('order_position', '-created_at')[:20]
         
         context = {
             'portfolio': portfolio,

@@ -30,7 +30,7 @@
     .withdrawal-name {
         font-weight: 600;
         font-size: 1.1rem;
-        color: white;
+        color: white !important;
     }
     
     .withdrawal-amount {
@@ -207,7 +207,7 @@
 <div class="container mx-auto px-4 py-8">
     <div class="withdrawal-card">
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold">{{ title }}</h1>
+            <h1 class="text-3xl font-bold text-white">{{ title }}</h1>
             <a href="{% url 'investments:withdrawal-list' %}" class="back-button">
                 ← Back to Top 20
             </a>
@@ -224,7 +224,7 @@
                     <div class="text-sm text-blue-200 mr-3 font-semibold">
                         {{ withdrawal.estimated_delivery_display }}
                     </div>
-                    <div class="withdrawal-name">{{ withdrawal.name }}</div>
+                    <div class="withdrawal-name text-white">{{ withdrawal.name }}</div>
                     {% if withdrawal.is_fast_track %}
                     <span class="fast-track-badge">FAST TRACK</span>
                     {% endif %}

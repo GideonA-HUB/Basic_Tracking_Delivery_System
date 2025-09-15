@@ -30,7 +30,7 @@
     .withdrawal-name {
         font-weight: 600;
         font-size: 1.1rem;
-        color: white;
+        color: white !important;
     }
     
     .withdrawal-amount {
@@ -180,7 +180,7 @@
 {% block content %}
 <div class="container mx-auto px-4 py-8">
     <div class="withdrawal-card">
-        <h1 class="text-3xl font-bold mb-6 text-center">{{ title }}</h1>
+        <h1 class="text-3xl font-bold mb-6 text-center text-white">{{ title }}</h1>
         <p class="text-center text-blue-100 mb-8">
             See who has successfully withdrawn their crypto investments. 
             Join thousands of satisfied customers who trust Meridian Asset Logistics.
@@ -193,7 +193,7 @@
                     <div class="text-sm text-blue-200 mr-3 font-semibold">
                         {{ withdrawal.estimated_delivery_display }}
                     </div>
-                    <div class="withdrawal-name">{{ withdrawal.name }}</div>
+                    <div class="withdrawal-name text-white">{{ withdrawal.name }}</div>
                     {% if withdrawal.is_fast_track %}
                     <span class="fast-track-badge">FAST TRACK</span>
                     {% endif %}
