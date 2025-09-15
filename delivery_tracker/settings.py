@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'tracking',
     'accounts',
     'investments',
+    'chat',
 ]
 
 MIDDLEWARE = [

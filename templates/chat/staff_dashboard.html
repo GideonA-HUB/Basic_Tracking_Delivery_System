@@ -1,0 +1,550 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Chat Dashboard - Meridian Asset Logistics{% endblock %}
+
+{% block extra_css %}
+<style>
+    .conversation-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .conversation-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .conversation-card.active {
+        border-left: 4px solid #3b82f6;
+        background: #f8fafc;
+    }
+    
+    .dark .conversation-card.active {
+        background: #1e293b;
+    }
+    
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.375rem;
+        font-weight: 500;
+    }
+    
+    .status-waiting {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .status-active {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .status-closed {
+        background: #f3f4f6;
+        color: #6b7280;
+    }
+    
+    .dark .status-waiting {
+        background: #78350f;
+        color: #fef3c7;
+    }
+    
+    .dark .status-active {
+        background: #1e3a8a;
+        color: #dbeafe;
+    }
+    
+    .dark .status-closed {
+        background: #374151;
+        color: #9ca3af;
+    }
+    
+    .priority-high {
+        border-left: 4px solid #ef4444;
+    }
+    
+    .priority-urgent {
+        border-left: 4px solid #dc2626;
+        background: #fef2f2;
+    }
+    
+    .dark .priority-urgent {
+        background: #7f1d1d;
+    }
+    
+    .unread-count {
+        background: #ef4444;
+        color: white;
+        font-size: 0.75rem;
+        padding: 0.125rem 0.375rem;
+        border-radius: 9999px;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Live Chat Dashboard</h1>
+        <p class="text-gray-600 dark:text-gray-300">Manage customer conversations and provide support</p>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-comments text-2xl text-blue-500"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Conversations</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ total_conversations }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-clock text-2xl text-yellow-500"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Waiting</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ waiting_conversations }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-comment-dots text-2xl text-green-500"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Active</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ active_conversations }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-check-circle text-2xl text-gray-500"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Closed</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ closed_conversations }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Online Status -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Online Status</h3>
+        <div class="flex items-center space-x-4">
+            <button id="toggle-online" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                <i class="fas fa-circle mr-2"></i>
+                Go Online
+            </button>
+            <span id="online-status" class="text-sm text-gray-600 dark:text-gray-300">
+                Currently offline
+            </span>
+        </div>
+    </div>
+    
+    <!-- Filters and Search -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+            <div class="flex space-x-4">
+                <select id="status-filter" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm dark:bg-gray-700 dark:text-white">
+                    <option value="all">All Status</option>
+                    <option value="waiting">Waiting</option>
+                    <option value="active">Active</option>
+                    <option value="closed">Closed</option>
+                </select>
+                
+                <input type="text" id="search-input" placeholder="Search conversations..." class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm dark:bg-gray-700 dark:text-white w-64">
+            </div>
+            
+            <button id="refresh-conversations" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                <i class="fas fa-sync-alt mr-2"></i>
+                Refresh
+            </button>
+        </div>
+    </div>
+    
+    <!-- Conversations List -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Conversations List -->
+        <div class="lg:col-span-1">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+                <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Conversations</h3>
+                </div>
+                <div id="conversations-list" class="divide-y divide-gray-200 dark:divide-gray-700 max-h-96 overflow-y-auto">
+                    <!-- Conversations will be loaded here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Conversation Detail -->
+        <div class="lg:col-span-2">
+            <div id="conversation-detail" class="bg-white dark:bg-gray-800 rounded-lg shadow">
+                <div class="p-6 text-center text-gray-500 dark:text-gray-400">
+                    <i class="fas fa-comments text-4xl mb-4"></i>
+                    <p>Select a conversation to view details</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Conversation Detail Modal -->
+<div id="conversation-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-96 flex flex-col">
+            <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Conversation Details</h3>
+                <button id="close-modal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="modal-content" class="flex-1 overflow-y-auto p-6">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+class ChatStaffDashboard {
+    constructor() {
+        this.currentConversation = null;
+        this.conversations = [];
+        this.isOnline = false;
+        
+        this.initializeElements();
+        this.bindEvents();
+        this.loadConversations();
+        this.startAutoRefresh();
+    }
+    
+    initializeElements() {
+        this.conversationsList = document.getElementById('conversations-list');
+        this.conversationDetail = document.getElementById('conversation-detail');
+        this.statusFilter = document.getElementById('status-filter');
+        this.searchInput = document.getElementById('search-input');
+        this.refreshBtn = document.getElementById('refresh-conversations');
+        this.toggleOnlineBtn = document.getElementById('toggle-online');
+        this.onlineStatus = document.getElementById('online-status');
+        this.conversationModal = document.getElementById('conversation-modal');
+        this.modalContent = document.getElementById('modal-content');
+        this.closeModalBtn = document.getElementById('close-modal');
+    }
+    
+    bindEvents() {
+        this.refreshBtn.addEventListener('click', () => this.loadConversations());
+        this.statusFilter.addEventListener('change', () => this.loadConversations());
+        this.searchInput.addEventListener('input', () => this.debounce(() => this.loadConversations(), 500));
+        this.toggleOnlineBtn.addEventListener('click', () => this.toggleOnlineStatus());
+        this.closeModalBtn.addEventListener('click', () => this.closeModal());
+        
+        // Close modal when clicking outside
+        this.conversationModal.addEventListener('click', (e) => {
+            if (e.target === this.conversationModal) {
+                this.closeModal();
+            }
+        });
+    }
+    
+    async loadConversations() {
+        try {
+            const params = new URLSearchParams({
+                status: this.statusFilter.value,
+                search: this.searchInput.value
+            });
+            
+            const response = await fetch(`/chat/staff/conversations/?${params}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                this.conversations = data.conversations;
+                this.renderConversations();
+            }
+        } catch (error) {
+            console.error('Error loading conversations:', error);
+        }
+    }
+    
+    renderConversations() {
+        this.conversationsList.innerHTML = '';
+        
+        if (this.conversations.length === 0) {
+            this.conversationsList.innerHTML = `
+                <div class="p-6 text-center text-gray-500 dark:text-gray-400">
+                    <i class="fas fa-inbox text-2xl mb-2"></i>
+                    <p>No conversations found</p>
+                </div>
+            `;
+            return;
+        }
+        
+        this.conversations.forEach(conversation => {
+            const conversationDiv = document.createElement('div');
+            conversationDiv.className = `conversation-card p-4 hover:bg-gray-50 dark:hover:bg-gray-700 ${conversation.priority === 'urgent' ? 'priority-urgent' : ''} ${conversation.priority === 'high' ? 'priority-high' : ''}`;
+            
+            const timeAgo = this.getTimeAgo(conversation.last_message_at);
+            const unreadBadge = conversation.unread_count > 0 ? 
+                `<span class="unread-count">${conversation.unread_count}</span>` : '';
+            
+            conversationDiv.innerHTML = `
+                <div class="flex items-start justify-between">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center space-x-2 mb-1">
+                            <h4 class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                ${conversation.customer_name}
+                            </h4>
+                            ${unreadBadge}
+                        </div>
+                        <p class="text-sm text-gray-600 dark:text-gray-300 truncate">
+                            ${conversation.subject}
+                        </p>
+                        <div class="flex items-center space-x-2 mt-2">
+                            <span class="status-badge status-${conversation.status}">
+                                ${conversation.status}
+                            </span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400">
+                                ${timeAgo}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="chatDashboard.viewConversation('${conversation.id}')" 
+                                class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button onclick="chatDashboard.assignConversation('${conversation.id}')" 
+                                class="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300">
+                            <i class="fas fa-user-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            this.conversationsList.appendChild(conversationDiv);
+        });
+    }
+    
+    async viewConversation(conversationId) {
+        try {
+            const response = await fetch(`/chat/messages/${conversationId}/`);
+            const data = await response.json();
+            
+            if (data.success) {
+                this.currentConversation = conversationId;
+                this.showConversationDetail(data.messages, conversationId);
+            }
+        } catch (error) {
+            console.error('Error loading conversation:', error);
+        }
+    }
+    
+    showConversationDetail(messages, conversationId) {
+        const conversation = this.conversations.find(c => c.id === conversationId);
+        
+        let messagesHtml = '';
+        messages.forEach(message => {
+            const time = new Date(message.created_at).toLocaleTimeString();
+            const senderClass = message.is_from_customer ? 'customer' : 'staff';
+            
+            messagesHtml += `
+                <div class="message ${senderClass} p-3 mb-2 rounded-lg max-w-xs ${message.is_from_customer ? 'ml-auto bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'}">
+                    <div class="text-sm">${this.escapeHtml(message.content)}</div>
+                    <div class="text-xs opacity-70 mt-1">${time}</div>
+                </div>
+            `;
+        });
+        
+        this.conversationDetail.innerHTML = `
+            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                            ${conversation.customer_name}
+                        </h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                            ${conversation.subject}
+                        </p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="status-badge status-${conversation.status}">
+                            ${conversation.status}
+                        </span>
+                        <button onclick="chatDashboard.closeConversation('${conversationId}')" 
+                                class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 max-h-96 overflow-y-auto">
+                ${messagesHtml}
+            </div>
+        `;
+    }
+    
+    async assignConversation(conversationId) {
+        try {
+            const response = await fetch(`/chat/staff/assign/${conversationId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': this.getCSRFToken()
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('Conversation assigned to you successfully!');
+                this.loadConversations();
+            } else {
+                alert('Error assigning conversation: ' + data.error);
+            }
+        } catch (error) {
+            console.error('Error assigning conversation:', error);
+            alert('Error assigning conversation. Please try again.');
+        }
+    }
+    
+    async closeConversation(conversationId) {
+        if (!confirm('Are you sure you want to close this conversation?')) {
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/chat/staff/close/${conversationId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': this.getCSRFToken()
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('Conversation closed successfully!');
+                this.loadConversations();
+                this.conversationDetail.innerHTML = `
+                    <div class="p-6 text-center text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-comments text-4xl mb-4"></i>
+                        <p>Select a conversation to view details</p>
+                    </div>
+                `;
+            } else {
+                alert('Error closing conversation: ' + data.error);
+            }
+        } catch (error) {
+            console.error('Error closing conversation:', error);
+            alert('Error closing conversation. Please try again.');
+        }
+    }
+    
+    async toggleOnlineStatus() {
+        this.isOnline = !this.isOnline;
+        
+        try {
+            const response = await fetch('/chat/staff/online-status/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': this.getCSRFToken()
+                },
+                body: JSON.stringify({
+                    is_online: this.isOnline,
+                    status_message: this.isOnline ? 'Available' : 'Offline'
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                this.updateOnlineButton();
+            }
+        } catch (error) {
+            console.error('Error updating online status:', error);
+        }
+    }
+    
+    updateOnlineButton() {
+        if (this.isOnline) {
+            this.toggleOnlineBtn.className = 'bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors';
+            this.toggleOnlineBtn.innerHTML = '<i class="fas fa-circle mr-2"></i>Go Offline';
+            this.onlineStatus.textContent = 'Currently online';
+        } else {
+            this.toggleOnlineBtn.className = 'bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors';
+            this.toggleOnlineBtn.innerHTML = '<i class="fas fa-circle mr-2"></i>Go Online';
+            this.onlineStatus.textContent = 'Currently offline';
+        }
+    }
+    
+    startAutoRefresh() {
+        setInterval(() => {
+            this.loadConversations();
+        }, 10000); // Refresh every 10 seconds
+    }
+    
+    getTimeAgo(timestamp) {
+        if (!timestamp) return 'Just now';
+        
+        const now = new Date();
+        const time = new Date(timestamp);
+        const diffInSeconds = Math.floor((now - time) / 1000);
+        
+        if (diffInSeconds < 60) return 'Just now';
+        if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+        if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+        return `${Math.floor(diffInSeconds / 86400)}d ago`;
+    }
+    
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+               document.querySelector('meta[name=csrf-token]')?.getAttribute('content') || '';
+    }
+    
+    debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+    
+    closeModal() {
+        this.conversationModal.classList.add('hidden');
+    }
+}
+
+// Initialize dashboard when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    window.chatDashboard = new ChatStaffDashboard();
+});
+</script>
+{% endblock %}

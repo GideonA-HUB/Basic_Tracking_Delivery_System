@@ -12,6 +12,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('api/', include('tracking.urls')),
     path('investments/', include('investments.urls', namespace='investments')),
+    path('chat/', include('chat.urls', namespace='chat')),
     path('', include('tracking.frontend_urls')),
     path('test-static/', serve, {'document_root': 'static', 'path': 'test.html'}),
 ]
