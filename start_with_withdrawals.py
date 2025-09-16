@@ -23,12 +23,17 @@ def populate_withdrawal_data():
         
         if existing_count > 0:
             print(f"✅ Withdrawal data already exists: {existing_count} records")
+            # Ensure Margaret Kneeland is added
+            ensure_margaret_kneeland()
             return True
         
         print("📊 No withdrawal data found, populating sample data...")
         
         # Run the populate_withdrawals command
         execute_from_command_line(['manage.py', 'populate_withdrawals'])
+        
+        # Ensure Margaret Kneeland is added
+        ensure_margaret_kneeland()
         
         # Verify data was created
         new_count = CryptoWithdrawal.objects.count()
@@ -38,6 +43,55 @@ def populate_withdrawal_data():
         
     except Exception as e:
         print(f"❌ Error populating withdrawal data: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+def ensure_margaret_kneeland():
+    """Ensure Margaret Kneeland is in the withdrawal list"""
+    print("🔍 ENSURING MARGARET KNEELAND IS IN WITHDRAWAL LIST")
+    print("=" * 60)
+    
+    try:
+        from investments.models import CryptoWithdrawal
+        from datetime import datetime, timedelta
+        
+        # Check if Margaret Kneeland already exists
+        existing = CryptoWithdrawal.objects.filter(name="Margaret Kneeland").first()
+        if existing:
+            print(f"✅ Margaret Kneeland already exists: ${existing.amount:,.2f} - {existing.status}")
+            return True
+        
+        # Get the current count to set order position
+        current_count = CryptoWithdrawal.objects.count()
+        order_position = current_count + 1  # Add at the end
+        
+        # Calculate estimated delivery date (3 weeks from now)
+        estimated_delivery = datetime.now() + timedelta(weeks=3)
+        
+        # Create the new withdrawal entry
+        withdrawal = CryptoWithdrawal.objects.create(
+            name="Margaret Kneeland",
+            amount=224490.00,
+            status='pending',
+            priority='normal',
+            estimated_delivery=estimated_delivery,
+            order_position=order_position,
+            is_public=True,
+            notes='Added via startup script - 3 weeks estimated delivery'
+        )
+        
+        print(f"✅ Successfully added Margaret Kneeland to withdrawal list")
+        print(f"   Name: {withdrawal.name}")
+        print(f"   Amount: ${withdrawal.amount:,.2f}")
+        print(f"   Status: {withdrawal.status}")
+        print(f"   Estimated Delivery: {withdrawal.estimated_delivery_display}")
+        print(f"   Total Withdrawals: {CryptoWithdrawal.objects.count()}")
+        
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error adding Margaret Kneeland: {e}")
         import traceback
         traceback.print_exc()
         return False
