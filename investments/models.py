@@ -1063,6 +1063,13 @@ class CryptoWithdrawal(models.Model):
                 return f"{weeks} week{'s' if weeks > 1 else ''}"
             else:
                 return f"{weeks} week{'s' if weeks > 1 else ''} {remaining_days} day{'s' if remaining_days > 1 else ''}"
+        elif delta.days < 28:  # Changed from 30 to 28 to handle 3 weeks (21 days) properly
+            weeks = delta.days // 7
+            remaining_days = delta.days % 7
+            if remaining_days == 0:
+                return f"{weeks} week{'s' if weeks > 1 else ''}"
+            else:
+                return f"{weeks} week{'s' if weeks > 1 else ''} {remaining_days} day{'s' if remaining_days > 1 else ''}"
         elif delta.days < 30:
             weeks = delta.days // 7
             return f"{weeks} week{'s' if weeks > 1 else ''}"

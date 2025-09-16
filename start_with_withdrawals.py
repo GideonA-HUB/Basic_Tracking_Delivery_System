@@ -68,7 +68,7 @@ def ensure_margaret_kneeland():
         
         # Calculate estimated delivery date (3 weeks from now) - ensure timezone-aware
         from django.utils import timezone
-        estimated_delivery = timezone.now() + timedelta(weeks=3)
+        estimated_delivery = timezone.now() + timedelta(days=21)  # Exactly 21 days = 3 weeks
         
         # Create the new withdrawal entry
         withdrawal = CryptoWithdrawal.objects.create(
