@@ -66,8 +66,9 @@ def ensure_margaret_kneeland():
         current_count = CryptoWithdrawal.objects.count()
         order_position = current_count + 1  # Add at the end
         
-        # Calculate estimated delivery date (3 weeks from now)
-        estimated_delivery = datetime.now() + timedelta(weeks=3)
+        # Calculate estimated delivery date (3 weeks from now) - ensure timezone-aware
+        from django.utils import timezone
+        estimated_delivery = timezone.now() + timedelta(weeks=3)
         
         # Create the new withdrawal entry
         withdrawal = CryptoWithdrawal.objects.create(

@@ -1038,7 +1038,15 @@ class CryptoWithdrawal(models.Model):
         
         from django.utils import timezone
         now = timezone.now()
-        delta = self.estimated_delivery - now
+        
+        # Handle timezone mismatch - make both timezone-aware
+        if self.estimated_delivery.tzinfo is None:
+            # If estimated_delivery is naive, make it timezone-aware
+            estimated_delivery = timezone.make_aware(self.estimated_delivery)
+        else:
+            estimated_delivery = self.estimated_delivery
+            
+        delta = estimated_delivery - now
         
         if delta.days < 0:
             return "Overdue"
