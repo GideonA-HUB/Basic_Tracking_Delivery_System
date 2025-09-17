@@ -746,6 +746,42 @@
     <!-- Live Chat Widget - Replaced with Hiver Widget -->
     <!-- {% include 'chat/chat_widget.html' %} -->
     
+    <!-- Hide any old chat widgets that might be cached -->
+    <style>
+        #chat-widget,
+        .chat-widget,
+        [id*="chat-widget"],
+        [class*="chat-widget"] {
+            display: none !important;
+        }
+        
+        /* Ensure only Hiver widget is visible */
+        .chatwoot-widget {
+            display: block !important;
+        }
+    </style>
+    
+    <!-- Remove any old chat widgets from DOM -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Remove any old chat widgets
+            const oldChatWidgets = document.querySelectorAll('#chat-widget, .chat-widget, [id*="chat-widget"], [class*="chat-widget"]');
+            oldChatWidgets.forEach(widget => {
+                if (widget && widget.parentNode) {
+                    widget.parentNode.removeChild(widget);
+                }
+            });
+            
+            // Remove any old chat icons
+            const oldChatIcons = document.querySelectorAll('[class*="fa-comments"], [id*="chat-icon"]');
+            oldChatIcons.forEach(icon => {
+                if (icon && icon.parentNode && icon.parentNode.id !== 'chatwoot-widget') {
+                    icon.parentNode.removeChild(icon);
+                }
+            });
+        });
+    </script>
+    
     <!-- Navigation Arrow Buttons -->
     <div class="fixed bottom-6 left-6 z-50 flex flex-col space-y-2">
         <!-- Scroll to Top Button -->
