@@ -743,8 +743,8 @@
         </div>
     </footer>
 
-    <!-- Live Chat Widget -->
-    {% include 'chat/chat_widget.html' %}
+    <!-- Live Chat Widget - Replaced with Hiver Widget -->
+    <!-- {% include 'chat/chat_widget.html' %} -->
     
     <!-- Navigation Arrow Buttons -->
     <div class="fixed bottom-6 left-6 z-50 flex flex-col space-y-2">
@@ -909,5 +909,54 @@
     </script>
     
     {% block extra_js %}{% endblock %}
+    
+    <!-- User Data for Hiver Chat -->
+    <script>
+        window.hiverUserData = {
+            {% if user.is_authenticated %}
+            isAuthenticated: true,
+            user: {
+                identifier: '{{ user.id }}',
+                name: '{{ user.get_full_name|default:user.username|escapejs }}',
+                email: '{{ user.email|escapejs }}'
+                {% if user.profile.avatar %}
+                ,avatar_url: '{{ user.profile.avatar.url|escapejs }}'
+                {% endif %}
+            }
+            {% else %}
+            isAuthenticated: false
+            {% endif %}
+        };
+    </script>
+    
+    <!-- Hiver Live Chat Widget -->
+    <script>
+        (function(d,t) {
+            var BASE_URL="";
+            var CDN_URL="https://chat-widget.hiverhq.com/chat-widget";
+            var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=CDN_URL+"/js/sdk.js";
+            g.defer = true;
+            g.async = true;
+            s.parentNode.insertBefore(g,s);
+            g.onload=function(){
+                var config = {
+                    websiteToken: 'har2BVT4AVuxZnF5QiWP62wb',
+                    baseUrl: BASE_URL,
+                    hideMessageBubble: false,
+                    showPopoutButton: true,
+                    position: 'right',
+                    locale: 'en'
+                };
+                
+                // Add user data if authenticated
+                if (window.hiverUserData && window.hiverUserData.isAuthenticated) {
+                    config.user = window.hiverUserData.user;
+                }
+                
+                window.chatwootSDK.run(config);
+            }
+        })(document,"script");
+    </script>
 </body>
 </html>
