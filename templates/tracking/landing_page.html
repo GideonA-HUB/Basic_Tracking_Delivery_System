@@ -10,6 +10,7 @@
         overflow: hidden;
         border-radius: 0.5rem;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #1d4ed8 100%);
     }
     
     .hero-image-container img {
@@ -104,10 +105,20 @@
         </div>
         <div class="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
             <div class="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full hero-image-container">
-                <!-- Beautiful Container Ship Image -->
-                <img src="https://img.freepik.com/premium-photo/aerial-view-container-ship-with-business-graph-analysis-global-business-import-export-logistic-transportation-worldwide-by-container-cargo-ship-vessel-freight-shipping-maritime_35024-1557.jpg?size=626&ext=jpg" 
+                <!-- Beautiful Container Ship Image with multiple fallbacks -->
+                <img src="https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
                      alt="Container Ship - Global Logistics Transportation" 
-                     class="w-full h-full object-cover object-center">
+                     class="w-full h-full object-cover object-center"
+                     onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80';">
+                
+                <!-- Fallback background with gradient if all images fail -->
+                <div class="w-full h-full bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 flex items-center justify-center" style="display: none;" id="fallback-bg">
+                    <div class="text-center text-white">
+                        <i class="fas fa-ship text-8xl mb-4 opacity-80"></i>
+                        <h3 class="text-4xl font-bold mb-2">Global Logistics</h3>
+                        <p class="text-xl">Fast & Reliable</p>
+                    </div>
+                </div>
                 
                 <!-- Overlay with gradient for better text readability -->
                 <div class="absolute inset-0 bg-gradient-to-br from-blue-900/40 via-blue-800/30 to-indigo-900/50"></div>
@@ -439,5 +450,43 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
+// Enhanced image loading with fallbacks
+document.addEventListener('DOMContentLoaded', function() {
+    const heroImage = document.querySelector('.hero-image-container img');
+    const fallbackBg = document.getElementById('fallback-bg');
+    
+    if (heroImage) {
+        // Set up image loading with multiple fallbacks
+        const imageSources = [
+            'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+            'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+            'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
+        ];
+        
+        let currentIndex = 0;
+        
+        function tryNextImage() {
+            if (currentIndex < imageSources.length) {
+                heroImage.src = imageSources[currentIndex];
+                currentIndex++;
+            } else {
+                // All images failed, show fallback
+                heroImage.style.display = 'none';
+                if (fallbackBg) {
+                    fallbackBg.style.display = 'flex';
+                }
+            }
+        }
+        
+        heroImage.onerror = function() {
+            console.log('Image failed to load, trying next...');
+            tryNextImage();
+        };
+        
+        // Start with first image
+        heroImage.src = imageSources[0];
+    }
+});
 </script>
 {% endblock %}
