@@ -577,6 +577,263 @@
             transform: translateY(0);
         }
     }
+    
+    /* Enhanced Features Section Styling */
+    .features-section {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .features-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 20% 50%, rgba(34, 211, 238, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 40% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+        animation: background-shift 20s ease-in-out infinite;
+    }
+    
+    .features-subtitle {
+        animation: sparkle-text 3s ease-in-out infinite;
+    }
+    
+    .features-title {
+        animation: title-glow 4s ease-in-out infinite;
+    }
+    
+    .features-description {
+        animation: description-float 6s ease-in-out infinite;
+    }
+    
+    .features-description .text-yellow-400 {
+        animation: highlight-glow 2s ease-in-out infinite;
+    }
+    
+    .features-description .text-cyan-400 {
+        animation: highlight-glow 2s ease-in-out infinite 0.5s;
+    }
+    
+    .features-description .text-emerald-400 {
+        animation: highlight-glow 2s ease-in-out infinite 1s;
+    }
+    
+    .features-description .text-pink-400 {
+        animation: highlight-glow 2s ease-in-out infinite 1.5s;
+    }
+    
+    /* Feature Cards */
+    .feature-card {
+        position: relative;
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(34, 211, 238, 0.2);
+        border-radius: 20px;
+        padding: 2rem;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+    }
+    
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.1), transparent);
+        transition: left 0.6s ease;
+    }
+    
+    .feature-card:hover::before {
+        left: 100%;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        border-color: rgba(34, 211, 238, 0.5);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3),
+                    0 0 20px rgba(34, 211, 238, 0.2);
+    }
+    
+    /* Feature Icons */
+    .feature-icon-container {
+        position: relative;
+        margin-bottom: 1.5rem;
+        display: flex;
+        justify-content: center;
+    }
+    
+    .feature-icon-bg {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.4s ease;
+    }
+    
+    .tracking-bg {
+        background: linear-gradient(135deg, #06b6d4, #0891b2);
+        box-shadow: 0 10px 20px rgba(6, 182, 212, 0.3);
+    }
+    
+    .security-bg {
+        background: linear-gradient(135deg, #10b981, #059669);
+        box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+    }
+    
+    .support-bg {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        box-shadow: 0 10px 20px rgba(245, 158, 11, 0.3);
+    }
+    
+    .feature-icon {
+        font-size: 2rem;
+        color: white;
+        z-index: 2;
+        transition: all 0.3s ease;
+    }
+    
+    .feature-icon-pulse {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100%;
+        height: 100%;
+        border-radius: 20px;
+        transform: translate(-50%, -50%);
+        animation: icon-pulse 2s ease-in-out infinite;
+    }
+    
+    .tracking-pulse {
+        background: rgba(6, 182, 212, 0.3);
+        animation-delay: 0s;
+    }
+    
+    .security-pulse {
+        background: rgba(16, 185, 129, 0.3);
+        animation-delay: 0.7s;
+    }
+    
+    .support-pulse {
+        background: rgba(245, 158, 11, 0.3);
+        animation-delay: 1.4s;
+    }
+    
+    .feature-card:hover .feature-icon {
+        transform: scale(1.1) rotate(5deg);
+    }
+    
+    .feature-card:hover .feature-icon-bg {
+        transform: scale(1.05);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Feature Content */
+    .feature-content {
+        text-align: center;
+    }
+    
+    .feature-title {
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    .feature-description {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: #cbd5e1;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Specific Card Animations */
+    .tracking-card:hover {
+        border-color: rgba(6, 182, 212, 0.6);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3),
+                    0 0 20px rgba(6, 182, 212, 0.3);
+    }
+    
+    .security-card:hover {
+        border-color: rgba(16, 185, 129, 0.6);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3),
+                    0 0 20px rgba(16, 185, 129, 0.3);
+    }
+    
+    .support-card:hover {
+        border-color: rgba(245, 158, 11, 0.6);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3),
+                    0 0 20px rgba(245, 158, 11, 0.3);
+    }
+    
+    /* Animations */
+    @keyframes background-shift {
+        0%, 100% {
+            transform: translateX(0) translateY(0);
+        }
+        33% {
+            transform: translateX(20px) translateY(-10px);
+        }
+        66% {
+            transform: translateX(-10px) translateY(20px);
+        }
+    }
+    
+    @keyframes sparkle-text {
+        0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+        50% {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+    }
+    
+    @keyframes title-glow {
+        0%, 100% {
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 20px rgba(34, 211, 238, 0.1);
+        }
+        50% {
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 30px rgba(34, 211, 238, 0.3);
+        }
+    }
+    
+    @keyframes description-float {
+        0%, 100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-3px);
+        }
+    }
+    
+    @keyframes highlight-glow {
+        0%, 100% {
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        50% {
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 10px currentColor;
+        }
+    }
+    
+    @keyframes icon-pulse {
+        0%, 100% {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 0.7;
+        }
+        50% {
+            transform: translate(-50%, -50%) scale(1.2);
+            opacity: 0.3;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -775,49 +1032,81 @@
         </div>
     </div>
 
-    <!-- Features Section -->
-    <div class="py-12 bg-gray-50">
+    <!-- Enhanced Features Section -->
+    <div class="py-16 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 features-section">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="lg:text-center">
-                <h2 class="text-base text-blue-600 font-semibold tracking-wide uppercase">Features</h2>
-                <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-                    Why Choose Meridian Asset Logistics?
+            <div class="text-center">
+                <h2 class="text-base text-cyan-400 font-semibold tracking-wide uppercase features-subtitle">
+                    <span class="inline-block animate-pulse">✨</span> Features <span class="inline-block animate-pulse" style="animation-delay: 0.5s;">✨</span>
+                </h2>
+                <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-white sm:text-4xl features-title">
+                    Why Choose <span class="text-cyan-400">Meridian Asset Logistics</span>?
                 </p>
-                <p class="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
-                    We provide world-class logistics services with real-time tracking and exceptional customer support.
+                <p class="mt-4 max-w-3xl text-xl text-slate-200 lg:mx-auto features-description">
+                    <span class="text-yellow-400 font-bold">Experience excellence</span> with our 
+                    <span class="text-cyan-400 font-semibold">world-class logistics services</span>, 
+                    <span class="text-emerald-400 font-semibold">real-time tracking</span>, and 
+                    <span class="text-pink-400 font-semibold">exceptional customer support</span>.
                 </p>
             </div>
 
-            <div class="mt-10">
-                <div class="space-y-10 md:space-y-0 md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-10">
-                    <div class="relative">
-                        <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white">
-                            <i class="fas fa-shipping-fast text-xl"></i>
+            <div class="mt-16">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Real-time Tracking Card -->
+                    <div class="feature-card tracking-card group">
+                        <div class="feature-icon-container tracking-icon">
+                            <div class="feature-icon-bg tracking-bg">
+                                <i class="fas fa-shipping-fast feature-icon tracking-icon-main"></i>
+                                <div class="feature-icon-pulse tracking-pulse"></div>
+                            </div>
                         </div>
-                        <p class="ml-16 text-lg leading-6 font-medium text-gray-900">Real-time Tracking</p>
-                        <p class="mt-2 ml-16 text-base text-gray-500">
-                            Get instant updates on your package location and delivery status.
-                        </p>
+                        <div class="feature-content">
+                            <h3 class="feature-title tracking-title">
+                                <span class="text-cyan-400">Real-time</span> <span class="text-white">Tracking</span>
+                            </h3>
+                            <p class="feature-description tracking-description">
+                                <span class="text-yellow-400 font-semibold">Get instant updates</span> on your package location and 
+                                <span class="text-emerald-400 font-semibold">delivery status</span> with our advanced tracking system.
+                            </p>
+                        </div>
                     </div>
 
-                    <div class="relative">
-                        <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white">
-                            <i class="fas fa-shield-alt text-xl"></i>
+                    <!-- Secure & Private Card -->
+                    <div class="feature-card security-card group">
+                        <div class="feature-icon-container security-icon">
+                            <div class="feature-icon-bg security-bg">
+                                <i class="fas fa-shield-alt feature-icon security-icon-main"></i>
+                                <div class="feature-icon-pulse security-pulse"></div>
+                            </div>
                         </div>
-                        <p class="ml-16 text-lg leading-6 font-medium text-gray-900">Secure & Private</p>
-                        <p class="mt-2 ml-16 text-base text-gray-500">
-                            Your tracking information is secure and only accessible to you.
-                        </p>
+                        <div class="feature-content">
+                            <h3 class="feature-title security-title">
+                                <span class="text-emerald-400">Secure</span> <span class="text-white">&</span> <span class="text-cyan-400">Private</span>
+                            </h3>
+                            <p class="feature-description security-description">
+                                <span class="text-pink-400 font-semibold">Your tracking information</span> is secure and 
+                                <span class="text-yellow-400 font-semibold">only accessible to you</span> with bank-level encryption.
+                            </p>
+                        </div>
                     </div>
 
-                    <div class="relative">
-                        <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white">
-                            <i class="fas fa-headset text-xl"></i>
+                    <!-- 24/7 Support Card -->
+                    <div class="feature-card support-card group">
+                        <div class="feature-icon-container support-icon">
+                            <div class="feature-icon-bg support-bg">
+                                <i class="fas fa-headset feature-icon support-icon-main"></i>
+                                <div class="feature-icon-pulse support-pulse"></div>
+                            </div>
                         </div>
-                        <p class="ml-16 text-lg leading-6 font-medium text-gray-900">24/7 Support</p>
-                        <p class="mt-2 ml-16 text-base text-gray-500">
-                            Our customer care team is always here to help you.
-                        </p>
+                        <div class="feature-content">
+                            <h3 class="feature-title support-title">
+                                <span class="text-orange-400">24/7</span> <span class="text-white">Support</span>
+                            </h3>
+                            <p class="feature-description support-description">
+                                <span class="text-cyan-400 font-semibold">Our customer care team</span> is always here to help you 
+                                <span class="text-emerald-400 font-semibold">whenever you need us</span>.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
