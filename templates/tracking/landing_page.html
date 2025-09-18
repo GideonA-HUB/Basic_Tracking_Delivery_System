@@ -1201,66 +1201,101 @@
     
     .hero-title-main {
         animation: hero-title-slide-in 1.2s ease-out;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        text-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
         position: relative;
+        background: linear-gradient(135deg, #1f2937, #374151);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
     
     .hero-title-main::after {
         content: '';
         position: absolute;
-        bottom: -5px;
+        bottom: -8px;
         left: 0;
         width: 0;
-        height: 3px;
-        background: linear-gradient(90deg, #3b82f6, #1d4ed8);
-        animation: title-underline 2s ease-out 2s forwards;
+        height: 4px;
+        background: linear-gradient(90deg, #3b82f6, #1d4ed8, #7c3aed);
+        border-radius: 2px;
+        animation: title-underline 2.5s ease-out 2s forwards;
     }
     
     .hero-title-accent {
         animation: hero-title-slide-in 1.4s ease-out;
-        text-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+        text-shadow: 0 3px 6px rgba(59, 130, 246, 0.3);
         position: relative;
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
     
     .hero-title-accent::before {
-        content: '✨';
+        content: '🚀';
         position: absolute;
-        left: -30px;
+        left: -35px;
         top: 50%;
         transform: translateY(-50%);
-        font-size: 0.6em;
-        animation: sparkle 2s ease-in-out infinite;
+        font-size: 0.7em;
+        animation: rocket-bounce 2s ease-in-out infinite;
     }
     
     .hero-title-accent::after {
         content: '✨';
         position: absolute;
-        right: -30px;
+        right: -35px;
         top: 50%;
         transform: translateY(-50%);
-        font-size: 0.6em;
-        animation: sparkle 2s ease-in-out infinite 1s;
+        font-size: 0.7em;
+        animation: sparkle-pulse 2s ease-in-out infinite 1s;
     }
     
-    /* Hero Description */
+    /* Hero Description with Color Animations */
     .hero-description {
         animation: hero-description-fade-in 1.6s ease-out;
-        line-height: 1.7;
+        line-height: 1.8;
         position: relative;
+    }
+    
+    .hero-description span {
+        animation: color-glow 3s ease-in-out infinite;
+        animation-fill-mode: both;
+    }
+    
+    .hero-description span:nth-child(1) {
+        animation-delay: 0.5s;
+    }
+    
+    .hero-description span:nth-child(2) {
+        animation-delay: 1s;
+    }
+    
+    .hero-description span:nth-child(3) {
+        animation-delay: 1.5s;
+    }
+    
+    .hero-description span:nth-child(4) {
+        animation-delay: 2s;
+    }
+    
+    .hero-description span:nth-child(5) {
+        animation-delay: 2.5s;
     }
     
     .hero-description::before {
         content: '';
         position: absolute;
-        left: -20px;
+        left: -25px;
         top: 0;
-        width: 4px;
+        width: 5px;
         height: 100%;
-        background: linear-gradient(180deg, #3b82f6, #1d4ed8);
-        border-radius: 2px;
-        animation: description-line 1.5s ease-out 2.5s forwards;
+        background: linear-gradient(180deg, #3b82f6, #1d4ed8, #7c3aed);
+        border-radius: 3px;
+        animation: description-line 2s ease-out 2.5s forwards;
         transform: scaleY(0);
         transform-origin: top;
+        box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
     }
     
     /* Hero Buttons */
@@ -1348,39 +1383,15 @@
     }
     
     .floating-icon-1 {
-        top: 15%;
-        left: 5%;
+        top: 20%;
+        right: 15%;
         animation-delay: 0s;
     }
     
     .floating-icon-2 {
-        top: 40%;
-        right: 8%;
-        animation-delay: 2s;
-    }
-    
-    .floating-icon-3 {
-        bottom: 20%;
-        left: 15%;
-        animation-delay: 4s;
-    }
-    
-    .floating-icon-4 {
-        top: 70%;
-        right: 20%;
-        animation-delay: 1s;
-    }
-    
-    .floating-icon-5 {
-        bottom: 50%;
-        right: 5%;
+        bottom: 25%;
+        right: 25%;
         animation-delay: 3s;
-    }
-    
-    .floating-icon-6 {
-        top: 25%;
-        right: 30%;
-        animation-delay: 5s;
     }
     
     /* Animations */
@@ -1469,6 +1480,37 @@
         }
     }
     
+    @keyframes rocket-bounce {
+        0%, 100% {
+            transform: translateY(-50%) scale(1);
+        }
+        50% {
+            transform: translateY(-60%) scale(1.1);
+        }
+    }
+    
+    @keyframes sparkle-pulse {
+        0%, 100% {
+            opacity: 0.7;
+            transform: translateY(-50%) scale(1);
+        }
+        50% {
+            opacity: 1;
+            transform: translateY(-50%) scale(1.3);
+        }
+    }
+    
+    @keyframes color-glow {
+        0%, 100% {
+            text-shadow: 0 0 5px currentColor;
+            transform: scale(1);
+        }
+        50% {
+            text-shadow: 0 0 15px currentColor, 0 0 25px currentColor;
+            transform: scale(1.02);
+        }
+    }
+    
     @keyframes float-icon {
         0%, 100% {
             transform: translateY(0px) rotate(0deg) scale(1);
@@ -1507,53 +1549,43 @@
     /* Responsive adjustments */
     @media (max-width: 768px) {
         .floating-icon {
-            width: 55px;
-            height: 55px;
+            width: 60px;
+            height: 60px;
         }
         
         .floating-icon i {
-            font-size: 1.4rem;
+            font-size: 1.5rem;
         }
         
         .floating-icon-1 {
-            left: 2%;
-            top: 10%;
+            right: 10%;
+            top: 15%;
         }
         
         .floating-icon-2 {
-            right: 5%;
-            top: 35%;
-        }
-        
-        .floating-icon-3 {
-            left: 10%;
-            bottom: 15%;
-        }
-        
-        .floating-icon-4 {
-            right: 15%;
-            top: 65%;
-        }
-        
-        .floating-icon-5 {
-            right: 2%;
-            bottom: 45%;
-        }
-        
-        .floating-icon-6 {
-            right: 25%;
-            top: 20%;
+            right: 20%;
+            bottom: 20%;
         }
     }
     
     @media (max-width: 480px) {
         .floating-icon {
-            width: 45px;
-            height: 45px;
+            width: 50px;
+            height: 50px;
         }
         
         .floating-icon i {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+        }
+        
+        .floating-icon-1 {
+            right: 5%;
+            top: 10%;
+        }
+        
+        .floating-icon-2 {
+            right: 15%;
+            bottom: 15%;
         }
     }
 </style>
@@ -1591,16 +1623,19 @@
             <div class="relative z-10 pb-8 sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32">
                 <main class="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
                     <div class="sm:text-center lg:text-left">
-                        <!-- Enhanced Title with subtle animations -->
-                        <h1 class="hero-title text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                            <span class="block xl:inline hero-title-main">Track Your Package</span>
+                        <!-- Enhanced Title with great colors and animations -->
+                        <h1 class="hero-title text-4xl tracking-tight font-extrabold sm:text-5xl md:text-6xl">
+                            <span class="block xl:inline hero-title-main text-gray-800">Track Your Package</span>
                             <span class="block text-blue-600 xl:inline hero-title-accent">with Confidence</span>
                         </h1>
                         
-                        <!-- Enhanced Description with minimal colors -->
-                        <p class="mt-3 text-base text-gray-600 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0 hero-description">
-                            <span class="font-semibold text-gray-800">Experience seamless tracking</span> with our advanced monitoring system. 
-                            <span class="font-medium text-gray-700">Simply enter your tracking number</span> and watch your package journey across the globe in real-time.
+                        <!-- Enhanced Description with vibrant colors -->
+                        <p class="mt-3 text-base sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0 hero-description">
+                            <span class="font-bold text-blue-700">Experience seamless tracking</span> with our 
+                            <span class="font-semibold text-emerald-600">advanced monitoring system</span>. 
+                            <span class="font-medium text-gray-700">Simply enter your tracking number</span> and watch your package 
+                            <span class="font-semibold text-purple-600">journey across the globe</span> in 
+                            <span class="font-bold text-orange-600">real-time</span>.
                         </p>
                         
                         <!-- Enhanced Buttons with animations -->
@@ -1619,25 +1654,13 @@
                             </div>
                         </div>
                         
-                        <!-- Floating elements for visual interest -->
+                        <!-- Clean floating elements - only 2 icons -->
                         <div class="hero-floating-elements">
                             <div class="floating-icon floating-icon-1">
                                 <i class="fas fa-shipping-fast"></i>
                             </div>
                             <div class="floating-icon floating-icon-2">
                                 <i class="fas fa-globe"></i>
-                            </div>
-                            <div class="floating-icon floating-icon-3">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <div class="floating-icon floating-icon-4">
-                                <i class="fas fa-map-marker-alt"></i>
-                            </div>
-                            <div class="floating-icon floating-icon-5">
-                                <i class="fas fa-truck"></i>
-                            </div>
-                            <div class="floating-icon floating-icon-6">
-                                <i class="fas fa-shield-alt"></i>
                             </div>
                         </div>
                     </div>
