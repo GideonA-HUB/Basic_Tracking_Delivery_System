@@ -56,6 +56,33 @@
         display: flex !important;
     }
     
+    /* CTA Section Background Image Styling */
+    .cta-section {
+        min-height: 400px;
+        overflow: hidden;
+    }
+    
+    .cta-background-image {
+        z-index: 1;
+    }
+    
+    .cta-background-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        transition: transform 0.3s ease;
+    }
+    
+    .cta-background-image:hover img {
+        transform: scale(1.05);
+    }
+    
+    /* Ensure content is above background */
+    .cta-section .relative {
+        z-index: 2;
+    }
+    
     @keyframes fadeInUp {
         from {
             opacity: 0;
@@ -343,9 +370,21 @@
         </div>
     </div>
 
-    <!-- CTA Section -->
-    <div class="bg-blue-600">
-        <div class="max-w-2xl mx-auto text-center py-16 px-4 sm:py-20 sm:px-6 lg:px-8">
+    <!-- CTA Section with Background Image -->
+    <div class="relative bg-blue-600 cta-section">
+        <!-- Background Image -->
+        <div class="absolute inset-0 cta-background-image">
+            <img src="https://th.bing.com/th/id/R.21fb98ba6d8be9f70ccd5a981c775a56?rik=Bu3Wz8aQqwA2xw&pid=ImgRaw&r=0" 
+                 alt="Logistics and Shipping Background" 
+                 class="w-full h-full object-cover object-center"
+                 onerror="this.style.display='none';">
+        </div>
+        
+        <!-- Overlay for better text readability -->
+        <div class="absolute inset-0 bg-blue-600 bg-opacity-80"></div>
+        
+        <!-- Content -->
+        <div class="relative max-w-2xl mx-auto text-center py-16 px-4 sm:py-20 sm:px-6 lg:px-8">
             <h2 class="text-3xl font-extrabold text-white sm:text-4xl">
                 <span class="block">Ready to ship?</span>
                 <span class="block">Contact us today.</span>
@@ -532,6 +571,43 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         }, 5000);
+    }
+    
+    // Handle CTA background image loading
+    const ctaBackgroundImage = document.querySelector('.cta-background-image img');
+    if (ctaBackgroundImage) {
+        const ctaImageSources = [
+            'https://th.bing.com/th/id/R.21fb98ba6d8be9f70ccd5a981c775a56?rik=Bu3Wz8aQqwA2xw&pid=ImgRaw&r=0',
+            'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+            'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'
+        ];
+        
+        let ctaCurrentIndex = 0;
+        let ctaImageLoaded = false;
+        
+        function tryNextCtaImage() {
+            if (ctaCurrentIndex < ctaImageSources.length) {
+                ctaBackgroundImage.src = ctaImageSources[ctaCurrentIndex];
+                ctaCurrentIndex++;
+            } else {
+                // All images failed, hide background image
+                ctaBackgroundImage.style.display = 'none';
+            }
+        }
+        
+        ctaBackgroundImage.onload = function() {
+            console.log('CTA background image loaded successfully:', ctaBackgroundImage.src);
+            ctaImageLoaded = true;
+        };
+        
+        ctaBackgroundImage.onerror = function() {
+            console.log('CTA background image failed to load:', ctaBackgroundImage.src, 'trying next...');
+            tryNextCtaImage();
+        };
+        
+        // Start with first image
+        console.log('Loading CTA background image:', ctaImageSources[0]);
+        ctaBackgroundImage.src = ctaImageSources[0];
     }
 });
 </script>
