@@ -15,6 +15,11 @@
     
     .hero-image-container img {
         transition: transform 0.3s ease;
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
     }
     
     .hero-image-container:hover img {
@@ -105,11 +110,11 @@
         </div>
         <div class="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
             <div class="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full hero-image-container">
-                <!-- Beautiful Container Ship Image with multiple fallbacks -->
-                <img src="https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
+                <!-- Beautiful Container Ship Image -->
+                <img src="https://ilovemoving.com/wp-content/uploads/2021/08/blog-header.jpg" 
                      alt="Container Ship - Global Logistics Transportation" 
                      class="w-full h-full object-cover object-center"
-                     onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80';">
+                     onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80';">
                 
                 <!-- Fallback background with gradient if all images fail -->
                 <div class="w-full h-full bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 flex items-center justify-center" style="display: none;" id="fallback-bg">
@@ -459,6 +464,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (heroImage) {
         // Set up image loading with multiple fallbacks
         const imageSources = [
+            'https://ilovemoving.com/wp-content/uploads/2021/08/blog-header.jpg',
             'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
             'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
             'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
@@ -479,12 +485,17 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
+        heroImage.onload = function() {
+            console.log('Image loaded successfully:', heroImage.src);
+        };
+        
         heroImage.onerror = function() {
-            console.log('Image failed to load, trying next...');
+            console.log('Image failed to load:', heroImage.src, 'trying next...');
             tryNextImage();
         };
         
         // Start with first image
+        console.log('Loading image:', imageSources[0]);
         heroImage.src = imageSources[0];
     }
 });
