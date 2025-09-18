@@ -15,11 +15,13 @@
     
     .hero-image-container img {
         transition: transform 0.3s ease;
-        display: block;
-        width: 100%;
-        height: 100%;
+        display: block !important;
+        width: 100% !important;
+        height: 100% !important;
         object-fit: cover;
         object-position: center;
+        position: relative;
+        z-index: 1;
     }
     
     .hero-image-container:hover img {
@@ -42,6 +44,16 @@
     /* Smooth animations */
     .hero-overlay {
         animation: fadeInUp 0.8s ease-out;
+    }
+    
+    /* Ensure text overlay is hidden by default */
+    #text-overlay {
+        display: none !important;
+    }
+    
+    /* Show text overlay only when explicitly enabled */
+    #text-overlay.show {
+        display: flex !important;
     }
     
     @keyframes fadeInUp {
@@ -128,8 +140,8 @@
                 <!-- Overlay with gradient for better text readability -->
                 <div class="absolute inset-0 bg-gradient-to-br from-blue-900/40 via-blue-800/30 to-indigo-900/50"></div>
                 
-                <!-- Text overlay with animation -->
-                <div class="absolute inset-0 flex items-center justify-center hero-overlay">
+                <!-- Text overlay with animation - only show if image fails to load -->
+                <div class="absolute inset-0 flex items-center justify-center hero-overlay" id="text-overlay" style="display: none;">
                     <div class="text-white text-center px-4">
                         <div class="mb-4">
                             <i class="fas fa-ship text-6xl sm:text-8xl opacity-90"></i>
@@ -460,6 +472,7 @@ function getCookie(name) {
 document.addEventListener('DOMContentLoaded', function() {
     const heroImage = document.querySelector('.hero-image-container img');
     const fallbackBg = document.getElementById('fallback-bg');
+    const textOverlay = document.getElementById('text-overlay');
     
     if (heroImage) {
         // Set up image loading with multiple fallbacks
@@ -471,14 +484,18 @@ document.addEventListener('DOMContentLoaded', function() {
         ];
         
         let currentIndex = 0;
+        let imageLoaded = false;
         
         function tryNextImage() {
             if (currentIndex < imageSources.length) {
                 heroImage.src = imageSources[currentIndex];
                 currentIndex++;
             } else {
-                // All images failed, show fallback
+                // All images failed, show text overlay
                 heroImage.style.display = 'none';
+                if (textOverlay) {
+                    textOverlay.classList.add('show');
+                }
                 if (fallbackBg) {
                     fallbackBg.style.display = 'flex';
                 }
@@ -487,6 +504,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         heroImage.onload = function() {
             console.log('Image loaded successfully:', heroImage.src);
+            imageLoaded = true;
+            // Hide text overlay when image loads successfully
+            if (textOverlay) {
+                textOverlay.classList.remove('show');
+            }
+            if (fallbackBg) {
+                fallbackBg.style.display = 'none';
+            }
         };
         
         heroImage.onerror = function() {
@@ -497,6 +522,16 @@ document.addEventListener('DOMContentLoaded', function() {
         // Start with first image
         console.log('Loading image:', imageSources[0]);
         heroImage.src = imageSources[0];
+        
+        // Set a timeout to show text overlay if no image loads within 5 seconds
+        setTimeout(function() {
+            if (!imageLoaded) {
+                console.log('Image loading timeout, showing text overlay');
+                if (textOverlay) {
+                    textOverlay.classList.add('show');
+                }
+            }
+        }, 5000);
     }
 });
 </script>
