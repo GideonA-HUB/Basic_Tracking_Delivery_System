@@ -276,6 +276,112 @@
         }
     }
     
+    /* Enhanced Investment Opportunities Section Styling */
+    .investment-main-title {
+        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        animation: title-glow 4s ease-in-out infinite;
+    }
+    
+    .investment-main-description {
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        animation: description-float 6s ease-in-out infinite;
+    }
+    
+    .investment-main-description .text-yellow-300 {
+        animation: sparkle 2s ease-in-out infinite;
+    }
+    
+    .investment-main-description .text-emerald-300 {
+        animation: color-shift 3s ease-in-out infinite;
+    }
+    
+    .investment-main-description .text-pink-300 {
+        animation: color-shift 3s ease-in-out infinite 0.5s;
+    }
+    
+    .investment-main-description .text-cyan-300 {
+        animation: color-shift 3s ease-in-out infinite 1s;
+    }
+    
+    .investment-main-description .text-purple-300 {
+        animation: color-shift 3s ease-in-out infinite 1.5s;
+    }
+    
+    .investment-main-description .text-orange-300 {
+        animation: color-shift 3s ease-in-out infinite 2s;
+    }
+    
+    .investment-main-description .text-yellow-400 {
+        animation: money-glow 2s ease-in-out infinite;
+        text-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
+    }
+    
+    .investment-btn-dashboard {
+        animation: button-pulse 3s ease-in-out infinite;
+    }
+    
+    .investment-btn-portfolio {
+        animation: button-pulse 3s ease-in-out infinite 1.5s;
+    }
+    
+    @keyframes title-glow {
+        0%, 100% {
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+        50% {
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 30px rgba(255, 255, 255, 0.3);
+        }
+    }
+    
+    @keyframes description-float {
+        0%, 100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-2px);
+        }
+    }
+    
+    @keyframes sparkle {
+        0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+        50% {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+    }
+    
+    @keyframes color-shift {
+        0%, 100% {
+            filter: hue-rotate(0deg);
+        }
+        50% {
+            filter: hue-rotate(20deg);
+        }
+    }
+    
+    @keyframes money-glow {
+        0%, 100% {
+            text-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
+            transform: scale(1);
+        }
+        50% {
+            text-shadow: 0 0 20px rgba(255, 255, 0, 0.8);
+            transform: scale(1.1);
+        }
+    }
+    
+    @keyframes button-pulse {
+        0%, 100% {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        50% {
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+    }
+    
     @keyframes fadeInUp {
         from {
             opacity: 0;
@@ -432,19 +538,27 @@
     <div class="py-16 bg-gradient-to-r from-blue-600 to-indigo-700">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center">
-                <h2 class="text-3xl font-extrabold text-white sm:text-4xl">
+                <h2 class="text-3xl font-extrabold text-white sm:text-4xl investment-main-title">
+                    <span class="inline-block animate-bounce">💎</span>
                     Investment Opportunities
+                    <span class="inline-block animate-bounce" style="animation-delay: 0.5s;">🚀</span>
                 </h2>
-                <p class="mt-4 text-xl text-blue-100 max-w-3xl mx-auto">
-                    Diversify your portfolio with precious metals, diamonds, real estate, and more. Start investing with as little as $100.
+                <p class="mt-4 text-xl text-blue-100 max-w-4xl mx-auto investment-main-description">
+                    <span class="text-yellow-300 font-bold animate-pulse">✨ Transform your wealth</span> with 
+                    <span class="text-emerald-300 font-semibold">precious metals</span>, 
+                    <span class="text-pink-300 font-semibold">diamonds</span>, 
+                    <span class="text-cyan-300 font-semibold">real estate</span>, and 
+                    <span class="text-purple-300 font-semibold">cryptocurrency</span>. 
+                    <span class="text-orange-300 font-bold">Start your journey</span> with just 
+                    <span class="text-yellow-400 font-extrabold text-2xl">$100</span>!
                 </p>
                 <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                     {% if user.is_authenticated and not user.is_staff %}
-                        <a href="{% url 'investments:investment-dashboard' %}" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50 transition-colors duration-200">
-                            <i class="fas fa-chart-line mr-2"></i>Investment Dashboard
+                        <a href="{% url 'investments:investment-dashboard' %}" class="investment-btn-dashboard inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 hover:shadow-lg">
+                            <i class="fas fa-chart-line mr-2 animate-pulse"></i>Investment Dashboard
                         </a>
-                        <a href="{% url 'investments:user-portfolio' %}" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white border-white hover:bg-blue-700 transition-colors duration-200">
-                            <i class="fas fa-briefcase mr-2"></i>My Portfolio
+                        <a href="{% url 'investments:user-portfolio' %}" class="investment-btn-portfolio inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white border-white hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 hover:shadow-lg">
+                            <i class="fas fa-briefcase mr-2 animate-bounce"></i>My Portfolio
                         </a>
                     {% else %}
                         <a href="{% url 'investments:investment-marketplace' %}" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50 transition-colors duration-200">
