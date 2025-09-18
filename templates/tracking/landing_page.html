@@ -186,6 +186,35 @@
         z-index: 2;
     }
     
+    /* Enhanced text visibility for all investment cards */
+    .precious-metals-card h3,
+    .real-estate-card h3,
+    .diamonds-gems-card h3 {
+        text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.9), 
+                     0 0 16px rgba(0, 0, 0, 0.8),
+                     0 0 32px rgba(0, 0, 0, 0.6);
+        font-weight: 800;
+    }
+    
+    .precious-metals-card p,
+    .real-estate-card p,
+    .diamonds-gems-card p {
+        text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.9), 
+                     0 0 12px rgba(0, 0, 0, 0.8),
+                     0 0 24px rgba(0, 0, 0, 0.6);
+        font-weight: 600;
+    }
+    
+    /* Additional background for text area */
+    .precious-metals-card .relative,
+    .real-estate-card .relative,
+    .diamonds-gems-card .relative {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 0.75rem;
+        padding: 1rem;
+        margin: 0.5rem;
+    }
+    
     @keyframes fadeInUp {
         from {
             opacity: 0;
@@ -442,16 +471,17 @@
                              onerror="this.style.display='none';">
                     </div>
                     
-                    <!-- Overlay for better text readability -->
-                    <div class="absolute inset-0 bg-gradient-to-br from-black/60 via-slate-800/70 to-black/60"></div>
+                    <!-- Enhanced overlay for better text readability -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-black/80 via-slate-900/85 to-black/80"></div>
+                    <div class="absolute inset-0 bg-slate-900/60"></div>
                     
                     <!-- Content -->
                     <div class="relative text-center">
                         <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg">
                             <i class="fas fa-coins text-3xl text-white"></i>
                         </div>
-                        <h3 class="mt-6 text-xl font-bold text-white drop-shadow-lg">Precious Metals</h3>
-                        <p class="mt-3 text-base text-white leading-relaxed drop-shadow-md">Gold, silver, and platinum investments with real-time tracking and secure storage</p>
+                        <h3 class="mt-6 text-xl font-bold text-white drop-shadow-2xl">Precious Metals</h3>
+                        <p class="mt-3 text-base text-white leading-relaxed drop-shadow-xl font-medium">Gold, silver, and platinum investments with real-time tracking and secure storage</p>
                     </div>
                 </div>
                 
@@ -464,16 +494,17 @@
                              onerror="this.style.display='none';">
                     </div>
                     
-                    <!-- Overlay for better text readability -->
-                    <div class="absolute inset-0 bg-gradient-to-br from-black/60 via-slate-800/70 to-black/60"></div>
+                    <!-- Enhanced overlay for better text readability -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-black/80 via-slate-900/85 to-black/80"></div>
+                    <div class="absolute inset-0 bg-slate-900/60"></div>
                     
                     <!-- Content -->
                     <div class="relative text-center">
                         <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg">
                             <i class="fas fa-home text-3xl text-white"></i>
                         </div>
-                        <h3 class="mt-6 text-xl font-bold text-white drop-shadow-lg">Real Estate</h3>
-                        <p class="mt-3 text-base text-white leading-relaxed drop-shadow-md">Property investments with growth potential, rental income, and portfolio diversification</p>
+                        <h3 class="mt-6 text-xl font-bold text-white drop-shadow-2xl">Real Estate</h3>
+                        <p class="mt-3 text-base text-white leading-relaxed drop-shadow-xl font-medium">Property investments with growth potential, rental income, and portfolio diversification</p>
                     </div>
                 </div>
                 
@@ -486,16 +517,17 @@
                              onerror="this.style.display='none';">
                     </div>
                     
-                    <!-- Overlay for better text readability -->
-                    <div class="absolute inset-0 bg-gradient-to-br from-black/60 via-slate-800/70 to-black/60"></div>
+                    <!-- Enhanced overlay for better text readability -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-black/80 via-slate-900/85 to-black/80"></div>
+                    <div class="absolute inset-0 bg-slate-900/60"></div>
                     
                     <!-- Content -->
                     <div class="relative text-center">
                         <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg">
                             <i class="fas fa-gem text-3xl text-white"></i>
                         </div>
-                        <h3 class="mt-6 text-xl font-bold text-white drop-shadow-lg">Diamonds & Gems</h3>
-                        <p class="mt-3 text-base text-white leading-relaxed drop-shadow-md">Rare and valuable stones with certified authenticity and investment-grade quality</p>
+                        <h3 class="mt-6 text-xl font-bold text-white drop-shadow-2xl">Diamonds & Gems</h3>
+                        <p class="mt-3 text-base text-white leading-relaxed drop-shadow-xl font-medium">Rare and valuable stones with certified authenticity and investment-grade quality</p>
                     </div>
                 </div>
             </div>
