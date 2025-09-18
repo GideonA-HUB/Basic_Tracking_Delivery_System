@@ -2,6 +2,55 @@
 
 {% block title %}Welcome to Meridian Asset Logistics{% endblock %}
 
+{% block extra_head %}
+<style>
+    /* Enhanced styling for the container ship image section */
+    .hero-image-container {
+        position: relative;
+        overflow: hidden;
+        border-radius: 0.5rem;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    
+    .hero-image-container img {
+        transition: transform 0.3s ease;
+    }
+    
+    .hero-image-container:hover img {
+        transform: scale(1.05);
+    }
+    
+    /* Responsive text sizing */
+    @media (max-width: 640px) {
+        .hero-text {
+            font-size: 1.5rem;
+        }
+    }
+    
+    @media (min-width: 641px) {
+        .hero-text {
+            font-size: 2rem;
+        }
+    }
+    
+    /* Smooth animations */
+    .hero-overlay {
+        animation: fadeInUp 0.8s ease-out;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
     <!-- Welcome Message for Authenticated Customers -->
@@ -54,10 +103,25 @@
             </div>
         </div>
         <div class="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
-            <div class="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center">
-                <div class="text-white text-center">
-                    <i class="fas fa-shipping-fast text-8xl mb-4"></i>
-                    <p class="text-xl font-semibold">Fast & Reliable</p>
+            <div class="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full hero-image-container">
+                <!-- Beautiful Container Ship Image -->
+                <img src="https://img.freepik.com/premium-photo/aerial-view-container-ship-with-business-graph-analysis-global-business-import-export-logistic-transportation-worldwide-by-container-cargo-ship-vessel-freight-shipping-maritime_35024-1557.jpg?size=626&ext=jpg" 
+                     alt="Container Ship - Global Logistics Transportation" 
+                     class="w-full h-full object-cover object-center">
+                
+                <!-- Overlay with gradient for better text readability -->
+                <div class="absolute inset-0 bg-gradient-to-br from-blue-900/40 via-blue-800/30 to-indigo-900/50"></div>
+                
+                <!-- Text overlay with animation -->
+                <div class="absolute inset-0 flex items-center justify-center hero-overlay">
+                    <div class="text-white text-center px-4">
+                        <div class="mb-4">
+                            <i class="fas fa-ship text-6xl sm:text-8xl opacity-90"></i>
+                        </div>
+                        <h3 class="hero-text font-bold mb-2 drop-shadow-lg">Global Logistics</h3>
+                        <p class="text-lg sm:text-xl font-semibold drop-shadow-md">Fast & Reliable</p>
+                        <p class="text-sm sm:text-base mt-2 opacity-90 drop-shadow-sm">Worldwide Shipping Excellence</p>
+                    </div>
                 </div>
             </div>
         </div>
