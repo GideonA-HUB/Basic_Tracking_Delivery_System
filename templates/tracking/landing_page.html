@@ -160,6 +160,32 @@
         z-index: 2;
     }
     
+    /* Diamonds & Gems Card Background Styling */
+    .diamonds-gems-card {
+        min-height: 280px;
+    }
+    
+    .diamonds-gems-bg {
+        z-index: 1;
+    }
+    
+    .diamonds-gems-bg img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        transition: transform 0.3s ease;
+    }
+    
+    .diamonds-gems-card:hover .diamonds-gems-bg img {
+        transform: scale(1.05);
+    }
+    
+    /* Ensure content is above background */
+    .diamonds-gems-card .relative {
+        z-index: 2;
+    }
+    
     @keyframes fadeInUp {
         from {
             opacity: 0;
@@ -451,13 +477,25 @@
                     </div>
                 </div>
                 
-                <div class="bg-slate-800/50 backdrop-blur-sm rounded-xl shadow-2xl p-8 hover:shadow-purple-500/20 hover:scale-105 transition-all duration-300 border border-slate-700/50">
-                    <div class="text-center">
+                <div class="relative bg-slate-800/50 backdrop-blur-sm rounded-xl shadow-2xl p-8 hover:shadow-purple-500/20 hover:scale-105 transition-all duration-300 border border-slate-700/50 overflow-hidden diamonds-gems-card">
+                    <!-- Background Image -->
+                    <div class="absolute inset-0 diamonds-gems-bg">
+                        <img src="https://watchandwares.com/wp-content/uploads/2019/08/iStock-147992985.jpg" 
+                             alt="Diamonds & Gems Background" 
+                             class="w-full h-full object-cover object-center"
+                             onerror="this.style.display='none';">
+                    </div>
+                    
+                    <!-- Overlay for better text readability -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-black/60 via-slate-800/70 to-black/60"></div>
+                    
+                    <!-- Content -->
+                    <div class="relative text-center">
                         <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg">
                             <i class="fas fa-gem text-3xl text-white"></i>
                         </div>
-                        <h3 class="mt-6 text-xl font-bold text-white">Diamonds & Gems</h3>
-                        <p class="mt-3 text-base text-slate-300 leading-relaxed">Rare and valuable stones with certified authenticity and investment-grade quality</p>
+                        <h3 class="mt-6 text-xl font-bold text-white drop-shadow-lg">Diamonds & Gems</h3>
+                        <p class="mt-3 text-base text-white leading-relaxed drop-shadow-md">Rare and valuable stones with certified authenticity and investment-grade quality</p>
                     </div>
                 </div>
             </div>
@@ -789,6 +827,43 @@ document.addEventListener('DOMContentLoaded', function() {
         // Start with first image
         console.log('Loading Real Estate background image:', realEstateImageSources[0]);
         realEstateImage.src = realEstateImageSources[0];
+    }
+    
+    // Handle Diamonds & Gems card background image loading
+    const diamondsGemsImage = document.querySelector('.diamonds-gems-bg img');
+    if (diamondsGemsImage) {
+        const diamondsGemsImageSources = [
+            'https://watchandwares.com/wp-content/uploads/2019/08/iStock-147992985.jpg',
+            'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+            'https://images.unsplash.com/photo-1544376664-80b17f09d399?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+        ];
+        
+        let diamondsGemsCurrentIndex = 0;
+        let diamondsGemsImageLoaded = false;
+        
+        function tryNextDiamondsGemsImage() {
+            if (diamondsGemsCurrentIndex < diamondsGemsImageSources.length) {
+                diamondsGemsImage.src = diamondsGemsImageSources[diamondsGemsCurrentIndex];
+                diamondsGemsCurrentIndex++;
+            } else {
+                // All images failed, hide background image
+                diamondsGemsImage.style.display = 'none';
+            }
+        }
+        
+        diamondsGemsImage.onload = function() {
+            console.log('Diamonds & Gems background image loaded successfully:', diamondsGemsImage.src);
+            diamondsGemsImageLoaded = true;
+        };
+        
+        diamondsGemsImage.onerror = function() {
+            console.log('Diamonds & Gems background image failed to load:', diamondsGemsImage.src, 'trying next...');
+            tryNextDiamondsGemsImage();
+        };
+        
+        // Start with first image
+        console.log('Loading Diamonds & Gems background image:', diamondsGemsImageSources[0]);
+        diamondsGemsImage.src = diamondsGemsImageSources[0];
     }
 });
 </script>
