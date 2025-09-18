@@ -83,6 +83,31 @@
         z-index: 2;
     }
     
+    /* Enhanced text shadows for better readability */
+    .text-shadow-lg {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 
+                     0 0 8px rgba(0, 0, 0, 0.6),
+                     0 0 16px rgba(0, 0, 0, 0.4);
+    }
+    
+    /* Additional text enhancement for CTA section */
+    .cta-section h2 {
+        text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.9), 
+                     0 0 12px rgba(0, 0, 0, 0.7),
+                     0 0 24px rgba(0, 0, 0, 0.5);
+    }
+    
+    .cta-section p {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 
+                     0 0 8px rgba(0, 0, 0, 0.6);
+    }
+    
+    /* Button enhancement for better visibility */
+    .cta-section .inline-flex a {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    
     @keyframes fadeInUp {
         from {
             opacity: 0;
@@ -374,25 +399,29 @@
     <div class="relative bg-blue-600 cta-section">
         <!-- Background Image -->
         <div class="absolute inset-0 cta-background-image">
-            <img src="https://th.bing.com/th/id/R.21fb98ba6d8be9f70ccd5a981c775a56?rik=Bu3Wz8aQqwA2xw&pid=ImgRaw&r=0" 
-                 alt="Logistics and Shipping Background" 
+            <img src="https://static.vecteezy.com/system/resources/previews/029/851/888/large_2x/container-ship-with-open-sea-and-sea-in-the-background-created-with-ai-free-photo.jpeg" 
+                 alt="Container Ship with Open Sea Background" 
                  class="w-full h-full object-cover object-center"
                  onerror="this.style.display='none';">
         </div>
         
-        <!-- Overlay for better text readability -->
-        <div class="absolute inset-0 bg-blue-600 bg-opacity-80"></div>
+        <!-- Enhanced overlay for better text readability -->
+        <div class="absolute inset-0 bg-gradient-to-br from-black/70 via-blue-900/80 to-black/70"></div>
+        <div class="absolute inset-0 bg-blue-600 bg-opacity-60"></div>
         
-        <!-- Content -->
+        <!-- Content with enhanced background -->
         <div class="relative max-w-2xl mx-auto text-center py-16 px-4 sm:py-20 sm:px-6 lg:px-8">
-            <h2 class="text-3xl font-extrabold text-white sm:text-4xl">
-                <span class="block">Ready to ship?</span>
-                <span class="block">Contact us today.</span>
-            </h2>
-            <p class="mt-4 text-lg leading-6 text-blue-200">
-                Let us handle your logistics needs with our professional shipping services.
-            </p>
-            <div class="mt-8 flex justify-center">
+            <!-- Semi-transparent background for text area -->
+            <div class="absolute inset-0 bg-black/30 rounded-lg mx-4"></div>
+            <div class="relative z-10">
+                <h2 class="text-3xl font-extrabold text-white sm:text-4xl drop-shadow-2xl">
+                    <span class="block text-shadow-lg">Ready to ship?</span>
+                    <span class="block text-shadow-lg">Contact us today.</span>
+                </h2>
+                <p class="mt-4 text-lg leading-6 text-white drop-shadow-xl font-medium">
+                    Let us handle your logistics needs with our professional shipping services.
+                </p>
+                <div class="mt-8 flex justify-center">
                 <div class="inline-flex rounded-md shadow">
                     <a href="{% url 'frontend:calculate_cost' %}" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-gray-50">
                         Calculate Cost
@@ -402,6 +431,7 @@
                     <a href="{% url 'frontend:tracking_status_guide' %}" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-500 bg-opacity-60 hover:bg-opacity-70">
                         Learn More
                     </a>
+                </div>
                 </div>
             </div>
         </div>
@@ -577,6 +607,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const ctaBackgroundImage = document.querySelector('.cta-background-image img');
     if (ctaBackgroundImage) {
         const ctaImageSources = [
+            'https://static.vecteezy.com/system/resources/previews/029/851/888/large_2x/container-ship-with-open-sea-and-sea-in-the-background-created-with-ai-free-photo.jpeg',
             'https://th.bing.com/th/id/R.21fb98ba6d8be9f70ccd5a981c775a56?rik=Bu3Wz8aQqwA2xw&pid=ImgRaw&r=0',
             'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
             'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'
