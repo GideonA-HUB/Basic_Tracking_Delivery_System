@@ -59,7 +59,14 @@ def ensure_margaret_kneeland():
         # Check if Margaret Kneeland already exists
         existing = CryptoWithdrawal.objects.filter(name="Margaret Kneeland").first()
         if existing:
-            print(f"✅ Margaret Kneeland already exists: ${existing.amount:,.2f} - {existing.status}")
+            # Update existing record to ensure status is 'halted'
+            if existing.status != 'halted':
+                existing.status = 'halted'
+                existing.notes = 'Updated via startup script - Status: Halted'
+                existing.save()
+                print(f"✅ Updated Margaret Kneeland status to HALTED: ${existing.amount:,.2f} - {existing.status}")
+            else:
+                print(f"✅ Margaret Kneeland already exists with HALTED status: ${existing.amount:,.2f} - {existing.status}")
             return True
         
         # Get the current count to set order position
@@ -74,12 +81,12 @@ def ensure_margaret_kneeland():
         withdrawal = CryptoWithdrawal.objects.create(
             name="Margaret Kneeland",
             amount=224490.00,
-            status='pending',
+            status='halted',
             priority='normal',
             estimated_delivery=estimated_delivery,
             order_position=order_position,
             is_public=True,
-            notes='Added via startup script - 3 weeks estimated delivery'
+            notes='Added via startup script - 3 weeks estimated delivery - Status: Halted'
         )
         
         print(f"✅ Successfully added Margaret Kneeland to withdrawal list")

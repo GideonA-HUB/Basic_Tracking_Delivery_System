@@ -963,6 +963,7 @@ class CryptoWithdrawal(models.Model):
         ('processing', 'Processing'),
         ('completed', 'Completed'),
         ('cancelled', 'Cancelled'),
+        ('halted', 'Halted'),
     ]
     
     PRIORITY_CHOICES = [
