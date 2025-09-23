@@ -4,11 +4,11 @@ from . import frontend_views
 app_name = 'frontend'
 
 urlpatterns = [
-    # Public landing page
-    path('', frontend_views.landing_page, name='landing_page'),
+    # Public landing page (now using Figma design)
+    path('', frontend_views.landing_page_figma, name='landing_page'),
     
-    # Figma redesigned landing page
-    path('figma/', frontend_views.landing_page_figma, name='landing_page_figma'),
+    # Original landing page (moved to /original/)
+    path('original/', frontend_views.landing_page, name='landing_page_original'),
     
     # Tracking search endpoint
     path('search-tracking/', frontend_views.search_tracking_number, name='search_tracking'),
