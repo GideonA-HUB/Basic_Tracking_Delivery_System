@@ -125,6 +125,33 @@
         transform: translateY(-1px);
     }
     
+    /* Hero Statistics */
+    .hero-stats {
+        display: flex;
+        gap: 3rem;
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e5e7eb;
+    }
+    
+    .stat-item {
+        text-align: left;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1f2937;
+        margin-bottom: 0.25rem;
+        line-height: 1;
+    }
+    
+    .stat-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+        font-weight: 500;
+    }
+    
     /* Hero Visual Styles */
     .hero-visual {
         position: relative;
@@ -258,6 +285,32 @@
             right: 0.5rem;
             padding: 0.75rem;
         }
+        
+        .hero-stats {
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 1.75rem;
+        }
+        
+        .features-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+    }
+    
+    @media (max-width: 1024px) {
+        .features-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
     }
     
     .tracking-section {
@@ -300,7 +353,7 @@
     
     .features-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        grid-template-columns: repeat(3, 1fr);
         gap: 2rem;
         margin-top: 3rem;
     }
@@ -447,6 +500,22 @@
                     <span>Watch Demo</span>
                 </a>
             </div>
+            
+            <!-- Hero Statistics -->
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-number">$2.5B+</div>
+                    <div class="stat-label">Assets Managed</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">15K+</div>
+                    <div class="stat-label">Active Clients</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">98.5%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
+            </div>
         </div>
         
         <div class="hero-visual">
@@ -523,44 +592,71 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center">
             <h2 class="text-3xl font-bold text-gray-900 mb-4">
-                Why Choose <span class="text-blue-600">Meridian Asset Logistics</span>?
+                These are why you should <span class="text-blue-600">use our service</span>
             </h2>
             <p class="text-lg text-gray-600 mb-8">
-                Experience excellence with our world-class logistics services, 
-                real-time tracking, and exceptional customer support.
+                Transform your logistics operations with our comprehensive platform designed for modern supply chain management and investment opportunities.
             </p>
         </div>
         
         <div class="features-grid">
             <div class="feature-card">
                 <div class="feature-icon">
-                    <i class="fas fa-shipping-fast"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-3">Real-time Tracking</h3>
-                <p class="text-gray-600">
-                    Get instant updates on your package location and delivery status 
-                    with our advanced tracking system.
-                </p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">
                     <i class="fas fa-shield-alt"></i>
                 </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-3">Secure & Private</h3>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">Secure & Reliable</h3>
                 <p class="text-gray-600">
-                    Your tracking information is secure and only accessible to you 
-                    with bank-level encryption.
+                    Bank-grade security with 99.9% uptime guarantee for your logistics operations.
                 </p>
             </div>
             
             <div class="feature-card">
                 <div class="feature-icon">
-                    <i class="fas fa-headset"></i>
+                    <i class="fas fa-chart-line"></i>
                 </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-3">24/7 Support</h3>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">Proven Returns</h3>
                 <p class="text-gray-600">
-                    Our customer care team is always here to help you whenever you need us.
+                    Consistent growth with average returns of 18-25% annually on logistics investments.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">Global Network</h3>
+                <p class="text-gray-600">
+                    Worldwide logistics network spanning 50+ countries and 200+ distribution centers.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">Expert Management</h3>
+                <p class="text-gray-600">
+                    Industry veterans with 20+ years experience managing complex supply chains.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">Real-Time Analytics</h3>
+                <p class="text-gray-600">
+                    Advanced tracking and analytics for complete visibility into your investments.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-award"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">Award Winning</h3>
+                <p class="text-gray-600">
+                    Recognized leader in logistics innovation and sustainable supply chain solutions.
                 </p>
             </div>
         </div>
