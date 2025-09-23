@@ -1,0 +1,510 @@
+<!-- Features Section Component - Converted from React to HTML/CSS/JS -->
+<section class="features-section" id="features">
+  <div class="features-container">
+    <div class="features-header">
+      <div class="features-badge">
+        <span class="features-badge-text">✨ Features</span>
+      </div>
+      
+      <h2 class="features-title">
+        Why Choose <span class="features-title-accent">Meridian Asset Logistics</span>?
+      </h2>
+      
+      <p class="features-description">
+        Experience excellence with our world-class logistics services, 
+        real-time tracking, and exceptional customer support.
+      </p>
+    </div>
+    
+    <div class="features-grid">
+      <!-- Real-time Tracking Feature -->
+      <div class="feature-card" data-feature="tracking">
+        <div class="feature-icon-container">
+          <div class="feature-icon-bg tracking-bg">
+            <i class="fas fa-shipping-fast feature-icon"></i>
+            <div class="feature-icon-pulse tracking-pulse"></div>
+          </div>
+        </div>
+        
+        <div class="feature-content">
+          <h3 class="feature-title">
+            <span class="text-cyan-400">Real-time</span> <span class="text-white">Tracking</span>
+          </h3>
+          <p class="feature-description">
+            <span class="text-yellow-400 font-semibold">Get instant updates</span> on your package location and 
+            <span class="text-emerald-400 font-semibold">delivery status</span> with our advanced tracking system.
+          </p>
+        </div>
+      </div>
+      
+      <!-- Secure & Private Feature -->
+      <div class="feature-card" data-feature="security">
+        <div class="feature-icon-container">
+          <div class="feature-icon-bg security-bg">
+            <i class="fas fa-shield-alt feature-icon"></i>
+            <div class="feature-icon-pulse security-pulse"></div>
+          </div>
+        </div>
+        
+        <div class="feature-content">
+          <h3 class="feature-title">
+            <span class="text-emerald-400">Secure</span> <span class="text-white">&</span> <span class="text-cyan-400">Private</span>
+          </h3>
+          <p class="feature-description">
+            <span class="text-pink-400 font-semibold">Your tracking information</span> is secure and 
+            <span class="text-yellow-400 font-semibold">only accessible to you</span> with bank-level encryption.
+          </p>
+        </div>
+      </div>
+      
+      <!-- 24/7 Support Feature -->
+      <div class="feature-card" data-feature="support">
+        <div class="feature-icon-container">
+          <div class="feature-icon-bg support-bg">
+            <i class="fas fa-headset feature-icon"></i>
+            <div class="feature-icon-pulse support-pulse"></div>
+          </div>
+        </div>
+        
+        <div class="feature-content">
+          <h3 class="feature-title">
+            <span class="text-orange-400">24/7</span> <span class="text-white">Support</span>
+          </h3>
+          <p class="feature-description">
+            <span class="text-cyan-400 font-semibold">Our customer care team</span> is always here to help you 
+            <span class="text-emerald-400 font-semibold">whenever you need us</span>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+/* Features Section Styles */
+.features-section {
+  @apply py-16 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800;
+  @apply relative overflow-hidden;
+}
+
+.features-section::before {
+  content: '';
+  @apply absolute inset-0;
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(34, 211, 238, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+  animation: features-bg-shift 20s ease-in-out infinite;
+}
+
+.features-container {
+  @apply relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.features-header {
+  @apply text-center mb-16;
+}
+
+.features-badge {
+  @apply inline-flex items-center px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/20;
+  @apply backdrop-blur-sm mb-6;
+}
+
+.features-badge-text {
+  @apply text-sm font-medium text-cyan-300;
+}
+
+.features-title {
+  @apply text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6;
+  animation: features-title-glow 4s ease-in-out infinite;
+}
+
+.features-title-accent {
+  @apply text-cyan-400;
+}
+
+.features-description {
+  @apply text-lg sm:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed;
+  animation: features-description-float 6s ease-in-out infinite;
+}
+
+.features-description .text-yellow-400 {
+  animation: highlight-glow 2s ease-in-out infinite;
+}
+
+.features-description .text-cyan-400 {
+  animation: highlight-glow 2s ease-in-out infinite 0.5s;
+}
+
+.features-description .text-emerald-400 {
+  animation: highlight-glow 2s ease-in-out infinite 1s;
+}
+
+.features-description .text-pink-400 {
+  animation: highlight-glow 2s ease-in-out infinite 1.5s;
+}
+
+.features-grid {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-8;
+}
+
+/* Feature Cards */
+.feature-card {
+  @apply relative bg-slate-800/80 backdrop-blur-md border border-cyan-400/20 rounded-2xl p-8;
+  @apply transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-cyan-400/20;
+  @apply overflow-hidden;
+}
+
+.feature-card::before {
+  content: '';
+  @apply absolute inset-0 bg-gradient-to-br from-cyan-400/5 to-transparent;
+  @apply opacity-0 transition-opacity duration-300;
+}
+
+.feature-card:hover::before {
+  @apply opacity-100;
+}
+
+.feature-card:hover {
+  @apply border-cyan-400/40 shadow-xl shadow-cyan-400/20;
+}
+
+/* Feature Icons */
+.feature-icon-container {
+  @apply relative mb-6 flex justify-center;
+}
+
+.feature-icon-bg {
+  @apply relative w-20 h-20 rounded-2xl flex items-center justify-center;
+  @apply transition-all duration-300;
+}
+
+.tracking-bg {
+  @apply bg-gradient-to-br from-cyan-500 to-cyan-600;
+  box-shadow: 0 10px 20px rgba(6, 182, 212, 0.3);
+}
+
+.security-bg {
+  @apply bg-gradient-to-br from-emerald-500 to-emerald-600;
+  box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+}
+
+.support-bg {
+  @apply bg-gradient-to-br from-orange-500 to-orange-600;
+  box-shadow: 0 10px 20px rgba(245, 158, 11, 0.3);
+}
+
+.feature-icon {
+  @apply text-2xl text-white z-10;
+  @apply transition-all duration-300;
+}
+
+.feature-icon-pulse {
+  @apply absolute inset-0 rounded-2xl;
+  animation: icon-pulse 2s ease-in-out infinite;
+}
+
+.tracking-pulse {
+  @apply bg-cyan-500/30;
+  animation-delay: 0s;
+}
+
+.security-pulse {
+  @apply bg-emerald-500/30;
+  animation-delay: 0.7s;
+}
+
+.support-pulse {
+  @apply bg-orange-500/30;
+  animation-delay: 1.4s;
+}
+
+.feature-card:hover .feature-icon {
+  @apply scale-110 rotate-5;
+}
+
+.feature-card:hover .feature-icon-bg {
+  @apply scale-105;
+}
+
+/* Feature Content */
+.feature-content {
+  @apply text-center;
+}
+
+.feature-title {
+  @apply text-2xl font-bold mb-4;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.feature-description {
+  @apply text-slate-300 leading-relaxed;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Animations */
+@keyframes features-bg-shift {
+  0%, 100% {
+    transform: translateX(0) translateY(0);
+  }
+  33% {
+    transform: translateX(20px) translateY(-10px);
+  }
+  66% {
+    transform: translateX(-10px) translateY(20px);
+  }
+}
+
+@keyframes features-title-glow {
+  0%, 100% {
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 20px rgba(34, 211, 238, 0.1);
+  }
+  50% {
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 30px rgba(34, 211, 238, 0.3);
+  }
+}
+
+@keyframes features-description-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes highlight-glow {
+  0%, 100% {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 10px currentColor;
+  }
+}
+
+@keyframes icon-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.3;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .features-grid {
+    @apply grid-cols-1 gap-6;
+  }
+  
+  .feature-card {
+    @apply p-6;
+  }
+  
+  .feature-icon-bg {
+    @apply w-16 h-16;
+  }
+  
+  .feature-icon {
+    @apply text-xl;
+  }
+}
+
+@media (max-width: 640px) {
+  .features-section {
+    @apply py-12;
+  }
+  
+  .features-title {
+    @apply text-2xl sm:text-3xl;
+  }
+  
+  .features-description {
+    @apply text-base;
+  }
+}
+
+/* Dark mode adjustments */
+.dark .features-section {
+  @apply bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800;
+}
+
+.dark .feature-card {
+  @apply bg-slate-800/80 border-cyan-400/20;
+}
+
+.dark .feature-card:hover {
+  @apply border-cyan-400/40 shadow-cyan-400/20;
+}
+
+.dark .feature-title {
+  @apply text-white;
+}
+
+.dark .feature-description {
+  @apply text-slate-300;
+}
+</style>
+
+<script>
+/**
+ * Features Section Component JavaScript
+ * Handles features section interactions and animations
+ */
+class FeaturesSectionComponent {
+  constructor(element) {
+    this.element = element;
+    this.init();
+  }
+  
+  init() {
+    this.setupEventListeners();
+    this.setupAnimations();
+    this.setupIntersectionObserver();
+  }
+  
+  setupEventListeners() {
+    // Feature card click handlers
+    const featureCards = this.element.querySelectorAll('.feature-card');
+    featureCards.forEach(card => {
+      card.addEventListener('click', () => {
+        this.handleFeatureClick(card);
+      });
+    });
+  }
+  
+  setupAnimations() {
+    // Staggered animation for feature cards
+    const featureCards = this.element.querySelectorAll('.feature-card');
+    featureCards.forEach((card, index) => {
+      card.style.animationDelay = `${index * 0.2}s`;
+      card.classList.add('animate-fade-in-up');
+    });
+  }
+  
+  setupIntersectionObserver() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-in');
+          this.animateFeatureCard(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    
+    const featureCards = this.element.querySelectorAll('.feature-card');
+    featureCards.forEach(card => observer.observe(card));
+  }
+  
+  handleFeatureClick(card) {
+    const feature = card.dataset.feature;
+    
+    // Add click animation
+    card.classList.add('animate-pulse');
+    setTimeout(() => {
+      card.classList.remove('animate-pulse');
+    }, 200);
+    
+    // Emit custom event
+    this.element.dispatchEvent(new CustomEvent('feature:click', {
+      detail: { feature, card },
+      bubbles: true
+    }));
+    
+    // Handle specific feature actions
+    switch (feature) {
+      case 'tracking':
+        this.scrollToTrackingSection();
+        break;
+      case 'security':
+        this.showSecurityInfo();
+        break;
+      case 'support':
+        this.scrollToSupportSection();
+        break;
+    }
+  }
+  
+  animateFeatureCard(card) {
+    const icon = card.querySelector('.feature-icon');
+    const title = card.querySelector('.feature-title');
+    const description = card.querySelector('.feature-description');
+    
+    // Animate elements in sequence
+    setTimeout(() => {
+      icon?.classList.add('animate-bounce');
+    }, 100);
+    
+    setTimeout(() => {
+      title?.classList.add('animate-fade-in');
+    }, 200);
+    
+    setTimeout(() => {
+      description?.classList.add('animate-fade-in');
+    }, 300);
+  }
+  
+  scrollToTrackingSection() {
+    const trackingSection = document.querySelector('#tracking-section');
+    if (trackingSection) {
+      trackingSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+  
+  showSecurityInfo() {
+    // Show security information modal or tooltip
+    this.element.dispatchEvent(new CustomEvent('security:info', {
+      detail: { message: 'Your data is protected with bank-level encryption' },
+      bubbles: true
+    }));
+  }
+  
+  scrollToSupportSection() {
+    const supportSection = document.querySelector('#support-section');
+    if (supportSection) {
+      supportSection.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      // Fallback to contact section
+      const contactSection = document.querySelector('#contact-section');
+      if (contactSection) {
+        contactSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }
+  
+  // Public methods
+  highlightFeature(feature) {
+    const card = this.element.querySelector(`[data-feature="${feature}"]`);
+    if (card) {
+      card.classList.add('ring-2', 'ring-cyan-400', 'ring-opacity-50');
+      setTimeout(() => {
+        card.classList.remove('ring-2', 'ring-cyan-400', 'ring-opacity-50');
+      }, 3000);
+    }
+  }
+  
+  setLoading(loading) {
+    const featureCards = this.element.querySelectorAll('.feature-card');
+    featureCards.forEach(card => {
+      if (loading) {
+        card.classList.add('opacity-50', 'pointer-events-none');
+      } else {
+        card.classList.remove('opacity-50', 'pointer-events-none');
+      }
+    });
+  }
+}
+
+// Auto-initialize features sections
+document.addEventListener('DOMContentLoaded', () => {
+  const featuresSections = document.querySelectorAll('.features-section');
+  featuresSections.forEach(section => {
+    new FeaturesSectionComponent(section);
+  });
+});
+
+// Export for manual initialization
+window.FeaturesSectionComponent = FeaturesSectionComponent;
+</script>

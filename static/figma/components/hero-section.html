@@ -1,0 +1,412 @@
+<!-- Hero Section Component - Converted from React to HTML/CSS/JS -->
+<section class="hero-section" id="hero">
+  <div class="hero-background">
+    <div class="hero-overlay"></div>
+  </div>
+  
+  <div class="hero-container">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="hero-badge-text">✨ New Features Available</span>
+      </div>
+      
+      <h1 class="hero-title">
+        <span class="hero-title-main">Track Your Package</span>
+        <span class="hero-title-accent">with Confidence</span>
+      </h1>
+      
+      <p class="hero-description">
+        Experience seamless tracking with our advanced monitoring system. 
+        Simply enter your tracking number and watch your package journey 
+        across the globe in real-time.
+      </p>
+      
+      <div class="hero-actions">
+        <button class="btn btn-primary hero-btn-primary" data-size="lg">
+          <i class="fas fa-search mr-2"></i>
+          Track Package
+        </button>
+        <button class="btn btn-outline hero-btn-secondary" data-size="lg">
+          <i class="fas fa-question-circle mr-2"></i>
+          Need Help?
+        </button>
+      </div>
+      
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-number">1M+</div>
+          <div class="hero-stat-label">Packages Tracked</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-number">99.9%</div>
+          <div class="hero-stat-label">Success Rate</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-number">24/7</div>
+          <div class="hero-stat-label">Support</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="hero-visual">
+      <div class="hero-image-container">
+        <img 
+          src="https://ilovemoving.com/wp-content/uploads/2021/08/blog-header.jpg" 
+          alt="Container Ship - Global Logistics Transportation"
+          class="hero-image"
+          onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80';"
+        />
+        <div class="hero-image-overlay"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+/* Hero Section Styles */
+.hero-section {
+  @apply relative min-h-screen flex items-center overflow-hidden;
+  @apply bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800;
+}
+
+.hero-background {
+  @apply absolute inset-0;
+  background-image: 
+    radial-gradient(circle at 20% 20%, rgba(34, 211, 238, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 60%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+  animation: hero-bg-shift 20s ease-in-out infinite;
+}
+
+.hero-overlay {
+  @apply absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/40;
+}
+
+.hero-container {
+  @apply relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  @apply grid grid-cols-1 lg:grid-cols-2 gap-12 items-center;
+}
+
+.hero-content {
+  @apply space-y-8;
+}
+
+.hero-badge {
+  @apply inline-flex items-center px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20;
+  @apply backdrop-blur-sm;
+}
+
+.hero-badge-text {
+  @apply text-sm font-medium text-blue-300;
+}
+
+.hero-title {
+  @apply text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight;
+}
+
+.hero-title-main {
+  @apply block text-white;
+  animation: hero-title-slide-in 1s ease-out;
+}
+
+.hero-title-accent {
+  @apply block text-cyan-400;
+  animation: hero-title-slide-in 1.2s ease-out;
+}
+
+.hero-description {
+  @apply text-lg sm:text-xl text-slate-300 leading-relaxed max-w-2xl;
+  animation: hero-description-fade-in 1.4s ease-out;
+}
+
+.hero-actions {
+  @apply flex flex-col sm:flex-row gap-4;
+}
+
+.hero-btn-primary {
+  @apply bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg hover:shadow-xl;
+  @apply transform hover:scale-105 transition-all duration-200;
+}
+
+.hero-btn-secondary {
+  @apply border-2 border-cyan-400 text-cyan-400 bg-transparent;
+  @apply hover:bg-cyan-400 hover:text-white transition-all duration-200;
+}
+
+.hero-stats {
+  @apply grid grid-cols-3 gap-8 pt-8 border-t border-slate-700;
+}
+
+.hero-stat {
+  @apply text-center;
+}
+
+.hero-stat-number {
+  @apply text-2xl sm:text-3xl font-bold text-white;
+  animation: hero-stat-count 2s ease-out;
+}
+
+.hero-stat-label {
+  @apply text-sm text-slate-400 mt-1;
+}
+
+.hero-visual {
+  @apply relative;
+}
+
+.hero-image-container {
+  @apply relative rounded-2xl overflow-hidden shadow-2xl;
+  @apply transform hover:scale-105 transition-transform duration-300;
+}
+
+.hero-image {
+  @apply w-full h-96 lg:h-[500px] object-cover;
+}
+
+.hero-image-overlay {
+  @apply absolute inset-0 bg-gradient-to-t from-black/50 to-transparent;
+}
+
+/* Animations */
+@keyframes hero-bg-shift {
+  0%, 100% {
+    transform: translateX(0) translateY(0);
+  }
+  33% {
+    transform: translateX(20px) translateY(-10px);
+  }
+  66% {
+    transform: translateX(-10px) translateY(20px);
+  }
+}
+
+@keyframes hero-title-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes hero-description-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hero-stat-count {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .hero-container {
+    @apply grid-cols-1 text-center;
+  }
+  
+  .hero-visual {
+    @apply order-first;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-section {
+    @apply min-h-[80vh];
+  }
+  
+  .hero-title {
+    @apply text-3xl;
+  }
+  
+  .hero-description {
+    @apply text-base;
+  }
+  
+  .hero-stats {
+    @apply grid-cols-1 gap-4;
+  }
+  
+  .hero-image {
+    @apply h-64;
+  }
+}
+
+/* Dark mode adjustments */
+.dark .hero-section {
+  @apply bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800;
+}
+
+.dark .hero-badge {
+  @apply bg-blue-500/10 border-blue-500/20;
+}
+
+.dark .hero-badge-text {
+  @apply text-blue-300;
+}
+
+.dark .hero-title-main {
+  @apply text-white;
+}
+
+.dark .hero-title-accent {
+  @apply text-cyan-400;
+}
+
+.dark .hero-description {
+  @apply text-slate-300;
+}
+
+.dark .hero-stat-number {
+  @apply text-white;
+}
+
+.dark .hero-stat-label {
+  @apply text-slate-400;
+}
+
+.dark .hero-stats {
+  @apply border-slate-700;
+}
+</style>
+
+<script>
+/**
+ * Hero Section Component JavaScript
+ * Handles hero section interactions and animations
+ */
+class HeroSectionComponent {
+  constructor(element) {
+    this.element = element;
+    this.init();
+  }
+  
+  init() {
+    this.setupEventListeners();
+    this.setupAnimations();
+    this.setupImageLoading();
+  }
+  
+  setupEventListeners() {
+    // Track package button
+    const trackBtn = this.element.querySelector('.hero-btn-primary');
+    if (trackBtn) {
+      trackBtn.addEventListener('click', () => {
+        this.scrollToTrackingSection();
+      });
+    }
+    
+    // Help button
+    const helpBtn = this.element.querySelector('.hero-btn-secondary');
+    if (helpBtn) {
+      helpBtn.addEventListener('click', () => {
+        this.scrollToHelpSection();
+      });
+    }
+  }
+  
+  setupAnimations() {
+    // Intersection Observer for animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-in');
+        }
+      });
+    }, { threshold: 0.1 });
+    
+    // Observe elements for animation
+    const animatedElements = this.element.querySelectorAll('.hero-title, .hero-description, .hero-actions, .hero-stats');
+    animatedElements.forEach(el => observer.observe(el));
+  }
+  
+  setupImageLoading() {
+    const heroImage = this.element.querySelector('.hero-image');
+    if (heroImage) {
+      // Set up fallback images
+      const fallbackImages = [
+        'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+        'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+        'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
+      ];
+      
+      let currentIndex = 0;
+      
+      heroImage.onerror = () => {
+        if (currentIndex < fallbackImages.length) {
+          heroImage.src = fallbackImages[currentIndex];
+          currentIndex++;
+        }
+      };
+    }
+  }
+  
+  scrollToTrackingSection() {
+    const trackingSection = document.querySelector('#tracking-section');
+    if (trackingSection) {
+      trackingSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+  
+  scrollToHelpSection() {
+    const helpSection = document.querySelector('#help-section');
+    if (helpSection) {
+      helpSection.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      // Fallback to contact or support section
+      const contactSection = document.querySelector('#contact-section');
+      if (contactSection) {
+        contactSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }
+  
+  // Public methods
+  updateStats(stats) {
+    const statElements = this.element.querySelectorAll('.hero-stat-number');
+    statElements.forEach((el, index) => {
+      if (stats[index]) {
+        el.textContent = stats[index];
+      }
+    });
+  }
+  
+  setLoading(loading) {
+    const buttons = this.element.querySelectorAll('.btn');
+    buttons.forEach(btn => {
+      if (loading) {
+        btn.classList.add('loading');
+        btn.disabled = true;
+      } else {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+      }
+    });
+  }
+}
+
+// Auto-initialize hero sections
+document.addEventListener('DOMContentLoaded', () => {
+  const heroSections = document.querySelectorAll('.hero-section');
+  heroSections.forEach(section => {
+    new HeroSectionComponent(section);
+  });
+});
+
+// Export for manual initialization
+window.HeroSectionComponent = HeroSectionComponent;
+</script>

@@ -1,0 +1,411 @@
+<!-- Card Component - Converted from React to HTML/CSS/JS -->
+<template id="card-template">
+  <div class="card">
+    <div class="card-header">
+      <slot name="header"></slot>
+    </div>
+    <div class="card-content">
+      <slot></slot>
+    </div>
+    <div class="card-footer">
+      <slot name="footer"></slot>
+    </div>
+  </div>
+</template>
+
+<style>
+/* Card Component Styles */
+.card {
+  @apply rounded-lg border bg-card text-card-foreground shadow-sm;
+  @apply transition-all duration-200;
+}
+
+.card:hover {
+  @apply shadow-md;
+}
+
+.card:focus-within {
+  @apply ring-2 ring-ring ring-offset-2;
+}
+
+/* Card Header */
+.card-header {
+  @apply flex flex-col space-y-1.5 p-6;
+}
+
+.card-header h3 {
+  @apply text-2xl font-semibold leading-none tracking-tight;
+}
+
+.card-header p {
+  @apply text-sm text-muted-foreground;
+}
+
+/* Card Content */
+.card-content {
+  @apply p-6 pt-0;
+}
+
+.card-content:last-child {
+  @apply pb-6;
+}
+
+/* Card Footer */
+.card-footer {
+  @apply flex items-center p-6 pt-0;
+}
+
+/* Card Variants */
+.card[data-variant="default"] {
+  @apply bg-card border-border;
+}
+
+.card[data-variant="outlined"] {
+  @apply bg-transparent border-2 border-border;
+}
+
+.card[data-variant="elevated"] {
+  @apply shadow-lg border-0;
+}
+
+.card[data-variant="flat"] {
+  @apply shadow-none border-0 bg-muted;
+}
+
+/* Interactive Cards */
+.card[data-interactive="true"] {
+  @apply cursor-pointer hover:shadow-lg hover:scale-105;
+  @apply transition-all duration-200;
+}
+
+.card[data-interactive="true"]:active {
+  @apply scale-95;
+}
+
+/* Card with Image */
+.card-image {
+  @apply w-full h-48 object-cover rounded-t-lg;
+}
+
+.card-image-container {
+  @apply relative overflow-hidden rounded-t-lg;
+}
+
+.card-image-overlay {
+  @apply absolute inset-0 bg-gradient-to-t from-black/50 to-transparent;
+}
+
+/* Card Actions */
+.card-actions {
+  @apply flex items-center justify-between p-6 pt-0;
+}
+
+.card-actions-left {
+  @apply flex items-center space-x-2;
+}
+
+.card-actions-right {
+  @apply flex items-center space-x-2;
+}
+
+/* Card Badge */
+.card-badge {
+  @apply absolute top-2 right-2 px-2 py-1 text-xs font-medium rounded-full;
+  @apply bg-primary text-primary-foreground;
+}
+
+/* Card Loading State */
+.card.loading {
+  @apply animate-pulse;
+}
+
+.card.loading .card-content {
+  @apply space-y-2;
+}
+
+.card.loading .skeleton {
+  @apply h-4 bg-muted rounded;
+}
+
+/* Card Error State */
+.card.error {
+  @apply border-destructive bg-destructive/5;
+}
+
+.card.error .card-content {
+  @apply text-destructive;
+}
+
+/* Card Success State */
+.card.success {
+  @apply border-green-500 bg-green-50;
+}
+
+.card.success .card-content {
+  @apply text-green-700;
+}
+
+/* Card Warning State */
+.card.warning {
+  @apply border-yellow-500 bg-yellow-50;
+}
+
+.card.warning .card-content {
+  @apply text-yellow-700;
+}
+
+/* Card Info State */
+.card.info {
+  @apply border-blue-500 bg-blue-50;
+}
+
+.card.info .card-content {
+  @apply text-blue-700;
+}
+
+/* Responsive Cards */
+@media (max-width: 640px) {
+  .card-header,
+  .card-content,
+  .card-footer {
+    @apply p-4;
+  }
+  
+  .card-header h3 {
+    @apply text-xl;
+  }
+}
+
+/* Card Grid */
+.card-grid {
+  @apply grid gap-4;
+}
+
+.card-grid[data-cols="1"] {
+  @apply grid-cols-1;
+}
+
+.card-grid[data-cols="2"] {
+  @apply grid-cols-1 md:grid-cols-2;
+}
+
+.card-grid[data-cols="3"] {
+  @apply grid-cols-1 md:grid-cols-2 lg:grid-cols-3;
+}
+
+.card-grid[data-cols="4"] {
+  @apply grid-cols-1 md:grid-cols-2 lg:grid-cols-4;
+}
+
+/* Card List */
+.card-list {
+  @apply space-y-4;
+}
+
+.card-list .card {
+  @apply w-full;
+}
+
+/* Card with Avatar */
+.card-avatar {
+  @apply flex items-center space-x-4 p-6;
+}
+
+.card-avatar img {
+  @apply w-12 h-12 rounded-full;
+}
+
+.card-avatar-content {
+  @apply flex-1;
+}
+
+.card-avatar-content h4 {
+  @apply font-semibold;
+}
+
+.card-avatar-content p {
+  @apply text-sm text-muted-foreground;
+}
+
+/* Card Stats */
+.card-stats {
+  @apply grid grid-cols-2 gap-4 p-6;
+}
+
+.card-stat {
+  @apply text-center;
+}
+
+.card-stat-value {
+  @apply text-2xl font-bold;
+}
+
+.card-stat-label {
+  @apply text-sm text-muted-foreground;
+}
+
+/* Card with Progress */
+.card-progress {
+  @apply p-6;
+}
+
+.card-progress-bar {
+  @apply w-full bg-muted rounded-full h-2;
+}
+
+.card-progress-fill {
+  @apply bg-primary h-2 rounded-full transition-all duration-300;
+}
+
+/* Card with Tabs */
+.card-tabs {
+  @apply border-b border-border;
+}
+
+.card-tab {
+  @apply px-4 py-2 text-sm font-medium border-b-2 border-transparent;
+  @apply hover:text-foreground hover:border-muted-foreground;
+}
+
+.card-tab.active {
+  @apply text-foreground border-primary;
+}
+
+.card-tab-content {
+  @apply p-6;
+}
+
+/* Dark mode adjustments */
+.dark .card {
+  @apply border-border;
+}
+
+.dark .card:hover {
+  @apply shadow-lg;
+}
+
+.dark .card-image-overlay {
+  @apply from-black/70;
+}
+</style>
+
+<script>
+/**
+ * Card Component JavaScript
+ * Handles card interactions and state management
+ */
+class CardComponent {
+  constructor(element) {
+    this.element = element;
+    this.init();
+  }
+  
+  init() {
+    this.setupEventListeners();
+    this.setupAccessibility();
+  }
+  
+  setupEventListeners() {
+    // Click handler for interactive cards
+    if (this.element.hasAttribute('data-interactive')) {
+      this.element.addEventListener('click', (e) => {
+        // Don't trigger if clicking on interactive elements inside
+        if (e.target.closest('button, a, input, select, textarea')) {
+          return;
+        }
+        
+        this.element.dispatchEvent(new CustomEvent('card:click', {
+          detail: { element: this.element },
+          bubbles: true
+        }));
+      });
+    }
+    
+    // Keyboard navigation for interactive cards
+    if (this.element.hasAttribute('data-interactive')) {
+      this.element.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          this.element.click();
+        }
+      });
+    }
+  }
+  
+  setupAccessibility() {
+    // Set up ARIA attributes for interactive cards
+    if (this.element.hasAttribute('data-interactive')) {
+      this.element.setAttribute('role', 'button');
+      this.element.setAttribute('tabindex', '0');
+    }
+  }
+  
+  // Public methods
+  setLoading(loading) {
+    if (loading) {
+      this.element.classList.add('loading');
+    } else {
+      this.element.classList.remove('loading');
+    }
+  }
+  
+  setError(error) {
+    if (error) {
+      this.element.classList.add('error');
+    } else {
+      this.element.classList.remove('error');
+    }
+  }
+  
+  setSuccess(success) {
+    if (success) {
+      this.element.classList.add('success');
+    } else {
+      this.element.classList.remove('success');
+    }
+  }
+  
+  setWarning(warning) {
+    if (warning) {
+      this.element.classList.add('warning');
+    } else {
+      this.element.classList.remove('warning');
+    }
+  }
+  
+  setInfo(info) {
+    if (info) {
+      this.element.classList.add('info');
+    } else {
+      this.element.classList.remove('info');
+    }
+  }
+  
+  setVariant(variant) {
+    this.element.setAttribute('data-variant', variant);
+  }
+  
+  setInteractive(interactive) {
+    if (interactive) {
+      this.element.setAttribute('data-interactive', 'true');
+      this.element.setAttribute('role', 'button');
+      this.element.setAttribute('tabindex', '0');
+    } else {
+      this.element.removeAttribute('data-interactive');
+      this.element.removeAttribute('role');
+      this.element.removeAttribute('tabindex');
+    }
+  }
+}
+
+// Auto-initialize cards
+document.addEventListener('DOMContentLoaded', () => {
+  const cards = document.querySelectorAll('.card');
+  cards.forEach(card => {
+    new CardComponent(card);
+  });
+});
+
+// Export for manual initialization
+window.CardComponent = CardComponent;
+</script>

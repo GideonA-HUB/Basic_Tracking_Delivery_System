@@ -1,0 +1,555 @@
+<!-- Input Component - Converted from React to HTML/CSS/JS -->
+<template id="input-template">
+  <div class="input-container">
+    <label class="input-label" for="input-field">
+      <slot name="label"></slot>
+    </label>
+    <div class="input-wrapper">
+      <input 
+        type="text" 
+        id="input-field" 
+        class="input" 
+        placeholder="Enter text..."
+        data-type="text"
+      />
+      <div class="input-icon-left">
+        <slot name="icon-left"></slot>
+      </div>
+      <div class="input-icon-right">
+        <slot name="icon-right"></slot>
+      </div>
+    </div>
+    <div class="input-message">
+      <slot name="message"></slot>
+    </div>
+  </div>
+</template>
+
+<style>
+/* Input Component Styles */
+.input-container {
+  @apply space-y-2;
+}
+
+.input-label {
+  @apply text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70;
+}
+
+.input-wrapper {
+  @apply relative;
+}
+
+.input {
+  @apply flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm;
+  @apply transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium;
+  @apply placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring;
+  @apply disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.input:focus {
+  @apply ring-2 ring-ring ring-offset-2 border-ring;
+}
+
+.input:disabled {
+  @apply cursor-not-allowed opacity-50;
+}
+
+/* Input with icons */
+.input-wrapper.has-icon-left .input {
+  @apply pl-10;
+}
+
+.input-wrapper.has-icon-right .input {
+  @apply pr-10;
+}
+
+.input-icon-left,
+.input-icon-right {
+  @apply absolute top-1/2 transform -translate-y-1/2 pointer-events-none;
+}
+
+.input-icon-left {
+  @apply left-3;
+}
+
+.input-icon-right {
+  @apply right-3;
+}
+
+.input-icon-left svg,
+.input-icon-right svg {
+  @apply w-4 h-4 text-muted-foreground;
+}
+
+/* Input states */
+.input-container[data-state="error"] .input {
+  @apply border-destructive focus-visible:ring-destructive;
+}
+
+.input-container[data-state="success"] .input {
+  @apply border-green-500 focus-visible:ring-green-500;
+}
+
+.input-container[data-state="warning"] .input {
+  @apply border-yellow-500 focus-visible:ring-yellow-500;
+}
+
+/* Input message */
+.input-message {
+  @apply text-sm;
+}
+
+.input-message[data-state="error"] {
+  @apply text-destructive;
+}
+
+.input-message[data-state="success"] {
+  @apply text-green-600;
+}
+
+.input-message[data-state="warning"] {
+  @apply text-yellow-600;
+}
+
+/* Input sizes */
+.input-container[data-size="sm"] .input {
+  @apply h-8 px-2 text-xs;
+}
+
+.input-container[data-size="lg"] .input {
+  @apply h-11 px-4 text-base;
+}
+
+/* Input variants */
+.input-container[data-variant="default"] .input {
+  @apply bg-background border-input;
+}
+
+.input-container[data-variant="filled"] .input {
+  @apply bg-muted border-muted;
+}
+
+.input-container[data-variant="outlined"] .input {
+  @apply bg-transparent border-2 border-input;
+}
+
+/* Input types */
+.input[type="password"] {
+  @apply font-mono;
+}
+
+.input[type="email"] {
+  @apply lowercase;
+}
+
+.input[type="number"] {
+  @apply text-right;
+}
+
+.input[type="search"] {
+  @apply pl-10;
+}
+
+.input[type="search"]::-webkit-search-cancel-button {
+  @apply appearance-none;
+}
+
+/* Input with floating label */
+.input-container[data-floating="true"] {
+  @apply relative;
+}
+
+.input-container[data-floating="true"] .input-label {
+  @apply absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground;
+  @apply transition-all duration-200 pointer-events-none;
+}
+
+.input-container[data-floating="true"] .input:focus + .input-label,
+.input-container[data-floating="true"] .input:not(:placeholder-shown) + .input-label {
+  @apply -translate-y-6 scale-75 text-xs text-foreground;
+}
+
+/* Input with prefix/suffix */
+.input-prefix,
+.input-suffix {
+  @apply absolute top-1/2 transform -translate-y-1/2 text-muted-foreground;
+}
+
+.input-prefix {
+  @apply left-3;
+}
+
+.input-suffix {
+  @apply right-3;
+}
+
+.input-container.has-prefix .input {
+  @apply pl-10;
+}
+
+.input-container.has-suffix .input {
+  @apply pr-10;
+}
+
+/* Input group */
+.input-group {
+  @apply flex;
+}
+
+.input-group .input {
+  @apply rounded-none border-r-0;
+}
+
+.input-group .input:first-child {
+  @apply rounded-l-md;
+}
+
+.input-group .input:last-child {
+  @apply rounded-r-md border-r;
+}
+
+.input-group .input:not(:first-child):not(:last-child) {
+  @apply rounded-none;
+}
+
+/* Input with button */
+.input-with-button {
+  @apply flex;
+}
+
+.input-with-button .input {
+  @apply rounded-r-none border-r-0;
+}
+
+.input-with-button .btn {
+  @apply rounded-l-none;
+}
+
+/* Loading state */
+.input-container.loading .input {
+  @apply pr-10;
+}
+
+.input-container.loading .input-icon-right {
+  @apply animate-spin;
+}
+
+/* Disabled state */
+.input-container[data-disabled="true"] .input {
+  @apply cursor-not-allowed opacity-50;
+}
+
+.input-container[data-disabled="true"] .input-label {
+  @apply cursor-not-allowed opacity-50;
+}
+
+/* Readonly state */
+.input-container[data-readonly="true"] .input {
+  @apply cursor-default bg-muted;
+}
+
+/* Required indicator */
+.input-label.required::after {
+  content: ' *';
+  @apply text-destructive;
+}
+
+/* Character count */
+.input-character-count {
+  @apply text-xs text-muted-foreground text-right;
+}
+
+/* Input with validation */
+.input-container[data-validating="true"] .input {
+  @apply border-yellow-500;
+}
+
+.input-container[data-valid="true"] .input {
+  @apply border-green-500;
+}
+
+.input-container[data-invalid="true"] .input {
+  @apply border-destructive;
+}
+
+/* Responsive inputs */
+@media (max-width: 640px) {
+  .input-container[data-size="lg"] .input {
+    @apply h-10 text-sm;
+  }
+}
+
+/* Dark mode adjustments */
+.dark .input {
+  @apply bg-background border-border;
+}
+
+.dark .input:focus {
+  @apply ring-ring;
+}
+
+.dark .input-icon-left svg,
+.dark .input-icon-right svg {
+  @apply text-muted-foreground;
+}
+</style>
+
+<script>
+/**
+ * Input Component JavaScript
+ * Handles input interactions, validation, and state management
+ */
+class InputComponent {
+  constructor(element) {
+    this.element = element;
+    this.input = this.element.querySelector('.input');
+    this.label = this.element.querySelector('.input-label');
+    this.message = this.element.querySelector('.input-message');
+    this.init();
+  }
+  
+  init() {
+    this.setupEventListeners();
+    this.setupValidation();
+    this.setupAccessibility();
+  }
+  
+  setupEventListeners() {
+    // Focus and blur events
+    this.input.addEventListener('focus', () => {
+      this.element.classList.add('focused');
+      this.emit('focus');
+    });
+    
+    this.input.addEventListener('blur', () => {
+      this.element.classList.remove('focused');
+      this.validate();
+      this.emit('blur');
+    });
+    
+    // Input events
+    this.input.addEventListener('input', (e) => {
+      this.emit('input', e.target.value);
+      this.updateCharacterCount();
+    });
+    
+    this.input.addEventListener('change', (e) => {
+      this.emit('change', e.target.value);
+    });
+    
+    // Key events
+    this.input.addEventListener('keydown', (e) => {
+      this.emit('keydown', e);
+    });
+    
+    this.input.addEventListener('keyup', (e) => {
+      this.emit('keyup', e);
+    });
+  }
+  
+  setupValidation() {
+    // Real-time validation
+    this.input.addEventListener('input', () => {
+      if (this.input.dataset.validate === 'true') {
+        this.validate();
+      }
+    });
+  }
+  
+  setupAccessibility() {
+    // ARIA attributes
+    if (this.label) {
+      this.input.setAttribute('aria-labelledby', this.label.id || this.generateId('label'));
+      if (!this.label.id) {
+        this.label.id = this.generateId('label');
+      }
+    }
+    
+    if (this.message) {
+      this.input.setAttribute('aria-describedby', this.message.id || this.generateId('message'));
+      if (!this.message.id) {
+        this.message.id = this.generateId('message');
+      }
+    }
+    
+    // Required attribute
+    if (this.input.hasAttribute('required')) {
+      this.input.setAttribute('aria-required', 'true');
+    }
+  }
+  
+  // Validation methods
+  validate() {
+    const value = this.input.value;
+    const rules = this.getValidationRules();
+    const errors = [];
+    
+    for (const rule of rules) {
+      const result = rule.validator(value);
+      if (!result.valid) {
+        errors.push(result.message);
+      }
+    }
+    
+    this.setValidationState(errors.length === 0 ? 'valid' : 'invalid', errors[0]);
+    return errors.length === 0;
+  }
+  
+  getValidationRules() {
+    const rules = [];
+    
+    // Required validation
+    if (this.input.hasAttribute('required')) {
+      rules.push({
+        validator: (value) => ({
+          valid: value.trim().length > 0,
+          message: 'This field is required'
+        })
+      });
+    }
+    
+    // Email validation
+    if (this.input.type === 'email') {
+      rules.push({
+        validator: (value) => ({
+          valid: !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
+          message: 'Please enter a valid email address'
+        })
+      });
+    }
+    
+    // Min length validation
+    if (this.input.hasAttribute('minlength')) {
+      const minLength = parseInt(this.input.getAttribute('minlength'));
+      rules.push({
+        validator: (value) => ({
+          valid: value.length >= minLength,
+          message: `Minimum length is ${minLength} characters`
+        })
+      });
+    }
+    
+    // Max length validation
+    if (this.input.hasAttribute('maxlength')) {
+      const maxLength = parseInt(this.input.getAttribute('maxlength'));
+      rules.push({
+        validator: (value) => ({
+          valid: value.length <= maxLength,
+          message: `Maximum length is ${maxLength} characters`
+        })
+      });
+    }
+    
+    // Pattern validation
+    if (this.input.hasAttribute('pattern')) {
+      const pattern = new RegExp(this.input.getAttribute('pattern'));
+      rules.push({
+        validator: (value) => ({
+          valid: !value || pattern.test(value),
+          message: 'Please enter a valid format'
+        })
+      });
+    }
+    
+    return rules;
+  }
+  
+  setValidationState(state, message) {
+    this.element.setAttribute('data-state', state);
+    this.element.setAttribute('data-valid', state === 'valid');
+    this.element.setAttribute('data-invalid', state === 'invalid');
+    
+    if (this.message) {
+      this.message.textContent = message || '';
+      this.message.setAttribute('data-state', state);
+    }
+  }
+  
+  updateCharacterCount() {
+    const maxLength = this.input.getAttribute('maxlength');
+    if (maxLength) {
+      const count = this.input.value.length;
+      const countElement = this.element.querySelector('.input-character-count');
+      if (countElement) {
+        countElement.textContent = `${count}/${maxLength}`;
+      }
+    }
+  }
+  
+  // Public methods
+  setValue(value) {
+    this.input.value = value;
+    this.emit('change', value);
+  }
+  
+  getValue() {
+    return this.input.value;
+  }
+  
+  setDisabled(disabled) {
+    this.input.disabled = disabled;
+    this.element.setAttribute('data-disabled', disabled);
+  }
+  
+  setReadonly(readonly) {
+    this.input.readOnly = readonly;
+    this.element.setAttribute('data-readonly', readonly);
+  }
+  
+  setLoading(loading) {
+    this.element.classList.toggle('loading', loading);
+    this.element.setAttribute('data-validating', loading);
+  }
+  
+  setState(state) {
+    this.element.setAttribute('data-state', state);
+  }
+  
+  setSize(size) {
+    this.element.setAttribute('data-size', size);
+  }
+  
+  setVariant(variant) {
+    this.element.setAttribute('data-variant', variant);
+  }
+  
+  setFloating(floating) {
+    this.element.setAttribute('data-floating', floating);
+  }
+  
+  focus() {
+    this.input.focus();
+  }
+  
+  blur() {
+    this.input.blur();
+  }
+  
+  select() {
+    this.input.select();
+  }
+  
+  // Utility methods
+  generateId(prefix) {
+    return `${prefix}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+  
+  emit(event, data) {
+    this.element.dispatchEvent(new CustomEvent(`input:${event}`, {
+      detail: { element: this.element, input: this.input, data },
+      bubbles: true
+    }));
+  }
+}
+
+// Auto-initialize inputs
+document.addEventListener('DOMContentLoaded', () => {
+  const inputContainers = document.querySelectorAll('.input-container');
+  inputContainers.forEach(container => {
+    new InputComponent(container);
+  });
+});
+
+// Export for manual initialization
+window.InputComponent = InputComponent;
+</script>

@@ -147,3 +147,8 @@ def calculate_cost(request):
 def landing_page(request):
     """Public landing page for customers"""
     return render(request, 'tracking/landing_page.html')
+
+
+def landing_page_figma(request):
+    """Figma redesigned landing page"""
+    return render(request, 'tracking/landing_page_figma.html')
