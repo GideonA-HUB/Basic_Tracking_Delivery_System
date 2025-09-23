@@ -5,21 +5,51 @@
 
 {% block extra_head %}
 <style>
-    /* Custom styles for the new landing page */
-    .hero-gradient {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    
+    /* Hero Section Styles - Exact Match to Image */
     .hero-section {
-        min-height: 100vh;
+        background: white;
+        padding: 4rem 0;
+        min-height: 80vh;
         display: flex;
         align-items: center;
     }
     
-    .hero-content {
+    .hero-container {
         max-width: 1200px;
         margin: 0 auto;
         padding: 0 2rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+    }
+    
+    .hero-content {
+        padding-right: 2rem;
+    }
+    
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: #f0f9ff;
+        border: 1px solid #e0f2fe;
+        border-radius: 2rem;
+        padding: 0.5rem 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .hero-badge-dot {
+        width: 8px;
+        height: 8px;
+        background: #3b82f6;
+        border-radius: 50%;
+    }
+    
+    .hero-badge-text {
+        font-size: 0.875rem;
+        color: #1e40af;
+        font-weight: 500;
     }
     
     .hero-title {
@@ -29,23 +59,34 @@
         margin-bottom: 1.5rem;
     }
     
-    .hero-subtitle {
-        font-size: 1.25rem;
+    .hero-title-line1 {
+        display: block;
+        color: #1f2937;
+    }
+    
+    .hero-title-line2 {
+        display: block;
+        color: #3b82f6;
+    }
+    
+    .hero-description {
+        font-size: 1.125rem;
         color: #6b7280;
+        line-height: 1.6;
         margin-bottom: 2rem;
-        max-width: 600px;
+        max-width: 500px;
     }
     
     .hero-buttons {
         display: flex;
         gap: 1rem;
-        margin-bottom: 3rem;
+        margin-bottom: 2rem;
     }
     
     .btn-primary {
         background: #3b82f6;
         color: white;
-        padding: 0.75rem 2rem;
+        padding: 0.875rem 1.5rem;
         border-radius: 0.5rem;
         font-weight: 600;
         text-decoration: none;
@@ -53,26 +94,29 @@
         align-items: center;
         gap: 0.5rem;
         transition: all 0.2s;
+        border: none;
+        cursor: pointer;
     }
     
     .btn-primary:hover {
         background: #2563eb;
         transform: translateY(-1px);
-        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
     
     .btn-secondary {
         background: white;
         color: #374151;
-        padding: 0.75rem 2rem;
+        padding: 0.875rem 1.5rem;
         border-radius: 0.5rem;
         font-weight: 600;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        border: 2px solid #e5e7eb;
+        border: 1px solid #d1d5db;
         transition: all 0.2s;
+        cursor: pointer;
     }
     
     .btn-secondary:hover {
@@ -81,27 +125,139 @@
         transform: translateY(-1px);
     }
     
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 2rem;
-        margin-top: 3rem;
+    /* Hero Visual Styles */
+    .hero-visual {
+        position: relative;
     }
     
-    .stat-item {
-        text-align: center;
+    .hero-image-container {
+        position: relative;
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     }
     
-    .stat-number {
-        font-size: 2.5rem;
-        font-weight: 800;
+    .hero-image {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+        display: block;
+    }
+    
+    .live-tracking-overlay {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        background: white;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .live-tracking-dot {
+        width: 8px;
+        height: 8px;
+        background: #10b981;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    
+    .live-tracking-text {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .live-tracking-title {
+        font-size: 0.875rem;
+        font-weight: 600;
         color: #1f2937;
-        margin-bottom: 0.5rem;
     }
     
-    .stat-label {
+    .live-tracking-subtitle {
+        font-size: 0.75rem;
         color: #6b7280;
-        font-weight: 500;
+    }
+    
+    .roi-performance-card {
+        position: absolute;
+        bottom: 1rem;
+        right: 1rem;
+        background: white;
+        border-radius: 0.75rem;
+        padding: 1rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        min-width: 140px;
+    }
+    
+    .roi-title {
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-bottom: 0.25rem;
+    }
+    
+    .roi-percentage {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #10b981;
+        margin-bottom: 0.25rem;
+    }
+    
+    .roi-period {
+        font-size: 0.75rem;
+        color: #6b7280;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .hero-container {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            text-align: center;
+        }
+        
+        .hero-content {
+            padding-right: 0;
+        }
+        
+        .hero-title {
+            font-size: 2.5rem;
+        }
+        
+        .hero-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .btn-primary,
+        .btn-secondary {
+            width: 100%;
+            max-width: 300px;
+            justify-content: center;
+        }
+        
+        .hero-image {
+            height: 300px;
+        }
+        
+        .live-tracking-overlay {
+            top: 0.5rem;
+            left: 0.5rem;
+            padding: 0.5rem 0.75rem;
+        }
+        
+        .roi-performance-card {
+            bottom: 0.5rem;
+            right: 0.5rem;
+            padding: 0.75rem;
+        }
     }
     
     .tracking-section {
@@ -263,40 +419,54 @@
 
 {% block content %}
 <!-- Hero Section -->
-<section class="hero-gradient text-white hero-section">
-    <div class="hero-content">
-        <div class="text-center">
+<section class="hero-section">
+    <div class="hero-container">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="hero-badge-dot"></span>
+                <span class="hero-badge-text">Unlock The Future of Asset Logistics</span>
+            </div>
+            
             <h1 class="hero-title">
-                Track Your Package<br>
-                <span class="text-blue-200">with Confidence</span>
+                <span class="hero-title-line1">Invest in Low-Risk</span>
+                <span class="hero-title-line2">Logistics Solutions</span>
             </h1>
-            <p class="hero-subtitle">
-                Experience seamless tracking with our advanced monitoring system. 
-                Simply enter your tracking number and watch your package journey 
-                across the globe in real-time.
+            
+            <p class="hero-description">
+                Transform your supply chain with our innovative asset logistics platform. 
+                Secure, efficient, and profitable logistics management for the modern era.
             </p>
+            
             <div class="hero-buttons">
-                <a href="#tracking" class="btn-primary">
-                    <i class="fas fa-search"></i>
-                    Track Package
+                <a href="{% url 'investments:investment-marketplace' %}" class="btn-primary">
+                    <span>Start Investing</span>
+                    <i class="fas fa-arrow-right"></i>
                 </a>
-                <a href="#help" class="btn-secondary">
-                    <i class="fas fa-question-circle"></i>
-                    Need Help?
+                <a href="#demo" class="btn-secondary">
+                    <i class="fas fa-play"></i>
+                    <span>Watch Demo</span>
                 </a>
             </div>
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-number">1M+</div>
-                    <div class="stat-label">Packages Tracked</div>
+        </div>
+        
+        <div class="hero-visual">
+            <div class="hero-image-container">
+                <img 
+                    src="https://wallpapercave.com/wp/wp2074700.jpg" 
+                    alt="Logistics Hub with Solar Panels"
+                    class="hero-image"
+                />
+                <div class="live-tracking-overlay">
+                    <div class="live-tracking-dot"></div>
+                    <div class="live-tracking-text">
+                        <div class="live-tracking-title">Live Tracking</div>
+                        <div class="live-tracking-subtitle">Real-time updates</div>
+                    </div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-number">99.9%</div>
-                    <div class="stat-label">Success Rate</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">24/7</div>
-                    <div class="stat-label">Support</div>
+                <div class="roi-performance-card">
+                    <div class="roi-title">ROI Performance</div>
+                    <div class="roi-percentage">+24.5%</div>
+                    <div class="roi-period">This quarter</div>
                 </div>
             </div>
         </div>
