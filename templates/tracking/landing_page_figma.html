@@ -500,12 +500,54 @@
         background: linear-gradient(to right, #f3f4f6 0%, #e5e7eb 100%);
         border-radius: 0.5rem;
         padding: 1rem;
+        display: grid;
+        grid-template-columns: 30px 1fr;
+        grid-template-rows: 1fr 30px;
+        gap: 0.5rem;
+    }
+    
+    .y-axis {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-end;
+        padding-right: 0.5rem;
+    }
+    
+    .y-label {
+        font-size: 0.75rem;
+        color: #6b7280;
+        font-weight: 500;
+    }
+    
+    .chart-area {
+        position: relative;
+        height: 100%;
+        width: 100%;
     }
     
     .chart-line {
         position: relative;
         height: 100%;
         width: 100%;
+        background: linear-gradient(to right, #3b82f6, #3b82f6);
+        background-size: 100% 2px;
+        background-repeat: no-repeat;
+        background-position: 0 50%;
+    }
+    
+    .x-axis {
+        grid-column: 2;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 0.5rem;
+    }
+    
+    .x-label {
+        font-size: 0.75rem;
+        color: #6b7280;
+        font-weight: 500;
     }
     
     .data-point {
@@ -532,7 +574,8 @@
     
     .chart-footer {
         margin-top: 1rem;
-        text-align: center;
+        text-align: left;
+        padding-left: 0.5rem;
     }
     
     .growth-text {
@@ -634,11 +677,32 @@
         margin-top: 1rem;
     }
     
+    .bar-chart-wrapper {
+        display: grid;
+        grid-template-columns: 30px 1fr;
+        gap: 0.5rem;
+        height: 200px;
+    }
+    
+    .bar-y-axis {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-end;
+        padding-right: 0.5rem;
+    }
+    
+    .bar-y-label {
+        font-size: 0.75rem;
+        color: #6b7280;
+        font-weight: 500;
+    }
+    
     .bar-chart {
         display: flex;
         align-items: end;
         justify-content: space-between;
-        height: 200px;
+        height: 100%;
         gap: 1rem;
         padding: 1rem 0;
     }
@@ -674,8 +738,9 @@
     .donut-chart-container {
         display: flex;
         align-items: center;
-        gap: 2rem;
+        gap: 3rem;
         margin-top: 1rem;
+        padding: 1rem;
     }
     
     .donut-chart {
@@ -995,13 +1060,33 @@
                     <h3 class="chart-title">Monthly Performance Growth</h3>
                     <div class="chart-container">
                         <div class="line-chart">
-                            <div class="chart-line">
-                                <div class="data-point" style="left: 8%; bottom: 45%;"></div>
-                                <div class="data-point" style="left: 25%; bottom: 55%;"></div>
-                                <div class="data-point" style="left: 42%; bottom: 70%;"></div>
-                                <div class="data-point" style="left: 58%; bottom: 80%;"></div>
-                                <div class="data-point" style="left: 75%; bottom: 70%;"></div>
-                                <div class="data-point" style="left: 92%; bottom: 90%;"></div>
+                            <!-- Y-axis labels -->
+                            <div class="y-axis">
+                                <span class="y-label">28</span>
+                                <span class="y-label">21</span>
+                                <span class="y-label">14</span>
+                                <span class="y-label">7</span>
+                                <span class="y-label">0</span>
+                            </div>
+                            <!-- Chart area -->
+                            <div class="chart-area">
+                                <div class="chart-line">
+                                    <div class="data-point" style="left: 8%; bottom: 45%;"></div>
+                                    <div class="data-point" style="left: 25%; bottom: 55%;"></div>
+                                    <div class="data-point" style="left: 42%; bottom: 70%;"></div>
+                                    <div class="data-point" style="left: 58%; bottom: 80%;"></div>
+                                    <div class="data-point" style="left: 75%; bottom: 70%;"></div>
+                                    <div class="data-point" style="left: 92%; bottom: 90%;"></div>
+                                </div>
+                            </div>
+                            <!-- X-axis labels -->
+                            <div class="x-axis">
+                                <span class="x-label">Jan</span>
+                                <span class="x-label">Feb</span>
+                                <span class="x-label">Mar</span>
+                                <span class="x-label">Apr</span>
+                                <span class="x-label">May</span>
+                                <span class="x-label">Jun</span>
                             </div>
                         </div>
                         <div class="chart-footer">
@@ -1012,6 +1097,24 @@
                 
                 <!-- KPI Cards Row -->
                 <div class="kpi-cards-row">
+                    <div class="kpi-card kpi-blue">
+                        <div class="kpi-value">24.5%</div>
+                        <div class="kpi-label">Annual ROI</div>
+                        <div class="kpi-growth">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+3.2% from last year</span>
+                        </div>
+                    </div>
+                    
+                    <div class="kpi-card kpi-green">
+                        <div class="kpi-value">$2.5B</div>
+                        <div class="kpi-label">Assets Under Management</div>
+                        <div class="kpi-growth">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+15% growth</span>
+                        </div>
+                    </div>
+                    
                     <div class="kpi-card kpi-purple">
                         <div class="kpi-value">15K+</div>
                         <div class="kpi-label">Active Investors</div>
@@ -1038,18 +1141,29 @@
                 <div class="volume-chart-card">
                     <h3 class="chart-title">Quarterly Investment Volume ($ Millions)</h3>
                     <div class="bar-chart-container">
-                        <div class="bar-chart">
-                            <div class="bar" style="height: 42%;">
-                                <div class="bar-value">$125M</div>
+                        <div class="bar-chart-wrapper">
+                            <!-- Y-axis labels -->
+                            <div class="bar-y-axis">
+                                <span class="bar-y-label">300</span>
+                                <span class="bar-y-label">225</span>
+                                <span class="bar-y-label">150</span>
+                                <span class="bar-y-label">75</span>
+                                <span class="bar-y-label">0</span>
                             </div>
-                            <div class="bar" style="height: 60%;">
-                                <div class="bar-value">$180M</div>
-                            </div>
-                            <div class="bar" style="height: 77%;">
-                                <div class="bar-value">$230M</div>
-                            </div>
-                            <div class="bar" style="height: 100%;">
-                                <div class="bar-value">$310M</div>
+                            <!-- Chart area -->
+                            <div class="bar-chart">
+                                <div class="bar" style="height: 42%;">
+                                    <div class="bar-value">$125M</div>
+                                </div>
+                                <div class="bar" style="height: 60%;">
+                                    <div class="bar-value">$180M</div>
+                                </div>
+                                <div class="bar" style="height: 77%;">
+                                    <div class="bar-value">$230M</div>
+                                </div>
+                                <div class="bar" style="height: 100%;">
+                                    <div class="bar-value">$310M</div>
+                                </div>
                             </div>
                         </div>
                         <div class="chart-labels">
