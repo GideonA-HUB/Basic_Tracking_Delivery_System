@@ -456,11 +456,23 @@
         padding: 4rem 0;
     }
     
-    .dashboard-grid {
+    .dashboard-top-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .dashboard-bottom-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 2rem;
-        margin-top: 2rem;
+    }
+    
+    .kpi-cards-row {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
     }
     
     .performance-chart-card {
@@ -728,12 +740,17 @@
     }
     
     @media (max-width: 1024px) {
-        .dashboard-grid {
+        .dashboard-top-row {
             grid-template-columns: 1fr;
         }
         
-        .kpi-cards-grid {
-            grid-template-columns: repeat(2, 1fr);
+        .dashboard-bottom-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .kpi-cards-row {
+            flex-direction: row;
+            gap: 1rem;
         }
     }
     
@@ -754,8 +771,8 @@
             grid-template-columns: 1fr;
         }
         
-        .kpi-cards-grid {
-            grid-template-columns: 1fr;
+        .kpi-cards-row {
+            flex-direction: column;
         }
         
         .donut-chart-container {
@@ -971,8 +988,8 @@
                 </p>
             </div>
             
-            <!-- Performance Metrics Grid -->
-            <div class="dashboard-grid">
+            <!-- Top Row: Chart and KPI Cards -->
+            <div class="dashboard-top-row">
                 <!-- Monthly Performance Growth Chart -->
                 <div class="performance-chart-card">
                     <h3 class="chart-title">Monthly Performance Growth</h3>
@@ -993,26 +1010,8 @@
                     </div>
                 </div>
                 
-                <!-- KPI Cards -->
-                <div class="kpi-cards-grid">
-                    <div class="kpi-card kpi-blue">
-                        <div class="kpi-value">24.5%</div>
-                        <div class="kpi-label">Annual ROI</div>
-                        <div class="kpi-growth">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>+3.2% from last year</span>
-                        </div>
-                    </div>
-                    
-                    <div class="kpi-card kpi-green">
-                        <div class="kpi-value">$2.5B</div>
-                        <div class="kpi-label">Assets Under Management</div>
-                        <div class="kpi-growth">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>+15% growth</span>
-                        </div>
-                    </div>
-                    
+                <!-- KPI Cards Row -->
+                <div class="kpi-cards-row">
                     <div class="kpi-card kpi-purple">
                         <div class="kpi-value">15K+</div>
                         <div class="kpi-label">Active Investors</div>
@@ -1032,13 +1031,9 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Investment Volume Section -->
-    <section class="investment-volume-section">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <div class="dashboard-grid">
+            
+            <!-- Bottom Row: Bar Chart and Donut Chart -->
+            <div class="dashboard-bottom-row">
                 <!-- Quarterly Investment Volume Chart -->
                 <div class="volume-chart-card">
                     <h3 class="chart-title">Quarterly Investment Volume ($ Millions)</h3>
