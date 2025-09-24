@@ -407,11 +407,192 @@
         margin-top: 3rem;
     }
     
-    .cta-section {
-        background: #1f2937;
-        color: white;
+    /* Contact Section Styles */
+    .contact-section {
+        background: white;
         padding: 4rem 0;
+    }
+    
+    .contact-header {
         text-align: center;
+        margin-bottom: 4rem;
+    }
+    
+    .contact-title {
+        font-size: 3rem;
+        font-weight: 800;
+        color: #1f2937;
+        margin-bottom: 1.5rem;
+    }
+    
+    .contact-description {
+        font-size: 1.125rem;
+        color: #6b7280;
+        line-height: 1.6;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .contact-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: start;
+    }
+    
+    /* Get in Touch Styles */
+    .contact-info {
+        padding-right: 2rem;
+    }
+    
+    .contact-info-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 2rem;
+    }
+    
+    .contact-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .contact-icon {
+        width: 3rem;
+        height: 3rem;
+        background: #dbeafe;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #3b82f6;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+    
+    .contact-details {
+        flex: 1;
+    }
+    
+    .contact-label {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+    
+    .contact-value {
+        font-size: 0.95rem;
+        color: #6b7280;
+        line-height: 1.5;
+        margin-bottom: 0.25rem;
+    }
+    
+    /* Why Choose Us Styles */
+    .why-choose-us {
+        background: #f8fafc;
+        border-radius: 1rem;
+        padding: 2rem;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .why-choose-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+    
+    .metric-card {
+        text-align: center;
+        padding: 1.5rem 1rem;
+        background: white;
+        border-radius: 0.75rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s ease;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .metric-number {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        line-height: 1;
+    }
+    
+    .metric-blue {
+        color: #3b82f6;
+    }
+    
+    .metric-green {
+        color: #10b981;
+    }
+    
+    .metric-purple {
+        color: #8b5cf6;
+    }
+    
+    .metric-orange {
+        color: #f59e0b;
+    }
+    
+    .metric-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+        font-weight: 500;
+    }
+    
+    /* Responsive Design for Contact */
+    @media (max-width: 1024px) {
+        .contact-content {
+            grid-template-columns: 1fr;
+            gap: 3rem;
+        }
+        
+        .contact-info {
+            padding-right: 0;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .contact-section {
+            padding: 3rem 0;
+        }
+        
+        .contact-title {
+            font-size: 2rem;
+        }
+        
+        .contact-description {
+            font-size: 1rem;
+        }
+        
+        .metrics-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .contact-item {
+            margin-bottom: 1.5rem;
+        }
+        
+        .contact-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            font-size: 1rem;
+        }
     }
     
     .footer {
@@ -1583,20 +1764,96 @@
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="cta-section">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-3xl font-bold mb-4">Ready to ship? Contact us today.</h2>
-        <p class="text-lg mb-8">
-                    Let us handle your logistics needs with our professional shipping services.
+    <!-- Contact Section -->
+    <section class="contact-section">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Contact Header -->
+            <div class="contact-header">
+                <h2 class="contact-title">Contact Us</h2>
+                <p class="contact-description">
+                    Ready to transform your logistics operations? Get in touch with our experts to discuss your investment opportunities and supply chain solutions.
                 </p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="{% url 'frontend:calculate_cost' %}" class="btn-primary">
-                        Calculate Cost
-                    </a>
-            <a href="{% url 'frontend:tracking_status_guide' %}" class="btn-secondary">
-                        Learn More
-                    </a>
+            </div>
+            
+            <!-- Contact Content -->
+            <div class="contact-content">
+                <!-- Left Column - Get in Touch -->
+                <div class="contact-info">
+                    <h3 class="contact-info-title">Get in Touch</h3>
+                    
+                    <!-- Phone -->
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="contact-details">
+                            <div class="contact-label">Phone</div>
+                            <div class="contact-value">+1 (555) 123-4567</div>
+                            <div class="contact-value">+1 (555) 987-6543</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Email -->
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-details">
+                            <div class="contact-label">Email</div>
+                            <div class="contact-value">info@meridianassetlogistics.com</div>
+                            <div class="contact-value">invest@meridianassetlogistics.com</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Address -->
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="contact-details">
+                            <div class="contact-label">Address</div>
+                            <div class="contact-value">123 Logistics Boulevard</div>
+                            <div class="contact-value">Suite 500</div>
+                            <div class="contact-value">New York, NY 10001</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Business Hours -->
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="contact-details">
+                            <div class="contact-label">Business Hours</div>
+                            <div class="contact-value">Monday - Friday: 9:00 AM - 6:00 PM EST</div>
+                            <div class="contact-value">Saturday: 10:00 AM - 4:00 PM EST</div>
+                            <div class="contact-value">Sunday: Closed</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Column - Why Choose Us -->
+                <div class="why-choose-us">
+                    <h3 class="why-choose-title">Why Choose Us?</h3>
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-number metric-blue">24/7</div>
+                            <div class="metric-label">Support Available</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-number metric-green">&lt;2hrs</div>
+                            <div class="metric-label">Response Time</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-number metric-purple">50+</div>
+                            <div class="metric-label">Countries Served</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-number metric-orange">98%</div>
+                            <div class="metric-label">Client Satisfaction</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
