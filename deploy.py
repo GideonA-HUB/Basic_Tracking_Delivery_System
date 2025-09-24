@@ -261,18 +261,30 @@ def save_articles_to_database(articles):
                     }
                 )
                 
-                # Parse published_at date
+                # Parse published_at date with proper timezone handling
+                from django.utils import timezone
                 published_at = article_data.get('published_at', '')
                 if isinstance(published_at, str):
                     try:
                         # Try to parse ISO format
-                        published_at = datetime.fromisoformat(published_at.replace('Z', '+00:00'))
+                        if published_at.endswith('Z'):
+                            published_at = published_at.replace('Z', '+00:00')
+                        parsed_dt = datetime.fromisoformat(published_at)
+                        # Make timezone aware
+                        if parsed_dt.tzinfo is None:
+                            published_at = timezone.make_aware(parsed_dt)
+                        else:
+                            published_at = parsed_dt
                     except:
-                        # Fallback to current time
-                        published_at = datetime.now()
+                        # Fallback to current time with timezone
+                        published_at = timezone.now()
                 elif isinstance(published_at, (int, float)):
-                    # Unix timestamp
-                    published_at = datetime.fromtimestamp(published_at)
+                    # Unix timestamp - convert to timezone aware datetime
+                    parsed_dt = datetime.fromtimestamp(published_at)
+                    published_at = timezone.make_aware(parsed_dt)
+                else:
+                    # Fallback to current time with timezone
+                    published_at = timezone.now()
                 
                 # Create article
                 article = NewsArticle.objects.create(
