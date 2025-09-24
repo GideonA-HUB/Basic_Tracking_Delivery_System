@@ -227,7 +227,8 @@ def force_fetch_marketaux_news():
 def save_articles_to_database(articles):
     """Save articles to database"""
     try:
-        from investments.models import NewsArticle
+        from investments.news_models import NewsArticle, NewsSource, NewsCategory
+        from datetime import datetime
         
         print("🗑️  Cleared existing articles")
         
@@ -240,27 +241,64 @@ def save_articles_to_database(articles):
         
         for i, article_data in enumerate(articles[:100]):  # Limit to 100 articles
             try:
+                # Get or create category
+                category_name = 'general'  # Default category
+                category, _ = NewsCategory.objects.get_or_create(
+                    name=category_name,
+                    defaults={
+                        'display_name': 'General News',
+                        'description': 'General news and updates'
+                    }
+                )
+                
+                # Get or create source
+                source_name = article_data.get('source', 'Unknown')
+                source, _ = NewsSource.objects.get_or_create(
+                    name=source_name,
+                    defaults={
+                        'base_url': 'https://api.marketaux.com' if source_name == 'MarketAux' else 'https://api.example.com',
+                        'is_active': True
+                    }
+                )
+                
+                # Parse published_at date
+                published_at = article_data.get('published_at', '')
+                if isinstance(published_at, str):
+                    try:
+                        # Try to parse ISO format
+                        published_at = datetime.fromisoformat(published_at.replace('Z', '+00:00'))
+                    except:
+                        # Fallback to current time
+                        published_at = datetime.now()
+                elif isinstance(published_at, (int, float)):
+                    # Unix timestamp
+                    published_at = datetime.fromtimestamp(published_at)
+                
                 # Create article
                 article = NewsArticle.objects.create(
-                    title=article_data['title'][:200],  # Limit title length
-                    content=article_data['description'][:1000] if article_data['description'] else '',  # Limit content length
-                    url=article_data['url'][:500] if article_data['url'] else '',  # Limit URL length
-                    source=article_data['source'][:50],  # Limit source length
-                    published_at=article_data['published_at'],
+                    title=article_data['title'][:500] if article_data['title'] else 'Untitled',
+                    summary=article_data.get('description', '')[:1000] if article_data.get('description') else '',
+                    content=article_data.get('description', '')[:2000] if article_data.get('description') else '',
+                    url=article_data.get('url', '')[:500] if article_data.get('url') else '',
+                    image_url=article_data.get('image_url', '')[:500] if article_data.get('image_url') else '',
+                    published_at=published_at,
+                    source=source,
+                    category=category,
                     is_featured=i < 5,  # First 5 articles are featured
                     is_active=True,
-                    image_url=article_data['image_url'][:500] if article_data['image_url'] else '',  # Limit image URL length
-                    symbols=article_data['symbols'][:200] if article_data['symbols'] else '',  # Limit symbols length
+                    tags=article_data.get('symbols', '').split(',') if article_data.get('symbols') else []
                 )
                 
                 saved_count += 1
                 if article.is_featured:
                     featured_count += 1
                     
-                print(f"  {i+1}. {article.title[:50]}... ({article.source})")
+                print(f"  {i+1}. {article.title[:50]}... ({source.name})")
                 
             except Exception as e:
                 print(f"❌ Error saving article {i+1}: {e}")
+                import traceback
+                traceback.print_exc()
                 continue
         
         # Get final stats

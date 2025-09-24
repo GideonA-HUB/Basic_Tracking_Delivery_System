@@ -16,6 +16,10 @@
         align-items: center;
     }
     
+    .dark .hero-section {
+        background: #1f2937;
+    }
+    
     .hero-container {
         max-width: 1200px;
         margin: 0 auto;
@@ -320,12 +324,22 @@
         padding: 4rem 0;
     }
     
+    .dark .tracking-section {
+        background: #1f2937;
+    }
+    
     .tracking-card {
         background: white;
         border-radius: 1rem;
         padding: 2rem;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         max-width: 500px;
+    }
+    
+    .dark .tracking-card {
+        background: #374151;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
         margin: 0 auto;
     }
     
@@ -350,7 +364,12 @@
     }
     
     .features-section {
+        background: #1e40af;
         padding: 4rem 0;
+    }
+    
+    .dark .features-section {
+        background: #1e3a8a;
     }
     
     .features-grid {
@@ -411,6 +430,10 @@
     .contact-section {
         background: white;
         padding: 4rem 0;
+    }
+    
+    .dark .contact-section {
+        background: #1f2937;
     }
     
     .contact-header {
@@ -642,10 +665,19 @@
         font-size: 1rem;
         border-radius: 0.5rem;
         background: transparent;
+        color: #374151;
     }
     
     .newsletter-input::placeholder {
         color: #9ca3af;
+    }
+    
+    .dark .newsletter-input {
+        color: #f9fafb;
+    }
+    
+    .dark .newsletter-input::placeholder {
+        color: #d1d5db;
     }
     
     .newsletter-btn {
@@ -692,10 +724,41 @@
         display: none;
     }
     
+    /* Additional Dark Mode Support */
+    .dark .feature-card {
+        background: #374151;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+    
+    .dark .chart-card {
+        background: #374151;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+    
+    .dark .kpi-card {
+        background: #374151;
+    }
+    
+    .dark .contact-item {
+        background: #374151;
+    }
+    
+    .dark .metric-card {
+        background: #374151;
+    }
+    
+    .dark .stat-card {
+        background: #374151;
+    }
+    
     /* About Section Styles */
     .about-section {
         background: #f8fafc;
         padding: 6rem 0;
+    }
+    
+    .dark .about-section {
+        background: #1f2937;
     }
     
     .about-content {
@@ -1263,6 +1326,10 @@
         padding: 4rem 0;
     }
     
+    .dark .investment-dashboard-section {
+        background: #1f2937;
+    }
+    
     .dashboard-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -1525,8 +1592,8 @@
 <section id="tracking" class="tracking-section">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center">
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">Where's My Package?</h2>
-            <p class="text-lg text-gray-600 mb-8">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Where's My Package?</h2>
+            <p class="text-lg text-gray-600 dark:text-gray-300 mb-8">
                     Enter your tracking number below to get real-time updates on your shipment.
                 </p>
             </div>
@@ -1570,10 +1637,10 @@
 <section class="features-section">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center">
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">
-                These are why you should <span class="text-blue-600">use our service</span>
+            <h2 class="text-3xl font-bold text-white mb-4">
+                These are why you should <span class="text-blue-200">use our service</span>
             </h2>
-            <p class="text-lg text-gray-600 mb-8">
+            <p class="text-lg text-blue-100 mb-8">
                 Transform your logistics operations with our comprehensive platform designed for modern supply chain management and investment opportunities.
             </p>
                 </div>
@@ -1583,8 +1650,8 @@
                 <div class="feature-icon">
                     <i class="fas fa-shield-alt"></i>
                 </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-3">Secure & Reliable</h3>
-                <p class="text-gray-600">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Secure & Reliable</h3>
+                <p class="text-gray-600 dark:text-gray-300">
                     Bank-grade security with 99.9% uptime guarantee for your logistics operations.
                 </p>
             </div>
@@ -1593,8 +1660,8 @@
                 <div class="feature-icon">
                     <i class="fas fa-chart-line"></i>
                 </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-3">Proven Returns</h3>
-                <p class="text-gray-600">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Proven Returns</h3>
+                <p class="text-gray-600 dark:text-gray-300">
                     Consistent growth with average returns of 18-25% annually on logistics investments.
                 </p>
             </div>
@@ -1603,8 +1670,8 @@
                 <div class="feature-icon">
                     <i class="fas fa-globe"></i>
                         </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-3">Global Network</h3>
-                <p class="text-gray-600">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Global Network</h3>
+                <p class="text-gray-600 dark:text-gray-300">
                     Worldwide logistics network spanning 50+ countries and 200+ distribution centers.
                 </p>
                     </div>
@@ -1613,8 +1680,8 @@
                 <div class="feature-icon">
                     <i class="fas fa-users"></i>
                 </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-3">Expert Management</h3>
-                <p class="text-gray-600">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Expert Management</h3>
+                <p class="text-gray-600 dark:text-gray-300">
                     Industry veterans with 20+ years experience managing complex supply chains.
                         </p>
                     </div>
@@ -1623,8 +1690,8 @@
                 <div class="feature-icon">
                     <i class="fas fa-clock"></i>
                 </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-3">Real-Time Analytics</h3>
-                <p class="text-gray-600">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Real-Time Analytics</h3>
+                <p class="text-gray-600 dark:text-gray-300">
                     Advanced tracking and analytics for complete visibility into your investments.
                 </p>
                 </div>
@@ -1633,8 +1700,8 @@
                 <div class="feature-icon">
                     <i class="fas fa-award"></i>
                         </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-3">Award Winning</h3>
-                <p class="text-gray-600">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Award Winning</h3>
+                <p class="text-gray-600 dark:text-gray-300">
                     Recognized leader in logistics innovation and sustainable supply chain solutions.
                 </p>
                     </div>
@@ -1647,10 +1714,10 @@
 <section id="investment-dashboard-section" class="investment-dashboard-section">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">
-                These are why you should be <span class="text-blue-600">investing</span>
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                These are why you should be <span class="text-blue-600 dark:text-blue-400">investing</span>
             </h2>
-            <p class="text-lg text-gray-600">
+            <p class="text-lg text-gray-600 dark:text-gray-300">
                 Data-driven insights showcase the exceptional performance and growth potential of our logistics investment opportunities.
             </p>
         </div>

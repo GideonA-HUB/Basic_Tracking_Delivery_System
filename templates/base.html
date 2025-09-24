@@ -476,6 +476,11 @@
                         Contact
                     </a>
                     
+                    <!-- Dark Mode Toggle -->
+                    <button id="theme-toggle" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 rounded-md transition-colors">
+                        <i id="theme-icon" class="fas fa-moon"></i>
+                    </button>
+                    
                     {% if user.is_authenticated %}
                         {% if user.is_staff %}
                             <!-- Staff Navigation -->
