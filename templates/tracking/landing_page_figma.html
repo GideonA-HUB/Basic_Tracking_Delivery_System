@@ -622,6 +622,221 @@
         }
     }
     
+    /* Smart Trading System Section Styles */
+    .smart-trading-section {
+        background: #f8fafc;
+        padding: 6rem 0;
+    }
+    
+    .smart-trading-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+    }
+    
+    .smart-trading-content {
+        padding-right: 2rem;
+    }
+    
+    .smart-trading-title {
+        font-size: 3rem;
+        font-weight: 800;
+        color: #1f2937;
+        margin-bottom: 1.5rem;
+        line-height: 1.2;
+    }
+    
+    .smart-trading-description {
+        font-size: 1.125rem;
+        color: #6b7280;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+    
+    .smart-trading-features {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 2.5rem 0;
+    }
+    
+    .smart-trading-features li {
+        position: relative;
+        padding-left: 1.5rem;
+        margin-bottom: 1rem;
+        color: #374151;
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+    
+    .smart-trading-features li:before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0.5rem;
+        width: 8px;
+        height: 8px;
+        background: #10b981;
+        border-radius: 50%;
+    }
+    
+    .smart-trading-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        background: #3b82f6;
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 1.125rem;
+    }
+    
+    .smart-trading-btn:hover {
+        background: #2563eb;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+    }
+    
+    .smart-trading-btn i {
+        font-size: 1rem;
+        transition: transform 0.3s ease;
+    }
+    
+    .smart-trading-btn:hover i {
+        transform: translateX(4px);
+    }
+    
+    /* Dashboard Styles */
+    .smart-trading-dashboard {
+        position: relative;
+    }
+    
+    .dashboard-container {
+        position: relative;
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        transform: perspective(1000px) rotateY(-5deg) rotateX(5deg);
+        transition: transform 0.3s ease;
+    }
+    
+    .dashboard-container:hover {
+        transform: perspective(1000px) rotateY(-2deg) rotateX(2deg);
+    }
+    
+    .dashboard-image {
+        width: 100%;
+        height: auto;
+        display: block;
+        border-radius: 1rem;
+    }
+    
+    /* Overlay Cards */
+    .overlay-card {
+        position: absolute;
+        background: white;
+        border-radius: 0.75rem;
+        padding: 1rem 1.25rem;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .portfolio-overlay {
+        top: 8%;
+        left: 5%;
+        min-width: 180px;
+    }
+    
+    .investments-overlay {
+        bottom: 15%;
+        right: 8%;
+        min-width: 140px;
+    }
+    
+    .overlay-title {
+        font-size: 0.75rem;
+        color: #6b7280;
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .overlay-value {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #1f2937;
+        margin-bottom: 0.25rem;
+        line-height: 1;
+    }
+    
+    .overlay-change {
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .overlay-change.positive {
+        color: #10b981;
+    }
+    
+    /* Responsive Design for Smart Trading */
+    @media (max-width: 1024px) {
+        .smart-trading-container {
+            grid-template-columns: 1fr;
+            gap: 3rem;
+            text-align: center;
+        }
+        
+        .smart-trading-content {
+            padding-right: 0;
+        }
+        
+        .dashboard-container {
+            transform: none;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .smart-trading-title {
+            font-size: 2.5rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .smart-trading-section {
+            padding: 4rem 0;
+        }
+        
+        .smart-trading-title {
+            font-size: 2rem;
+        }
+        
+        .smart-trading-description {
+            font-size: 1rem;
+        }
+        
+        .smart-trading-btn {
+            padding: 0.875rem 1.5rem;
+            font-size: 1rem;
+        }
+        
+        .overlay-card {
+            padding: 0.75rem 1rem;
+        }
+        
+        .portfolio-overlay {
+            min-width: 160px;
+        }
+        
+        .investments-overlay {
+            min-width: 120px;
+        }
+    }
+    
     /* Investment Dashboard Section Styles */
     .investment-dashboard-section {
         background: #f8fafc;
@@ -1250,6 +1465,50 @@
                     Learn more
                     <i class="fas fa-arrow-right"></i>
                 </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <!-- Smart Trading System Section -->
+<section class="smart-trading-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="smart-trading-container">
+            <!-- Left Side - Content -->
+            <div class="smart-trading-content">
+                <h2 class="smart-trading-title">Smart Trading System</h2>
+                <p class="smart-trading-description">
+                    Advanced analytics and AI-powered insights help you make informed decisions about your logistics investments. Track performance, analyze trends, and optimize your portfolio in real-time.
+                </p>
+                <ul class="smart-trading-features">
+                    <li>Real-time market data</li>
+                    <li>Automated risk assessment</li>
+                    <li>Portfolio optimization</li>
+                </ul>
+                <a href="#" class="smart-trading-btn">
+                    Explore Platform
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <!-- Right Side - Dashboard -->
+            <div class="smart-trading-dashboard">
+                <div class="dashboard-container">
+                    <img src="https://i.pinimg.com/originals/dd/d0/b8/ddd0b8e512f739c33f20620761a207af.jpg" alt="Smart Trading Dashboard" class="dashboard-image">
+                    
+                    <!-- Total Portfolio Value Overlay -->
+                    <div class="overlay-card portfolio-overlay">
+                        <div class="overlay-title">Total Portfolio Value</div>
+                        <div class="overlay-value">$1,234,567</div>
+                        <div class="overlay-change positive">+12.5% today</div>
+                    </div>
+                    
+                    <!-- Active Investments Overlay -->
+                    <div class="overlay-card investments-overlay">
+                        <div class="overlay-title">Active Investments</div>
+                        <div class="overlay-value">23</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
