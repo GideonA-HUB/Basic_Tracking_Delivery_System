@@ -453,20 +453,23 @@
     /* Dashboard Section Styles */
     .dashboard-section {
         background: #f8fafc;
-        padding: 4rem 0;
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+        position: relative;
+        z-index: 1;
     }
     
     .dashboard-top-row {
         display: grid;
         grid-template-columns: 2fr 1fr;
-        gap: 2rem;
-        margin-bottom: 2rem;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
     }
     
     .dashboard-bottom-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 2rem;
+        gap: 1.5rem;
     }
     
     .kpi-cards-column {
@@ -478,8 +481,10 @@
     .performance-chart-card {
         background: white;
         border-radius: 0.75rem;
-        padding: 1.5rem;
+        padding: 1.25rem;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        position: relative;
+        z-index: 1;
     }
     
     .chart-title {
@@ -491,7 +496,7 @@
     
     .chart-container {
         position: relative;
-        height: 150px;
+        height: 120px;
     }
     
     .line-chart {
@@ -570,7 +575,7 @@
     }
     
     .chart-footer {
-        margin-top: 1rem;
+        margin-top: 0.75rem;
         text-align: left;
         padding-left: 0.5rem;
     }
@@ -666,8 +671,10 @@
     .volume-chart-card, .portfolio-card {
         background: white;
         border-radius: 0.75rem;
-        padding: 1.5rem;
+        padding: 1.25rem;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        position: relative;
+        z-index: 1;
     }
     
     .bar-chart-container {
@@ -678,7 +685,7 @@
         display: grid;
         grid-template-columns: 30px 1fr;
         gap: 0.5rem;
-        height: 150px;
+        height: 120px;
     }
     
     .bar-y-axis {
@@ -742,9 +749,9 @@
     .donut-chart-container {
         display: flex;
         align-items: center;
-        gap: 3rem;
+        gap: 2rem;
         margin-top: 1rem;
-        padding: 1rem;
+        padding: 0.5rem;
     }
     
     .donut-chart {
@@ -1086,15 +1093,15 @@
                                     <polyline points="8,55 25,45 42,30 58,20 75,30 92,10" 
                                               fill="none" 
                                               stroke="#3b82f6" 
-                                              stroke-width="2"/>
+                                              stroke-width="3"/>
                                     
                                     <!-- Data points -->
-                                    <circle cx="8" cy="55" r="3" fill="#3b82f6" stroke="white" stroke-width="2"/>
-                                    <circle cx="25" cy="45" r="3" fill="#3b82f6" stroke="white" stroke-width="2"/>
-                                    <circle cx="42" cy="30" r="3" fill="#3b82f6" stroke="white" stroke-width="2"/>
-                                    <circle cx="58" cy="20" r="3" fill="#3b82f6" stroke="white" stroke-width="2"/>
-                                    <circle cx="75" cy="30" r="3" fill="#3b82f6" stroke="white" stroke-width="2"/>
-                                    <circle cx="92" cy="10" r="3" fill="#3b82f6" stroke="white" stroke-width="2"/>
+                                    <circle cx="8" cy="55" r="4" fill="#3b82f6" stroke="white" stroke-width="2"/>
+                                    <circle cx="25" cy="45" r="4" fill="#3b82f6" stroke="white" stroke-width="2"/>
+                                    <circle cx="42" cy="30" r="4" fill="#3b82f6" stroke="white" stroke-width="2"/>
+                                    <circle cx="58" cy="20" r="4" fill="#3b82f6" stroke="white" stroke-width="2"/>
+                                    <circle cx="75" cy="30" r="4" fill="#3b82f6" stroke="white" stroke-width="2"/>
+                                    <circle cx="92" cy="10" r="4" fill="#3b82f6" stroke="white" stroke-width="2"/>
                                 </svg>
                             </div>
                             <!-- X-axis labels -->
@@ -1234,6 +1241,9 @@
             </div>
         </div>
     </section>
+
+    <!-- Spacer to prevent overlap -->
+    <div style="height: 2rem; background: transparent;"></div>
 
     <!-- Investment Opportunities Section -->
 <section class="investment-section">
