@@ -458,6 +458,36 @@
         padding: 4rem 0;
     }
     
+    .services-hero {
+        text-align: center;
+        margin-bottom: 4rem;
+    }
+    
+    .services-hero-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 1.5rem;
+    }
+    
+    .services-hero-line1 {
+        display: block;
+        color: #1f2937;
+    }
+    
+    .services-hero-line2 {
+        display: block;
+        color: #3b82f6;
+    }
+    
+    .services-hero-description {
+        font-size: 1.125rem;
+        color: #6b7280;
+        line-height: 1.6;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
     .services-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -562,7 +592,7 @@
     }
     
     /* Responsive Design for Services */
-    @media (max-width: 1024px) {
+    @media (max-width: 1200px) {
         .services-grid {
             grid-template-columns: repeat(2, 1fr);
             gap: 1.5rem;
@@ -581,6 +611,14 @@
         
         .service-card {
             padding: 1.5rem;
+        }
+        
+        .services-hero-title {
+            font-size: 2.5rem;
+        }
+        
+        .services-hero-description {
+            font-size: 1rem;
         }
     }
     
@@ -848,73 +886,6 @@
         </div>
     </section>
 
-    <!-- Services Section -->
-<section class="services-section">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="services-grid">
-            <!-- Maritime Logistics Card -->
-            <div class="service-card">
-                <div class="service-icon">
-                    <i class="fas fa-ship"></i>
-                </div>
-                <h3 class="service-title">Maritime Logistics</h3>
-                <p class="service-description">
-                    Global shipping solutions with real-time tracking and optimized routes.
-                </p>
-                <ul class="service-features">
-                    <li>Port-to-port delivery</li>
-                    <li>Container management</li>
-                    <li>Customs clearance</li>
-                </ul>
-                <a href="#" class="service-link">
-                    Learn more
-                    <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-            
-            <!-- Air Freight Card -->
-            <div class="service-card">
-                <div class="service-icon">
-                    <i class="fas fa-plane"></i>
-                </div>
-                <h3 class="service-title">Air Freight</h3>
-                <p class="service-description">
-                    Express air cargo services for time-sensitive shipments worldwide.
-                </p>
-                <ul class="service-features">
-                    <li>Express delivery</li>
-                    <li>Temperature control</li>
-                    <li>High-value cargo</li>
-                </ul>
-                <a href="#" class="service-link">
-                    Learn more
-                    <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-            
-            <!-- Ground Transportation Card -->
-            <div class="service-card">
-                <div class="service-icon">
-                    <i class="fas fa-truck"></i>
-                </div>
-                <h3 class="service-title">Ground Transportation</h3>
-                <p class="service-description">
-                    Last-mile delivery and regional distribution network coverage.
-                </p>
-                <ul class="service-features">
-                    <li>Local delivery</li>
-                    <li>Cross-country transport</li>
-                    <li>White glove service</li>
-                </ul>
-                <a href="#" class="service-link">
-                    Learn more
-                    <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
-
     <!-- Tracking Section -->
 <section id="tracking" class="tracking-section">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1140,6 +1111,145 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <!-- Services Section -->
+<section class="services-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Hero Content -->
+        <div class="services-hero">
+            <h2 class="services-hero-title">
+                <span class="services-hero-line1">Facilitate Accessible</span>
+                <span class="services-hero-line2">Financial Services</span>
+            </h2>
+            <p class="services-hero-description">
+                Comprehensive logistics solutions designed to optimize your supply chain while providing attractive investment opportunities in the growing logistics sector.
+            </p>
+        </div>
+        
+        <!-- Services Grid -->
+        <div class="services-grid">
+            <!-- Maritime Logistics Card -->
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-ship"></i>
+                </div>
+                <h3 class="service-title">Maritime Logistics</h3>
+                <p class="service-description">
+                    Global shipping solutions with real-time tracking and optimized routes.
+                </p>
+                <ul class="service-features">
+                    <li>Port-to-port delivery</li>
+                    <li>Container management</li>
+                    <li>Customs clearance</li>
+                </ul>
+                <a href="#" class="service-link">
+                    Learn more
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <!-- Air Freight Card -->
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-plane"></i>
+                </div>
+                <h3 class="service-title">Air Freight</h3>
+                <p class="service-description">
+                    Express air cargo services for time-sensitive shipments worldwide.
+                </p>
+                <ul class="service-features">
+                    <li>Express delivery</li>
+                    <li>Temperature control</li>
+                    <li>High-value cargo</li>
+                </ul>
+                <a href="#" class="service-link">
+                    Learn more
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <!-- Ground Transportation Card -->
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-truck"></i>
+                </div>
+                <h3 class="service-title">Ground Transportation</h3>
+                <p class="service-description">
+                    Last-mile delivery and regional distribution network coverage.
+                </p>
+                <ul class="service-features">
+                    <li>Local delivery</li>
+                    <li>Cross-country transport</li>
+                    <li>White glove service</li>
+                </ul>
+                <a href="#" class="service-link">
+                    Learn more
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <!-- Warehousing & Storage Card -->
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-warehouse"></i>
+                </div>
+                <h3 class="service-title">Warehousing & Storage</h3>
+                <p class="service-description">
+                    Strategic storage solutions with advanced inventory management systems.
+                </p>
+                <ul class="service-features">
+                    <li>Climate controlled</li>
+                    <li>Automated systems</li>
+                    <li>24/7 security</li>
+                </ul>
+                <a href="#" class="service-link">
+                    Learn more
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <!-- Investment Platform Card -->
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="service-title">Investment Platform</h3>
+                <p class="service-description">
+                    Diversified logistics investment opportunities with transparent returns.
+                </p>
+                <ul class="service-features">
+                    <li>Low minimum investment</li>
+                    <li>Regular dividends</li>
+                    <li>Portfolio tracking</li>
+                </ul>
+                <a href="#" class="service-link">
+                    Learn more
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <!-- Risk Management Card -->
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="service-title">Risk Management</h3>
+                <p class="service-description">
+                    Comprehensive insurance and risk mitigation for all logistics operations.
+                </p>
+                <ul class="service-features">
+                    <li>Cargo insurance</li>
+                    <li>Route optimization</li>
+                    <li>Compliance management</li>
+                </ul>
+                <a href="#" class="service-link">
+                    Learn more
+                    <i class="fas fa-arrow-right"></i>
+                </a>
             </div>
         </div>
     </div>
