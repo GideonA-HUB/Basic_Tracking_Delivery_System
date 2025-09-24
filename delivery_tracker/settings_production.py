@@ -30,7 +30,7 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 if not DEBUG:
     DEBUG = False
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='meridian-asset-logistics.up.railway.app,healthcheck.railway.app,*.railway.app', cast=lambda v: [s.strip() for s in v.split(',')])
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='meridian-asset-logistics.up.railway.app,healthcheck.railway.app,*.railway.app,*', cast=lambda v: [s.strip() for s in v.split(',')])
 
 # Use X-Forwarded headers for external access
 USE_X_FORWARDED_HOST = True
