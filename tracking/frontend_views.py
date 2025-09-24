@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.conf import settings
-from .models import Delivery
+from .models import Delivery, NewsletterSubscriber
 import json
 
 
@@ -152,3 +152,54 @@ def landing_page(request):
 def landing_page_figma(request):
     """Figma redesigned landing page"""
     return render(request, 'tracking/landing_page_figma.html')
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def newsletter_subscribe(request):
+    """Handle newsletter subscription"""
+    try:
+        data = json.loads(request.body)
+        email = data.get('email', '').strip().lower()
+        
+        if not email:
+            return JsonResponse({
+                'success': False,
+                'error': 'Email address is required'
+            }, status=400)
+        
+        # Check if email is already subscribed
+        if NewsletterSubscriber.objects.filter(email=email).exists():
+            return JsonResponse({
+                'success': False,
+                'error': 'This email is already subscribed to our newsletter'
+            }, status=400)
+        
+        # Get client information
+        ip_address = request.META.get('REMOTE_ADDR', '')
+        user_agent = request.META.get('HTTP_USER_AGENT', '')
+        
+        # Create new subscriber
+        subscriber = NewsletterSubscriber.objects.create(
+            email=email,
+            source='website',
+            ip_address=ip_address,
+            user_agent=user_agent,
+            is_active=True
+        )
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Successfully subscribed to newsletter'
+        })
+        
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'success': False,
+            'error': 'Invalid JSON data'
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': 'An error occurred while subscribing. Please try again.'
+        }, status=500)

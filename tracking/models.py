@@ -304,3 +304,54 @@ class DeliveryCheckpoint(models.Model):
             'checkpoint_type': self.checkpoint_type,
             'checkpoint_type_display': self.get_checkpoint_type_display()
         }
+
+
+class NewsletterSubscriber(models.Model):
+    """Model for newsletter subscribers"""
+    
+    email = models.EmailField(unique=True, help_text="Subscriber's email address")
+    first_name = models.CharField(max_length=100, blank=True, null=True, help_text="Subscriber's first name")
+    last_name = models.CharField(max_length=100, blank=True, null=True, help_text="Subscriber's last name")
+    is_active = models.BooleanField(default=True, help_text="Whether the subscriber is active")
+    subscribed_at = models.DateTimeField(auto_now_add=True, help_text="When the subscription was created")
+    unsubscribed_at = models.DateTimeField(blank=True, null=True, help_text="When the subscription was cancelled")
+    source = models.CharField(max_length=100, default='website', help_text="Source of the subscription")
+    ip_address = models.GenericIPAddressField(blank=True, null=True, help_text="IP address of the subscriber")
+    user_agent = models.TextField(blank=True, null=True, help_text="User agent of the subscriber")
+    
+    # Additional preferences
+    preferences = models.JSONField(default=dict, blank=True, help_text="Subscriber preferences")
+    
+    class Meta:
+        verbose_name = 'Newsletter Subscriber'
+        verbose_name_plural = 'Newsletter Subscribers'
+        ordering = ['-subscribed_at']
+        indexes = [
+            models.Index(fields=['email']),
+            models.Index(fields=['is_active', 'subscribed_at']),
+        ]
+    
+    def __str__(self):
+        return f"{self.email} ({'Active' if self.is_active else 'Inactive'})"
+    
+    def unsubscribe(self):
+        """Unsubscribe the user from the newsletter"""
+        self.is_active = False
+        self.unsubscribed_at = timezone.now()
+        self.save()
+    
+    def resubscribe(self):
+        """Resubscribe the user to the newsletter"""
+        self.is_active = True
+        self.unsubscribed_at = None
+        self.save()
+    
+    @classmethod
+    def get_active_subscribers(cls):
+        """Get all active subscribers"""
+        return cls.objects.filter(is_active=True)
+    
+    @classmethod
+    def get_subscriber_count(cls):
+        """Get the total number of active subscribers"""
+        return cls.get_active_subscribers().count()

@@ -23,4 +23,7 @@ urlpatterns = [
     # Public tracking page (no authentication required)
     path('track/<str:tracking_number>/<str:tracking_secret>/',
          frontend_views.tracking_page, name='track_delivery'),
+    
+    # Newsletter subscription endpoint
+    path('newsletter/subscribe/', frontend_views.newsletter_subscribe, name='newsletter_subscribe'),
 ]

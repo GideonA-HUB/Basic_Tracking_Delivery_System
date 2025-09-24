@@ -4,7 +4,7 @@ from django.urls import path, reverse
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.http import JsonResponse
-from .models import Delivery, DeliveryStatus, DeliveryCheckpoint
+from .models import Delivery, DeliveryStatus, DeliveryCheckpoint, NewsletterSubscriber
 import json
 
 
@@ -92,133 +92,6 @@ class DeliveryAdmin(admin.ModelAdmin):
             reverse('admin:tracking_delivery_update_location', args=[obj.pk])
         )
     live_tracking_actions.short_description = 'Live Tracking'
-    
-    def get_urls(self):
-        """Add custom admin URLs"""
-        urls = super().get_urls()
-        custom_urls = [
-            path('live-map/<int:delivery_id>/', self.admin_site.admin_view(self.live_map_view), name='tracking_delivery_live_map'),
-            path('update-location/<int:delivery_id>/', self.admin_site.admin_view(self.update_location_view), name='tracking_delivery_update_location'),
-            path('global-dashboard/', self.admin_site.admin_view(self.global_dashboard_view), name='tracking_global_dashboard'),
-            path('add-checkpoint/<int:delivery_id>/', self.admin_site.admin_view(self.add_checkpoint_view), name='tracking_delivery_add_checkpoint'),
-        ]
-        return custom_urls + urls
-    
-    def live_map_view(self, request, delivery_id):
-        """Live map view for specific delivery"""
-        try:
-            delivery = Delivery.objects.get(id=delivery_id)
-        except Delivery.DoesNotExist:
-            messages.error(request, 'Delivery not found')
-            return redirect('admin:tracking_delivery_changelist')
-        
-        context = {
-            'title': f'Live Map - {delivery.tracking_number}',
-            'delivery': delivery,
-            'has_permission': True,
-            'opts': self.model._meta,
-        }
-        return render(request, 'admin/tracking/delivery/live_map.html', context)
-    
-    def update_location_view(self, request, delivery_id):
-        """Update location view"""
-        try:
-            delivery = Delivery.objects.get(id=delivery_id)
-        except Delivery.DoesNotExist:
-            messages.error(request, 'Delivery not found')
-            return redirect('admin:tracking_delivery_changelist')
-        
-        if request.method == 'POST':
-            try:
-                latitude = float(request.POST.get('latitude'))
-                longitude = float(request.POST.get('longitude'))
-                location_name = request.POST.get('location_name', '')
-                accuracy = request.POST.get('accuracy')
-                
-                if accuracy:
-                    accuracy = float(accuracy)
-                
-                delivery.update_current_location(
-                    latitude=latitude,
-                    longitude=longitude,
-                    location_name=location_name,
-                    accuracy=accuracy
-                )
-                
-                # If this is an AJAX request, return JSON
-                if request.headers.get('Content-Type') == 'application/x-www-form-urlencoded' and 'application/json' in request.headers.get('Accept', ''):
-                    return JsonResponse({'success': True, 'message': 'Location updated successfully'})
-                
-                messages.success(request, f'Location updated successfully for {delivery.tracking_number}')
-                return redirect('admin:tracking_delivery_change', delivery_id)
-                
-            except (ValueError, TypeError) as e:
-                if request.headers.get('Content-Type') == 'application/x-www-form-urlencoded' and 'application/json' in request.headers.get('Accept', ''):
-                    return JsonResponse({'success': False, 'error': f'Invalid location data: {e}'})
-                messages.error(request, f'Invalid location data: {e}')
-        
-        context = {
-            'title': f'Update Location - {delivery.tracking_number}',
-            'delivery': delivery,
-            'has_permission': True,
-            'opts': self.model._meta,
-        }
-        return render(request, 'admin/tracking/delivery/update_location.html', context)
-    
-    def global_dashboard_view(self, request):
-        """Global dashboard view for all active deliveries"""
-        active_deliveries = Delivery.objects.filter(
-            current_status__in=['confirmed', 'in_transit', 'out_for_delivery']
-        ).select_related('created_by')
-        
-        context = {
-            'title': 'Global Delivery Dashboard',
-            'deliveries': active_deliveries,
-            'has_permission': True,
-            'opts': self.model._meta,
-        }
-        return render(request, 'admin/tracking/delivery/global_dashboard.html', context)
-    
-    def add_checkpoint_view(self, request, delivery_id):
-        """Add checkpoint view"""
-        try:
-            delivery = Delivery.objects.get(id=delivery_id)
-        except Delivery.DoesNotExist:
-            messages.error(request, 'Delivery not found')
-            return redirect('admin:tracking_delivery_changelist')
-        
-        if request.method == 'POST':
-            try:
-                checkpoint_type = request.POST.get('checkpoint_type')
-                location_name = request.POST.get('location_name')
-                latitude = float(request.POST.get('latitude'))
-                longitude = float(request.POST.get('longitude'))
-                description = request.POST.get('description', '')
-                courier_notes = request.POST.get('courier_notes', '')
-                
-                DeliveryCheckpoint.objects.create(
-                    delivery=delivery,
-                    checkpoint_type=checkpoint_type,
-                    location_name=location_name,
-                    latitude=latitude,
-                    longitude=longitude,
-                    description=description,
-                    courier_notes=courier_notes
-                )
-                
-                messages.success(request, f'Checkpoint added successfully for {delivery.tracking_number}')
-                return redirect('admin:tracking_delivery_change', delivery_id)
-                
-            except (ValueError, TypeError) as e:
-                messages.error(request, f'Invalid checkpoint data: {e}')
-        
-        context = {
-            'title': f'Add Checkpoint - {delivery.tracking_number}',
-            'delivery': delivery,
-            'has_permission': True,
-            'opts': self.model._meta,
-        }
-        return render(request, 'admin/tracking/delivery/add_checkpoint.html', context)
 
 
 @admin.register(DeliveryStatus)
@@ -296,3 +169,95 @@ class DeliveryCheckpointAdmin(admin.ModelAdmin):
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('delivery')
+
+
+@admin.register(NewsletterSubscriber)
+class NewsletterSubscriberAdmin(admin.ModelAdmin):
+    list_display = [
+        'email', 'first_name', 'last_name', 'is_active', 'source', 'subscribed_at', 'admin_actions'
+    ]
+    list_filter = ['is_active', 'source', 'subscribed_at', 'unsubscribed_at']
+    search_fields = ['email', 'first_name', 'last_name', 'ip_address']
+    readonly_fields = ['subscribed_at', 'unsubscribed_at']
+    list_per_page = 50
+    
+    fieldsets = (
+        ('Subscriber Information', {
+            'fields': ('email', 'first_name', 'last_name', 'is_active')
+        }),
+        ('Subscription Details', {
+            'fields': ('source', 'subscribed_at', 'unsubscribed_at')
+        }),
+        ('Technical Information', {
+            'fields': ('ip_address', 'user_agent', 'preferences'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def admin_actions(self, obj):
+        """Display action buttons"""
+        if obj.is_active:
+            return format_html(
+                '<a href="{}" class="button" style="background: #EF4444; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px;">Unsubscribe</a>',
+                reverse('admin:tracking_newslettersubscriber_unsubscribe', args=[obj.pk])
+            )
+        else:
+            return format_html(
+                '<a href="{}" class="button" style="background: #10B981; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px;">Resubscribe</a>',
+                reverse('admin:tracking_newslettersubscriber_resubscribe', args=[obj.pk])
+            )
+    admin_actions.short_description = 'Actions'
+    
+    def get_urls(self):
+        """Add custom admin URLs"""
+        urls = super().get_urls()
+        custom_urls = [
+            path('unsubscribe/<int:subscriber_id>/', self.admin_site.admin_view(self.unsubscribe_view), name='tracking_newslettersubscriber_unsubscribe'),
+            path('resubscribe/<int:subscriber_id>/', self.admin_site.admin_view(self.resubscribe_view), name='tracking_newslettersubscriber_resubscribe'),
+            path('export-subscribers/', self.admin_site.admin_view(self.export_subscribers_view), name='tracking_newslettersubscriber_export'),
+        ]
+        return custom_urls + urls
+    
+    def unsubscribe_view(self, request, subscriber_id):
+        """Unsubscribe a subscriber"""
+        try:
+            subscriber = NewsletterSubscriber.objects.get(id=subscriber_id)
+            subscriber.unsubscribe()
+            messages.success(request, f'{subscriber.email} has been unsubscribed successfully.')
+        except NewsletterSubscriber.DoesNotExist:
+            messages.error(request, 'Subscriber not found.')
+        return redirect('admin:tracking_newslettersubscriber_changelist')
+    
+    def resubscribe_view(self, request, subscriber_id):
+        """Resubscribe a subscriber"""
+        try:
+            subscriber = NewsletterSubscriber.objects.get(id=subscriber_id)
+            subscriber.resubscribe()
+            messages.success(request, f'{subscriber.email} has been resubscribed successfully.')
+        except NewsletterSubscriber.DoesNotExist:
+            messages.error(request, 'Subscriber not found.')
+        return redirect('admin:tracking_newslettersubscriber_changelist')
+    
+    def export_subscribers_view(self, request):
+        """Export subscribers to CSV"""
+        import csv
+        from django.http import HttpResponse
+        
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="newsletter_subscribers.csv"'
+        
+        writer = csv.writer(response)
+        writer.writerow(['Email', 'First Name', 'Last Name', 'Status', 'Source', 'Subscribed At'])
+        
+        subscribers = NewsletterSubscriber.objects.all().order_by('-subscribed_at')
+        for subscriber in subscribers:
+            writer.writerow([
+                subscriber.email,
+                subscriber.first_name or '',
+                subscriber.last_name or '',
+                'Active' if subscriber.is_active else 'Inactive',
+                subscriber.source,
+                subscriber.subscribed_at.strftime('%Y-%m-%d %H:%M:%S')
+            ])
+        
+        return response

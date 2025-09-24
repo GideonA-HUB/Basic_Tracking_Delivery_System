@@ -1,7 +1,15 @@
 [build]
-builder = "nixpacks"
+builder = "NIXPACKS"
 
 [deploy]
-startCommand = "python start_with_withdrawals.py"
+startCommand = "python manage.py migrate && python manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:$PORT"
+healthcheckPath = "/"
+healthcheckTimeout = 100
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
+
+[environments.production]
+variables = { DATABASE_URL = "postgresql://user:password@host:port/database", DEBUG = "False", SECRET_KEY = "your-secret-key-here" }
+
+[environments.staging]
+variables = { DATABASE_URL = "postgresql://user:password@host:port/database", DEBUG = "True", SECRET_KEY = "your-secret-key-here" }
