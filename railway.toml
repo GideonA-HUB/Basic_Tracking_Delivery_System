@@ -7,7 +7,7 @@ restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
 
 [environments.production]
-variables = { DATABASE_URL = "postgresql://user:password@host:port/database", DEBUG = "False", SECRET_KEY = "your-secret-key-here", DJANGO_SETTINGS_MODULE = "delivery_tracker.settings_production" }
+variables = { DATABASE_URL = "postgresql://user:password@host:port/database", DEBUG = "False", SECRET_KEY = "your-secret-key-here" }
 
 [environments.staging]
 variables = { DATABASE_URL = "postgresql://user:password@host:port/database", DEBUG = "True", SECRET_KEY = "your-secret-key-here" }
