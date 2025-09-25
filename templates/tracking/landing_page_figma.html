@@ -982,46 +982,56 @@
         }
     }
     
-    .footer {
-        background: #111827;
-        color: #9ca3af;
-        padding: 3rem 0 2rem;
-    }
-    
-    .footer-global-section {
+    /* Global Home Section */
+    .global-home-section {
+        background: #1f2937;
+        padding: 4rem 0;
         text-align: center;
-        margin-bottom: 3rem;
     }
     
-    .footer-global-section h3 {
+    .dark .global-home-section {
+        background: #111827;
+    }
+    
+    .global-home-title {
         color: white;
-        font-weight: 600;
-        margin-bottom: 1.5rem;
-        font-size: 1.5rem;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
     }
     
-    .footer-countries {
+    .global-home-countries {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
         gap: 1rem;
-        margin-bottom: 2rem;
+        max-width: 800px;
+        margin: 0 auto;
     }
     
-    .footer-country-link {
-        color: #9ca3af;
+    .global-country-link {
+        color: #d1d5db;
         text-decoration: none;
-        padding: 0.5rem 1rem;
-        border: 1px solid #374151;
-        border-radius: 0.375rem;
+        padding: 0.75rem 1.5rem;
+        border: 1px solid #4b5563;
+        border-radius: 0.5rem;
         transition: all 0.2s;
-        font-size: 0.875rem;
+        font-size: 0.95rem;
+        font-weight: 500;
+        background: rgba(75, 85, 99, 0.1);
     }
     
-    .footer-country-link:hover {
+    .global-country-link:hover {
         color: white;
         border-color: #3b82f6;
         background: rgba(59, 130, 246, 0.1);
+        transform: translateY(-1px);
+    }
+    
+    .footer {
+        background: #111827;
+        color: #9ca3af;
+        padding: 3rem 0 2rem;
     }
     
     .footer-legal-security {
@@ -2054,16 +2064,25 @@
             gap: 1.5rem;
         }
         
+        /* Global Home Mobile Styles */
+        .global-home-section {
+            padding: 3rem 0;
+        }
+        
+        .global-home-title {
+            font-size: 2rem;
+        }
+        
+        .global-home-countries {
+            gap: 0.75rem;
+        }
+        
+        .global-country-link {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+        
         /* Footer Mobile Styles */
-        .footer-countries {
-            gap: 0.5rem;
-        }
-        
-        .footer-country-link {
-            padding: 0.375rem 0.75rem;
-            font-size: 0.8rem;
-        }
-        
         .footer-legal-security {
             grid-template-columns: 1fr;
             gap: 1.5rem;
@@ -3209,26 +3228,28 @@
         </div>
     </section>
 
+<!-- Global Home Section -->
+<section class="global-home-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="global-home-title">Global Home</h2>
+        <div class="global-home-countries">
+            <a href="#" class="global-country-link">United States</a>
+            <a href="#" class="global-country-link">Canada</a>
+            <a href="#" class="global-country-link">Mexico</a>
+            <a href="#" class="global-country-link">United Kingdom</a>
+            <a href="#" class="global-country-link">Germany</a>
+            <a href="#" class="global-country-link">France</a>
+            <a href="#" class="global-country-link">Spain</a>
+            <a href="#" class="global-country-link">Italy</a>
+            <a href="#" class="global-country-link">China</a>
+            <a href="#" class="global-country-link">Japan</a>
+        </div>
+    </div>
+</section>
+
 <!-- Footer -->
 <footer class="footer">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Global Home Section -->
-        <div class="footer-global-section">
-            <h3>Global Home</h3>
-            <div class="footer-countries">
-                <a href="#" class="footer-country-link">United States</a>
-                <a href="#" class="footer-country-link">Canada</a>
-                <a href="#" class="footer-country-link">Mexico</a>
-                <a href="#" class="footer-country-link">United Kingdom</a>
-                <a href="#" class="footer-country-link">Germany</a>
-                <a href="#" class="footer-country-link">France</a>
-                <a href="#" class="footer-country-link">Spain</a>
-                <a href="#" class="footer-country-link">Italy</a>
-                <a href="#" class="footer-country-link">China</a>
-                <a href="#" class="footer-country-link">Japan</a>
-            </div>
-        </div>
-        
         <!-- Legal and Security Section -->
         <div class="footer-legal-security">
             <div class="footer-section">
