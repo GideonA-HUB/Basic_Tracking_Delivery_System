@@ -1210,6 +1210,327 @@
         transform: translateX(2px);
     }
     
+    /* Service Modals */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(5px);
+        animation: fadeIn 0.3s ease;
+    }
+    
+    .modal.show {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal-content {
+        background: white;
+        margin: auto;
+        padding: 0;
+        border-radius: 1rem;
+        width: 90%;
+        max-width: 800px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        animation: slideIn 0.3s ease;
+        position: relative;
+    }
+    
+    .dark .modal-content {
+        background: #1f2937;
+        color: #f9fafb;
+    }
+    
+    .modal-header {
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 1rem 1rem 0 0;
+        position: relative;
+    }
+    
+    .modal-header h2 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .modal-header .modal-icon {
+        width: 3rem;
+        height: 3rem;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+    
+    .modal-close {
+        position: absolute;
+        right: 1.5rem;
+        top: 1.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+    
+    .modal-close:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+    }
+    
+    .modal-body {
+        padding: 2rem;
+    }
+    
+    .modal-description {
+        font-size: 1.125rem;
+        color: #6b7280;
+        line-height: 1.7;
+        margin-bottom: 2rem;
+    }
+    
+    .dark .modal-description {
+        color: #d1d5db;
+    }
+    
+    .modal-features {
+        margin-bottom: 2rem;
+    }
+    
+    .modal-features h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .dark .modal-features h3 {
+        color: #f9fafb;
+    }
+    
+    .modal-features ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .modal-features li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+        font-size: 1rem;
+        color: #4b5563;
+        line-height: 1.6;
+    }
+    
+    .dark .modal-features li {
+        color: #d1d5db;
+    }
+    
+    .modal-features li::before {
+        content: "✓";
+        color: #10b981;
+        font-weight: bold;
+        font-size: 1.125rem;
+        margin-top: 0.125rem;
+        flex-shrink: 0;
+    }
+    
+    .modal-benefits {
+        background: #f8fafc;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+        margin-bottom: 2rem;
+    }
+    
+    .dark .modal-benefits {
+        background: #374151;
+    }
+    
+    .modal-benefits h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .dark .modal-benefits h3 {
+        color: #f9fafb;
+    }
+    
+    .modal-benefits ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .modal-benefits li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+        font-size: 0.95rem;
+        color: #4b5563;
+        line-height: 1.6;
+    }
+    
+    .dark .modal-benefits li {
+        color: #d1d5db;
+    }
+    
+    .modal-benefits li::before {
+        content: "★";
+        color: #fbbf24;
+        font-weight: bold;
+        margin-top: 0.125rem;
+        flex-shrink: 0;
+    }
+    
+    .modal-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .modal-stat {
+        text-align: center;
+        padding: 1rem;
+        background: #f8fafc;
+        border-radius: 0.5rem;
+        border-left: 4px solid #1e40af;
+    }
+    
+    .dark .modal-stat {
+        background: #374151;
+    }
+    
+    .modal-stat-number {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1e40af;
+        margin-bottom: 0.25rem;
+    }
+    
+    .modal-stat-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+        font-weight: 500;
+    }
+    
+    .dark .modal-stat-label {
+        color: #d1d5db;
+    }
+    
+    .modal-cta {
+        text-align: center;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        border-radius: 0 0 1rem 1rem;
+        color: white;
+    }
+    
+    .modal-cta h3 {
+        margin: 0 0 1rem 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+    
+    .modal-cta p {
+        margin: 0 0 1.5rem 0;
+        opacity: 0.9;
+        line-height: 1.6;
+    }
+    
+    .modal-cta-btn {
+        background: white;
+        color: #1e40af;
+        border: none;
+        padding: 0.875rem 2rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .modal-cta-btn:hover {
+        background: #f8fafc;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    @keyframes slideIn {
+        from { 
+            opacity: 0;
+            transform: translateY(-50px) scale(0.95);
+        }
+        to { 
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .modal-content {
+            width: 95%;
+            margin: 1rem;
+        }
+        
+        .modal-header {
+            padding: 1.5rem;
+        }
+        
+        .modal-header h2 {
+            font-size: 1.5rem;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-stats {
+            grid-template-columns: 1fr;
+        }
+    }
+    
     /* Responsive Design for Services */
     @media (max-width: 1200px) {
         .services-grid {
@@ -2008,7 +2329,7 @@
                     <li>Container management</li>
                     <li>Customs clearance</li>
                 </ul>
-                <a href="#" class="service-link">
+                <a href="#" class="service-link" data-modal="maritime-modal">
                     Learn more
                     <i class="fas fa-arrow-right"></i>
                 </a>
@@ -2028,7 +2349,7 @@
                     <li>Temperature control</li>
                     <li>High-value cargo</li>
                 </ul>
-                <a href="#" class="service-link">
+                <a href="#" class="service-link" data-modal="airfreight-modal">
                     Learn more
                     <i class="fas fa-arrow-right"></i>
                 </a>
@@ -2048,7 +2369,7 @@
                     <li>Cross-country transport</li>
                     <li>White glove service</li>
                 </ul>
-                <a href="#" class="service-link">
+                <a href="#" class="service-link" data-modal="ground-modal">
                     Learn more
                     <i class="fas fa-arrow-right"></i>
                 </a>
@@ -2068,7 +2389,7 @@
                     <li>Automated systems</li>
                     <li>24/7 security</li>
                 </ul>
-                <a href="#" class="service-link">
+                <a href="#" class="service-link" data-modal="warehousing-modal">
                     Learn more
                     <i class="fas fa-arrow-right"></i>
                 </a>
@@ -2088,7 +2409,7 @@
                     <li>Regular dividends</li>
                     <li>Portfolio tracking</li>
                 </ul>
-                <a href="#" class="service-link">
+                <a href="#" class="service-link" data-modal="investment-modal">
                     Learn more
                     <i class="fas fa-arrow-right"></i>
                 </a>
@@ -2108,7 +2429,7 @@
                     <li>Route optimization</li>
                     <li>Compliance management</li>
                 </ul>
-                <a href="#" class="service-link">
+                <a href="#" class="service-link" data-modal="risk-modal">
                     Learn more
                     <i class="fas fa-arrow-right"></i>
                 </a>
@@ -2116,6 +2437,421 @@
         </div>
     </div>
 </section>
+
+<!-- Service Modals -->
+<!-- Maritime Logistics Modal -->
+<div id="maritime-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>
+                <div class="modal-icon">
+                    <i class="fas fa-ship"></i>
+                </div>
+                Maritime Logistics
+            </h2>
+            <button class="modal-close" onclick="closeModal('maritime-modal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="modal-description">
+                Navigate the world's oceans with confidence using our comprehensive maritime logistics solutions. 
+                From container shipping to bulk cargo transportation, we provide end-to-end maritime services 
+                that ensure your goods reach their destination safely, on time, and cost-effectively.
+            </p>
+            
+            <div class="modal-features">
+                <h3><i class="fas fa-list-check"></i> Core Services</h3>
+                <ul>
+                    <li>Full container load (FCL) and less than container load (LCL) shipping</li>
+                    <li>Bulk cargo transportation for commodities and raw materials</li>
+                    <li>Roll-on/roll-off (RoRo) services for vehicles and heavy machinery</li>
+                    <li>Break-bulk shipping for oversized and irregular cargo</li>
+                    <li>Intermodal transportation connecting sea, land, and air</li>
+                    <li>Customs clearance and documentation services</li>
+                    <li>Port-to-port and door-to-door delivery options</li>
+                </ul>
+            </div>
+            
+            <div class="modal-benefits">
+                <h3><i class="fas fa-star"></i> Key Benefits</h3>
+                <ul>
+                    <li>Access to major shipping lines and competitive freight rates</li>
+                    <li>Real-time cargo tracking and monitoring systems</li>
+                    <li>Expert knowledge of international shipping regulations</li>
+                    <li>Strategic partnerships with global port operators</li>
+                    <li>Comprehensive insurance coverage for all shipments</li>
+                    <li>Dedicated customer support throughout the shipping process</li>
+                </ul>
+            </div>
+            
+            <div class="modal-stats">
+                <div class="modal-stat">
+                    <div class="modal-stat-number">150+</div>
+                    <div class="modal-stat-label">Global Ports</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="modal-stat-number">99.2%</div>
+                    <div class="modal-stat-label">On-Time Delivery</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="modal-stat-number">24/7</div>
+                    <div class="modal-stat-label">Cargo Tracking</div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-cta">
+            <h3>Ready to Ship Globally?</h3>
+            <p>Get a personalized quote for your maritime logistics needs and experience world-class shipping services.</p>
+            <button class="modal-cta-btn" onclick="closeModal('maritime-modal')">
+                Get Quote <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Air Freight Modal -->
+<div id="airfreight-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>
+                <div class="modal-icon">
+                    <i class="fas fa-plane"></i>
+                </div>
+                Air Freight Services
+            </h2>
+            <button class="modal-close" onclick="closeModal('airfreight-modal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="modal-description">
+                When speed matters most, our air freight services deliver exceptional results. Whether you're 
+                shipping high-value electronics, perishable goods, or time-critical documents, we provide 
+                reliable air cargo solutions that keep your business moving at the speed of commerce.
+            </p>
+            
+            <div class="modal-features">
+                <h3><i class="fas fa-list-check"></i> Service Categories</h3>
+                <ul>
+                    <li>Next-flight-out (NFO) and same-day delivery options</li>
+                    <li>Temperature-controlled shipping for pharmaceuticals and perishables</li>
+                    <li>High-value cargo security and specialized handling</li>
+                    <li>Oversized and heavy cargo air transportation</li>
+                    <li>Express document and package delivery</li>
+                    <li>Charter flight services for urgent shipments</li>
+                    <li>Consolidation services for cost-effective shipping</li>
+                </ul>
+            </div>
+            
+            <div class="modal-benefits">
+                <h3><i class="fas fa-star"></i> Competitive Advantages</h3>
+                <ul>
+                    <li>Partnerships with major airlines for priority access</li>
+                    <li>Advanced temperature monitoring and control systems</li>
+                    <li>Dedicated security protocols for high-value shipments</li>
+                    <li>Real-time flight tracking and delivery confirmation</li>
+                    <li>Global network covering all major airports</li>
+                    <li>Flexible scheduling to meet urgent deadlines</li>
+                </ul>
+            </div>
+            
+            <div class="modal-stats">
+                <div class="modal-stat">
+                    <div class="modal-stat-number">500+</div>
+                    <div class="modal-stat-label">Daily Flights</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="modal-stat-number">6-48hrs</div>
+                    <div class="modal-stat-label">Delivery Times</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="modal-stat-number">99.8%</div>
+                    <div class="modal-stat-label">Success Rate</div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-cta">
+            <h3>Need Express Delivery?</h3>
+            <p>Contact our air freight specialists for immediate pricing and booking assistance.</p>
+            <button class="modal-cta-btn" onclick="closeModal('airfreight-modal')">
+                Book Now <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Ground Transportation Modal -->
+<div id="ground-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>
+                <div class="modal-icon">
+                    <i class="fas fa-truck"></i>
+                </div>
+                Ground Transportation
+            </h2>
+            <button class="modal-close" onclick="closeModal('ground-modal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="modal-description">
+                Connect your business with reliable ground transportation solutions that span local delivery 
+                to cross-continental shipping. Our extensive fleet and network ensure your cargo reaches its 
+                destination efficiently, whether it's across town or across the country.
+            </p>
+            
+            <div class="modal-features">
+                <h3><i class="fas fa-list-check"></i> Transportation Solutions</h3>
+                <ul>
+                    <li>Local and regional delivery services</li>
+                    <li>Long-haul freight transportation</li>
+                    <li>Less-than-truckload (LTL) and full truckload (FTL) services</li>
+                    <li>Specialized transport for hazardous materials</li>
+                    <li>White glove delivery and installation services</li>
+                    <li>Cross-docking and distribution center services</li>
+                    <li>Dedicated fleet management and leasing</li>
+                </ul>
+            </div>
+            
+            <div class="modal-benefits">
+                <h3><i class="fas fa-star"></i> Service Excellence</h3>
+                <ul>
+                    <li>Modern fleet with GPS tracking and telematics</li>
+                    <li>Professional drivers with extensive training</li>
+                    <li>Flexible scheduling and route optimization</li>
+                    <li>Comprehensive insurance and cargo protection</li>
+                    <li>Real-time shipment visibility and updates</li>
+                    <li>Environmentally conscious transportation options</li>
+                </ul>
+            </div>
+            
+            <div class="modal-stats">
+                <div class="modal-stat">
+                    <div class="modal-stat-number">2000+</div>
+                    <div class="modal-stat-label">Fleet Vehicles</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="modal-stat-number">50+</div>
+                    <div class="modal-stat-label">Countries Served</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="modal-stat-number">98.5%</div>
+                    <div class="modal-stat-label">On-Time Performance</div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-cta">
+            <h3>Ready to Ship?</h3>
+            <p>Get competitive rates for your ground transportation needs with our flexible and reliable services.</p>
+            <button class="modal-cta-btn" onclick="closeModal('ground-modal')">
+                Request Quote <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Warehousing & Storage Modal -->
+<div id="warehousing-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>
+                <div class="modal-icon">
+                    <i class="fas fa-warehouse"></i>
+                </div>
+                Warehousing & Storage
+            </h2>
+            <button class="modal-close" onclick="closeModal('warehousing-modal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="modal-description">
+                Secure, efficient, and strategically located warehousing solutions designed to optimize your 
+                supply chain operations. Our state-of-the-art facilities provide the perfect environment for 
+                storing, managing, and distributing your inventory with precision and care.
+            </p>
+            
+            <div class="modal-features">
+                <h3><i class="fas fa-list-check"></i> Storage Solutions</h3>
+                <ul>
+                    <li>Climate-controlled environments for sensitive goods</li>
+                    <li>Automated storage and retrieval systems (AS/RS)</li>
+                    <li>High-security vaults for valuable items</li>
+                    <li>Bonded warehouse facilities for international trade</li>
+                    <li>Cold storage for pharmaceuticals and food products</li>
+                    <li>Cross-docking and transloading services</li>
+                    <li>Inventory management and cycle counting</li>
+                </ul>
+            </div>
+            
+            <div class="modal-benefits">
+                <h3><i class="fas fa-star"></i> Facility Advantages</h3>
+                <ul>
+                    <li>24/7 security with advanced surveillance systems</li>
+                    <li>Fire suppression and safety compliance</li>
+                    <li>Energy-efficient lighting and climate control</li>
+                    <li>Scalable storage solutions for growing businesses</li>
+                    <li>Integration with transportation networks</li>
+                    <li>Real-time inventory visibility and reporting</li>
+                </ul>
+            </div>
+            
+            <div class="modal-stats">
+                <div class="modal-stat">
+                    <div class="modal-stat-number">5M+</div>
+                    <div class="modal-stat-label">Sq Ft Capacity</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="modal-stat-number">50+</div>
+                    <div class="modal-stat-label">Warehouse Locations</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="modal-stat-number">99.9%</div>
+                    <div class="modal-stat-label">Inventory Accuracy</div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-cta">
+            <h3>Need Storage Space?</h3>
+            <p>Discover how our warehousing solutions can streamline your operations and reduce costs.</p>
+            <button class="modal-cta-btn" onclick="closeModal('warehousing-modal')">
+                View Facilities <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Investment Platform Modal -->
+<div id="investment-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>
+                <div class="modal-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                Investment Platform
+            </h2>
+            <button class="modal-close" onclick="closeModal('investment-modal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="modal-description">
+                Diversify your investment portfolio with our innovative logistics investment opportunities. 
+                Backed by real assets and proven performance, our platform offers transparent, profitable 
+                investment options in the rapidly growing logistics sector.
+            </p>
+            
+            <div class="modal-features">
+                <h3><i class="fas fa-list-check"></i> Investment Options</h3>
+                <ul>
+                    <li>Infrastructure funds for port and warehouse development</li>
+                    <li>Transportation asset investments (ships, trucks, aircraft)</li>
+                    <li>Technology investments in logistics automation</li>
+                    <li>Real estate investments in logistics hubs</li>
+                    <li>Private equity opportunities in logistics companies</li>
+                    <li>Fixed-income securities backed by logistics assets</li>
+                    <li>Commodity trading and futures contracts</li>
+                </ul>
+            </div>
+            
+            <div class="modal-benefits">
+                <h3><i class="fas fa-star"></i> Platform Benefits</h3>
+                <ul>
+                    <li>Low minimum investment starting from $1,000</li>
+                    <li>Regular quarterly dividends and distributions</li>
+                    <li>Transparent reporting and performance tracking</li>
+                    <li>Professional portfolio management services</li>
+                    <li>Diversification across multiple logistics sectors</li>
+                    <li>Access to exclusive investment opportunities</li>
+                </ul>
+            </div>
+            
+            <div class="modal-stats">
+                <div class="modal-stat">
+                    <div class="modal-stat-number">15.8%</div>
+                    <div class="modal-stat-label">Average Annual Return</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="modal-stat-number">$1K</div>
+                    <div class="modal-stat-label">Minimum Investment</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="modal-stat-number">95%</div>
+                    <div class="modal-stat-label">Investor Satisfaction</div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-cta">
+            <h3>Start Investing Today</h3>
+            <p>Join thousands of investors who are building wealth through logistics investments.</p>
+            <button class="modal-cta-btn" onclick="closeModal('investment-modal')">
+                Invest Now <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Risk Management Modal -->
+<div id="risk-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>
+                <div class="modal-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                Risk Management
+            </h2>
+            <button class="modal-close" onclick="closeModal('risk-modal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="modal-description">
+                Protect your business with comprehensive risk management solutions tailored to the logistics 
+                industry. Our expert team provides proactive risk assessment, mitigation strategies, and 
+                comprehensive insurance coverage to safeguard your operations and investments.
+            </p>
+            
+            <div class="modal-features">
+                <h3><i class="fas fa-list-check"></i> Risk Services</h3>
+                <ul>
+                    <li>Comprehensive cargo and freight insurance</li>
+                    <li>Liability coverage for transportation operations</li>
+                    <li>Cyber security and data protection insurance</li>
+                    <li>Business interruption and loss of profits coverage</li>
+                    <li>Environmental liability and pollution insurance</li>
+                    <li>Professional indemnity and errors & omissions</li>
+                    <li>Supply chain disruption risk assessment</li>
+                </ul>
+            </div>
+            
+            <div class="modal-benefits">
+                <h3><i class="fas fa-star"></i> Protection Benefits</h3>
+                <ul>
+                    <li>Tailored insurance policies for logistics operations</li>
+                    <li>Proactive risk assessment and mitigation strategies</li>
+                    <li>24/7 claims support and emergency response</li>
+                    <li>Compliance monitoring and regulatory updates</li>
+                    <li>Technology-driven risk monitoring systems</li>
+                    <li>Expert consultation on risk management best practices</li>
+                </ul>
+            </div>
+            
+            <div class="modal-stats">
+                <div class="modal-stat">
+                    <div class="modal-stat-number">$2.5B</div>
+                    <div class="modal-stat-label">Coverage Capacity</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="modal-stat-number">4hrs</div>
+                    <div class="modal-stat-label">Claims Response</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="modal-stat-number">99.7%</div>
+                    <div class="modal-stat-label">Claims Success Rate</div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-cta">
+            <h3>Protect Your Business</h3>
+            <p>Get a comprehensive risk assessment and customized insurance solution for your logistics operations.</p>
+            <button class="modal-cta-btn" onclick="closeModal('risk-modal')">
+                Get Coverage <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
 
     <!-- Smart Trading System Section -->
 <section class="smart-trading-section">
@@ -2779,6 +3515,53 @@ function showNewsletterMessage(message, type) {
 function hideNewsletterMessage() {
     const messageDiv = document.getElementById('newsletter-message');
     messageDiv.classList.add('hidden');
+}
+
+// Modal functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Add click event listeners to all service links
+    const serviceLinks = document.querySelectorAll('.service-link[data-modal]');
+    
+    serviceLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const modalId = this.getAttribute('data-modal');
+            openModal(modalId);
+        });
+    });
+    
+    // Add click event listeners to modal close buttons and overlays
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('modal')) {
+            closeModal(e.target.id);
+        }
+    });
+    
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const openModal = document.querySelector('.modal.show');
+            if (openModal) {
+                closeModal(openModal.id);
+            }
+        }
+    });
+});
+
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.remove('show');
+        document.body.style.overflow = ''; // Restore scrolling
+    }
 }
 </script>
 {% endblock %}
