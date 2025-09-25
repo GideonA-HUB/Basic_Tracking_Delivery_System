@@ -982,89 +982,6 @@
         }
     }
     
-    /* Global Home Section */
-    .global-home-section {
-        background: #1f2937;
-        padding: 4rem 0;
-        text-align: center;
-    }
-    
-    .dark .global-home-section {
-        background: #111827;
-    }
-    
-    .global-home-title {
-        color: white;
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin-bottom: 2rem;
-    }
-    
-    .global-home-countries {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 1rem;
-        max-width: 800px;
-        margin: 0 auto;
-    }
-    
-    .global-country-link {
-        color: #d1d5db;
-        text-decoration: none;
-        padding: 0.75rem 1.5rem;
-        border: 1px solid #4b5563;
-        border-radius: 0.5rem;
-        transition: all 0.2s;
-        font-size: 0.95rem;
-        font-weight: 500;
-        background: rgba(75, 85, 99, 0.1);
-    }
-    
-    .global-country-link:hover {
-        color: white;
-        border-color: #3b82f6;
-        background: rgba(59, 130, 246, 0.1);
-        transform: translateY(-1px);
-    }
-    
-    .footer {
-        background: #111827;
-        color: #9ca3af;
-        padding: 3rem 0 2rem;
-    }
-    
-    .footer-legal-security {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 2rem;
-        margin-bottom: 2rem;
-    }
-    
-    .footer-section h3 {
-        color: white;
-        font-weight: 600;
-        margin-bottom: 1rem;
-    }
-    
-    .footer-section ul {
-        list-style: none;
-        padding: 0;
-    }
-    
-    .footer-section li {
-        margin-bottom: 0.5rem;
-    }
-    
-    .footer-section a {
-        color: #9ca3af;
-        text-decoration: none;
-        transition: color 0.2s;
-    }
-    
-    .footer-section a:hover {
-        color: white;
-    }
     
     /* Services Section Styles */
     .services-section {
@@ -2064,29 +1981,6 @@
             gap: 1.5rem;
         }
         
-        /* Global Home Mobile Styles */
-        .global-home-section {
-            padding: 3rem 0;
-        }
-        
-        .global-home-title {
-            font-size: 2rem;
-        }
-        
-        .global-home-countries {
-            gap: 0.75rem;
-        }
-        
-        .global-country-link {
-            padding: 0.5rem 1rem;
-            font-size: 0.85rem;
-        }
-        
-        /* Footer Mobile Styles */
-        .footer-legal-security {
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-        }
     }
     
 </style>
@@ -3227,59 +3121,6 @@
             </div>
         </div>
     </section>
-
-<!-- Global Home Section -->
-<section class="global-home-section">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="global-home-title">Global Home</h2>
-        <div class="global-home-countries">
-            <a href="#" class="global-country-link">United States</a>
-            <a href="#" class="global-country-link">Canada</a>
-            <a href="#" class="global-country-link">Mexico</a>
-            <a href="#" class="global-country-link">United Kingdom</a>
-            <a href="#" class="global-country-link">Germany</a>
-            <a href="#" class="global-country-link">France</a>
-            <a href="#" class="global-country-link">Spain</a>
-            <a href="#" class="global-country-link">Italy</a>
-            <a href="#" class="global-country-link">China</a>
-            <a href="#" class="global-country-link">Japan</a>
-        </div>
-    </div>
-</section>
-
-<!-- Footer -->
-<footer class="footer">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Legal and Security Section -->
-        <div class="footer-legal-security">
-            <div class="footer-section">
-                <h3>Legal</h3>
-                <ul>
-                    <li><a href="#">Terms and Conditions</a></li>
-                    <li><a href="#">Website Terms of Use</a></li>
-                    <li><a href="#">Privacy Notice</a></li>
-                    <li><a href="#">Cookie Settings</a></li>
-                </ul>
-            </div>
-            
-            <div class="footer-section">
-                <h3>Security</h3>
-                <ul>
-                    <li><a href="#">Protect Against Fraud</a></li>
-                    <li><a href="#">Security Center</a></li>
-                    <li><a href="#">Report Suspicious Activity</a></li>
-                </ul>
-            </div>
-        </div>
-        
-        <!-- Copyright -->
-        <div class="border-t border-gray-700 pt-6 mt-8">
-            <div class="text-center text-sm">
-                <p>&copy; {% now "Y" %} Meridian Asset Logistics. All rights reserved.</p>
-            </div>
-        </div>
-    </div>
-</footer>
 
 <script>
 // Tracking form functionality
