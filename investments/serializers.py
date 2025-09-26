@@ -22,7 +22,7 @@ class PriceHistorySerializer(serializers.ModelSerializer):
 
 class InvestmentItemSerializer(serializers.ModelSerializer):
     category = InvestmentCategorySerializer(read_only=True)
-    price_history = PriceHistorySerializer(many=True, read_only=True)
+    # Removed price_history to prevent N+1 queries - only include when specifically needed
     
     class Meta:
         model = InvestmentItem
@@ -32,8 +32,7 @@ class InvestmentItemSerializer(serializers.ModelSerializer):
             'weight', 'purity', 'dimensions', 'origin', 'investment_type',
             'minimum_investment', 'maximum_investment', 'total_available',
             'currently_available', 'main_image_url', 'additional_image_urls',
-            'is_active', 'is_featured', 'created_at', 'updated_at',
-            'price_history'
+            'is_active', 'is_featured', 'created_at', 'updated_at'
         ]
     
     def to_representation(self, instance):

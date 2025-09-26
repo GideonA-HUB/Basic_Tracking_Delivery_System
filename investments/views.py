@@ -73,9 +73,10 @@ class InvestmentCategoryViewSet(viewsets.ReadOnlyModelViewSet):
 
 class InvestmentItemViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet for investment items"""
-    queryset = InvestmentItem.objects.filter(is_active=True)
+    queryset = InvestmentItem.objects.filter(is_active=True).select_related('category')
     serializer_class = InvestmentItemSerializer
     permission_classes = [permissions.AllowAny]
+    pagination_class = None  # Disable pagination for now, but we can add it later if needed
     
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -120,6 +121,10 @@ class InvestmentItemViewSet(viewsets.ReadOnlyModelViewSet):
             queryset = queryset.order_by('price_change_percentage_24h')
         else:
             queryset = queryset.order_by(sort_by)
+        
+        # Limit results to prevent timeout - max 100 items
+        limit = min(int(self.request.query_params.get('limit', 50)), 100)
+        queryset = queryset[:limit]
         
         return queryset
     
