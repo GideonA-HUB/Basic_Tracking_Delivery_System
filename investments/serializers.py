@@ -42,6 +42,9 @@ class InvestmentItemSerializer(serializers.ModelSerializer):
         data['is_available_for_investment'] = instance.is_available_for_investment
         data['is_available_for_delivery'] = instance.is_available_for_delivery
         
+        # Add category name for JavaScript compatibility
+        data['category_name'] = instance.category.name if instance.category else 'Uncategorized'
+        
         # Format price change display
         if instance.price_change_24h > 0:
             data['price_change_display'] = f"+${instance.price_change_24h}"

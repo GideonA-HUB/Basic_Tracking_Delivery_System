@@ -126,6 +126,10 @@ class InvestmentItemViewSet(viewsets.ReadOnlyModelViewSet):
         limit = min(int(self.request.query_params.get('limit', 50)), 100)
         queryset = queryset[:limit]
         
+        # Debug logging
+        logger.info(f"API items endpoint - Query params: {self.request.query_params}")
+        logger.info(f"API items endpoint - Items found: {queryset.count()}")
+        
         return queryset
     
     def get_serializer_class(self):
@@ -676,6 +680,11 @@ def investment_marketplace(request):
             logger.warning(f"Could not load news for marketplace: {e}")
             marketplace_news = []
 
+        # Debug logging for items
+        logger.info(f"Marketplace view - Total items found: {items.count()}")
+        logger.info(f"Marketplace view - Featured items: {featured_items.count()}")
+        logger.info(f"Marketplace view - Trending items: {trending_items.count()}")
+        
         context = {
             'categories': categories,
             'featured_items': featured_items,

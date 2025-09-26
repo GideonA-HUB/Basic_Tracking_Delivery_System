@@ -641,8 +641,11 @@
                 .then(data => {
                     loadingDiv.classList.add('hidden');
                     
-                    if (data.results && data.results.length > 0) {
-                        displayItems(data.results);
+                    // Handle both paginated and non-paginated responses
+                    const items = data.results || data;
+                    
+                    if (items && items.length > 0) {
+                        displayItems(items);
                     } else {
                         noItemsDiv.classList.remove('hidden');
                     }
