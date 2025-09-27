@@ -3,135 +3,291 @@
 {% block title %}Customer Registration - Meridian Asset Logistics{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-12">
-    <div class="max-w-md mx-auto">
-        <!-- Header -->
-        <div class="text-center mb-8">
-            <div class="bg-blue-600 text-white font-bold text-3xl px-4 py-3 rounded-lg shadow-md inline-block mb-4">
-                MAL
-            </div>
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Create Your Account</h1>
-            <p class="text-gray-600 dark:text-gray-300 mt-2">Join Meridian Asset Logistics to access investment opportunities</p>
-        </div>
+<style>
+    .registration-container {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #1e40af 100%);
+        min-height: 100vh;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .dark .registration-container {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    }
+    
+    .registration-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        opacity: 0.3;
+    }
+    
+    .registration-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    
+    .dark .registration-card {
+        background: rgba(15, 23, 42, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .form-input {
+        background: rgba(255, 255, 255, 0.9);
+        border: 2px solid rgba(59, 130, 246, 0.2);
+        transition: all 0.3s ease;
+        color: #1f2937;
+    }
+    
+    .form-input:focus {
+        background: rgba(255, 255, 255, 1);
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        outline: none;
+    }
+    
+    .dark .form-input {
+        background: rgba(30, 41, 59, 0.8);
+        border-color: rgba(59, 130, 246, 0.3);
+        color: #f1f5f9;
+    }
+    
+    .dark .form-input:focus {
+        background: rgba(30, 41, 59, 1);
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+    
+    .form-input::placeholder {
+        color: #6b7280;
+    }
+    
+    .dark .form-input::placeholder {
+        color: #94a3b8;
+    }
+    
+    .form-label {
+        color: #374151;
+        font-weight: 600;
+    }
+    
+    .dark .form-label {
+        color: #e2e8f0;
+    }
+    
+    .submit-btn {
+        background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+    }
+    
+    .submit-btn:active {
+        transform: translateY(0);
+    }
+    
+    .floating-elements {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        overflow: hidden;
+    }
+    
+    .floating-circle {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .floating-circle:nth-child(1) {
+        width: 80px;
+        height: 80px;
+        top: 20%;
+        left: 10%;
+        animation-delay: 0s;
+    }
+    
+    .floating-circle:nth-child(2) {
+        width: 120px;
+        height: 120px;
+        top: 60%;
+        right: 10%;
+        animation-delay: 2s;
+    }
+    
+    .floating-circle:nth-child(3) {
+        width: 60px;
+        height: 60px;
+        bottom: 20%;
+        left: 20%;
+        animation-delay: 4s;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+    
+    .logo-container {
+        background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+    }
+    
+    .section-divider {
+        background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3), transparent);
+        height: 1px;
+        margin: 1.5rem 0;
+    }
+    
+    .dark .section-divider {
+        background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.5), transparent);
+    }
+</style>
 
-        <!-- Registration Form -->
-        <div class="bg-white dark:bg-gray-800 shadow-xl rounded-lg p-8">
+<div class="registration-container">
+    <!-- Floating Background Elements -->
+    <div class="floating-elements">
+        <div class="floating-circle"></div>
+        <div class="floating-circle"></div>
+        <div class="floating-circle"></div>
+    </div>
+    
+    <div class="relative z-10 min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-lg w-full">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="logo-container text-white font-bold text-3xl px-6 py-4 rounded-xl shadow-lg inline-block mb-6">
+                    MAL
+                </div>
+                <h1 class="text-4xl font-bold text-white mb-3">Create Your Account</h1>
+                <p class="text-blue-100 dark:text-blue-200 text-lg">Join Meridian Asset Logistics to access investment opportunities</p>
+            </div>
+
+            <!-- Registration Form -->
+            <div class="registration-card rounded-2xl p-8">
             <form method="post" class="space-y-6">
                 {% csrf_token %}
                 
-                <!-- Username -->
-                <div>
-                    <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Username
-                    </label>
-                    {{ form.username }}
-                    {% if form.username.errors %}
-                        <div class="mt-1 text-sm text-red-600">
-                            {% for error in form.username.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-
-                <!-- Email -->
-                <div>
-                    <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Email Address
-                    </label>
-                    {{ form.email }}
-                    {% if form.email.errors %}
-                        <div class="mt-1 text-sm text-red-600">
-                            {% for error in form.email.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-
-                <!-- First Name -->
-                <div>
-                    <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        First Name
-                    </label>
-                    {{ form.first_name }}
-                    {% if form.first_name.errors %}
-                        <div class="mt-1 text-sm text-red-600">
-                            {% for error in form.first_name.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-
-                <!-- Last Name -->
-                <div>
-                    <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Last Name
-                    </label>
-                    {{ form.last_name }}
-                    {% if form.last_name.errors %}
-                        <div class="mt-1 text-sm text-red-600">
-                            {% for error in form.last_name.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-
-                <!-- Phone Number -->
-                <div>
-                    <label for="{{ form.phone_number.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Phone Number (Optional)
-                    </label>
-                    {{ form.phone_number }}
-                    {% if form.phone_number.errors %}
-                        <div class="mt-1 text-sm text-red-600">
-                            {% for error in form.phone_number.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-
-                <!-- Address -->
-                <div>
-                    <label for="{{ form.address.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Address (Optional)
-                    </label>
-                    {{ form.address }}
-                    {% if form.address.errors %}
-                        <div class="mt-1 text-sm text-red-600">
-                            {% for error in form.address.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-
-                <!-- City and State -->
-                <div class="grid grid-cols-2 gap-4">
+                <!-- Personal Information Section -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold form-label flex items-center">
+                        <i class="fas fa-user mr-2 text-blue-600"></i>
+                        Personal Information
+                    </h3>
+                    
+                    <!-- Username -->
                     <div>
-                        <label for="{{ form.city.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            City (Optional)
+                        <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium form-label mb-2">
+                            Username *
                         </label>
-                        {{ form.city }}
-                        {% if form.city.errors %}
+                        <input type="text" 
+                               name="{{ form.username.name }}" 
+                               id="{{ form.username.id_for_label }}" 
+                               class="form-input w-full px-4 py-3 rounded-lg text-sm" 
+                               placeholder="Choose a unique username"
+                               value="{{ form.username.value|default:'' }}"
+                               required>
+                        {% if form.username.errors %}
                             <div class="mt-1 text-sm text-red-600">
-                                {% for error in form.city.errors %}
+                                {% for error in form.username.errors %}
                                     <p>{{ error }}</p>
                                 {% endfor %}
                             </div>
                         {% endif %}
                     </div>
+
+                    <!-- Email -->
                     <div>
-                        <label for="{{ form.state.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            State (Optional)
+                        <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium form-label mb-2">
+                            Email Address *
                         </label>
-                        {{ form.state }}
-                        {% if form.state.errors %}
+                        <input type="email" 
+                               name="{{ form.email.name }}" 
+                               id="{{ form.email.id_for_label }}" 
+                               class="form-input w-full px-4 py-3 rounded-lg text-sm" 
+                               placeholder="Enter your email address"
+                               value="{{ form.email.value|default:'' }}"
+                               required>
+                        {% if form.email.errors %}
                             <div class="mt-1 text-sm text-red-600">
-                                {% for error in form.state.errors %}
+                                {% for error in form.email.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- First Name and Last Name -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium form-label mb-2">
+                                First Name *
+                            </label>
+                            <input type="text" 
+                                   name="{{ form.first_name.name }}" 
+                                   id="{{ form.first_name.id_for_label }}" 
+                                   class="form-input w-full px-4 py-3 rounded-lg text-sm" 
+                                   placeholder="First name"
+                                   value="{{ form.first_name.value|default:'' }}"
+                                   required>
+                            {% if form.first_name.errors %}
+                                <div class="mt-1 text-sm text-red-600">
+                                    {% for error in form.first_name.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium form-label mb-2">
+                                Last Name *
+                            </label>
+                            <input type="text" 
+                                   name="{{ form.last_name.name }}" 
+                                   id="{{ form.last_name.id_for_label }}" 
+                                   class="form-input w-full px-4 py-3 rounded-lg text-sm" 
+                                   placeholder="Last name"
+                                   value="{{ form.last_name.value|default:'' }}"
+                                   required>
+                            {% if form.last_name.errors %}
+                                <div class="mt-1 text-sm text-red-600">
+                                    {% for error in form.last_name.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div>
+                        <label for="{{ form.phone_number.id_for_label }}" class="block text-sm font-medium form-label mb-2">
+                            Phone Number
+                        </label>
+                        <input type="tel" 
+                               name="{{ form.phone_number.name }}" 
+                               id="{{ form.phone_number.id_for_label }}" 
+                               class="form-input w-full px-4 py-3 rounded-lg text-sm" 
+                               placeholder="Enter your phone number"
+                               value="{{ form.phone_number.value|default:'' }}">
+                        {% if form.phone_number.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {% for error in form.phone_number.errors %}
                                     <p>{{ error }}</p>
                                 {% endfor %}
                             </div>
@@ -139,29 +295,127 @@
                     </div>
                 </div>
 
-                <!-- Country and Postal Code -->
-                <div class="grid grid-cols-2 gap-4">
+                <div class="section-divider"></div>
+
+                <!-- Address Information Section -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold form-label flex items-center">
+                        <i class="fas fa-map-marker-alt mr-2 text-blue-600"></i>
+                        Address Information
+                    </h3>
+
+                    <!-- Address -->
                     <div>
-                        <label for="{{ form.country.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Country (Optional)
+                        <label for="{{ form.address.id_for_label }}" class="block text-sm font-medium form-label mb-2">
+                            Address
                         </label>
-                        {{ form.country }}
-                        {% if form.country.errors %}
+                        <textarea name="{{ form.address.name }}" 
+                                  id="{{ form.address.id_for_label }}" 
+                                  rows="3"
+                                  class="form-input w-full px-4 py-3 rounded-lg text-sm resize-none" 
+                                  placeholder="Enter your full address">{{ form.address.value|default:'' }}</textarea>
+                        {% if form.address.errors %}
                             <div class="mt-1 text-sm text-red-600">
-                                {% for error in form.country.errors %}
+                                {% for error in form.address.errors %}
                                     <p>{{ error }}</p>
                                 {% endfor %}
                             </div>
                         {% endif %}
                     </div>
+
+                    <!-- City and State -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="{{ form.city.id_for_label }}" class="block text-sm font-medium form-label mb-2">
+                                City
+                            </label>
+                            <input type="text" 
+                                   name="{{ form.city.name }}" 
+                                   id="{{ form.city.id_for_label }}" 
+                                   class="form-input w-full px-4 py-3 rounded-lg text-sm" 
+                                   placeholder="City"
+                                   value="{{ form.city.value|default:'' }}">
+                            {% if form.city.errors %}
+                                <div class="mt-1 text-sm text-red-600">
+                                    {% for error in form.city.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label for="{{ form.state.id_for_label }}" class="block text-sm font-medium form-label mb-2">
+                                State
+                            </label>
+                            <input type="text" 
+                                   name="{{ form.state.name }}" 
+                                   id="{{ form.state.id_for_label }}" 
+                                   class="form-input w-full px-4 py-3 rounded-lg text-sm" 
+                                   placeholder="State"
+                                   value="{{ form.state.value|default:'' }}">
+                            {% if form.state.errors %}
+                                <div class="mt-1 text-sm text-red-600">
+                                    {% for error in form.state.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Country and Postal Code -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="{{ form.country.id_for_label }}" class="block text-sm font-medium form-label mb-2">
+                                Country
+                            </label>
+                            <input type="text" 
+                                   name="{{ form.country.name }}" 
+                                   id="{{ form.country.id_for_label }}" 
+                                   class="form-input w-full px-4 py-3 rounded-lg text-sm" 
+                                   placeholder="Country"
+                                   value="{{ form.country.value|default:'' }}">
+                            {% if form.country.errors %}
+                                <div class="mt-1 text-sm text-red-600">
+                                    {% for error in form.country.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label for="{{ form.postal_code.id_for_label }}" class="block text-sm font-medium form-label mb-2">
+                                Postal Code
+                            </label>
+                            <input type="text" 
+                                   name="{{ form.postal_code.name }}" 
+                                   id="{{ form.postal_code.id_for_label }}" 
+                                   class="form-input w-full px-4 py-3 rounded-lg text-sm" 
+                                   placeholder="Postal code"
+                                   value="{{ form.postal_code.value|default:'' }}">
+                            {% if form.postal_code.errors %}
+                                <div class="mt-1 text-sm text-red-600">
+                                    {% for error in form.postal_code.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Date of Birth -->
                     <div>
-                        <label for="{{ form.postal_code.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Postal Code (Optional)
+                        <label for="{{ form.date_of_birth.id_for_label }}" class="block text-sm font-medium form-label mb-2">
+                            Date of Birth
                         </label>
-                        {{ form.postal_code }}
-                        {% if form.postal_code.errors %}
+                        <input type="date" 
+                               name="{{ form.date_of_birth.name }}" 
+                               id="{{ form.date_of_birth.id_for_label }}" 
+                               class="form-input w-full px-4 py-3 rounded-lg text-sm" 
+                               value="{{ form.date_of_birth.value|default:'' }}">
+                        {% if form.date_of_birth.errors %}
                             <div class="mt-1 text-sm text-red-600">
-                                {% for error in form.postal_code.errors %}
+                                {% for error in form.date_of_birth.errors %}
                                     <p>{{ error }}</p>
                                 {% endfor %}
                             </div>
@@ -169,72 +423,78 @@
                     </div>
                 </div>
 
-                <!-- Date of Birth -->
-                <div>
-                    <label for="{{ form.date_of_birth.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Date of Birth (Optional)
-                    </label>
-                    {{ form.date_of_birth }}
-                    {% if form.date_of_birth.errors %}
-                        <div class="mt-1 text-sm text-red-600">
-                            {% for error in form.date_of_birth.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
+                <div class="section-divider"></div>
 
-                <!-- Password 1 -->
-                <div>
-                    <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Password
-                    </label>
-                    {{ form.password1 }}
-                    {% if form.password1.errors %}
-                        <div class="mt-1 text-sm text-red-600">
-                            {% for error in form.password1.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                    {% if form.password1.help_text %}
-                        <div class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            {{ form.password1.help_text|safe }}
-                        </div>
-                    {% endif %}
-                </div>
+                <!-- Security Section -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold form-label flex items-center">
+                        <i class="fas fa-lock mr-2 text-blue-600"></i>
+                        Security
+                    </h3>
 
-                <!-- Password 2 -->
-                <div>
-                    <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Confirm Password
-                    </label>
-                    {{ form.password2 }}
-                    {% if form.password2.errors %}
-                        <div class="mt-1 text-sm text-red-600">
-                            {% for error in form.password2.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                    {% if form.password2.help_text %}
-                        <div class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            {{ form.password2.help_text|safe }}
-                        </div>
-                    {% endif %}
+                    <!-- Password 1 -->
+                    <div>
+                        <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium form-label mb-2">
+                            Password *
+                        </label>
+                        <input type="password" 
+                               name="{{ form.password1.name }}" 
+                               id="{{ form.password1.id_for_label }}" 
+                               class="form-input w-full px-4 py-3 rounded-lg text-sm" 
+                               placeholder="Create a strong password"
+                               required>
+                        {% if form.password1.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {% for error in form.password1.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        {% if form.password1.help_text %}
+                            <div class="mt-2 text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                                {{ form.password1.help_text|safe }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Password 2 -->
+                    <div>
+                        <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium form-label mb-2">
+                            Confirm Password *
+                        </label>
+                        <input type="password" 
+                               name="{{ form.password2.name }}" 
+                               id="{{ form.password2.id_for_label }}" 
+                               class="form-input w-full px-4 py-3 rounded-lg text-sm" 
+                               placeholder="Confirm your password"
+                               required>
+                        {% if form.password2.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {% for error in form.password2.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        {% if form.password2.help_text %}
+                            <div class="mt-2 text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                                {{ form.password2.help_text|safe }}
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit" class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 font-medium">
+                <button type="submit" class="submit-btn w-full text-white py-4 px-6 rounded-lg font-semibold text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    <i class="fas fa-user-plus mr-2"></i>
                     Create Account
                 </button>
             </form>
 
             <!-- Login Link -->
-            <div class="mt-6 text-center">
-                <p class="text-sm text-gray-600 dark:text-gray-400">
+            <div class="mt-8 text-center">
+                <p class="text-sm form-label">
                     Already have an account? 
-                    <a href="{% url 'accounts:customer_login' %}" class="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
+                    <a href="{% url 'accounts:customer_login' %}" class="font-semibold text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
                         Sign in here
                     </a>
                 </p>
@@ -242,8 +502,8 @@
         </div>
 
         <!-- Back to Home -->
-        <div class="text-center mt-6">
-            <a href="{% url 'frontend:landing_page' %}" class="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
+        <div class="text-center mt-8">
+            <a href="{% url 'frontend:landing_page' %}" class="inline-flex items-center text-white hover:text-blue-200 dark:text-blue-300 dark:hover:text-blue-100 font-medium transition-colors">
                 <i class="fas fa-arrow-left mr-2"></i>
                 Back to Home
             </a>
