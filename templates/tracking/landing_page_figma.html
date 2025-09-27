@@ -416,9 +416,13 @@
     }
     
     .investment-section {
-        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
         color: white;
         padding: 4rem 0;
+    }
+    
+    .dark .investment-section {
+        background: linear-gradient(135deg, #0f172a 0%, #020617 100%);
     }
     
     .investment-card {
@@ -427,6 +431,11 @@
         padding: 2rem;
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .dark .investment-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
     
     .investment-grid {
@@ -2872,10 +2881,10 @@
 <section class="investment-section">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center">
-            <h2 class="text-3xl font-bold mb-4">
-                💎 Investment Opportunities 🚀
+            <h2 class="text-3xl font-bold mb-4 text-white dark:text-white">
+                Investment Opportunities
                     </h2>
-            <p class="text-xl mb-8">
+            <p class="text-xl mb-8 text-white dark:text-white">
                 Transform your wealth with precious metals, diamonds, real estate, and cryptocurrency. 
                 Build your legacy with strategic investments and expert guidance!
                     </p>
@@ -2885,8 +2894,8 @@
             <div class="investment-card">
                 <div class="text-center">
                     <i class="fas fa-coins text-4xl text-yellow-400 mb-4"></i>
-                    <h3 class="text-2xl font-bold mb-4">Precious Metals</h3>
-                    <p class="text-blue-100">
+                    <h3 class="text-2xl font-bold mb-4 text-white dark:text-white">Precious Metals</h3>
+                    <p class="text-white dark:text-white">
                         Gold, silver, and platinum investments with real-time tracking and secure storage
                             </p>
                         </div>
@@ -2895,8 +2904,8 @@
             <div class="investment-card">
                 <div class="text-center">
                                 <i class="fas fa-building text-4xl text-blue-400 mb-4"></i>
-                    <h3 class="text-2xl font-bold mb-4">Real Estate</h3>
-                    <p class="text-blue-100">
+                    <h3 class="text-2xl font-bold mb-4 text-white dark:text-white">Real Estate</h3>
+                    <p class="text-white dark:text-white">
                         Property investments with growth potential, rental income, and portfolio diversification
                             </p>
                         </div>
@@ -2905,8 +2914,8 @@
             <div class="investment-card">
                 <div class="text-center">
                                 <i class="fas fa-gem text-4xl text-purple-400 mb-4"></i>
-                    <h3 class="text-2xl font-bold mb-4">Diamonds & Gems</h3>
-                    <p class="text-blue-100">
+                    <h3 class="text-2xl font-bold mb-4 text-white dark:text-white">Diamonds & Gems</h3>
+                    <p class="text-white dark:text-white">
                         Rare and valuable stones with certified authenticity and investment-grade quality
                             </p>
                         </div>
