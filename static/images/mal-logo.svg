@@ -1,81 +1,102 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
   <defs>
     <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#FFA500;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#FF8C00;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#DAA520;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#B8860B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8B6914;stop-opacity:1" />
     </linearGradient>
     <linearGradient id="globeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#FFF8DC;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#F0E68C;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F5DEB3;stop-opacity:1" />
     </linearGradient>
+    <radialGradient id="globeTexture" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#FFF8DC;stop-opacity:1" />
+      <stop offset="70%" style="stop-color:#F5DEB3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#DEB887;stop-opacity:1" />
+    </radialGradient>
   </defs>
   
   <!-- Background -->
   <rect width="400" height="400" fill="white"/>
   
-  <!-- Central Globe -->
-  <circle cx="200" cy="200" r="120" fill="url(#globeGradient)" stroke="url(#goldGradient)" stroke-width="8"/>
+  <!-- Thick Golden-Brown Outer Ring -->
+  <circle cx="200" cy="200" r="140" fill="none" stroke="url(#goldGradient)" stroke-width="12"/>
   
-  <!-- Globe Grid Lines -->
-  <path d="M 80 200 Q 200 160 320 200 Q 200 240 80 200" fill="none" stroke="#DAA520" stroke-width="2" opacity="0.6"/>
-  <path d="M 80 200 Q 200 240 320 200" fill="none" stroke="#DAA520" stroke-width="2" opacity="0.6"/>
-  <ellipse cx="200" cy="200" rx="120" ry="40" fill="none" stroke="#DAA520" stroke-width="2" opacity="0.4"/>
-  <ellipse cx="200" cy="200" rx="120" ry="80" fill="none" stroke="#DAA520" stroke-width="2" opacity="0.3"/>
+  <!-- Central Globe with Texture -->
+  <circle cx="200" cy="200" r="110" fill="url(#globeTexture)" stroke="#DAA520" stroke-width="3"/>
   
-  <!-- Gold Bars -->
-  <rect x="185" y="170" width="30" height="8" fill="url(#goldGradient)" rx="2"/>
-  <rect x="185" y="180" width="30" height="8" fill="url(#goldGradient)" rx="2"/>
-  <rect x="185" y="190" width="30" height="8" fill="url(#goldGradient)" rx="2"/>
+  <!-- Globe Latitude Lines -->
+  <path d="M 90 200 Q 200 170 310 200" fill="none" stroke="#DAA520" stroke-width="1.5" opacity="0.4"/>
+  <path d="M 90 200 Q 200 230 310 200" fill="none" stroke="#DAA520" stroke-width="1.5" opacity="0.4"/>
+  <path d="M 90 200 Q 200 185 310 200" fill="none" stroke="#DAA520" stroke-width="1" opacity="0.3"/>
+  <path d="M 90 200 Q 200 215 310 200" fill="none" stroke="#DAA520" stroke-width="1" opacity="0.3"/>
   
-  <!-- Dollar Sign -->
-  <text x="200" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#2F4F4F">$</text>
+  <!-- Globe Longitude Lines -->
+  <ellipse cx="200" cy="200" rx="110" ry="35" fill="none" stroke="#DAA520" stroke-width="1" opacity="0.3"/>
+  <ellipse cx="200" cy="200" rx="110" ry="70" fill="none" stroke="#DAA520" stroke-width="1" opacity="0.3"/>
   
-  <!-- Asset Stacks -->
-  <rect x="140" y="220" width="20" height="6" fill="#2F4F4F" rx="1"/>
-  <rect x="140" y="228" width="20" height="6" fill="#2F4F4F" rx="1"/>
-  <rect x="140" y="236" width="20" height="6" fill="#2F4F4F" rx="1"/>
+  <!-- Three Stacked Gold Bars (Pyramid) -->
+  <rect x="190" y="160" width="20" height="6" fill="#FFD700" stroke="#DAA520" stroke-width="0.5"/>
+  <rect x="185" y="168" width="30" height="6" fill="#FFD700" stroke="#DAA520" stroke-width="0.5"/>
+  <rect x="180" y="176" width="40" height="6" fill="#FFD700" stroke="#DAA520" stroke-width="0.5"/>
   
-  <rect x="240" y="220" width="20" height="6" fill="#2F4F4F" rx="1"/>
-  <rect x="240" y="228" width="20" height="6" fill="#2F4F4F" rx="1"/>
-  <rect x="240" y="236" width="20" height="6" fill="#2F4F4F" rx="1"/>
+  <!-- Horizontal Golden Bar -->
+  <rect x="140" y="190" width="120" height="8" fill="#FFD700" stroke="#DAA520" stroke-width="0.5"/>
   
-  <!-- Text Banner -->
-  <path d="M 80 120 A 120 120 0 0 1 320 120" fill="none" stroke="url(#goldGradient)" stroke-width="6"/>
-  <text x="200" y="110" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#2F4F4F">MERIDIAN ASSETS</text>
+  <!-- Two Stacks of Grey Rectangular Items -->
+  <rect x="150" y="205" width="15" height="5" fill="#696969" rx="1"/>
+  <rect x="150" y="212" width="15" height="5" fill="#696969" rx="1"/>
+  <rect x="150" y="219" width="15" height="5" fill="#696969" rx="1"/>
   
-  <path d="M 80 280 A 120 120 0 0 0 320 280" fill="none" stroke="url(#goldGradient)" stroke-width="6"/>
-  <text x="200" y="290" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#2F4F4F">LOGISTICS</text>
+  <rect x="235" y="205" width="15" height="5" fill="#696969" rx="1"/>
+  <rect x="235" y="212" width="15" height="5" fill="#696969" rx="1"/>
+  <rect x="235" y="219" width="15" height="5" fill="#696969" rx="1"/>
   
-  <!-- Delivery Truck -->
-  <g transform="translate(50, 180)">
+  <!-- Large Dark Grey Dollar Sign -->
+  <text x="200" y="245" text-anchor="middle" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="#2F4F4F">$</text>
+  
+  <!-- Text Banners with Golden-Brown Color -->
+  <path d="M 90 100 A 110 110 0 0 1 310 100" fill="none" stroke="url(#goldGradient)" stroke-width="8"/>
+  <text x="200" y="95" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#8B4513">MERIDIAN ASSETS</text>
+  
+  <path d="M 90 300 A 110 110 0 0 0 310 300" fill="none" stroke="url(#goldGradient)" stroke-width="8"/>
+  <text x="200" y="305" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#8B4513">LOGISTICS</text>
+  
+  <!-- Delivery Truck (Golden-Brown) -->
+  <g transform="translate(30, 180)">
     <!-- Truck Body -->
-    <rect x="0" y="10" width="40" height="20" fill="url(#goldGradient)" rx="3"/>
+    <rect x="0" y="15" width="45" height="25" fill="url(#goldGradient)" rx="4"/>
     <!-- Truck Cab -->
-    <rect x="0" y="5" width="15" height="25" fill="url(#goldGradient)" rx="2"/>
+    <rect x="0" y="8" width="18" height="32" fill="url(#goldGradient)" rx="3"/>
     <!-- Wheels -->
-    <circle cx="8" cy="32" r="4" fill="#2F4F4F"/>
-    <circle cx="32" cy="32" r="4" fill="#2F4F4F"/>
+    <circle cx="12" cy="45" r="5" fill="#2F4F4F"/>
+    <circle cx="38" cy="45" r="5" fill="#2F4F4F"/>
     <!-- Windshield -->
-    <rect x="2" y="8" width="11" height="8" fill="#87CEEB" opacity="0.7"/>
+    <rect x="2" y="12" width="14" height="10" fill="#87CEEB" opacity="0.8"/>
+    <!-- Connection Lines -->
+    <path d="M 45 25 Q 70 30 90 40" fill="none" stroke="url(#goldGradient)" stroke-width="3"/>
   </g>
   
-  <!-- Airplane -->
-  <g transform="translate(320, 120)">
+  <!-- Airplane (Golden-Brown) -->
+  <g transform="translate(350, 120)">
     <!-- Airplane Body -->
-    <ellipse cx="0" cy="0" rx="25" ry="3" fill="url(#goldGradient)"/>
+    <ellipse cx="0" cy="0" rx="30" ry="4" fill="url(#goldGradient)"/>
     <!-- Wings -->
-    <ellipse cx="-5" cy="0" rx="8" ry="15" fill="url(#goldGradient)"/>
+    <ellipse cx="-8" cy="0" rx="12" ry="18" fill="url(#goldGradient)"/>
     <!-- Tail -->
-    <path d="M -20 -5 L -15 0 L -20 5 Z" fill="url(#goldGradient)"/>
+    <path d="M -25 -8 L -18 0 L -25 8 Z" fill="url(#goldGradient)"/>
     <!-- Propeller -->
-    <circle cx="-25" cy="0" r="2" fill="#2F4F4F"/>
+    <circle cx="-30" cy="0" r="3" fill="#2F4F4F"/>
+    <!-- Connection Lines -->
+    <path d="M -30 0 Q -70 10 -90 25" fill="none" stroke="url(#goldGradient)" stroke-width="3"/>
   </g>
   
-  <!-- Movement Path -->
-  <path d="M 90 210 Q 200 250 310 160" fill="none" stroke="url(#goldGradient)" stroke-width="3" opacity="0.8"/>
+  <!-- Golden Network Lines -->
+  <path d="M 75 220 Q 140 250 180 200" fill="none" stroke="url(#goldGradient)" stroke-width="2" opacity="0.8"/>
+  <path d="M 325 180 Q 280 220 220 200" fill="none" stroke="url(#goldGradient)" stroke-width="2" opacity="0.8"/>
+  <path d="M 75 220 Q 200 280 325 180" fill="none" stroke="url(#goldGradient)" stroke-width="2" opacity="0.6"/>
   
-  <!-- Gold Border (partial) -->
-  <path d="M 80 80 A 120 120 0 0 1 320 80 A 120 120 0 0 1 320 320 A 120 120 0 0 1 80 320 A 120 120 0 0 1 80 80" 
-        fill="none" stroke="url(#goldGradient)" stroke-width="8" stroke-dasharray="200,50"/>
+  <!-- Additional Network Arcs -->
+  <path d="M 90 120 Q 200 80 310 120" fill="none" stroke="url(#goldGradient)" stroke-width="2" opacity="0.5"/>
+  <path d="M 90 280 Q 200 320 310 280" fill="none" stroke="url(#goldGradient)" stroke-width="2" opacity="0.5"/>
 </svg>
