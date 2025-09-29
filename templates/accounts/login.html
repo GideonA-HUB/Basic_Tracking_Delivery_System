@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Staff Login - MAL{% endblock %}
 
@@ -195,7 +196,7 @@
             <!-- Header -->
             <div class="text-center mb-8">
                 <div class="logo-container text-white font-bold text-4xl px-8 py-5 rounded-xl shadow-lg inline-block mb-6">
-                    MAL
+                    <img src="{% static 'images/mal-logo.svg' %}" alt="MAL Logo" class="w-16 h-16 object-contain">
                 </div>
                 <div class="flex items-center justify-center mb-4">
                     <span class="text-white font-semibold text-xl">Meridian Asset Logistics</span>

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Staff Registration - MAL{% endblock %}
 
@@ -9,8 +10,8 @@
             <!-- MAL Logo -->
             <div class="mx-auto flex justify-center">
                 <a href="{% url 'frontend:dashboard' %}" class="flex items-center space-x-3">
-                    <div class="bg-blue-600 text-white font-bold text-3xl px-4 py-3 rounded-lg shadow-md">
-                        MAL
+                    <div class="w-12 h-12 flex items-center justify-center">
+                        <img src="{% static 'images/mal-logo.svg' %}" alt="MAL Logo" class="w-full h-full object-contain">
                     </div>
                     <div class="hidden sm:block">
                         <span class="text-gray-900 font-semibold text-xl">Meridian Asset Logistics</span>

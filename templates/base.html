@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en" class="light">
 <head>
@@ -10,6 +11,11 @@
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
+    <link rel="apple-touch-icon" href="{% static 'images/favicon.svg' %}">
+    <meta name="theme-color" content="#3b82f6">
     
     <script>
         tailwind.config = {
@@ -455,8 +461,8 @@
                         {% else %}
                             <a href="{% url 'frontend:landing_page' %}" class="flex items-center space-x-3 hover:opacity-80 transition-opacity duration-200">
                         {% endif %}
-                            <div class="bg-blue-600 text-white font-bold text-2xl px-3 py-2 rounded-lg shadow-md">
-                                M
+                            <div class="w-12 h-12 flex items-center justify-center">
+                                <img src="{% static 'images/mal-logo.svg' %}" alt="MAL Logo" class="w-full h-full object-contain">
                             </div>
                             <div class="hidden sm:block">
                                 <span class="text-gray-900 dark:text-white font-semibold text-lg">Meridian Asset Logistics</span>

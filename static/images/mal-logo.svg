@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FFA500;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF8C00;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="globeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFF8DC;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F0E68C;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="400" height="400" fill="white"/>
+  
+  <!-- Central Globe -->
+  <circle cx="200" cy="200" r="120" fill="url(#globeGradient)" stroke="url(#goldGradient)" stroke-width="8"/>
+  
+  <!-- Globe Grid Lines -->
+  <path d="M 80 200 Q 200 160 320 200 Q 200 240 80 200" fill="none" stroke="#DAA520" stroke-width="2" opacity="0.6"/>
+  <path d="M 80 200 Q 200 240 320 200" fill="none" stroke="#DAA520" stroke-width="2" opacity="0.6"/>
+  <ellipse cx="200" cy="200" rx="120" ry="40" fill="none" stroke="#DAA520" stroke-width="2" opacity="0.4"/>
+  <ellipse cx="200" cy="200" rx="120" ry="80" fill="none" stroke="#DAA520" stroke-width="2" opacity="0.3"/>
+  
+  <!-- Gold Bars -->
+  <rect x="185" y="170" width="30" height="8" fill="url(#goldGradient)" rx="2"/>
+  <rect x="185" y="180" width="30" height="8" fill="url(#goldGradient)" rx="2"/>
+  <rect x="185" y="190" width="30" height="8" fill="url(#goldGradient)" rx="2"/>
+  
+  <!-- Dollar Sign -->
+  <text x="200" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#2F4F4F">$</text>
+  
+  <!-- Asset Stacks -->
+  <rect x="140" y="220" width="20" height="6" fill="#2F4F4F" rx="1"/>
+  <rect x="140" y="228" width="20" height="6" fill="#2F4F4F" rx="1"/>
+  <rect x="140" y="236" width="20" height="6" fill="#2F4F4F" rx="1"/>
+  
+  <rect x="240" y="220" width="20" height="6" fill="#2F4F4F" rx="1"/>
+  <rect x="240" y="228" width="20" height="6" fill="#2F4F4F" rx="1"/>
+  <rect x="240" y="236" width="20" height="6" fill="#2F4F4F" rx="1"/>
+  
+  <!-- Text Banner -->
+  <path d="M 80 120 A 120 120 0 0 1 320 120" fill="none" stroke="url(#goldGradient)" stroke-width="6"/>
+  <text x="200" y="110" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#2F4F4F">MERIDIAN ASSETS</text>
+  
+  <path d="M 80 280 A 120 120 0 0 0 320 280" fill="none" stroke="url(#goldGradient)" stroke-width="6"/>
+  <text x="200" y="290" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#2F4F4F">LOGISTICS</text>
+  
+  <!-- Delivery Truck -->
+  <g transform="translate(50, 180)">
+    <!-- Truck Body -->
+    <rect x="0" y="10" width="40" height="20" fill="url(#goldGradient)" rx="3"/>
+    <!-- Truck Cab -->
+    <rect x="0" y="5" width="15" height="25" fill="url(#goldGradient)" rx="2"/>
+    <!-- Wheels -->
+    <circle cx="8" cy="32" r="4" fill="#2F4F4F"/>
+    <circle cx="32" cy="32" r="4" fill="#2F4F4F"/>
+    <!-- Windshield -->
+    <rect x="2" y="8" width="11" height="8" fill="#87CEEB" opacity="0.7"/>
+  </g>
+  
+  <!-- Airplane -->
+  <g transform="translate(320, 120)">
+    <!-- Airplane Body -->
+    <ellipse cx="0" cy="0" rx="25" ry="3" fill="url(#goldGradient)"/>
+    <!-- Wings -->
+    <ellipse cx="-5" cy="0" rx="8" ry="15" fill="url(#goldGradient)"/>
+    <!-- Tail -->
+    <path d="M -20 -5 L -15 0 L -20 5 Z" fill="url(#goldGradient)"/>
+    <!-- Propeller -->
+    <circle cx="-25" cy="0" r="2" fill="#2F4F4F"/>
+  </g>
+  
+  <!-- Movement Path -->
+  <path d="M 90 210 Q 200 250 310 160" fill="none" stroke="url(#goldGradient)" stroke-width="3" opacity="0.8"/>
+  
+  <!-- Gold Border (partial) -->
+  <path d="M 80 80 A 120 120 0 0 1 320 80 A 120 120 0 0 1 320 320 A 120 120 0 0 1 80 320 A 120 120 0 0 1 80 80" 
+        fill="none" stroke="url(#goldGradient)" stroke-width="8" stroke-dasharray="200,50"/>
+</svg>
