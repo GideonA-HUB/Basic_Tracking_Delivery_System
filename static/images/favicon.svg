@@ -1,51 +1,55 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
   <defs>
-    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#DAA520;stop-opacity:1" />
+    <linearGradient id="goldenBrown" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#CD853F;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#B8860B;stop-opacity:1" />
     </linearGradient>
+    <radialGradient id="globeGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#F5DEB3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#CD853F;stop-opacity:1" />
+    </radialGradient>
   </defs>
   
   <!-- Background -->
   <rect width="32" height="32" fill="white" rx="6"/>
   
-  <!-- Thick Golden-Brown Outer Ring -->
-  <circle cx="16" cy="16" r="14" fill="none" stroke="url(#goldGradient)" stroke-width="1.5"/>
+  <!-- Outer Golden-Brown Ring -->
+  <circle cx="16" cy="16" r="14" fill="none" stroke="url(#goldenBrown)" stroke-width="1.2"/>
   
-  <!-- Central Globe -->
-  <circle cx="16" cy="16" r="11" fill="#FFF8DC" stroke="#DAA520" stroke-width="0.8"/>
+  <!-- Central Globe with Texture -->
+  <circle cx="16" cy="16" r="11" fill="url(#globeGradient)" stroke="#CD853F" stroke-width="0.6"/>
   
-  <!-- Globe Lines -->
-  <path d="M 5 16 Q 16 13 27 16" fill="none" stroke="#DAA520" stroke-width="0.4" opacity="0.4"/>
-  <path d="M 5 16 Q 16 19 27 16" fill="none" stroke="#DAA520" stroke-width="0.4" opacity="0.4"/>
+  <!-- Globe Grid Lines (Subtle) -->
+  <path d="M 5 16 Q 16 12 27 16" fill="none" stroke="#CD853F" stroke-width="0.3" opacity="0.3"/>
+  <path d="M 5 16 Q 16 20 27 16" fill="none" stroke="#CD853F" stroke-width="0.3" opacity="0.3"/>
+  <ellipse cx="16" cy="16" rx="11" ry="3" fill="none" stroke="#CD853F" stroke-width="0.2" opacity="0.2"/>
   
   <!-- Three Stacked Gold Bars (Pyramid) -->
-  <rect x="15" y="12" width="2" height="0.8" fill="#FFD700"/>
-  <rect x="14" y="13" width="4" height="0.8" fill="#FFD700"/>
-  <rect x="13" y="14" width="6" height="0.8" fill="#FFD700"/>
+  <rect x="15.5" y="11" width="1" height="0.4" fill="#FFD700"/>
+  <rect x="15" y="12" width="2" height="0.4" fill="#FFD700"/>
+  <rect x="14.5" y="13" width="3" height="0.4" fill="#FFD700"/>
   
   <!-- Horizontal Golden Bar -->
-  <rect x="10" y="16" width="12" height="1" fill="#FFD700"/>
+  <rect x="11" y="15" width="10" height="0.6" fill="#FFD700"/>
   
-  <!-- Two Stacks of Grey Items -->
-  <rect x="11" y="18" width="2" height="0.6" fill="#696969"/>
-  <rect x="11" y="19" width="2" height="0.6" fill="#696969"/>
-  <rect x="19" y="18" width="2" height="0.6" fill="#696969"/>
-  <rect x="19" y="19" width="2" height="0.6" fill="#696969"/>
+  <!-- Two Stacks of Dark Grey Items -->
+  <rect x="12" y="17" width="1.5" height="0.3" fill="#2F2F2F"/>
+  <rect x="12" y="18" width="1.5" height="0.3" fill="#2F2F2F"/>
+  <rect x="18.5" y="17" width="1.5" height="0.3" fill="#2F2F2F"/>
+  <rect x="18.5" y="18" width="1.5" height="0.3" fill="#2F2F2F"/>
   
   <!-- Large Dark Grey Dollar Sign -->
-  <text x="16" y="22" text-anchor="middle" font-family="Arial, sans-serif" font-size="4" font-weight="bold" fill="#2F4F4F">$</text>
+  <text x="16" y="21" text-anchor="middle" font-family="Arial, sans-serif" font-size="3.5" font-weight="bold" fill="#2F2F2F">$</text>
   
-  <!-- Truck (simplified) -->
-  <rect x="2" y="20" width="6" height="3" fill="url(#goldGradient)" rx="0.5"/>
-  <circle cx="3.5" cy="24" r="1" fill="#2F4F4F"/>
-  <circle cx="6.5" cy="24" r="1" fill="#2F4F4F"/>
+  <!-- Truck (Golden-Brown) -->
+  <rect x="2" y="20" width="5" height="2.5" fill="url(#goldenBrown)" rx="0.3"/>
+  <circle cx="3.5" cy="23" r="0.8" fill="#2F2F2F"/>
+  <circle cx="5.5" cy="23" r="0.8" fill="#2F2F2F"/>
   
-  <!-- Airplane (simplified) -->
-  <ellipse cx="26" cy="12" rx="3" ry="0.8" fill="url(#goldGradient)"/>
-  <ellipse cx="25" cy="12" rx="1.5" ry="2" fill="url(#goldGradient)"/>
+  <!-- Airplane (Golden-Brown) -->
+  <ellipse cx="26" cy="11" rx="2.5" ry="0.6" fill="url(#goldenBrown)"/>
+  <ellipse cx="25" cy="11" rx="1.2" ry="1.5" fill="url(#goldenBrown)"/>
   
-  <!-- Network Lines -->
-  <path d="M 7 18 Q 12 20 15 16" fill="none" stroke="url(#goldGradient)" stroke-width="0.5" opacity="0.8"/>
-  <path d="M 25 16 Q 20 18 17 16" fill="none" stroke="url(#goldGradient)" stroke-width="0.5" opacity="0.8"/>
+  <!-- Connecting Swoosh -->
+  <path d="M 7 18 Q 14 22 25 14" fill="none" stroke="url(#goldenBrown)" stroke-width="0.8" opacity="0.7"/>
 </svg>

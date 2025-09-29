@@ -1,102 +1,99 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
   <defs>
-    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#DAA520;stop-opacity:1" />
+    <linearGradient id="goldenBrown" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#CD853F;stop-opacity:1" />
       <stop offset="50%" style="stop-color:#B8860B;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#8B6914;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8B7355;stop-opacity:1" />
     </linearGradient>
-    <linearGradient id="globeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#FFF8DC;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#F5DEB3;stop-opacity:1" />
+    <linearGradient id="goldBars" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#DAA520;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#B8860B;stop-opacity:1" />
     </linearGradient>
-    <radialGradient id="globeTexture" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" style="stop-color:#FFF8DC;stop-opacity:1" />
-      <stop offset="70%" style="stop-color:#F5DEB3;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#DEB887;stop-opacity:1" />
+    <radialGradient id="globeGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#F5DEB3;stop-opacity:1" />
+      <stop offset="70%" style="stop-color:#DEB887;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#CD853F;stop-opacity:1" />
     </radialGradient>
   </defs>
   
   <!-- Background -->
   <rect width="400" height="400" fill="white"/>
   
-  <!-- Thick Golden-Brown Outer Ring -->
-  <circle cx="200" cy="200" r="140" fill="none" stroke="url(#goldGradient)" stroke-width="12"/>
+  <!-- Outer Golden-Brown Ring -->
+  <circle cx="200" cy="200" r="135" fill="none" stroke="url(#goldenBrown)" stroke-width="10"/>
   
-  <!-- Central Globe with Texture -->
-  <circle cx="200" cy="200" r="110" fill="url(#globeTexture)" stroke="#DAA520" stroke-width="3"/>
+  <!-- Central Globe with Realistic Texture -->
+  <circle cx="200" cy="200" r="105" fill="url(#globeGradient)" stroke="#CD853F" stroke-width="2"/>
   
-  <!-- Globe Latitude Lines -->
-  <path d="M 90 200 Q 200 170 310 200" fill="none" stroke="#DAA520" stroke-width="1.5" opacity="0.4"/>
-  <path d="M 90 200 Q 200 230 310 200" fill="none" stroke="#DAA520" stroke-width="1.5" opacity="0.4"/>
-  <path d="M 90 200 Q 200 185 310 200" fill="none" stroke="#DAA520" stroke-width="1" opacity="0.3"/>
-  <path d="M 90 200 Q 200 215 310 200" fill="none" stroke="#DAA520" stroke-width="1" opacity="0.3"/>
+  <!-- Globe Grid Lines (Subtle) -->
+  <path d="M 95 200 Q 200 165 305 200" fill="none" stroke="#CD853F" stroke-width="0.8" opacity="0.3"/>
+  <path d="M 95 200 Q 200 235 305 200" fill="none" stroke="#CD853F" stroke-width="0.8" opacity="0.3"/>
+  <path d="M 95 200 Q 200 180 305 200" fill="none" stroke="#CD853F" stroke-width="0.5" opacity="0.2"/>
+  <path d="M 95 200 Q 200 220 305 200" fill="none" stroke="#CD853F" stroke-width="0.5" opacity="0.2"/>
+  <ellipse cx="200" cy="200" rx="105" ry="30" fill="none" stroke="#CD853F" stroke-width="0.5" opacity="0.2"/>
+  <ellipse cx="200" cy="200" rx="105" ry="60" fill="none" stroke="#CD853F" stroke-width="0.5" opacity="0.2"/>
   
-  <!-- Globe Longitude Lines -->
-  <ellipse cx="200" cy="200" rx="110" ry="35" fill="none" stroke="#DAA520" stroke-width="1" opacity="0.3"/>
-  <ellipse cx="200" cy="200" rx="110" ry="70" fill="none" stroke="#DAA520" stroke-width="1" opacity="0.3"/>
-  
-  <!-- Three Stacked Gold Bars (Pyramid) -->
-  <rect x="190" y="160" width="20" height="6" fill="#FFD700" stroke="#DAA520" stroke-width="0.5"/>
-  <rect x="185" y="168" width="30" height="6" fill="#FFD700" stroke="#DAA520" stroke-width="0.5"/>
-  <rect x="180" y="176" width="40" height="6" fill="#FFD700" stroke="#DAA520" stroke-width="0.5"/>
+  <!-- Three Stacked Gold Bars (Pyramid) - Top Center -->
+  <rect x="195" y="155" width="10" height="4" fill="url(#goldBars)" stroke="#B8860B" stroke-width="0.3"/>
+  <rect x="190" y="161" width="20" height="4" fill="url(#goldBars)" stroke="#B8860B" stroke-width="0.3"/>
+  <rect x="185" y="167" width="30" height="4" fill="url(#goldBars)" stroke="#B8860B" stroke-width="0.3"/>
   
   <!-- Horizontal Golden Bar -->
-  <rect x="140" y="190" width="120" height="8" fill="#FFD700" stroke="#DAA520" stroke-width="0.5"/>
+  <rect x="145" y="185" width="110" height="6" fill="url(#goldBars)" stroke="#B8860B" stroke-width="0.3"/>
   
-  <!-- Two Stacks of Grey Rectangular Items -->
-  <rect x="150" y="205" width="15" height="5" fill="#696969" rx="1"/>
-  <rect x="150" y="212" width="15" height="5" fill="#696969" rx="1"/>
-  <rect x="150" y="219" width="15" height="5" fill="#696969" rx="1"/>
+  <!-- Two Stacks of Dark Grey Rectangular Items -->
+  <rect x="155" y="195" width="12" height="4" fill="#2F2F2F" rx="0.5"/>
+  <rect x="155" y="201" width="12" height="4" fill="#2F2F2F" rx="0.5"/>
+  <rect x="155" y="207" width="12" height="4" fill="#2F2F2F" rx="0.5"/>
   
-  <rect x="235" y="205" width="15" height="5" fill="#696969" rx="1"/>
-  <rect x="235" y="212" width="15" height="5" fill="#696969" rx="1"/>
-  <rect x="235" y="219" width="15" height="5" fill="#696969" rx="1"/>
+  <rect x="233" y="195" width="12" height="4" fill="#2F2F2F" rx="0.5"/>
+  <rect x="233" y="201" width="12" height="4" fill="#2F2F2F" rx="0.5"/>
+  <rect x="233" y="207" width="12" height="4" fill="#2F2F2F" rx="0.5"/>
   
   <!-- Large Dark Grey Dollar Sign -->
-  <text x="200" y="245" text-anchor="middle" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="#2F4F4F">$</text>
+  <text x="200" y="230" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#2F2F2F">$</text>
   
-  <!-- Text Banners with Golden-Brown Color -->
-  <path d="M 90 100 A 110 110 0 0 1 310 100" fill="none" stroke="url(#goldGradient)" stroke-width="8"/>
-  <text x="200" y="95" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#8B4513">MERIDIAN ASSETS</text>
+  <!-- Text Banners -->
+  <path d="M 95 105 A 105 105 0 0 1 305 105" fill="none" stroke="url(#goldenBrown)" stroke-width="6"/>
+  <text x="200" y="102" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#2F2F2F">MERIDIAN ASSETS</text>
   
-  <path d="M 90 300 A 110 110 0 0 0 310 300" fill="none" stroke="url(#goldGradient)" stroke-width="8"/>
-  <text x="200" y="305" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#8B4513">LOGISTICS</text>
+  <path d="M 95 295 A 105 105 0 0 0 305 295" fill="none" stroke="url(#goldenBrown)" stroke-width="6"/>
+  <text x="200" y="298" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#2F2F2F">LOGISTICS</text>
   
   <!-- Delivery Truck (Golden-Brown) -->
-  <g transform="translate(30, 180)">
+  <g transform="translate(25, 175)">
     <!-- Truck Body -->
-    <rect x="0" y="15" width="45" height="25" fill="url(#goldGradient)" rx="4"/>
+    <rect x="0" y="18" width="40" height="22" fill="url(#goldenBrown)" rx="3"/>
     <!-- Truck Cab -->
-    <rect x="0" y="8" width="18" height="32" fill="url(#goldGradient)" rx="3"/>
+    <rect x="0" y="10" width="16" height="30" fill="url(#goldenBrown)" rx="2"/>
     <!-- Wheels -->
-    <circle cx="12" cy="45" r="5" fill="#2F4F4F"/>
-    <circle cx="38" cy="45" r="5" fill="#2F4F4F"/>
+    <circle cx="10" cy="43" r="4" fill="#2F2F2F"/>
+    <circle cx="34" cy="43" r="4" fill="#2F2F2F"/>
     <!-- Windshield -->
-    <rect x="2" y="12" width="14" height="10" fill="#87CEEB" opacity="0.8"/>
+    <rect x="2" y="14" width="12" height="8" fill="#87CEEB" opacity="0.7"/>
     <!-- Connection Lines -->
-    <path d="M 45 25 Q 70 30 90 40" fill="none" stroke="url(#goldGradient)" stroke-width="3"/>
+    <path d="M 40 25 Q 60 30 75 35" fill="none" stroke="url(#goldenBrown)" stroke-width="2" opacity="0.8"/>
   </g>
   
   <!-- Airplane (Golden-Brown) -->
-  <g transform="translate(350, 120)">
+  <g transform="translate(360, 115)">
     <!-- Airplane Body -->
-    <ellipse cx="0" cy="0" rx="30" ry="4" fill="url(#goldGradient)"/>
+    <ellipse cx="0" cy="0" rx="25" ry="3" fill="url(#goldenBrown)"/>
     <!-- Wings -->
-    <ellipse cx="-8" cy="0" rx="12" ry="18" fill="url(#goldGradient)"/>
+    <ellipse cx="-6" cy="0" rx="10" ry="15" fill="url(#goldenBrown)"/>
     <!-- Tail -->
-    <path d="M -25 -8 L -18 0 L -25 8 Z" fill="url(#goldGradient)"/>
+    <path d="M -22 -6 L -16 0 L -22 6 Z" fill="url(#goldenBrown)"/>
     <!-- Propeller -->
-    <circle cx="-30" cy="0" r="3" fill="#2F4F4F"/>
+    <circle cx="-25" cy="0" r="2" fill="#2F2F2F"/>
     <!-- Connection Lines -->
-    <path d="M -30 0 Q -70 10 -90 25" fill="none" stroke="url(#goldGradient)" stroke-width="3"/>
+    <path d="M -25 0 Q -60 10 -80 20" fill="none" stroke="url(#goldenBrown)" stroke-width="2" opacity="0.8"/>
   </g>
   
-  <!-- Golden Network Lines -->
-  <path d="M 75 220 Q 140 250 180 200" fill="none" stroke="url(#goldGradient)" stroke-width="2" opacity="0.8"/>
-  <path d="M 325 180 Q 280 220 220 200" fill="none" stroke="url(#goldGradient)" stroke-width="2" opacity="0.8"/>
-  <path d="M 75 220 Q 200 280 325 180" fill="none" stroke="url(#goldGradient)" stroke-width="2" opacity="0.6"/>
+  <!-- Connecting Swoosh/Path -->
+  <path d="M 65 220 Q 140 280 315 180" fill="none" stroke="url(#goldenBrown)" stroke-width="3" opacity="0.7"/>
   
-  <!-- Additional Network Arcs -->
-  <path d="M 90 120 Q 200 80 310 120" fill="none" stroke="url(#goldGradient)" stroke-width="2" opacity="0.5"/>
-  <path d="M 90 280 Q 200 320 310 280" fill="none" stroke="url(#goldGradient)" stroke-width="2" opacity="0.5"/>
+  <!-- Additional Network Lines -->
+  <path d="M 80 210 Q 160 250 185 200" fill="none" stroke="url(#goldenBrown)" stroke-width="1.5" opacity="0.6"/>
+  <path d="M 320 190 Q 250 230 215 200" fill="none" stroke="url(#goldenBrown)" stroke-width="1.5" opacity="0.6"/>
 </svg>
