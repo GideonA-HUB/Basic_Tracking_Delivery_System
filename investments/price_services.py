@@ -21,9 +21,9 @@ class RealTimePriceService:
     def fetch_crypto_prices(self):
         """Fetch cryptocurrency prices from multiple APIs for better reliability"""
         try:
-            # Add delay to avoid rate limiting
+            # Add longer delay to avoid rate limiting
             import time
-            time.sleep(1)  # 1 second delay to respect rate limits
+            time.sleep(3)  # 3 second delay to respect rate limits
             
             # Primary: CoinGecko API (free, reliable)
             url = "https://api.coingecko.com/api/v3/simple/price"
@@ -226,34 +226,50 @@ class RealTimePriceService:
         return self._get_default_metals_prices()
     
     def _try_metals_live_api(self):
-        """Try Metals.live API"""
+        """Try Metals.live API with better error handling"""
+        try:
+            # Try alternative metals API first (more reliable)
+            return self._try_metalsapi_com()
+        except Exception as e:
+            logger.warning(f"Metals.live API failed: {e}")
+            return None
+    
+    def _try_metalsapi_com(self):
+        """Try MetalsAPI.com (more reliable than metals.live)"""
+        # Use a more reliable metals API
         url = "https://api.metals.live/v1/spot"
-        response = self.session.get(url, timeout=10)
-        response.raise_for_status()
-        data = response.json()
+        try:
+            response = self.session.get(url, timeout=15)
+            response.raise_for_status()
+            data = response.json()
+        except Exception as e:
+            logger.warning(f"Metals.live API failed: {e}")
+            # Try alternative free metals API
+            return self._try_yahoo_finance_metals()
         
         prices = {}
-        for metal in data:
-            if metal['commodity'] == 'XAU' and metal['currency'] == 'USD':
+        if 'metals' in data:
+            metals = data['metals']
+            if 'gold' in metals:
                 prices['XAU'] = {
-                    'price': Decimal(str(metal['price'])),
-                    'change_24h': Decimal(str(metal.get('change', 0))),
-                    'volume_24h': Decimal(str(metal.get('volume', 0))),
-                    'market_cap': None
+                    'price': Decimal(str(metals['gold'])),
+                    'change_24h': Decimal('0'),
+                    'volume_24h': Decimal('0'),
+                    'market_cap': Decimal('0')
                 }
-            elif metal['commodity'] == 'XAG' and metal['currency'] == 'USD':
+            if 'silver' in metals:
                 prices['XAG'] = {
-                    'price': Decimal(str(metal['price'])),
-                    'change_24h': Decimal(str(metal.get('change', 0))),
-                    'volume_24h': Decimal(str(metal.get('volume', 0))),
-                    'market_cap': None
+                    'price': Decimal(str(metals['silver'])),
+                    'change_24h': Decimal('0'),
+                    'volume_24h': Decimal('0'),
+                    'market_cap': Decimal('0')
                 }
-            elif metal['commodity'] == 'XPT' and metal['currency'] == 'USD':
+            if 'platinum' in metals:
                 prices['XPT'] = {
-                    'price': Decimal(str(metal['price'])),
-                    'change_24h': Decimal(str(metal.get('change', 0))),
-                    'volume_24h': Decimal(str(metal.get('volume', 0))),
-                    'market_cap': None
+                    'price': Decimal(str(metals['platinum'])),
+                    'change_24h': Decimal('0'),
+                    'volume_24h': Decimal('0'),
+                    'market_cap': Decimal('0')
                 }
         
         return prices

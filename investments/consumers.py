@@ -172,13 +172,13 @@ class PriceFeedConsumer(AsyncWebsocketConsumer):
             return True
     
     async def start_periodic_updates(self):
-        """Start periodic price updates every 60 seconds to avoid rate limits"""
+        """Start periodic price updates every 5 minutes to avoid rate limits"""
         import asyncio
         
         async def periodic_update():
             while True:
                 try:
-                    await asyncio.sleep(60)  # Wait 60 seconds (reduced from 30 to avoid rate limits)
+                    await asyncio.sleep(300)  # Wait 5 minutes to avoid rate limits
                     logger.info("🔄 Running periodic price update...")
                     
                     # Force update prices from APIs (with error handling)
@@ -197,21 +197,32 @@ class PriceFeedConsumer(AsyncWebsocketConsumer):
                 except Exception as e:
                     logger.error(f"Error in periodic update: {e}")
                     # Don't break the loop, just continue
-                    await asyncio.sleep(60)  # Wait before retrying
+                    await asyncio.sleep(300)  # Wait before retrying
         
         # Start the periodic update task
         asyncio.create_task(periodic_update())
-        logger.info("✅ Periodic updates started (every 60 seconds)")
+        logger.info("✅ Periodic updates started (every 5 minutes)")
     
     async def disconnect(self, close_code):
-        """Handle WebSocket disconnection"""
+        """Handle WebSocket disconnection with proper cleanup"""
         try:
             logger.info(f"WebSocket disconnected with code: {close_code}")
+            
+            # Cancel any running tasks to prevent hanging
+            if hasattr(self, '_periodic_task') and self._periodic_task:
+                self._periodic_task.cancel()
+                try:
+                    await self._periodic_task
+                except asyncio.CancelledError:
+                    logger.info("Periodic update task cancelled successfully")
+            
             # Leave room group
             await self.channel_layer.group_discard(
                 self.room_group_name,
                 self.channel_name
             )
+            
+            logger.info("WebSocket cleanup completed successfully")
         except Exception as e:
             logger.error(f"Error in WebSocket disconnect: {e}")
     

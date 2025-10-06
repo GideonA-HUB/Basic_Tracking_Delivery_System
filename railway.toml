@@ -1,13 +1,17 @@
 [build]
-builder = "NIXPACKS"
+builder = "nixpacks"
 
 [deploy]
-startCommand = "python deploy.py"
-restartPolicyType = "ON_FAILURE"
-restartPolicyMaxRetries = 10
+startCommand = "pip install -r requirements.txt && python deploy.py"
+healthcheckPath = "/"
+healthcheckTimeout = 300
+restartPolicyType = "always"
 
-[environments.production]
-variables = { DATABASE_URL = "postgresql://user:password@host:port/database", DEBUG = "False", SECRET_KEY = "your-secret-key-here" }
+[[services]]
+name = "web"
+source = "."
 
-[environments.staging]
-variables = { DATABASE_URL = "postgresql://user:password@host:port/database", DEBUG = "True", SECRET_KEY = "your-secret-key-here" }
+[[services]]
+name = "worker"
+source = "."
+command = "python background_price_worker.py"
