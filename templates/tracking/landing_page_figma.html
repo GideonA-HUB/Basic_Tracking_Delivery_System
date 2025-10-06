@@ -2064,24 +2064,26 @@
         position: relative;
         max-width: 900px;
         margin: 0 auto 3rem;
+        overflow: hidden;
     }
 
     .testimonials-track {
         display: flex;
         transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        gap: 2rem;
+        width: 500%;
     }
 
     .testimonial-slide {
-        min-width: 100%;
+        width: 20%;
+        flex-shrink: 0;
         opacity: 0;
-        transform: translateX(50px);
-        transition: all 0.5s ease;
+        transition: opacity 0.5s ease;
+        padding: 0 2rem;
+        box-sizing: border-box;
     }
 
     .testimonial-slide.active {
         opacity: 1;
-        transform: translateX(0);
     }
 
     .testimonial-card {
@@ -2257,12 +2259,15 @@
         transition: all 0.3s ease;
         color: #6b7280;
         font-size: 1.125rem;
+        z-index: 10;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
 
     .dark .testimonials-nav {
         background: #374151;
         border-color: #4b5563;
         color: #d1d5db;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
 
     .testimonials-nav:hover {
@@ -2270,14 +2275,15 @@
         color: white;
         border-color: #3b82f6;
         transform: translateY(-50%) scale(1.1);
+        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
     }
 
     .testimonials-nav.prev {
-        left: -25px;
+        left: -60px;
     }
 
     .testimonials-nav.next {
-        right: -25px;
+        right: -60px;
     }
 
     /* Trust Indicators */
@@ -2359,6 +2365,10 @@
             display: none;
         }
 
+        .testimonial-slide {
+            padding: 0 1rem;
+        }
+
         .trust-indicators {
             grid-template-columns: repeat(2, 1fr);
             gap: 1rem;
@@ -2367,6 +2377,16 @@
         .trust-item {
             padding: 0.75rem;
             font-size: 0.875rem;
+        }
+    }
+
+    @media (max-width: 1024px) {
+        .testimonials-nav.prev {
+            left: -40px;
+        }
+
+        .testimonials-nav.next {
+            right: -40px;
         }
     }
 
@@ -2491,7 +2511,7 @@
                                 </blockquote>
                                 <div class="testimonial-author">
                                     <div class="author-avatar">
-                                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="Sarah Johnson">
+                                        <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face" alt="Sarah Johnson">
                                     </div>
                                     <div class="author-info">
                                         <h4 class="author-name">Sarah Johnson</h4>
@@ -4115,8 +4135,8 @@ document.addEventListener('DOMContentLoaded', function() {
         slides[index].classList.add('active');
         dots[index].classList.add('active');
         
-        // Update track position
-        track.style.transform = `translateX(-${index * 100}%)`;
+        // Update track position (each slide is 20% width, so move by 20% * index)
+        track.style.transform = `translateX(-${index * 20}%)`;
         
         currentSlide = index;
     }
