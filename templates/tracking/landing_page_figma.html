@@ -1991,6 +1991,390 @@
         }
         
     }
+
+    /* Testimonials Section Styles */
+    .testimonials-section {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        padding: 5rem 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dark .testimonials-section {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    }
+
+    .testimonials-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        position: relative;
+    }
+
+    /* Testimonials Header */
+    .testimonials-header {
+        text-align: center;
+        margin-bottom: 4rem;
+    }
+
+    .testimonials-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+        padding: 0.5rem 1.5rem;
+        border-radius: 2rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    }
+
+    .testimonials-badge i {
+        color: #fbbf24;
+    }
+
+    .testimonials-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        line-height: 1.2;
+        margin-bottom: 1rem;
+        color: #1f2937;
+    }
+
+    .dark .testimonials-title {
+        color: #f9fafb;
+    }
+
+    .testimonials-subtitle {
+        font-size: 1.125rem;
+        color: #6b7280;
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .dark .testimonials-subtitle {
+        color: #d1d5db;
+    }
+
+    /* Testimonials Slideshow */
+    .testimonials-slideshow {
+        position: relative;
+        max-width: 900px;
+        margin: 0 auto 3rem;
+    }
+
+    .testimonials-track {
+        display: flex;
+        transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        gap: 2rem;
+    }
+
+    .testimonial-slide {
+        min-width: 100%;
+        opacity: 0;
+        transform: translateX(50px);
+        transition: all 0.5s ease;
+    }
+
+    .testimonial-slide.active {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .testimonial-card {
+        background: white;
+        border-radius: 1.5rem;
+        padding: 3rem;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dark .testimonial-card {
+        background: #374151;
+        border-color: #4b5563;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    }
+
+    .testimonial-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #3b82f6, #1d4ed8, #7c3aed);
+    }
+
+    .testimonial-content {
+        text-align: center;
+    }
+
+    .testimonial-stars {
+        display: flex;
+        justify-content: center;
+        gap: 0.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .testimonial-stars i {
+        color: #fbbf24;
+        font-size: 1.25rem;
+    }
+
+    .testimonial-quote {
+        font-size: 1.25rem;
+        line-height: 1.7;
+        color: #374151;
+        font-style: italic;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    .dark .testimonial-quote {
+        color: #d1d5db;
+    }
+
+    .testimonial-quote::before {
+        content: '"';
+        font-size: 4rem;
+        color: #3b82f6;
+        position: absolute;
+        top: -1rem;
+        left: -1rem;
+        font-family: serif;
+        opacity: 0.3;
+    }
+
+    .testimonial-quote::after {
+        content: '"';
+        font-size: 4rem;
+        color: #3b82f6;
+        position: absolute;
+        bottom: -2rem;
+        right: -1rem;
+        font-family: serif;
+        opacity: 0.3;
+    }
+
+    .testimonial-author {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .author-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 3px solid #3b82f6;
+    }
+
+    .author-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .author-info {
+        text-align: left;
+    }
+
+    .author-name {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.25rem;
+    }
+
+    .dark .author-name {
+        color: #f9fafb;
+    }
+
+    .author-title {
+        font-size: 0.875rem;
+        color: #3b82f6;
+        font-weight: 600;
+        margin-bottom: 0.125rem;
+    }
+
+    .author-location {
+        font-size: 0.75rem;
+        color: #6b7280;
+    }
+
+    .dark .author-location {
+        color: #9ca3af;
+    }
+
+    /* Navigation */
+    .testimonials-dots {
+        display: flex;
+        justify-content: center;
+        gap: 0.75rem;
+        margin-top: 2rem;
+    }
+
+    .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: none;
+        background: #d1d5db;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .dot.active {
+        background: #3b82f6;
+        transform: scale(1.2);
+    }
+
+    .dot:hover {
+        background: #3b82f6;
+        transform: scale(1.1);
+    }
+
+    .testimonials-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: #6b7280;
+        font-size: 1.125rem;
+    }
+
+    .dark .testimonials-nav {
+        background: #374151;
+        border-color: #4b5563;
+        color: #d1d5db;
+    }
+
+    .testimonials-nav:hover {
+        background: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
+        transform: translateY(-50%) scale(1.1);
+    }
+
+    .testimonials-nav.prev {
+        left: -25px;
+    }
+
+    .testimonials-nav.next {
+        right: -25px;
+    }
+
+    /* Trust Indicators */
+    .trust-indicators {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+    }
+
+    .trust-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        background: white;
+        border-radius: 1rem;
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+    }
+
+    .dark .trust-item {
+        background: #374151;
+        border-color: #4b5563;
+    }
+
+    .trust-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .dark .trust-item:hover {
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .trust-item i {
+        color: #3b82f6;
+        font-size: 1.25rem;
+    }
+
+    .trust-item span {
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .dark .trust-item span {
+        color: #d1d5db;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .testimonials-section {
+            padding: 3rem 0;
+        }
+
+        .testimonials-title {
+            font-size: 2rem;
+        }
+
+        .testimonial-card {
+            padding: 2rem;
+        }
+
+        .testimonial-quote {
+            font-size: 1.125rem;
+        }
+
+        .testimonial-author {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .author-info {
+            text-align: center;
+        }
+
+        .testimonials-nav {
+            display: none;
+        }
+
+        .trust-indicators {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .trust-item {
+            padding: 0.75rem;
+            font-size: 0.875rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .trust-indicators {
+            grid-template-columns: 1fr;
+        }
+    }
     
 </style>
 {% endblock %}
@@ -2062,6 +2446,220 @@
                     <div class="roi-percentage">+24.5%</div>
                     <div class="roi-period">This quarter</div>
                 </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Customer Testimonials Slideshow -->
+    <section class="testimonials-section">
+        <div class="testimonials-container">
+            <!-- Section Header -->
+            <div class="testimonials-header">
+                <div class="testimonials-badge">
+                    <i class="fas fa-star"></i>
+                    <span>Customer Success Stories</span>
+                </div>
+                <h2 class="testimonials-title">
+                    What Our Clients Say About 
+                    <span class="text-blue-600">Meridian Asset Logistics</span>
+                </h2>
+                <p class="testimonials-subtitle">
+                    Join thousands of satisfied customers who trust us with their logistics and investment needs
+                </p>
+            </div>
+
+            <!-- Testimonials Slideshow -->
+            <div class="testimonials-slideshow">
+                <div class="testimonials-track" id="testimonialsTrack">
+                    
+                    <!-- Testimonial 1 -->
+                    <div class="testimonial-slide active">
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                <div class="testimonial-stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <blockquote class="testimonial-quote">
+                                    "The withdrawal process is incredibly fast! I received my funds within 24 hours. 
+                                    Meridian Asset Logistics has the best customer service I've ever experienced. 
+                                    Their VIP support team is absolutely exceptional."
+                                </blockquote>
+                                <div class="testimonial-author">
+                                    <div class="author-avatar">
+                                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="Sarah Johnson">
+                                    </div>
+                                    <div class="author-info">
+                                        <h4 class="author-name">Sarah Johnson</h4>
+                                        <p class="author-title">Business Owner</p>
+                                        <p class="author-location">New York, USA</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Testimonial 2 -->
+                    <div class="testimonial-slide">
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                <div class="testimonial-stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <blockquote class="testimonial-quote">
+                                    "Outstanding investment advice! My portfolio has grown by 35% in just 6 months. 
+                                    The team's expertise in logistics investments is unmatched. 
+                                    They provided personalized strategies that perfectly fit my financial goals."
+                                </blockquote>
+                                <div class="testimonial-author">
+                                    <div class="author-avatar">
+                                        <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face" alt="Michael Chen">
+                                    </div>
+                                    <div class="author-info">
+                                        <h4 class="author-name">Michael Chen</h4>
+                                        <p class="author-title">Investment Advisor</p>
+                                        <p class="author-location">Singapore</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Testimonial 3 -->
+                    <div class="testimonial-slide">
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                <div class="testimonial-stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <blockquote class="testimonial-quote">
+                                    "Lightning-fast payments and zero hidden fees! I've been using Meridian for 2 years 
+                                    and never had a single issue. Their platform is user-friendly and their support 
+                                    team responds within minutes. Highly recommended!"
+                                </blockquote>
+                                <div class="testimonial-author">
+                                    <div class="author-avatar">
+                                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="David Rodriguez">
+                                    </div>
+                                    <div class="author-info">
+                                        <h4 class="author-name">David Rodriguez</h4>
+                                        <p class="author-title">E-commerce Entrepreneur</p>
+                                        <p class="author-location">Madrid, Spain</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Testimonial 4 -->
+                    <div class="testimonial-slide">
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                <div class="testimonial-stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <blockquote class="testimonial-quote">
+                                    "The VIP services are absolutely premium! Dedicated account manager, priority support, 
+                                    and exclusive investment opportunities. The returns have been consistently excellent. 
+                                    This is how wealth management should be done."
+                                </blockquote>
+                                <div class="testimonial-author">
+                                    <div class="author-avatar">
+                                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" alt="Emma Thompson">
+                                    </div>
+                                    <div class="author-info">
+                                        <h4 class="author-name">Emma Thompson</h4>
+                                        <p class="author-title">Wealth Manager</p>
+                                        <p class="author-location">London, UK</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Testimonial 5 -->
+                    <div class="testimonial-slide">
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                <div class="testimonial-stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <blockquote class="testimonial-quote">
+                                    "Meridian Asset Logistics transformed my business operations. Their logistics solutions 
+                                    are cutting-edge and their investment opportunities have been incredibly profitable. 
+                                    The team's professionalism and expertise are world-class."
+                                </blockquote>
+                                <div class="testimonial-author">
+                                    <div class="author-avatar">
+                                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face" alt="James Wilson">
+                                    </div>
+                                    <div class="author-info">
+                                        <h4 class="author-name">James Wilson</h4>
+                                        <p class="author-title">Supply Chain Director</p>
+                                        <p class="author-location">Sydney, Australia</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Navigation Dots -->
+                <div class="testimonials-dots">
+                    <button class="dot active" data-slide="0"></button>
+                    <button class="dot" data-slide="1"></button>
+                    <button class="dot" data-slide="2"></button>
+                    <button class="dot" data-slide="3"></button>
+                    <button class="dot" data-slide="4"></button>
+                </div>
+
+                <!-- Navigation Arrows -->
+                <button class="testimonials-nav prev" id="prevBtn">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="testimonials-nav next" id="nextBtn">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <!-- Trust Indicators -->
+            <div class="trust-indicators">
+                <div class="trust-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Bank-Level Security</span>
+                </div>
+                <div class="trust-item">
+                    <i class="fas fa-clock"></i>
+                    <span>24/7 Support</span>
+                </div>
+                <div class="trust-item">
+                    <i class="fas fa-award"></i>
+                    <span>Industry Certified</span>
+                </div>
+                <div class="trust-item">
+                    <i class="fas fa-users"></i>
+                    <span>15,000+ Happy Clients</span>
                 </div>
             </div>
         </div>
@@ -3488,5 +4086,190 @@ function closeModal(modalId) {
         document.body.style.overflow = ''; // Restore scrolling
     }
 }
+
+// Testimonials Slideshow Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const track = document.getElementById('testimonialsTrack');
+    const slides = document.querySelectorAll('.testimonial-slide');
+    const dots = document.querySelectorAll('.dot');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    
+    let currentSlide = 0;
+    const totalSlides = slides.length;
+    let slideInterval;
+    
+    // Initialize slideshow
+    function initSlideshow() {
+        showSlide(0);
+        startAutoSlide();
+    }
+    
+    // Show specific slide
+    function showSlide(index) {
+        // Remove active class from all slides and dots
+        slides.forEach(slide => slide.classList.remove('active'));
+        dots.forEach(dot => dot.classList.remove('active'));
+        
+        // Add active class to current slide and dot
+        slides[index].classList.add('active');
+        dots[index].classList.add('active');
+        
+        // Update track position
+        track.style.transform = `translateX(-${index * 100}%)`;
+        
+        currentSlide = index;
+    }
+    
+    // Go to next slide
+    function nextSlide() {
+        const nextIndex = (currentSlide + 1) % totalSlides;
+        showSlide(nextIndex);
+    }
+    
+    // Go to previous slide
+    function prevSlide() {
+        const prevIndex = (currentSlide - 1 + totalSlides) % totalSlides;
+        showSlide(prevIndex);
+    }
+    
+    // Start auto-sliding
+    function startAutoSlide() {
+        slideInterval = setInterval(nextSlide, 5000); // Change slide every 5 seconds
+    }
+    
+    // Stop auto-sliding
+    function stopAutoSlide() {
+        clearInterval(slideInterval);
+    }
+    
+    // Event listeners for navigation buttons
+    if (nextBtn) {
+        nextBtn.addEventListener('click', function() {
+            stopAutoSlide();
+            nextSlide();
+            startAutoSlide();
+        });
+    }
+    
+    if (prevBtn) {
+        prevBtn.addEventListener('click', function() {
+            stopAutoSlide();
+            prevSlide();
+            startAutoSlide();
+        });
+    }
+    
+    // Event listeners for dots
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', function() {
+            stopAutoSlide();
+            showSlide(index);
+            startAutoSlide();
+        });
+    });
+    
+    // Pause auto-slide on hover
+    const slideshow = document.querySelector('.testimonials-slideshow');
+    if (slideshow) {
+        slideshow.addEventListener('mouseenter', stopAutoSlide);
+        slideshow.addEventListener('mouseleave', startAutoSlide);
+    }
+    
+    // Touch/swipe support for mobile
+    let startX = 0;
+    let endX = 0;
+    
+    if (track) {
+        track.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+        });
+        
+        track.addEventListener('touchend', function(e) {
+            endX = e.changedTouches[0].clientX;
+            handleSwipe();
+        });
+    }
+    
+    function handleSwipe() {
+        const swipeThreshold = 50;
+        const diff = startX - endX;
+        
+        if (Math.abs(diff) > swipeThreshold) {
+            if (diff > 0) {
+                // Swipe left - next slide
+                stopAutoSlide();
+                nextSlide();
+                startAutoSlide();
+            } else {
+                // Swipe right - previous slide
+                stopAutoSlide();
+                prevSlide();
+                startAutoSlide();
+            }
+        }
+    }
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowLeft') {
+            stopAutoSlide();
+            prevSlide();
+            startAutoSlide();
+        } else if (e.key === 'ArrowRight') {
+            stopAutoSlide();
+            nextSlide();
+            startAutoSlide();
+        }
+    });
+    
+    // Initialize slideshow when page loads
+    initSlideshow();
+    
+    // Accessibility improvements
+    dots.forEach((dot, index) => {
+        dot.setAttribute('aria-label', `Go to slide ${index + 1}`);
+        dot.setAttribute('role', 'button');
+        dot.setAttribute('tabindex', '0');
+        
+        dot.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                stopAutoSlide();
+                showSlide(index);
+                startAutoSlide();
+            }
+        });
+    });
+    
+    // Update ARIA labels for navigation buttons
+    if (prevBtn) {
+        prevBtn.setAttribute('aria-label', 'Previous testimonial');
+    }
+    if (nextBtn) {
+        nextBtn.setAttribute('aria-label', 'Next testimonial');
+    }
+    
+    // Add ARIA live region for screen readers
+    const liveRegion = document.createElement('div');
+    liveRegion.setAttribute('aria-live', 'polite');
+    liveRegion.setAttribute('aria-atomic', 'true');
+    liveRegion.style.position = 'absolute';
+    liveRegion.style.left = '-10000px';
+    liveRegion.style.width = '1px';
+    liveRegion.style.height = '1px';
+    liveRegion.style.overflow = 'hidden';
+    document.body.appendChild(liveRegion);
+    
+    // Update live region when slide changes
+    const originalShowSlide = showSlide;
+    showSlide = function(index) {
+        originalShowSlide(index);
+        const currentTestimonial = slides[index];
+        const authorName = currentTestimonial.querySelector('.author-name').textContent;
+        const authorTitle = currentTestimonial.querySelector('.author-title').textContent;
+        liveRegion.textContent = `Now showing testimonial from ${authorName}, ${authorTitle}`;
+    };
+});
 </script>
 {% endblock %}
