@@ -18,6 +18,7 @@ class VIPStaff(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
+        app_label = 'vip_members'
         verbose_name = 'VIP Staff Member'
         verbose_name_plural = 'VIP Staff Members'
         ordering = ['full_name']
@@ -83,6 +84,7 @@ class VIPMember(models.Model):
     notes = models.TextField(blank=True, help_text="Internal notes about the VIP member")
     
     class Meta:
+        app_label = 'vip_members'
         verbose_name = 'VIP Member'
         verbose_name_plural = 'VIP Members'
         ordering = ['-created_at']
@@ -126,6 +128,7 @@ class VIPActivity(models.Model):
     is_important = models.BooleanField(default=False)
     
     class Meta:
+        app_label = 'vip_members'
         verbose_name = 'VIP Activity'
         verbose_name_plural = 'VIP Activities'
         ordering = ['-timestamp']
@@ -144,6 +147,7 @@ class VIPBenefit(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
+        app_label = 'vip_members'
         verbose_name = 'VIP Benefit'
         verbose_name_plural = 'VIP Benefits'
         ordering = ['name']
@@ -205,6 +209,7 @@ class VIPApplication(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
+        app_label = 'vip_members'
         verbose_name = 'VIP Application'
         verbose_name_plural = 'VIP Applications'
         ordering = ['-submitted_at']
@@ -249,6 +254,7 @@ class VIPNotification(models.Model):
     expires_at = models.DateTimeField(null=True, blank=True)
     
     class Meta:
+        app_label = 'vip_members'
         verbose_name = 'VIP Notification'
         verbose_name_plural = 'VIP Notifications'
         ordering = ['-created_at']
