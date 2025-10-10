@@ -5,15 +5,31 @@ from django.http import JsonResponse
 from django.utils import timezone
 from django.db.models import Sum, Count
 from django.contrib.auth.models import User
-from .models import VIPMember, VIPStaff, VIPActivity, VIPBenefit, VIPNotification, VIPApplication
-from .forms import VIPApplicationForm
-from investments.models import UserInvestment, InvestmentPortfolio
 import json
+
+# Lazy imports to avoid circular import issues during Django initialization
+def get_vip_models():
+    """Lazy import VIP models to avoid initialization issues"""
+    from .models import VIPMember, VIPStaff, VIPActivity, VIPBenefit, VIPNotification, VIPApplication
+    return VIPMember, VIPStaff, VIPActivity, VIPBenefit, VIPNotification, VIPApplication
+
+def get_vip_forms():
+    """Lazy import VIP forms"""
+    from .forms import VIPApplicationForm
+    return VIPApplicationForm
+
+def get_investment_models():
+    """Lazy import investment models"""
+    from investments.models import UserInvestment, InvestmentPortfolio
+    return UserInvestment, InvestmentPortfolio
 
 
 @login_required
 def vip_dashboard(request):
     """Main VIP dashboard view - only accessible to approved VIP members"""
+    VIPMember, VIPStaff, VIPActivity, VIPBenefit, VIPNotification, VIPApplication = get_vip_models()
+    UserInvestment, InvestmentPortfolio = get_investment_models()
+    
     try:
         # Check if user has an approved VIP membership
         vip_member = get_object_or_404(VIPMember, customer=request.user, status='active')
@@ -93,6 +109,8 @@ def vip_dashboard(request):
 @login_required
 def vip_profile(request):
     """VIP member profile view"""
+    VIPMember, VIPStaff, VIPActivity, VIPBenefit, VIPNotification, VIPApplication = get_vip_models()
+    
     try:
         vip_member = get_object_or_404(VIPMember, customer=request.user)
         
@@ -119,6 +137,8 @@ def vip_profile(request):
 @login_required
 def mark_notification_read(request, notification_id):
     """Mark a notification as read"""
+    VIPMember, VIPStaff, VIPActivity, VIPBenefit, VIPNotification, VIPApplication = get_vip_models()
+    
     if request.method == 'POST':
         try:
             notification = get_object_or_404(VIPNotification, id=notification_id, member__customer=request.user)
@@ -135,6 +155,8 @@ def mark_notification_read(request, notification_id):
 @login_required
 def vip_benefits(request):
     """VIP benefits page"""
+    VIPMember, VIPStaff, VIPActivity, VIPBenefit, VIPNotification, VIPApplication = get_vip_models()
+    
     try:
         vip_member = get_object_or_404(VIPMember, customer=request.user)
         
@@ -163,6 +185,8 @@ def vip_benefits(request):
 @login_required
 def vip_support(request):
     """VIP support page"""
+    VIPMember, VIPStaff, VIPActivity, VIPBenefit, VIPNotification, VIPApplication = get_vip_models()
+    
     try:
         vip_member = get_object_or_404(VIPMember, customer=request.user)
         
@@ -181,6 +205,8 @@ def vip_support(request):
 @login_required
 def vip_activities(request):
     """VIP activities history page"""
+    VIPMember, VIPStaff, VIPActivity, VIPBenefit, VIPNotification, VIPApplication = get_vip_models()
+    
     try:
         vip_member = get_object_or_404(VIPMember, customer=request.user)
         
@@ -201,6 +227,8 @@ def vip_activities(request):
 
 def vip_membership_info(request):
     """Public VIP membership information page"""
+    VIPMember, VIPStaff, VIPActivity, VIPBenefit, VIPNotification, VIPApplication = get_vip_models()
+    
     # Get all VIP benefits
     all_benefits = VIPBenefit.objects.filter(is_active=True).order_by('name')
     
@@ -249,6 +277,9 @@ def vip_membership_info(request):
 @login_required
 def vip_application(request):
     """VIP membership application form"""
+    VIPMember, VIPStaff, VIPActivity, VIPBenefit, VIPNotification, VIPApplication = get_vip_models()
+    VIPApplicationForm = get_vip_forms()
+    
     try:
         # Check if user already has a VIP membership
         if VIPMember.objects.filter(customer=request.user, status='active').exists():
@@ -303,6 +334,8 @@ def vip_application(request):
 @login_required
 def application_status(request):
     """Check VIP application status"""
+    VIPMember, VIPStaff, VIPActivity, VIPBenefit, VIPNotification, VIPApplication = get_vip_models()
+    
     try:
         # Get user's VIP application
         application = VIPApplication.objects.filter(customer=request.user).first()
@@ -325,6 +358,8 @@ def application_status(request):
 
 def vip_login_redirect(request):
     """Redirect users to appropriate VIP page based on their status"""
+    VIPMember, VIPStaff, VIPActivity, VIPBenefit, VIPNotification, VIPApplication = get_vip_models()
+    
     if not request.user.is_authenticated:
         messages.info(request, "Please log in to access VIP features.")
         return redirect('accounts:customer_login')
