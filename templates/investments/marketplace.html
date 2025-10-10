@@ -10,10 +10,22 @@
         <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">
             Investment Marketplace
         </h1>
-        <p class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+        <p class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-6">
             Discover premium investment opportunities in gold, real estate, precious metals, diamonds, art, and more. 
             Invest for growth or choose delivery - the choice is yours.
         </p>
+        
+        <!-- VIP Members Link -->
+        {% if user.is_authenticated %}
+        <div class="mb-6">
+            <a href="{% url 'vip_members:dashboard' %}" 
+               class="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                <i class="fas fa-crown"></i>
+                <span>VIP Members Dashboard</span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        {% endif %}
     </div>
 
     <!-- News Widget -->

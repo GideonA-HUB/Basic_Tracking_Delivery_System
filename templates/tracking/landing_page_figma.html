@@ -143,6 +143,28 @@
         transform: translateY(-1px);
     }
     
+    .btn-vip {
+        background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
+        color: white;
+        padding: 0.875rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: none;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+    
+    .btn-vip:hover {
+        background: linear-gradient(135deg, #7c3aed 0%, #2563eb 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        color: white;
+    }
+    
     /* Hero Statistics */
     .hero-stats {
         display: flex;
@@ -2428,6 +2450,12 @@
                     <i class="fas fa-play"></i>
                     <span>Watch Demo</span>
                 </a>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'vip_members:index' %}" class="btn-vip">
+                        <i class="fas fa-crown"></i>
+                        <span>VIP Members</span>
+                    </a>
+                    {% endif %}
                 </div>
                 
             <!-- Hero Statistics -->

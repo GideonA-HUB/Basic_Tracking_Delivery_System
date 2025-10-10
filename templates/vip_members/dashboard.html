@@ -1,0 +1,780 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}VIP Members Dashboard - {{ vip_member.full_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* VIP Dashboard Styles - Banking-inspired design */
+    .vip-dashboard {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        min-height: 100vh;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .vip-header {
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        color: white;
+        padding: 1rem 2rem;
+        box-shadow: 0 4px 20px rgba(30, 64, 175, 0.3);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .vip-layout {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 0;
+        min-height: calc(100vh - 80px);
+    }
+
+    .vip-sidebar {
+        background: white;
+        border-right: 1px solid #e2e8f0;
+        padding: 2rem 0;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .vip-main-content {
+        padding: 2rem;
+        overflow-y: auto;
+    }
+
+    /* User Profile Card */
+    .vip-user-profile {
+        text-align: center;
+        padding: 0 2rem 2rem;
+        border-bottom: 1px solid #e2e8f0;
+        margin-bottom: 2rem;
+    }
+
+    .vip-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #3b82f6, #1e40af);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+        font-weight: bold;
+        margin: 0 auto 1rem;
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        transition: transform 0.3s ease;
+    }
+
+    .vip-avatar:hover {
+        transform: scale(1.05);
+    }
+
+    .vip-user-name {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .vip-member-id {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin-bottom: 1rem;
+    }
+
+    .vip-tier-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 1rem;
+    }
+
+    .vip-tier-bronze { background: #CD7F32; color: white; }
+    .vip-tier-silver { background: #C0C0C0; color: #1e293b; }
+    .vip-tier-gold { background: #FFD700; color: #1e293b; }
+    .vip-tier-platinum { background: #E5E4E2; color: #1e293b; }
+    .vip-tier-diamond { background: #B9F2FF; color: #1e293b; }
+
+    .vip-staff-info {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .vip-staff-label {
+        font-size: 0.75rem;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    .vip-staff-name {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .vip-action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+
+    .vip-btn {
+        flex: 1;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .vip-btn-primary {
+        background: #3b82f6;
+        color: white;
+    }
+
+    .vip-btn-secondary {
+        background: #f1f5f9;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+    }
+
+    .vip-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Navigation Menu */
+    .vip-nav-section {
+        margin-bottom: 2rem;
+    }
+
+    .vip-nav-title {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 1rem;
+        padding: 0 2rem;
+    }
+
+    .vip-nav-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 2rem;
+        color: #64748b;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border-left: 3px solid transparent;
+    }
+
+    .vip-nav-item:hover {
+        background: #f8fafc;
+        color: #3b82f6;
+        border-left-color: #3b82f6;
+    }
+
+    .vip-nav-item.active {
+        background: linear-gradient(90deg, #dbeafe 0%, #f8fafc 100%);
+        color: #1e40af;
+        border-left-color: #1e40af;
+        font-weight: 600;
+    }
+
+    .vip-nav-icon {
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Main Content */
+    .vip-welcome-section {
+        margin-bottom: 2rem;
+    }
+
+    .vip-welcome-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .vip-welcome-subtitle {
+        font-size: 1.125rem;
+        color: #64748b;
+    }
+
+    .vip-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .vip-stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid #f1f5f9;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .vip-stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #3b82f6, #1e40af);
+    }
+
+    .vip-stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .vip-stat-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+
+    .vip-stat-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .vip-stat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    .vip-stat-icon.blue { background: #dbeafe; color: #1e40af; }
+    .vip-stat-icon.green { background: #dcfce7; color: #16a34a; }
+    .vip-stat-icon.purple { background: #e9d5ff; color: #7c3aed; }
+    .vip-stat-icon.orange { background: #fed7aa; color: #ea580c; }
+
+    .vip-stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .vip-stat-change {
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .vip-stat-change.positive { color: #16a34a; }
+    .vip-stat-change.negative { color: #dc2626; }
+
+    /* Content Sections */
+    .vip-content-section {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid #f1f5f9;
+    }
+
+    .vip-section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .vip-section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .vip-section-link {
+        color: #3b82f6;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+
+    .vip-section-link:hover {
+        color: #1e40af;
+    }
+
+    /* Activity Items */
+    .vip-activity-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .vip-activity-item:last-child {
+        border-bottom: none;
+    }
+
+    .vip-activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+
+    .vip-activity-content {
+        flex: 1;
+    }
+
+    .vip-activity-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.25rem;
+    }
+
+    .vip-activity-time {
+        font-size: 0.75rem;
+        color: #64748b;
+    }
+
+    /* Notification Items */
+    .vip-notification-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem;
+        background: #f8fafc;
+        border-radius: 8px;
+        margin-bottom: 0.75rem;
+        border-left: 4px solid #3b82f6;
+    }
+
+    .vip-notification-item.unread {
+        background: #eff6ff;
+        border-left-color: #1e40af;
+    }
+
+    .vip-notification-content {
+        flex: 1;
+    }
+
+    .vip-notification-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.25rem;
+    }
+
+    .vip-notification-message {
+        font-size: 0.75rem;
+        color: #64748b;
+        line-height: 1.4;
+    }
+
+    /* Empty States */
+    .vip-empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: #64748b;
+    }
+
+    .vip-empty-icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 1rem;
+        opacity: 0.5;
+    }
+
+    .vip-empty-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .vip-empty-description {
+        font-size: 0.875rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .vip-layout {
+            grid-template-columns: 1fr;
+        }
+        
+        .vip-sidebar {
+            display: none;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .vip-main-content {
+            padding: 1rem;
+        }
+        
+        .vip-stats-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .vip-welcome-title {
+            font-size: 1.5rem;
+        }
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .vip-stat-card,
+    .vip-content-section {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .vip-stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .vip-stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .vip-stat-card:nth-child(3) { animation-delay: 0.3s; }
+    .vip-stat-card:nth-child(4) { animation-delay: 0.4s; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="vip-dashboard">
+    <!-- VIP Header -->
+    <div class="vip-header">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h4 mb-0">
+                    <i class="fas fa-crown me-2"></i>
+                    VIP Members Dashboard
+                </h1>
+                <p class="mb-0 opacity-75">{{ current_time|date:"l, F j, Y" }}</p>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fas fa-wallet"></i>
+                    <span class="fw-bold">${{ current_value|floatformat:2 }}</span>
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-link text-white p-0" type="button" data-bs-toggle="dropdown">
+                        <div class="vip-avatar" style="width: 40px; height: 40px; font-size: 1rem;">
+                            {{ vip_member.full_name|slice:":2"|upper }}
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIP Layout -->
+    <div class="vip-layout">
+        <!-- VIP Sidebar -->
+        <div class="vip-sidebar">
+            <!-- User Profile Card -->
+            <div class="vip-user-profile">
+                <div class="vip-avatar">
+                    {{ vip_member.full_name|slice:":2"|upper }}
+                </div>
+                <div class="vip-user-name">{{ vip_member.full_name }}</div>
+                <div class="vip-member-id">ID: {{ vip_member.member_id }}</div>
+                <div class="vip-tier-badge vip-tier-{{ vip_member.membership_tier }}">
+                    {{ vip_member.get_membership_tier_display }}
+                </div>
+                
+                <!-- Staff Information -->
+                <div class="vip-staff-info">
+                    <div class="vip-staff-label">Assigned Staff</div>
+                    <div class="vip-staff-name">
+                        {% if assigned_staff %}
+                            {{ assigned_staff.full_name }}
+                        {% else %}
+                            Not Assigned
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="vip-action-buttons">
+                    <a href="{% url 'vip_members:profile' %}" class="vip-btn vip-btn-secondary">
+                        <i class="fas fa-user"></i>
+                        Profile
+                    </a>
+                    <a href="{% url 'vip_members:support' %}" class="vip-btn vip-btn-primary">
+                        <i class="fas fa-headset"></i>
+                        Support
+                    </a>
+                </div>
+            </div>
+
+            <!-- Navigation Menu -->
+            <nav>
+                <div class="vip-nav-section">
+                    <div class="vip-nav-title">Main Menu</div>
+                    <a href="{% url 'vip_members:dashboard' %}" class="vip-nav-item active">
+                        <div class="vip-nav-icon">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        Dashboard
+                    </a>
+                    <a href="{% url 'investments:investment-marketplace' %}" class="vip-nav-item">
+                        <div class="vip-nav-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        Investments
+                    </a>
+                    <a href="{% url 'vip_members:activities' %}" class="vip-nav-item">
+                        <div class="vip-nav-icon">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        Activities
+                    </a>
+                </div>
+
+                <div class="vip-nav-section">
+                    <div class="vip-nav-title">Services</div>
+                    <a href="{% url 'vip_members:benefits' %}" class="vip-nav-item">
+                        <div class="vip-nav-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        VIP Benefits
+                    </a>
+                    <a href="{% url 'vip_members:support' %}" class="vip-nav-item">
+                        <div class="vip-nav-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        Priority Support
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- VIP Main Content -->
+        <div class="vip-main-content">
+            <!-- Welcome Section -->
+            <div class="vip-welcome-section">
+                <h1 class="vip-welcome-title">
+                    Welcome, {{ vip_member.full_name|split:" "|first }}! 👋
+                </h1>
+                <p class="vip-welcome-subtitle">
+                    Here's your VIP dashboard overview
+                </p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="vip-stats-grid">
+                <div class="vip-stat-card">
+                    <div class="vip-stat-header">
+                        <div class="vip-stat-title">Total Invested</div>
+                        <div class="vip-stat-icon blue">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                    </div>
+                    <div class="vip-stat-value">${{ total_investments|floatformat:2 }}</div>
+                </div>
+
+                <div class="vip-stat-card">
+                    <div class="vip-stat-header">
+                        <div class="vip-stat-title">Current Value</div>
+                        <div class="vip-stat-icon green">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                    </div>
+                    <div class="vip-stat-value">${{ current_value|floatformat:2 }}</div>
+                    <div class="vip-stat-change positive">
+                        +${{ total_return|floatformat:2 }} ({{ total_return_percentage|floatformat:2 }}%)
+                    </div>
+                </div>
+
+                <div class="vip-stat-card">
+                    <div class="vip-stat-header">
+                        <div class="vip-stat-title">Active Investments</div>
+                        <div class="vip-stat-icon purple">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                    </div>
+                    <div class="vip-stat-value">{{ active_investments_count }}</div>
+                    <div class="vip-stat-change">
+                        <a href="{% url 'investments:investment-marketplace' %}" class="vip-section-link">
+                            View Portfolio →
+                        </a>
+                    </div>
+                </div>
+
+                <div class="vip-stat-card">
+                    <div class="vip-stat-header">
+                        <div class="vip-stat-title">VIP Tier</div>
+                        <div class="vip-stat-icon orange">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                    </div>
+                    <div class="vip-stat-value">{{ vip_member.get_membership_tier_display }}</div>
+                    <div class="vip-stat-change">
+                        <a href="{% url 'vip_members:benefits' %}" class="vip-section-link">
+                            View Benefits →
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activities -->
+            <div class="vip-content-section">
+                <div class="vip-section-header">
+                    <div class="vip-section-title">
+                        <i class="fas fa-history"></i>
+                        Recent Activities
+                    </div>
+                    <a href="{% url 'vip_members:activities' %}" class="vip-section-link">
+                        View all →
+                    </a>
+                </div>
+
+                {% if recent_activities %}
+                    {% for activity in recent_activities %}
+                    <div class="vip-activity-item">
+                        <div class="vip-activity-icon blue">
+                            {% if activity.activity_type == 'login' %}
+                                <i class="fas fa-sign-in-alt"></i>
+                            {% elif activity.activity_type == 'investment' %}
+                                <i class="fas fa-chart-line"></i>
+                            {% elif activity.activity_type == 'support' %}
+                                <i class="fas fa-headset"></i>
+                            {% else %}
+                                <i class="fas fa-circle"></i>
+                            {% endif %}
+                        </div>
+                        <div class="vip-activity-content">
+                            <div class="vip-activity-title">{{ activity.title }}</div>
+                            <div class="vip-activity-time">{{ activity.timestamp|timesince }} ago</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="vip-empty-state">
+                        <div class="vip-empty-icon">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <div class="vip-empty-title">No Recent Activities</div>
+                        <div class="vip-empty-description">
+                            Your recent activities will appear here
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Notifications -->
+            {% if unread_notifications %}
+            <div class="vip-content-section">
+                <div class="vip-section-header">
+                    <div class="vip-section-title">
+                        <i class="fas fa-bell"></i>
+                        Notifications
+                    </div>
+                </div>
+
+                {% for notification in unread_notifications %}
+                <div class="vip-notification-item {% if not notification.is_read %}unread{% endif %}" 
+                     data-notification-id="{{ notification.id }}">
+                    <div class="vip-notification-content">
+                        <div class="vip-notification-title">{{ notification.title }}</div>
+                        <div class="vip-notification-message">{{ notification.message }}</div>
+                    </div>
+                    <button class="btn btn-sm btn-outline-primary" onclick="markAsRead({{ notification.id }})">
+                        <i class="fas fa-check"></i>
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function markAsRead(notificationId) {
+    fetch(`/vip-members/notification/${notificationId}/read/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            const notification = document.querySelector(`[data-notification-id="${notificationId}"]`);
+            if (notification) {
+                notification.classList.remove('unread');
+                notification.style.opacity = '0.6';
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+// Add smooth scrolling and animations
+document.addEventListener('DOMContentLoaded', function() {
+    // Add hover effects to cards
+    const cards = document.querySelectorAll('.vip-stat-card, .vip-content-section');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+</script>
+{% endblock %}

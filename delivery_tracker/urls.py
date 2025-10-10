@@ -13,6 +13,7 @@ urlpatterns = [
     path('api/', include('tracking.urls')),
     path('investments/', include('investments.urls', namespace='investments')),
     path('chat/', include('chat.urls', namespace='chat')),
+    path('vip-members/', include('vip_members.urls', namespace='vip_members')),
     path('', include('tracking.frontend_urls')),
     path('test-static/', serve, {'document_root': 'static', 'path': 'test.html'}),
 ]
