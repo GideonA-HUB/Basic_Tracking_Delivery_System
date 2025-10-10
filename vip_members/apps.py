@@ -7,4 +7,7 @@ class VipMembersConfig(AppConfig):
     verbose_name = 'VIP Members Management'
     
     def ready(self):
-        import vip_members.signals
+        try:
+            import vip_members.signals  # noqa
+        except ImportError:
+            pass
