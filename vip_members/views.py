@@ -32,7 +32,12 @@ def vip_dashboard(request):
     
     try:
         # Check if user has an approved VIP membership
-        vip_member = get_object_or_404(VIPMember, customer=request.user, status='active')
+        try:
+            vip_member = get_object_or_404(VIPMember, customer=request.user, status='active')
+        except Exception as db_error:
+            # If tables don't exist yet, show a helpful message
+            messages.error(request, "VIP system is being set up. Please try again in a few minutes.")
+            return redirect('frontend:landing_page')
         
         # Check if VIP member is approved
         if vip_member.status != 'active':
@@ -282,9 +287,14 @@ def vip_application(request):
     
     try:
         # Check if user already has a VIP membership
-        if VIPMember.objects.filter(customer=request.user, status='active').exists():
-            messages.info(request, "You already have an active VIP membership!")
-            return redirect('vip_members:dashboard')
+        try:
+            if VIPMember.objects.filter(customer=request.user, status='active').exists():
+                messages.info(request, "You already have an active VIP membership!")
+                return redirect('vip_members:dashboard')
+        except Exception as db_error:
+            # If tables don't exist yet, show a helpful message
+            messages.error(request, "VIP system is being set up. Please try again in a few minutes.")
+            return redirect('frontend:landing_page')
         
         # Check if user has a pending application
         pending_application = VIPApplication.objects.filter(
@@ -328,7 +338,7 @@ def vip_application(request):
         
     except Exception as e:
         messages.error(request, f"Error processing VIP application: {str(e)}")
-        return redirect('tracking:landing_page')
+        return redirect('frontend:landing_page')
 
 
 @login_required
@@ -353,7 +363,7 @@ def application_status(request):
         
     except Exception as e:
         messages.error(request, f"Error checking application status: {str(e)}")
-        return redirect('tracking:landing_page')
+        return redirect('frontend:landing_page')
 
 
 def vip_login_redirect(request):
