@@ -287,14 +287,17 @@ def main():
     # Set Django settings
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'delivery_tracker.settings')
     
-    print("🚀 COMPLETE PRODUCTION DEPLOYMENT")
-    print("=" * 60)
+    print("🚀 COMPLETE PRODUCTION DEPLOYMENT - VIP MEMBERS INCLUDED")
+    print("=" * 70)
     print("📋 This deployment includes:")
     print("  ✅ News API Integration (MarketAux, CryptoNews, Finnhub)")
     print("  ✅ VIP Members System (Complete Banking-Style Dashboard)")
     print("  ✅ Investment Marketplace")
     print("  ✅ All existing features")
-    print("=" * 60)
+    print("=" * 70)
+    print("🔍 DEBUG: Using deploy_complete.py (NOT the old deploy.py)")
+    print("🔍 DEBUG: VIP Members will be fully integrated")
+    print("=" * 70)
     
     try:
         # Initialize Django
