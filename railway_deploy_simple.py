@@ -37,13 +37,13 @@ def main():
         execute_from_command_line(['manage.py', 'migrate', '--noinput'])
         print("✅ All migrations completed")
         
-               # Step 3: Create VIP test user
-               print("🔄 STEP 3: Creating VIP test user...")
-               try:
-                   execute_from_command_line(['manage.py', 'create_vip_user', '--username', 'vip_demo', '--email', 'vip@meridianassetlogistics.com', '--password', 'vip123456', '--tier', 'gold'])
-                   print("✅ VIP test user created")
-               except Exception as e:
-                   print(f"⚠️ VIP user creation failed: {e}")
+        # Step 3: Create VIP test user
+        print("🔄 STEP 3: Creating VIP test user...")
+        try:
+            execute_from_command_line(['manage.py', 'create_vip_user', '--username', 'vip_demo', '--email', 'vip@meridianassetlogistics.com', '--password', 'vip123456', '--tier', 'gold'])
+            print("✅ VIP test user created")
+        except Exception as e:
+            print(f"⚠️ VIP user creation failed: {e}")
         
         # Step 4: Collect static files
         print("🔄 STEP 4: Collecting static files...")
@@ -65,16 +65,16 @@ def main():
         print("  ✅ Customer Login: https://meridianassetlogistics.com/accounts/customer/login/")
         print("  ✅ Staff Login: https://meridianassetlogistics.com/accounts/login/")
         print("")
-               print("🔑 VIP Demo Credentials:")
-               print("  Username: vip_demo")
-               print("  Password: vip123456")
-               print("")
-               print("📊 Django Admin:")
-               print("  Admin URL: https://meridianassetlogistics.com/admin/")
-               print("  VIP Profiles: Admin > ACCOUNTS > VIP Profiles")
-               print("  Staff Profiles: Admin > ACCOUNTS > Staff Profiles")
-               print("  Customer Profiles: Admin > ACCOUNTS > Customer Profiles")
-               print("=" * 60)
+        print("🔑 VIP Demo Credentials:")
+        print("  Username: vip_demo")
+        print("  Password: vip123456")
+        print("")
+        print("📊 Django Admin:")
+        print("  Admin URL: https://meridianassetlogistics.com/admin/")
+        print("  VIP Profiles: Admin > ACCOUNTS > VIP Profiles")
+        print("  Staff Profiles: Admin > ACCOUNTS > Staff Profiles")
+        print("  Customer Profiles: Admin > ACCOUNTS > Customer Profiles")
+        print("=" * 60)
         
         # Start Daphne
         cmd = ['daphne', '-b', '0.0.0.0', '-p', port, 'delivery_tracker.asgi:application']
