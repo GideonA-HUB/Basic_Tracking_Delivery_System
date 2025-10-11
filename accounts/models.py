@@ -60,6 +60,90 @@ class StaffProfile(models.Model):
         return self.role in ['manager', 'admin']
 
 
+class VIPProfile(models.Model):
+    """VIP member profile with enhanced features"""
+    
+    STATUS_CHOICES = [
+        ('active', 'Active'),
+        ('inactive', 'Inactive'),
+        ('pending', 'Pending Approval'),
+        ('suspended', 'Suspended'),
+    ]
+    
+    MEMBERSHIP_TIER_CHOICES = [
+        ('bronze', 'Bronze VIP'),
+        ('silver', 'Silver VIP'),
+        ('gold', 'Gold VIP'),
+        ('platinum', 'Platinum VIP'),
+        ('diamond', 'Diamond VIP'),
+    ]
+    
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='vip_profile')
+    member_id = models.CharField(max_length=20, unique=True, help_text="Unique VIP member identifier")
+    
+    # Staff assignment
+    assigned_staff = models.ForeignKey(StaffProfile, on_delete=models.SET_NULL, null=True, blank=True, 
+                                     related_name='assigned_vip_members', help_text="VIP Staff member assigned to this customer")
+    
+    # Membership details
+    membership_tier = models.CharField(max_length=20, choices=MEMBERSHIP_TIER_CHOICES, default='bronze')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    
+    # Personal information
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    preferred_contact_method = models.CharField(max_length=20, 
+                                              choices=[('email', 'Email'), ('phone', 'Phone'), ('both', 'Both')],
+                                              default='email')
+    
+    # VIP Benefits
+    priority_support = models.BooleanField(default=True)
+    dedicated_account_manager = models.BooleanField(default=True)
+    exclusive_investment_opportunities = models.BooleanField(default=True)
+    faster_processing = models.BooleanField(default=True)
+    
+    # Financial information
+    total_investments = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
+    monthly_income = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    net_worth = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
+    
+    # Timestamps
+    membership_start_date = models.DateTimeField(auto_now_add=True)
+    last_contact_date = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    # Notes and comments
+    notes = models.TextField(blank=True, null=True, help_text="Internal notes about the VIP member")
+    
+    class Meta:
+        verbose_name = 'VIP Profile'
+        verbose_name_plural = 'VIP Profiles'
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.user.get_full_name()} - {self.get_membership_tier_display()}"
+    
+    @property
+    def full_name(self):
+        return f"{self.user.first_name} {self.user.last_name}".strip() or self.user.username
+    
+    @property
+    def staff_name(self):
+        return self.assigned_staff.user.get_full_name() if self.assigned_staff else "Not Assigned"
+    
+    @property
+    def membership_duration_days(self):
+        from django.utils import timezone
+        return (timezone.now() - self.membership_start_date).days
+    
+    def save(self, *args, **kwargs):
+        """Auto-generate member_id if not provided"""
+        if not self.member_id:
+            import uuid
+            self.member_id = f"VIP-{str(uuid.uuid4())[:8].upper()}"
+        super().save(*args, **kwargs)
+
+
 @receiver(post_save, sender=User)
 def create_customer_profile(sender, instance, created, **kwargs):
     """Create customer profile when user is created (if not staff)"""

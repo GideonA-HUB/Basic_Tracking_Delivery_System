@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.contrib.auth.models import User
 from .forms import StaffLoginForm, StaffRegistrationForm, CustomerRegistrationForm, CustomerLoginForm, VIPLoginForm
-from .models import StaffProfile, CustomerProfile
+from .models import StaffProfile, CustomerProfile, VIPProfile
 
 
 def is_staff_user(user):
@@ -19,9 +19,10 @@ def is_customer_user(user):
 
 def is_vip_user(user):
     """Check if user is a VIP member"""
-    # For now, allow any authenticated user to access VIP
-    # In production, you would check for actual VIP status here
-    return user.is_authenticated and user.is_active
+    try:
+        return user.is_authenticated and hasattr(user, 'vip_profile') and user.vip_profile.status == 'active'
+    except VIPProfile.DoesNotExist:
+        return False
 
 
 def customer_register(request):
@@ -212,40 +213,21 @@ def vip_login(request):
 @user_passes_test(is_vip_user)
 def vip_dashboard(request):
     """VIP dashboard view - Silver Bridge Bank style"""
-    # Create mock VIP member data for demonstration
-    class MockVIPMember:
-        def __init__(self, user):
-            self.customer = user
-            self.member_id = f"VIP-{user.id:06d}"
-            self.full_name = user.get_full_name() or user.username
-            self.membership_tier = 'gold'
-            self.status = 'active'
-            self.total_investments = 50000.00
-            self.monthly_income = 5000.00
-            self.membership_start_date = user.date_joined
-            
-        def get_membership_tier_display(self):
-            return 'Gold VIP'
-            
-        def get_status_display(self):
-            return 'Active'
-    
-    class MockStaff:
-        def __init__(self):
-            self.full_name = "Sarah Johnson"
-            self.department = "VIP Services"
-            self.staff_id = "VIP-STAFF-001"
-    
-    vip_member = MockVIPMember(request.user)
-    assigned_staff = MockStaff()
-    
-    context = {
-        'vip_member': vip_member,
-        'assigned_staff': assigned_staff,
-        'user': request.user,
-    }
-    
-    return render(request, 'accounts/vip_dashboard.html', context)
+    try:
+        vip_profile = request.user.vip_profile
+        assigned_staff = vip_profile.assigned_staff
+        
+        context = {
+            'vip_member': vip_profile,
+            'assigned_staff': assigned_staff,
+            'user': request.user,
+        }
+        
+        return render(request, 'accounts/vip_dashboard.html', context)
+        
+    except VIPProfile.DoesNotExist:
+        messages.error(request, 'VIP profile not found. Please contact support.')
+        return redirect('frontend:landing_page')
 
 
 @login_required

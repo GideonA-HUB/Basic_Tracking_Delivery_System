@@ -326,8 +326,8 @@
                     {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
                 </div>
                 <div>
-                    <h3 class="font-semibold text-gray-800 dark:text-white">{{ vip_member.full_name|default:user.get_full_name }}</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">ID: {{ vip_member.member_id|default:"VIP-"|add:user.id }}</p>
+                    <h3 class="font-semibold text-gray-800 dark:text-white">{{ vip_member.full_name }}</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">ID: {{ vip_member.member_id }}</p>
                 </div>
                 
                 {% if vip_member %}
@@ -453,7 +453,7 @@
             <!-- Primary Balance Card -->
             <div class="vip-primary-card">
                 <div class="vip-greeting">
-                    Good {{ "now"|date:"A"|lower|capfirst }}, {{ user.first_name|default:user.username }}!
+                    Good {{ "now"|date:"A"|lower|capfirst }}, {{ vip_member.full_name }}!
                 </div>
                 <div class="text-sm opacity-90 mb-4">
                     {{ "now"|date:"l, F j, Y" }} • <span id="current-time-small"></span>
@@ -467,7 +467,7 @@
                 <div class="vip-account-info">
                     <div class="flex items-center gap-2">
                         <i class="fas fa-shield-alt opacity-75"></i>
-                        <span class="vip-account-number">Account: {{ vip_member.member_id|default:"VIP-"|add:user.id }}</span>
+                        <span class="vip-account-number">Account: {{ vip_member.member_id }}</span>
                     </div>
                     {% if vip_member and vip_member.status == 'active' %}
                         <div class="vip-status-badge vip-status-active">
@@ -495,8 +495,8 @@
                     <i class="fas fa-user-tie mr-2"></i>
                     Your Dedicated Account Manager
                 </h3>
-                <div class="vip-staff-name">{{ assigned_staff.full_name }}</div>
-                <div class="vip-staff-role">{{ assigned_staff.department }} • {{ assigned_staff.staff_id }}</div>
+                <div class="vip-staff-name">{{ assigned_staff.user.get_full_name }}</div>
+                <div class="vip-staff-role">{{ assigned_staff.department }} • {{ assigned_staff.get_role_display }}</div>
                 <div class="mt-3">
                     <a href="#" class="inline-flex items-center gap-2 bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-opacity-30 transition-colors">
                         <i class="fas fa-phone mr-1"></i>
