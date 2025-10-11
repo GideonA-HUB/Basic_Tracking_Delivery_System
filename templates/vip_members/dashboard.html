@@ -5,21 +5,34 @@
 
 {% block extra_css %}
 <style>
-    /* VIP Dashboard Styles - Banking-inspired design */
+    /* VIP Dashboard Styles - Silver Bridge Bank inspired design */
     .vip-dashboard {
-        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        background: #f5f7fa;
         min-height: 100vh;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
     .vip-header {
-        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-        color: white;
+        background: white;
+        border-bottom: 1px solid #e2e8f0;
         padding: 1rem 2rem;
-        box-shadow: 0 4px 20px rgba(30, 64, 175, 0.3);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         position: sticky;
         top: 0;
         z-index: 100;
+    }
+
+    .vip-logo-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #3b82f6, #1e40af);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
 
     .vip-layout {
@@ -301,6 +314,162 @@
     .vip-stat-change.positive { color: #16a34a; }
     .vip-stat-change.negative { color: #dc2626; }
 
+    /* Account Overview Cards */
+    .vip-main-account-card {
+        background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+        color: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .vip-main-account-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .vip-account-title {
+        font-size: 1rem;
+        font-weight: 500;
+        opacity: 0.9;
+        margin-bottom: 0.5rem;
+    }
+
+    .vip-account-balance {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .vip-account-number {
+        text-align: right;
+    }
+
+    .vip-account-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .vip-action-btn {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .vip-action-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .vip-account-stats-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid #f1f5f9;
+        height: 100%;
+    }
+
+    .vip-stat-item {
+        padding: 1rem 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .vip-stat-item:last-child {
+        border-bottom: none;
+    }
+
+    .vip-stat-icon-small {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.875rem;
+    }
+
+    .vip-stat-icon-small.blue { background: #dbeafe; color: #1e40af; }
+    .vip-stat-icon-small.yellow { background: #fef3c7; color: #d97706; }
+    .vip-stat-icon-small.green { background: #dcfce7; color: #16a34a; }
+
+    .vip-stat-label {
+        font-size: 0.75rem;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.25rem;
+    }
+
+    .vip-stat-value-small {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    /* Quick Action Cards */
+    .vip-quick-action-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-decoration: none;
+        color: #374151;
+        display: block;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .vip-quick-action-card:hover {
+        border-color: #3b82f6;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        transform: translateY(-2px);
+        color: #374151;
+    }
+
+    .vip-quick-action-icon {
+        width: 48px;
+        height: 48px;
+        background: #f8fafc;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.25rem;
+        color: #64748b;
+        transition: all 0.3s ease;
+    }
+
+    .vip-quick-action-card:hover .vip-quick-action-icon {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .vip-quick-action-card h6 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
     /* Content Sections */
     .vip-content-section {
         background: white;
@@ -493,21 +662,28 @@
     <!-- VIP Header -->
     <div class="vip-header">
         <div class="container-fluid d-flex justify-content-between align-items-center">
-            <div>
-                <h1 class="h4 mb-0">
-                    <i class="fas fa-crown me-2"></i>
-                    VIP Members Dashboard
-                </h1>
-                <p class="mb-0 opacity-75">{{ current_time|date:"l, F j, Y" }}</p>
+            <div class="d-flex align-items-center">
+                <div class="vip-logo me-3">
+                    <div class="vip-logo-icon">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="h4 mb-0 text-dark">MERIDIAN VIP MEMBERS</h1>
+                    <p class="mb-0 text-muted">{{ current_time|date:"l, F j, Y" }}</p>
+                </div>
             </div>
-            <div class="d-flex align-items-center gap-3">
-                <div class="d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center gap-4">
+                <div class="d-flex align-items-center gap-2 text-dark">
                     <i class="fas fa-wallet"></i>
                     <span class="fw-bold">${{ current_value|floatformat:2 }}</span>
                 </div>
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fas fa-bell text-muted"></i>
+                </div>
                 <div class="dropdown">
-                    <button class="btn btn-link text-white p-0" type="button" data-bs-toggle="dropdown">
-                        <div class="vip-avatar" style="width: 40px; height: 40px; font-size: 1rem;">
+                    <button class="btn btn-link p-0" type="button" data-bs-toggle="dropdown">
+                        <div class="vip-avatar" style="width: 40px; height: 40px; font-size: 1rem; background: #3b82f6; color: white;">
                             {{ vip_member.full_name|slice:":2"|upper }}
                         </div>
                     </button>
@@ -601,12 +777,91 @@
         <div class="vip-main-content">
             <!-- Welcome Section -->
             <div class="vip-welcome-section">
-                <h1 class="vip-welcome-title">
-                    Welcome, {{ vip_member.full_name|split:" "|first }}! 👋
-                </h1>
-                <p class="vip-welcome-subtitle">
-                    Here's your VIP dashboard overview
-                </p>
+                <div class="d-flex justify-content-between align-items-start mb-4">
+                    <div>
+                        <h1 class="vip-welcome-title">
+                            Good {{ current_time|time:"A"|lower|truncatewords:1 }}, {{ vip_member.full_name|split:" "|first }} 👋
+                        </h1>
+                        <p class="vip-welcome-subtitle">
+                            {{ current_time|time:"H:i:s" }} • {{ current_time|date:"l, F j, Y" }}
+                        </p>
+                    </div>
+                    <div class="text-end">
+                        <div class="vip-account-status">
+                            <span class="badge bg-success">Active</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Overview Card -->
+            <div class="vip-account-overview mb-4">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="vip-main-account-card">
+                            <div class="vip-account-header">
+                                <div>
+                                    <h2 class="vip-account-title">Available Balance</h2>
+                                    <div class="vip-account-balance">${{ current_value|floatformat:2 }} USD</div>
+                                </div>
+                                <div class="text-end">
+                                    <div class="vip-account-number">
+                                        <small class="text-muted">Your Account Number</small>
+                                        <div class="fw-bold">{{ vip_member.member_id }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="vip-account-actions">
+                                <a href="{% url 'investments:investment-marketplace' %}" class="vip-action-btn">
+                                    <i class="fas fa-chart-line"></i>
+                                    Investments
+                                </a>
+                                <a href="{% url 'vip_members:support' %}" class="vip-action-btn">
+                                    <i class="fas fa-headset"></i>
+                                    Support
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="vip-account-stats-card">
+                            <h5 class="mb-3">Account Statistics</h5>
+                            <div class="vip-stat-item">
+                                <div class="d-flex align-items-center">
+                                    <div class="vip-stat-icon-small blue me-3">
+                                        <i class="fas fa-wallet"></i>
+                                    </div>
+                                    <div>
+                                        <div class="vip-stat-label">Total Invested</div>
+                                        <div class="vip-stat-value-small">${{ total_investments|floatformat:2 }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="vip-stat-item">
+                                <div class="d-flex align-items-center">
+                                    <div class="vip-stat-icon-small yellow me-3">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <div>
+                                        <div class="vip-stat-label">Active Investments</div>
+                                        <div class="vip-stat-value-small">{{ active_investments_count }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="vip-stat-item">
+                                <div class="d-flex align-items-center">
+                                    <div class="vip-stat-icon-small green me-3">
+                                        <i class="fas fa-chart-bar"></i>
+                                    </div>
+                                    <div>
+                                        <div class="vip-stat-label">Total Return</div>
+                                        <div class="vip-stat-value-small">${{ total_return|floatformat:2 }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Stats Grid -->
@@ -660,6 +915,52 @@
                     <div class="vip-stat-change">
                         <a href="{% url 'vip_members:benefits' %}" class="vip-section-link">
                             View Benefits →
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="vip-content-section mb-4">
+                <div class="vip-section-header">
+                    <div class="vip-section-title">
+                        <i class="fas fa-magic"></i>
+                        What would you like to do today?
+                    </div>
+                </div>
+                <p class="text-muted mb-4">Choose from our popular actions below.</p>
+                
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <a href="{% url 'vip_members:profile' %}" class="vip-quick-action-card">
+                            <div class="vip-quick-action-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h6>Account Info</h6>
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'investments:investment-marketplace' %}" class="vip-quick-action-card">
+                            <div class="vip-quick-action-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h6>Investments</h6>
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'investments:investment-marketplace' %}" class="vip-quick-action-card">
+                            <div class="vip-quick-action-icon">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <h6>New Investment</h6>
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'vip_members:activities' %}" class="vip-quick-action-card">
+                            <div class="vip-quick-action-icon">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <h6>History</h6>
                         </a>
                     </div>
                 </div>

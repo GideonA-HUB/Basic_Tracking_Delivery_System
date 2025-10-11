@@ -1,0 +1,383 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}VIP Profile - {{ vip_member.full_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .vip-profile-container {
+        background: #f5f7fa;
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .vip-profile-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid #f1f5f9;
+        margin-bottom: 2rem;
+    }
+
+    .vip-profile-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .vip-profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #3b82f6, #1e40af);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 3rem;
+        font-weight: bold;
+        margin: 0 auto 1rem;
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+    }
+
+    .vip-profile-name {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .vip-profile-tier {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 1rem;
+    }
+
+    .vip-tier-bronze { background: #CD7F32; color: white; }
+    .vip-tier-silver { background: #C0C0C0; color: #1e293b; }
+    .vip-tier-gold { background: #FFD700; color: #1e293b; }
+    .vip-tier-platinum { background: #E5E4E2; color: #1e293b; }
+    .vip-tier-diamond { background: #B9F2FF; color: #1e293b; }
+
+    .vip-info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .vip-info-section h5 {
+        color: #1e293b;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .vip-info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .vip-info-item:last-child {
+        border-bottom: none;
+    }
+
+    .vip-info-label {
+        font-weight: 500;
+        color: #64748b;
+    }
+
+    .vip-info-value {
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .vip-activity-timeline {
+        position: relative;
+        padding-left: 2rem;
+    }
+
+    .vip-activity-timeline::before {
+        content: '';
+        position: absolute;
+        left: 1rem;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e2e8f0;
+    }
+
+    .vip-activity-item {
+        position: relative;
+        margin-bottom: 2rem;
+        padding-left: 2rem;
+    }
+
+    .vip-activity-item::before {
+        content: '';
+        position: absolute;
+        left: -0.5rem;
+        top: 0.5rem;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #3b82f6;
+        border: 3px solid white;
+        box-shadow: 0 0 0 2px #e2e8f0;
+    }
+
+    .vip-activity-content {
+        background: white;
+        border-radius: 8px;
+        padding: 1rem;
+        border: 1px solid #f1f5f9;
+    }
+
+    .vip-activity-title {
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.25rem;
+    }
+
+    .vip-activity-time {
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+
+    .vip-activity-description {
+        color: #64748b;
+        margin-top: 0.5rem;
+    }
+
+    .vip-notification-item {
+        background: #f8fafc;
+        border-left: 4px solid #3b82f6;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .vip-notification-item.unread {
+        background: #eff6ff;
+        border-left-color: #1e40af;
+    }
+
+    .vip-notification-title {
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.25rem;
+    }
+
+    .vip-notification-message {
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+
+    .vip-notification-time {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        margin-top: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="vip-profile-container">
+    <div class="container">
+        <!-- Profile Header -->
+        <div class="vip-profile-card">
+            <div class="vip-profile-header">
+                <div class="vip-profile-avatar">
+                    {{ vip_member.full_name|slice:":2"|upper }}
+                </div>
+                <h1 class="vip-profile-name">{{ vip_member.full_name }}</h1>
+                <div class="vip-profile-tier vip-tier-{{ vip_member.membership_tier }}">
+                    {{ vip_member.get_membership_tier_display }}
+                </div>
+                <p class="text-muted">Member ID: {{ vip_member.member_id }}</p>
+            </div>
+        </div>
+
+        <div class="vip-info-grid">
+            <!-- Personal Information -->
+            <div class="vip-profile-card">
+                <h5><i class="fas fa-user me-2"></i>Personal Information</h5>
+                <div class="vip-info-item">
+                    <span class="vip-info-label">Full Name</span>
+                    <span class="vip-info-value">{{ vip_member.full_name }}</span>
+                </div>
+                <div class="vip-info-item">
+                    <span class="vip-info-label">Email</span>
+                    <span class="vip-info-value">{{ vip_member.customer.email }}</span>
+                </div>
+                <div class="vip-info-item">
+                    <span class="vip-info-label">Phone</span>
+                    <span class="vip-info-value">{{ vip_member.phone|default:"Not provided" }}</span>
+                </div>
+                <div class="vip-info-item">
+                    <span class="vip-info-label">Preferred Contact</span>
+                    <span class="vip-info-value">{{ vip_member.get_preferred_contact_method_display }}</span>
+                </div>
+            </div>
+
+            <!-- Membership Information -->
+            <div class="vip-profile-card">
+                <h5><i class="fas fa-crown me-2"></i>Membership Details</h5>
+                <div class="vip-info-item">
+                    <span class="vip-info-label">Membership Tier</span>
+                    <span class="vip-info-value">{{ vip_member.get_membership_tier_display }}</span>
+                </div>
+                <div class="vip-info-item">
+                    <span class="vip-info-label">Status</span>
+                    <span class="vip-info-value">
+                        <span class="badge bg-success">{{ vip_member.get_status_display }}</span>
+                    </span>
+                </div>
+                <div class="vip-info-item">
+                    <span class="vip-info-label">Member Since</span>
+                    <span class="vip-info-value">{{ vip_member.membership_start_date|date:"M j, Y" }}</span>
+                </div>
+                <div class="vip-info-item">
+                    <span class="vip-info-label">Duration</span>
+                    <span class="vip-info-value">{{ vip_member.membership_duration_days }} days</span>
+                </div>
+            </div>
+
+            <!-- Staff Assignment -->
+            <div class="vip-profile-card">
+                <h5><i class="fas fa-user-tie me-2"></i>Assigned Staff</h5>
+                {% if assigned_staff %}
+                <div class="vip-info-item">
+                    <span class="vip-info-label">Staff Name</span>
+                    <span class="vip-info-value">{{ assigned_staff.full_name }}</span>
+                </div>
+                <div class="vip-info-item">
+                    <span class="vip-info-label">Staff ID</span>
+                    <span class="vip-info-value">{{ assigned_staff.staff_id }}</span>
+                </div>
+                <div class="vip-info-item">
+                    <span class="vip-info-label">Department</span>
+                    <span class="vip-info-value">{{ assigned_staff.department }}</span>
+                </div>
+                <div class="vip-info-item">
+                    <span class="vip-info-label">Email</span>
+                    <span class="vip-info-value">{{ assigned_staff.email|default:"Not provided" }}</span>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-user-slash text-muted mb-3" style="font-size: 2rem;"></i>
+                    <p class="text-muted">No staff member assigned yet</p>
+                    <p class="text-muted small">Contact support to get assigned a dedicated account manager</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Financial Information -->
+            <div class="vip-profile-card">
+                <h5><i class="fas fa-dollar-sign me-2"></i>Financial Information</h5>
+                <div class="vip-info-item">
+                    <span class="vip-info-label">Total Investments</span>
+                    <span class="vip-info-value">${{ vip_member.total_investments|floatformat:2 }}</span>
+                </div>
+                <div class="vip-info-item">
+                    <span class="vip-info-label">Monthly Income</span>
+                    <span class="vip-info-value">${{ vip_member.monthly_income|floatformat:2 }}</span>
+                </div>
+                <div class="vip-info-item">
+                    <span class="vip-info-label">Net Worth</span>
+                    <span class="vip-info-value">${{ vip_member.net_worth|floatformat:2 }}</span>
+                </div>
+            </div>
+
+            <!-- VIP Benefits -->
+            <div class="vip-profile-card">
+                <h5><i class="fas fa-star me-2"></i>VIP Benefits</h5>
+                <div class="vip-info-item">
+                    <span class="vip-info-label">Priority Support</span>
+                    <span class="vip-info-value">
+                        {% if vip_member.priority_support %}
+                            <i class="fas fa-check text-success"></i> Enabled
+                        {% else %}
+                            <i class="fas fa-times text-danger"></i> Disabled
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="vip-info-item">
+                    <span class="vip-info-label">Dedicated Account Manager</span>
+                    <span class="vip-info-value">
+                        {% if vip_member.dedicated_account_manager %}
+                            <i class="fas fa-check text-success"></i> Enabled
+                        {% else %}
+                            <i class="fas fa-times text-danger"></i> Disabled
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="vip-info-item">
+                    <span class="vip-info-label">Exclusive Opportunities</span>
+                    <span class="vip-info-value">
+                        {% if vip_member.exclusive_investment_opportunities %}
+                            <i class="fas fa-check text-success"></i> Enabled
+                        {% else %}
+                            <i class="fas fa-times text-danger"></i> Disabled
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="vip-info-item">
+                    <span class="vip-info-label">Faster Processing</span>
+                    <span class="vip-info-value">
+                        {% if vip_member.faster_processing %}
+                            <i class="fas fa-check text-success"></i> Enabled
+                        {% else %}
+                            <i class="fas fa-times text-danger"></i> Disabled
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activities -->
+        {% if all_activities %}
+        <div class="vip-profile-card">
+            <h5><i class="fas fa-history me-2"></i>Recent Activities</h5>
+            <div class="vip-activity-timeline">
+                {% for activity in all_activities|slice:":10" %}
+                <div class="vip-activity-item">
+                    <div class="vip-activity-content">
+                        <div class="vip-activity-title">{{ activity.title }}</div>
+                        <div class="vip-activity-time">{{ activity.timestamp|timesince }} ago</div>
+                        {% if activity.description %}
+                        <div class="vip-activity-description">{{ activity.description }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Notifications -->
+        {% if all_notifications %}
+        <div class="vip-profile-card">
+            <h5><i class="fas fa-bell me-2"></i>Recent Notifications</h5>
+            {% for notification in all_notifications|slice:":10" %}
+            <div class="vip-notification-item {% if not notification.is_read %}unread{% endif %}">
+                <div class="vip-notification-title">{{ notification.title }}</div>
+                <div class="vip-notification-message">{{ notification.message }}</div>
+                <div class="vip-notification-time">{{ notification.created_at|timesince }} ago</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

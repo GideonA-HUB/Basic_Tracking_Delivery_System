@@ -1,0 +1,448 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}VIP Support - {{ vip_member.full_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .vip-support-container {
+        background: #f5f7fa;
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .vip-support-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .vip-support-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 1rem;
+    }
+
+    .vip-support-subtitle {
+        font-size: 1.125rem;
+        color: #64748b;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .vip-support-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .vip-support-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid #f1f5f9;
+        transition: all 0.3s ease;
+    }
+
+    .vip-support-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .vip-support-card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .vip-support-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #3b82f6, #1e40af);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.25rem;
+        margin-right: 1rem;
+    }
+
+    .vip-support-card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .vip-support-card-description {
+        color: #64748b;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+
+    .vip-support-contact-info {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .vip-support-contact-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .vip-support-contact-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .vip-support-contact-icon {
+        width: 20px;
+        color: #64748b;
+        margin-right: 0.75rem;
+    }
+
+    .vip-support-contact-text {
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+
+    .vip-support-btn {
+        background: linear-gradient(135deg, #3b82f6, #1e40af);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .vip-support-btn:hover {
+        background: linear-gradient(135deg, #1e40af, #1e3a8a);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .vip-staff-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid #f1f5f9;
+        margin-bottom: 2rem;
+    }
+
+    .vip-staff-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .vip-staff-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #3b82f6, #1e40af);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-right: 1rem;
+    }
+
+    .vip-staff-info h4 {
+        margin: 0 0 0.25rem 0;
+        color: #1e293b;
+        font-weight: 600;
+    }
+
+    .vip-staff-info p {
+        margin: 0;
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+
+    .vip-staff-contact {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .vip-staff-contact-item {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .vip-staff-contact-icon {
+        width: 24px;
+        height: 24px;
+        margin: 0 auto 0.5rem;
+        color: #3b82f6;
+    }
+
+    .vip-staff-contact-label {
+        font-size: 0.75rem;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.25rem;
+    }
+
+    .vip-staff-contact-value {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #1e293b;
+    }
+
+    .vip-faq-section {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid #f1f5f9;
+    }
+
+    .vip-faq-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .vip-faq-item {
+        border-bottom: 1px solid #f1f5f9;
+        padding: 1rem 0;
+    }
+
+    .vip-faq-item:last-child {
+        border-bottom: none;
+    }
+
+    .vip-faq-question {
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .vip-faq-answer {
+        color: #64748b;
+        line-height: 1.6;
+    }
+
+    .vip-priority-badge {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-block;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="vip-support-container">
+    <div class="container">
+        <!-- Header -->
+        <div class="vip-support-header">
+            <h1 class="vip-support-title">VIP Priority Support</h1>
+            <p class="vip-support-subtitle">
+                Get instant access to our dedicated VIP support team. 
+                We're here to help you with any questions or concerns.
+            </p>
+            <div class="vip-priority-badge">
+                <i class="fas fa-crown me-1"></i>
+                Priority Support Active
+            </div>
+        </div>
+
+        <!-- Support Options Grid -->
+        <div class="vip-support-grid">
+            <!-- Live Chat -->
+            <div class="vip-support-card">
+                <div class="vip-support-card-header">
+                    <div class="vip-support-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3 class="vip-support-card-title">Live Chat</h3>
+                </div>
+                <p class="vip-support-card-description">
+                    Chat with our VIP support team instantly. Average response time: 2 minutes.
+                </p>
+                <div class="vip-support-contact-info">
+                    <div class="vip-support-contact-item">
+                        <i class="fas fa-clock vip-support-contact-icon"></i>
+                        <span class="vip-support-contact-text">Available 24/7</span>
+                    </div>
+                    <div class="vip-support-contact-item">
+                        <i class="fas fa-users vip-support-contact-icon"></i>
+                        <span class="vip-support-contact-text">Dedicated VIP Team</span>
+                    </div>
+                </div>
+                <a href="#" class="vip-support-btn" onclick="openLiveChat()">
+                    <i class="fas fa-comment"></i>
+                    Start Live Chat
+                </a>
+            </div>
+
+            <!-- Phone Support -->
+            <div class="vip-support-card">
+                <div class="vip-support-card-header">
+                    <div class="vip-support-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <h3 class="vip-support-card-title">Phone Support</h3>
+                </div>
+                <p class="vip-support-card-description">
+                    Speak directly with a VIP support specialist. Priority queue for VIP members.
+                </p>
+                <div class="vip-support-contact-info">
+                    <div class="vip-support-contact-item">
+                        <i class="fas fa-phone vip-support-contact-icon"></i>
+                        <span class="vip-support-contact-text">+1 (555) VIP-HELP</span>
+                    </div>
+                    <div class="vip-support-contact-item">
+                        <i class="fas fa-clock vip-support-contact-icon"></i>
+                        <span class="vip-support-contact-text">Mon-Fri 8AM-8PM EST</span>
+                    </div>
+                </div>
+                <a href="tel:+15558474357" class="vip-support-btn">
+                    <i class="fas fa-phone"></i>
+                    Call Now
+                </a>
+            </div>
+
+            <!-- Email Support -->
+            <div class="vip-support-card">
+                <div class="vip-support-card-header">
+                    <div class="vip-support-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h3 class="vip-support-card-title">Email Support</h3>
+                </div>
+                <p class="vip-support-card-description">
+                    Send us a detailed message and we'll respond within 1 hour during business hours.
+                </p>
+                <div class="vip-support-contact-info">
+                    <div class="vip-support-contact-item">
+                        <i class="fas fa-envelope vip-support-contact-icon"></i>
+                        <span class="vip-support-contact-text">vip-support@meridianassetlogistics.com</span>
+                    </div>
+                    <div class="vip-support-contact-item">
+                        <i class="fas fa-reply vip-support-contact-icon"></i>
+                        <span class="vip-support-contact-text">Response within 1 hour</span>
+                    </div>
+                </div>
+                <a href="mailto:vip-support@meridianassetlogistics.com" class="vip-support-btn">
+                    <i class="fas fa-envelope"></i>
+                    Send Email
+                </a>
+            </div>
+        </div>
+
+        <!-- Assigned Staff -->
+        {% if assigned_staff %}
+        <div class="vip-staff-card">
+            <div class="vip-staff-header">
+                <div class="vip-staff-avatar">
+                    {{ assigned_staff.full_name|slice:":2"|upper }}
+                </div>
+                <div class="vip-staff-info">
+                    <h4>{{ assigned_staff.full_name }}</h4>
+                    <p>Your Dedicated VIP Account Manager</p>
+                </div>
+            </div>
+            <div class="vip-staff-contact">
+                <div class="vip-staff-contact-item">
+                    <i class="fas fa-envelope vip-staff-contact-icon"></i>
+                    <div class="vip-staff-contact-label">Email</div>
+                    <div class="vip-staff-contact-value">{{ assigned_staff.email|default:"Contact via VIP Support" }}</div>
+                </div>
+                <div class="vip-staff-contact-item">
+                    <i class="fas fa-phone vip-staff-contact-icon"></i>
+                    <div class="vip-staff-contact-label">Phone</div>
+                    <div class="vip-staff-contact-value">{{ assigned_staff.phone|default:"Contact via VIP Support" }}</div>
+                </div>
+                <div class="vip-staff-contact-item">
+                    <i class="fas fa-building vip-staff-contact-icon"></i>
+                    <div class="vip-staff-contact-label">Department</div>
+                    <div class="vip-staff-contact-value">{{ assigned_staff.department }}</div>
+                </div>
+                <div class="vip-staff-contact-item">
+                    <i class="fas fa-id-badge vip-staff-contact-icon"></i>
+                    <div class="vip-staff-contact-label">Staff ID</div>
+                    <div class="vip-staff-contact-value">{{ assigned_staff.staff_id }}</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- FAQ Section -->
+        <div class="vip-faq-section">
+            <h2 class="vip-faq-title">Frequently Asked Questions</h2>
+            
+            <div class="vip-faq-item">
+                <div class="vip-faq-question">How do I upgrade my VIP membership tier?</div>
+                <div class="vip-faq-answer">
+                    Contact your assigned account manager or VIP support team. They will review your investment activity and eligibility for tier upgrades.
+                </div>
+            </div>
+
+            <div class="vip-faq-item">
+                <div class="vip-faq-question">What are the benefits of VIP membership?</div>
+                <div class="vip-faq-answer">
+                    VIP members enjoy priority support, dedicated account managers, exclusive investment opportunities, faster processing, and higher investment limits.
+                </div>
+            </div>
+
+            <div class="vip-faq-item">
+                <div class="vip-faq-question">How can I contact my assigned account manager?</div>
+                <div class="vip-faq-answer">
+                    You can reach your account manager through the contact information provided above, or use the VIP support channels for immediate assistance.
+                </div>
+            </div>
+
+            <div class="vip-faq-item">
+                <div class="vip-faq-question">What is the response time for VIP support?</div>
+                <div class="vip-faq-answer">
+                    VIP members receive priority support with average response times of 2 minutes for live chat, immediate phone support during business hours, and email responses within 1 hour.
+                </div>
+            </div>
+
+            <div class="vip-faq-item">
+                <div class="vip-faq-question">Can I change my preferred contact method?</div>
+                <div class="vip-faq-answer">
+                    Yes, you can update your preferred contact method in your profile settings or contact VIP support to make the change.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function openLiveChat() {
+    // This would integrate with a live chat service like Intercom, Zendesk, etc.
+    alert('Live chat feature would be integrated here. For now, please use phone or email support.');
+}
+</script>
+{% endblock %}

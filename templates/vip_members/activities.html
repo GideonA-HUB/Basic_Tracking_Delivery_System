@@ -1,0 +1,452 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}VIP Activities - {{ vip_member.full_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .vip-activities-container {
+        background: #f5f7fa;
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .vip-activities-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .vip-activities-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 1rem;
+    }
+
+    .vip-activities-subtitle {
+        font-size: 1.125rem;
+        color: #64748b;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .vip-activities-filters {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid #f1f5f9;
+        margin-bottom: 2rem;
+    }
+
+    .vip-filter-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        align-items: end;
+    }
+
+    .vip-filter-group label {
+        display: block;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .vip-filter-select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        background: white;
+        color: #374151;
+        font-size: 0.875rem;
+    }
+
+    .vip-filter-btn {
+        background: linear-gradient(135deg, #3b82f6, #1e40af);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .vip-filter-btn:hover {
+        background: linear-gradient(135deg, #1e40af, #1e3a8a);
+        transform: translateY(-1px);
+    }
+
+    .vip-activities-timeline {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid #f1f5f9;
+        position: relative;
+    }
+
+    .vip-activities-timeline::before {
+        content: '';
+        position: absolute;
+        left: 2rem;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e2e8f0;
+    }
+
+    .vip-activity-item {
+        position: relative;
+        margin-bottom: 2rem;
+        padding-left: 4rem;
+    }
+
+    .vip-activity-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .vip-activity-item::before {
+        content: '';
+        position: absolute;
+        left: 1.25rem;
+        top: 0.75rem;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #3b82f6;
+        border: 4px solid white;
+        box-shadow: 0 0 0 2px #e2e8f0;
+    }
+
+    .vip-activity-item.important::before {
+        background: #f59e0b;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+    }
+
+    .vip-activity-content {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 1px solid #f1f5f9;
+        transition: all 0.3s ease;
+    }
+
+    .vip-activity-content:hover {
+        background: #f1f5f9;
+        border-color: #e2e8f0;
+    }
+
+    .vip-activity-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+
+    .vip-activity-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .vip-activity-type {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .vip-activity-type.login { background: #dbeafe; color: #1e40af; }
+    .vip-activity-type.investment { background: #dcfce7; color: #16a34a; }
+    .vip-activity-type.withdrawal { background: #fef3c7; color: #d97706; }
+    .vip-activity-type.support { background: #e0e7ff; color: #6366f1; }
+    .vip-activity-type.meeting { background: #f3e8ff; color: #8b5cf6; }
+    .vip-activity-type.call { background: #fce7f3; color: #ec4899; }
+    .vip-activity-type.email { background: #ecfdf5; color: #059669; }
+    .vip-activity-type.other { background: #f1f5f9; color: #64748b; }
+
+    .vip-activity-meta {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .vip-activity-time {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+
+    .vip-activity-staff {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+
+    .vip-activity-description {
+        color: #64748b;
+        line-height: 1.6;
+    }
+
+    .vip-activity-empty {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #64748b;
+    }
+
+    .vip-activity-empty-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1rem;
+        opacity: 0.5;
+        color: #94a3b8;
+    }
+
+    .vip-activity-empty-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #374151;
+    }
+
+    .vip-activity-empty-description {
+        font-size: 0.875rem;
+        margin-bottom: 2rem;
+    }
+
+    .vip-activity-empty-btn {
+        background: linear-gradient(135deg, #3b82f6, #1e40af);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .vip-activity-empty-btn:hover {
+        background: linear-gradient(135deg, #1e40af, #1e3a8a);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .vip-activity-pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .vip-pagination-btn {
+        background: white;
+        border: 1px solid #d1d5db;
+        color: #374151;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+    }
+
+    .vip-pagination-btn:hover {
+        background: #f9fafb;
+        border-color: #9ca3af;
+        color: #374151;
+    }
+
+    .vip-pagination-btn.active {
+        background: #3b82f6;
+        border-color: #3b82f6;
+        color: white;
+    }
+
+    .vip-pagination-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="vip-activities-container">
+    <div class="container">
+        <!-- Header -->
+        <div class="vip-activities-header">
+            <h1 class="vip-activities-title">Activity History</h1>
+            <p class="vip-activities-subtitle">
+                Track all your VIP activities, interactions, and account events in one place.
+            </p>
+        </div>
+
+        <!-- Filters -->
+        <div class="vip-activities-filters">
+            <form method="GET" id="activityFilters">
+                <div class="vip-filter-grid">
+                    <div class="vip-filter-group">
+                        <label for="activity_type">Activity Type</label>
+                        <select name="activity_type" id="activity_type" class="vip-filter-select">
+                            <option value="">All Types</option>
+                            <option value="login" {% if request.GET.activity_type == 'login' %}selected{% endif %}>Dashboard Login</option>
+                            <option value="investment" {% if request.GET.activity_type == 'investment' %}selected{% endif %}>Investment Activity</option>
+                            <option value="withdrawal" {% if request.GET.activity_type == 'withdrawal' %}selected{% endif %}>Withdrawal Request</option>
+                            <option value="support" {% if request.GET.activity_type == 'support' %}selected{% endif %}>Support Contact</option>
+                            <option value="meeting" {% if request.GET.activity_type == 'meeting' %}selected{% endif %}>Staff Meeting</option>
+                            <option value="call" {% if request.GET.activity_type == 'call' %}selected{% endif %}>Phone Call</option>
+                            <option value="email" {% if request.GET.activity_type == 'email' %}selected{% endif %}>Email Communication</option>
+                            <option value="other" {% if request.GET.activity_type == 'other' %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+                    <div class="vip-filter-group">
+                        <label for="date_range">Date Range</label>
+                        <select name="date_range" id="date_range" class="vip-filter-select">
+                            <option value="">All Time</option>
+                            <option value="today" {% if request.GET.date_range == 'today' %}selected{% endif %}>Today</option>
+                            <option value="week" {% if request.GET.date_range == 'week' %}selected{% endif %}>This Week</option>
+                            <option value="month" {% if request.GET.date_range == 'month' %}selected{% endif %}>This Month</option>
+                            <option value="quarter" {% if request.GET.date_range == 'quarter' %}selected{% endif %}>This Quarter</option>
+                            <option value="year" {% if request.GET.date_range == 'year' %}selected{% endif %}>This Year</option>
+                        </select>
+                    </div>
+                    <div class="vip-filter-group">
+                        <label for="importance">Importance</label>
+                        <select name="importance" id="importance" class="vip-filter-select">
+                            <option value="">All Activities</option>
+                            <option value="important" {% if request.GET.importance == 'important' %}selected{% endif %}>Important Only</option>
+                        </select>
+                    </div>
+                    <div class="vip-filter-group">
+                        <button type="submit" class="vip-filter-btn">
+                            <i class="fas fa-filter"></i>
+                            Apply Filters
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Activities Timeline -->
+        <div class="vip-activities-timeline">
+            {% if all_activities %}
+                {% for activity in all_activities %}
+                <div class="vip-activity-item {% if activity.is_important %}important{% endif %}">
+                    <div class="vip-activity-content">
+                        <div class="vip-activity-header">
+                            <h3 class="vip-activity-title">{{ activity.title }}</h3>
+                            <span class="vip-activity-type {{ activity.activity_type }}">
+                                {% if activity.activity_type == 'login' %}
+                                    <i class="fas fa-sign-in-alt"></i> Login
+                                {% elif activity.activity_type == 'investment' %}
+                                    <i class="fas fa-chart-line"></i> Investment
+                                {% elif activity.activity_type == 'withdrawal' %}
+                                    <i class="fas fa-money-bill-wave"></i> Withdrawal
+                                {% elif activity.activity_type == 'support' %}
+                                    <i class="fas fa-headset"></i> Support
+                                {% elif activity.activity_type == 'meeting' %}
+                                    <i class="fas fa-users"></i> Meeting
+                                {% elif activity.activity_type == 'call' %}
+                                    <i class="fas fa-phone"></i> Call
+                                {% elif activity.activity_type == 'email' %}
+                                    <i class="fas fa-envelope"></i> Email
+                                {% else %}
+                                    <i class="fas fa-circle"></i> Other
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                        <div class="vip-activity-meta">
+                            <div class="vip-activity-time">
+                                <i class="fas fa-clock"></i>
+                                {{ activity.timestamp|date:"M j, Y" }} at {{ activity.timestamp|time:"g:i A" }}
+                                <span class="text-muted">({{ activity.timestamp|timesince }} ago)</span>
+                            </div>
+                            {% if activity.staff_member %}
+                            <div class="vip-activity-staff">
+                                <i class="fas fa-user-tie"></i>
+                                {{ activity.staff_member.full_name }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        {% if activity.description %}
+                        <div class="vip-activity-description">
+                            {{ activity.description }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="vip-activity-empty">
+                    <i class="fas fa-history vip-activity-empty-icon"></i>
+                    <h3 class="vip-activity-empty-title">No Activities Found</h3>
+                    <p class="vip-activity-empty-description">
+                        {% if request.GET %}
+                            No activities match your current filters. Try adjusting your search criteria.
+                        {% else %}
+                            Your activity history will appear here as you use VIP services.
+                        {% endif %}
+                    </p>
+                    {% if request.GET %}
+                        <a href="{% url 'vip_members:activities' %}" class="vip-activity-empty-btn">
+                            <i class="fas fa-refresh"></i>
+                            Clear Filters
+                        </a>
+                    {% else %}
+                        <a href="{% url 'investments:investment-marketplace' %}" class="vip-activity-empty-btn">
+                            <i class="fas fa-chart-line"></i>
+                            Start Investing
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Pagination (if needed) -->
+        {% if all_activities %}
+        <div class="vip-activity-pagination">
+            <!-- Pagination would be implemented here if needed -->
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Auto-submit form when filters change
+document.addEventListener('DOMContentLoaded', function() {
+    const filterForm = document.getElementById('activityFilters');
+    const filterSelects = filterForm.querySelectorAll('select');
+    
+    filterSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            filterForm.submit();
+        });
+    });
+});
+</script>
+{% endblock %}
