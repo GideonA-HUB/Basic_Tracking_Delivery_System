@@ -11,3 +11,6 @@ class VipMembersConfig(AppConfig):
             import vip_members.signals  # noqa
         except ImportError:
             pass
+        except Exception:
+            # If signals fail, don't crash the app
+            pass
