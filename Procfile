@@ -1,1 +1,1 @@
-web: pip install -r requirements.txt && echo "🚀 RAILWAY VIP MEMBERS DEPLOYMENT" && python railway_start.py
+web: pip install -r requirements.txt && echo "🚀 RAILWAY DEPLOYMENT - SIMPLE VERSION" && python railway_deploy_simple.py
