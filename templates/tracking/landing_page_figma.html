@@ -2451,9 +2451,9 @@
                     <span>Watch Demo</span>
                 </a>
                     {% if user.is_authenticated %}
-                    <a href="{% url 'vip_members:index' %}" class="btn-vip">
+                    <a href="{% url 'accounts:vip_login' %}" class="btn-vip">
                         <i class="fas fa-crown"></i>
-                        <span>VIP Members</span>
+                        <span>VIP Login</span>
                     </a>
                     {% endif %}
                 </div>

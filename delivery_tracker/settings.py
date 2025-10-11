@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'accounts',
     'investments',
     'chat.apps.ChatConfig',
-    'vip_members.apps.VipMembersConfig',
+    # 'vip_members.apps.VipMembersConfig',  # Temporarily disabled - using VIP login in accounts app
 ]
 
 MIDDLEWARE = [

@@ -15,13 +15,13 @@
             Invest for growth or choose delivery - the choice is yours.
         </p>
         
-        <!-- VIP Members Link -->
+        <!-- VIP Login Link -->
         {% if user.is_authenticated %}
         <div class="mb-6">
-            <a href="{% url 'vip_members:dashboard' %}" 
+            <a href="{% url 'accounts:vip_login' %}" 
                class="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
                 <i class="fas fa-crown"></i>
-                <span>VIP Members Dashboard</span>
+                <span>VIP Login</span>
                 <i class="fas fa-arrow-right"></i>
             </a>
         </div>

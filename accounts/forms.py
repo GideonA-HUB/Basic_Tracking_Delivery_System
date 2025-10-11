@@ -176,3 +176,43 @@ class StaffLoginForm(AuthenticationForm):
                 pass
         
         return cleaned_data
+
+
+class VIPLoginForm(AuthenticationForm):
+    """Custom login form for VIP members"""
+    
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500',
+            'placeholder': 'VIP Username or Email'
+        })
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500',
+            'placeholder': 'VIP Password'
+        })
+    )
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        username = cleaned_data.get('username')
+        password = cleaned_data.get('password')
+        
+        if username and password:
+            try:
+                user = User.objects.get(username=username)
+                # For now, allow any authenticated user to access VIP
+                # In production, you would check for VIP status here
+                if not user.is_active:
+                    raise forms.ValidationError("Account is not active.")
+            except User.DoesNotExist:
+                # Try to find by email
+                try:
+                    user = User.objects.get(email=username)
+                    if not user.is_active:
+                        raise forms.ValidationError("Account is not active.")
+                except User.DoesNotExist:
+                    pass
+        
+        return cleaned_data
