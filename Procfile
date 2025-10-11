@@ -1,1 +1,1 @@
-web: pip install -r requirements.txt && python deploy.py
+web: pip install -r requirements.txt && python deploy_complete.py

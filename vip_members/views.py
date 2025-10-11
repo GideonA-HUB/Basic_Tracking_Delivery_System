@@ -368,32 +368,38 @@ def application_status(request):
 
 def vip_login_redirect(request):
     """Redirect users to appropriate VIP page based on their status"""
-    VIPMember, VIPStaff, VIPActivity, VIPBenefit, VIPNotification, VIPApplication = get_vip_models()
-    
     if not request.user.is_authenticated:
         messages.info(request, "Please log in to access VIP features.")
         return redirect('accounts:customer_login')
     
-    # Check if user has active VIP membership
-    vip_member = VIPMember.objects.filter(customer=request.user, status='active').first()
-    if vip_member:
-        return redirect('vip_members:dashboard')
-    
-    # Check if user has pending application
-    application = VIPApplication.objects.filter(
-        customer=request.user,
-        status__in=['pending', 'under_review', 'requires_info']
-    ).first()
-    if application:
-        return redirect('vip_members:application_status')
-    
-    # Check if user has rejected application
-    rejected_application = VIPApplication.objects.filter(
-        customer=request.user,
-        status='rejected'
-    ).first()
-    if rejected_application:
-        messages.warning(request, "Your previous VIP application was rejected. You may apply again.")
-    
-    # Redirect to application form
-    return redirect('vip_members:apply')
+    try:
+        VIPMember, VIPStaff, VIPActivity, VIPBenefit, VIPNotification, VIPApplication = get_vip_models()
+        
+        # Check if user has active VIP membership
+        vip_member = VIPMember.objects.filter(customer=request.user, status='active').first()
+        if vip_member:
+            return redirect('vip_members:dashboard')
+        
+        # Check if user has pending application
+        application = VIPApplication.objects.filter(
+            customer=request.user,
+            status__in=['pending', 'under_review', 'requires_info']
+        ).first()
+        if application:
+            return redirect('vip_members:application_status')
+        
+        # Check if user has rejected application
+        rejected_application = VIPApplication.objects.filter(
+            customer=request.user,
+            status='rejected'
+        ).first()
+        if rejected_application:
+            messages.warning(request, "Your previous VIP application was rejected. You may apply again.")
+        
+        # Redirect to application form
+        return redirect('vip_members:apply')
+        
+    except Exception as e:
+        # If VIP tables don't exist yet, show a helpful message
+        messages.error(request, "VIP system is being set up. Please try again in a few minutes.")
+        return redirect('frontend:landing_page')
