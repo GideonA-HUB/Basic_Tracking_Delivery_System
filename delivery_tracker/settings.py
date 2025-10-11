@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'accounts',
     'investments',
     'chat.apps.ChatConfig',
-    'vip_members',
+    'vip_members.apps.VipMembersConfig',
 ]
 
 MIDDLEWARE = [

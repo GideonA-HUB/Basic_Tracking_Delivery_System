@@ -37,8 +37,20 @@ def main():
         
         # Specifically run VIP Members migrations
         print("🔄 STEP 3: Running VIP Members migrations...")
-        execute_from_command_line(['manage.py', 'migrate', 'vip_members', '--noinput'])
-        print("✅ VIP Members migrations completed")
+        try:
+            execute_from_command_line(['manage.py', 'migrate', 'vip_members', '--noinput'])
+            print("✅ VIP Members migrations completed")
+        except Exception as e:
+            print(f"⚠️ VIP Members migration failed: {e}")
+            print("🔄 Continuing with general migration...")
+            # Try to run makemigrations for vip_members first
+            try:
+                execute_from_command_line(['manage.py', 'makemigrations', 'vip_members', '--noinput'])
+                execute_from_command_line(['manage.py', 'migrate', 'vip_members', '--noinput'])
+                print("✅ VIP Members migrations completed after makemigrations")
+            except Exception as e2:
+                print(f"⚠️ VIP Members still failed: {e2}")
+                print("🔄 Skipping VIP Members migrations for now...")
         
         # Verify VIP tables exist
         print("🔄 STEP 4: Verifying VIP tables...")
