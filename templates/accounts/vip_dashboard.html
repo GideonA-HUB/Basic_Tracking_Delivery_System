@@ -66,22 +66,25 @@
         display: grid;
         grid-template-columns: 280px 1fr;
         min-height: 100vh;
+        background: #f8f9fa;
     }
 
     .dashboard-sidebar {
-        background: hsl(var(--card));
-        border-right: 1px solid hsl(var(--border));
+        background: #2c3e50;
+        border-right: 1px solid #34495e;
         overflow-y: auto;
+        color: white;
     }
 
     .dashboard-main {
         display: flex;
         flex-direction: column;
+        background: #f8f9fa;
     }
 
     .dashboard-header {
-        background: hsl(var(--card));
-        border-bottom: 1px solid hsl(var(--border));
+        background: white;
+        border-bottom: 1px solid #e5e7eb;
         padding: 1rem 2rem;
         display: flex;
         justify-content: space-between;
@@ -132,7 +135,7 @@
 
     /* Custom component styles */
     .balance-card {
-        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
         position: relative;
         overflow: hidden;
     }
@@ -167,9 +170,9 @@
 
     /* Sidebar navigation active state */
     .nav-item-active {
-        background: hsl(var(--accent));
-        color: hsl(var(--accent-foreground));
-        border-left: 3px solid #3b82f6;
+        background: #3498db;
+        color: white;
+        border-left: 3px solid #2980b9;
     }
 
     /* Card hover effects */
@@ -232,57 +235,44 @@
 <div class="dashboard-layout">
     <!-- Sidebar -->
     <aside class="dashboard-sidebar custom-scrollbar">
-        <div class="p-6">
-            <!-- Logo Section -->
-            <div class="flex items-center gap-3 mb-8">
-                <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-ship text-white text-lg"></i>
-                </div>
-                <div>
-                    <h1 class="text-lg font-bold text-gray-900 dark:text-white">MERIDIAN VIP</h1>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Banking Portal</p>
-                </div>
-            </div>
-
+        <div class="p-6 h-full flex flex-col">
             <!-- User Profile Section -->
-            <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 mb-6">
-                <div class="flex flex-col items-center text-center">
-                    <div class="w-16 h-16 bg-gradient-to-r from-purple-600 to-purple-700 rounded-full flex items-center justify-center text-white text-xl font-semibold mb-3">
+            <div class="mb-6">
+                <div class="flex flex-col items-center text-center mb-4">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-2xl font-bold mb-3">
                         {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
                     </div>
-                    <h3 class="font-semibold text-gray-900 dark:text-white">{{ vip_member.full_name }}</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">ID: {{ vip_member.member_id }}</p>
-                    <button class="mt-3 w-full bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors">
-                        <i class="fas fa-shield-alt mr-2"></i>
-                        Verify KYC
-                    </button>
-                    <div class="flex gap-2 mt-3 w-full">
-                        <button class="flex-1 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm py-2 px-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
-                            Profile
-                        </button>
-                        <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 px-3 rounded-lg transition-colors">
-                            Logout
-                        </button>
-                    </div>
+                    <h3 class="font-bold text-gray-900 text-lg">{{ vip_member.full_name }}</h3>
+                    <p class="text-sm text-gray-500">ID: {{ vip_member.member_id }}</p>
+                </div>
+                
+                <button class="w-full bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium py-2 px-4 rounded-md transition-colors mb-3 flex items-center justify-center gap-2">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Verify KYC
+                </button>
+                
+                <div class="flex items-center justify-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-md">
+                    <i class="fas fa-shield-alt"></i>
+                    <span class="text-sm font-medium">MERIDIAN VIP</span>
                 </div>
             </div>
 
             <!-- Navigation Menu -->
-            <nav class="space-y-6">
+            <nav class="flex-1 space-y-6">
                 <!-- Main Menu -->
                 <div>
-                    <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 px-3">Main Menu</h4>
+                    <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">MAIN MENU</h4>
                     <div class="space-y-1">
                         <a href="#" class="nav-item-active flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors">
-                            <i class="fas fa-home w-5 text-center"></i>
+                            <i class="fas fa-home w-4"></i>
                             Dashboard
                         </a>
-                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                            <i class="fas fa-chart-line w-5 text-center"></i>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-exchange-alt w-4"></i>
                             Transactions
                         </a>
-                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                            <i class="fas fa-credit-card w-5 text-center"></i>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-credit-card w-4"></i>
                             Cards
                         </a>
                     </div>
@@ -290,18 +280,18 @@
 
                 <!-- Transfers -->
                 <div>
-                    <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 px-3">Transfers</h4>
+                    <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">TRANSFERS</h4>
                     <div class="space-y-1">
-                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                            <i class="fas fa-paper-plane w-5 text-center"></i>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-desktop w-4"></i>
                             Local Transfer
                         </a>
-                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                            <i class="fas fa-globe w-5 text-center"></i>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-globe w-4"></i>
                             International Wire
                         </a>
-                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                            <i class="fas fa-plus w-5 text-center"></i>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-dollar-sign w-4"></i>
                             Deposit
                         </a>
                     </div>
@@ -309,18 +299,18 @@
 
                 <!-- Services -->
                 <div>
-                    <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 px-3">Services</h4>
+                    <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">SERVICES</h4>
                     <div class="space-y-1">
-                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                            <i class="fas fa-file-alt w-5 text-center"></i>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-file-alt w-4"></i>
                             Loan Request
                         </a>
-                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                            <i class="fas fa-receipt w-5 text-center"></i>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-receipt w-4"></i>
                             IRS Tax Refund
                         </a>
-                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                            <i class="fas fa-history w-5 text-center"></i>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-clock w-4"></i>
                             Loan History
                         </a>
                     </div>
@@ -328,28 +318,32 @@
 
                 <!-- Account -->
                 <div>
-                    <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 px-3">Account</h4>
+                    <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">ACCOUNT</h4>
                     <div class="space-y-1">
-                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                            <i class="fas fa-cog w-5 text-center"></i>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-user w-4"></i>
+                            Account
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-cog w-4"></i>
                             Settings
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-comment w-4"></i>
+                            Message us
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-building w-4"></i>
+                            Online Banking
                         </a>
                     </div>
                 </div>
             </nav>
 
             <!-- Footer -->
-            <div class="mt-auto pt-6 border-t border-gray-200 dark:border-gray-700">
-                <a href="#" class="flex items-center gap-3 bg-green-600 hover:bg-green-700 text-white p-3 rounded-lg transition-colors mb-3">
-                    <i class="fab fa-whatsapp"></i>
-                    <span class="text-sm font-medium">Message us</span>
-                </a>
-                <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm mb-2">
-                    <i class="fas fa-shield-alt"></i>
-                    <span>Secure Banking</span>
-                </div>
-                <div class="text-xs text-gray-400 dark:text-gray-500 text-center">
-                    v2.0.0 - New Design
+            <div class="mt-auto pt-6 border-t border-gray-200">
+                <div class="text-xs text-gray-400 text-center">
+                    © 2025 Meridian Asset Logistics
                 </div>
             </div>
         </div>
@@ -360,116 +354,121 @@
         <!-- Header -->
         <header class="dashboard-header">
             <div class="flex items-center gap-4">
-                <div class="text-gray-600 dark:text-gray-400">
-                    <span id="current-date-header"></span>
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">M</span>
+                    </div>
+                    <span class="text-gray-900 font-semibold">Meridian Asset Logistics</span>
                 </div>
             </div>
             <div class="flex items-center gap-4">
-                <div class="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-lg">
-                    <i class="fas fa-wallet text-gray-600 dark:text-gray-400"></i>
-                    <span class="font-semibold text-gray-900 dark:text-white">${{ vip_member.total_investments|default:"0" }}</span>
-                </div>
                 <div class="relative">
-                    <button class="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                        <i class="fas fa-bell"></i>
-                        <span class="notification-badge"></span>
+                    <button class="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-gray-900 transition-colors">
+                        <i class="fas fa-bell text-lg"></i>
+                        <span class="absolute -top-1 -right-1 w-5 h-5 bg-blue-600 text-white text-xs rounded-full flex items-center justify-center">3</span>
                     </button>
                 </div>
-                <div class="w-10 h-10 bg-gradient-to-r from-purple-600 to-purple-700 rounded-full flex items-center justify-center text-white font-semibold cursor-pointer">
-                    {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                    <i class="fas fa-user text-gray-600"></i>
                 </div>
             </div>
         </header>
 
         <!-- Dashboard Content -->
         <div class="dashboard-content">
-            <!-- Welcome Section -->
-            <div class="mb-8 animate-fade-in">
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Welcome back, {{ vip_member.full_name }}!</h1>
-                <p class="text-gray-600 dark:text-gray-400">Here's what's happening with your VIP account today.</p>
-            </div>
-
             <!-- Stats Overview -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-slide-up">
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 card-hover">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-xl p-6 border border-gray-200 card-hover">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">Current Balance</p>
-                            <p class="text-2xl font-bold text-gray-900 dark:text-white">${{ vip_member.total_investments|default:"0" }}</p>
+                            <p class="text-sm text-gray-600">Current Balance</p>
+                            <p class="text-2xl font-bold text-gray-900">$0</p>
                         </div>
-                        <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-wallet text-blue-600 dark:text-blue-400"></i>
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-wallet text-blue-600"></i>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 card-hover">
+                <div class="bg-white rounded-xl p-6 border border-gray-200 card-hover">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">Monthly Income</p>
-                            <p class="text-2xl font-bold text-gray-900 dark:text-white">${{ vip_member.monthly_income|default:"0" }}</p>
+                            <p class="text-sm text-gray-600">Monthly Income</p>
+                            <p class="text-2xl font-bold text-gray-900">$0</p>
                         </div>
-                        <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-arrow-up text-green-600 dark:text-green-400"></i>
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-chart-line text-green-600"></i>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 card-hover">
+                <div class="bg-white rounded-xl p-6 border border-gray-200 card-hover">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">Monthly Outgoing</p>
-                            <p class="text-2xl font-bold text-gray-900 dark:text-white">${{ vip_member.monthly_income|default:"0" }}</p>
+                            <p class="text-sm text-gray-600">Monthly Outgoing</p>
+                            <p class="text-2xl font-bold text-gray-900">$0</p>
                         </div>
-                        <div class="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-arrow-down text-red-600 dark:text-red-400"></i>
+                        <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-chart-line-down text-red-600"></i>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 card-hover">
+                <div class="bg-white rounded-xl p-6 border border-gray-200 card-hover">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">Transaction Limit</p>
-                            <p class="text-2xl font-bold text-gray-900 dark:text-white">$500,000</p>
+                            <p class="text-sm text-gray-600">Transaction Limit</p>
+                            <p class="text-2xl font-bold text-gray-900">$500,000</p>
                         </div>
-                        <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-chart-line text-purple-600 dark:text-purple-400"></i>
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-credit-card text-purple-600"></i>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Enhanced Balance Card -->
-            <div class="balance-card rounded-2xl p-8 mb-8 text-white animate-slide-up">
+            <div class="balance-card rounded-2xl p-8 mb-8 text-white">
                 <div class="balance-card-content">
                     <div class="flex justify-between items-start mb-6">
-                        <div>
-                            <p class="text-lg font-semibold mb-1">Good <span id="time-greeting"></span>, {{ vip_member.full_name }}!</p>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                                <span class="text-gray-600 font-bold text-lg">{{ user.first_name|first|upper }}</span>
+                            </div>
+                            <div>
+                                <p class="text-lg font-semibold">Good Evening, {{ vip_member.full_name }}</p>
+                            </div>
                         </div>
                         <div class="text-right">
-                            <p class="text-2xl font-bold font-mono" id="current-time">--:--:--</p>
-                            <p class="text-sm opacity-90" id="current-date-main">--</p>
+                            <p class="text-2xl font-bold font-mono" id="current-time">22:36:54</p>
+                            <p class="text-sm opacity-90" id="current-date-main">Sunday, October 12, 2025</p>
                         </div>
                     </div>
 
                     <div class="text-center mb-6">
                         <p class="text-sm opacity-90 mb-2">Available Balance</p>
-                        <p class="text-5xl font-bold mb-2">${{ vip_member.total_investments|default:"0" }} USD</p>
-                        <p class="text-sm opacity-90">Account: {{ vip_member.member_id }}</p>
-                        <div class="flex items-center justify-center gap-2 mt-2">
-                            <span class="w-2 h-2 bg-green-400 rounded-full"></span>
-                            <span class="text-sm">{{ vip_member.get_status_display }}</span>
+                        <div class="flex items-center justify-center gap-2 mb-2">
+                            <p class="text-5xl font-bold">$0.00</p>
+                            <span class="text-lg">USD</span>
+                            <button class="ml-2">
+                                <i class="fas fa-eye-slash text-white opacity-70"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center justify-center gap-2 mt-4">
+                            <i class="fas fa-shield-alt text-white"></i>
+                            <span class="text-sm">Your Account Number</span>
+                            <span class="text-sm font-bold">{{ vip_member.member_id }}</span>
+                            <span class="bg-red-500 text-white px-2 py-1 rounded text-xs">Inactive</span>
                         </div>
                     </div>
 
                     <div class="flex justify-center gap-4">
-                        <button class="bg-white bg-opacity-20 hover:bg-opacity-30 border border-white border-opacity-30 px-6 py-3 rounded-lg font-semibold transition-all flex items-center gap-2">
+                        <button class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold transition-all flex items-center gap-2">
                             <i class="fas fa-chart-line"></i>
                             Transactions
                         </button>
-                        <button class="bg-white bg-opacity-20 hover:bg-opacity-30 border border-white border-opacity-30 px-6 py-3 rounded-lg font-semibold transition-all flex items-center gap-2">
-                            <i class="fas fa-plus"></i>
+                        <button class="bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold transition-all flex items-center gap-2">
+                            <i class="fas fa-arrow-up"></i>
                             Top up
                         </button>
                     </div>
@@ -477,47 +476,35 @@
             </div>
 
             <!-- Quick Actions -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 mb-8 animate-slide-up">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <button class="flex items-center gap-3 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                        <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-paper-plane text-blue-600 dark:text-blue-400"></i>
+            <div class="bg-white rounded-xl p-6 border border-gray-200 mb-8">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">Quick Actions</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <button class="flex flex-col items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-paper-plane text-blue-600"></i>
                         </div>
-                        <div class="text-left">
-                            <p class="font-medium text-gray-900 dark:text-white">Transfer</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Send money</p>
-                        </div>
+                        <span class="font-medium text-gray-900">Transfer</span>
                     </button>
 
-                    <button class="flex items-center gap-3 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                        <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-plus text-green-600 dark:text-green-400"></i>
+                    <button class="flex flex-col items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-arrow-down text-green-600"></i>
                         </div>
-                        <div class="text-left">
-                            <p class="font-medium text-gray-900 dark:text-white">Deposit</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Add funds</p>
-                        </div>
+                        <span class="font-medium text-gray-900">Deposit</span>
                     </button>
 
-                    <button class="flex items-center gap-3 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                        <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-chart-line text-purple-600 dark:text-purple-400"></i>
+                    <button class="flex flex-col items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-plus text-purple-600"></i>
                         </div>
-                        <div class="text-left">
-                            <p class="font-medium text-gray-900 dark:text-white">Invest</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Grow wealth</p>
-                        </div>
+                        <span class="font-medium text-gray-900">Invest</span>
                     </button>
 
-                    <button class="flex items-center gap-3 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                        <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-exchange-alt text-orange-600 dark:text-orange-400"></i>
+                    <button class="flex flex-col items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-exchange-alt text-orange-600"></i>
                         </div>
-                        <div class="text-left">
-                            <p class="font-medium text-gray-900 dark:text-white">Exchange</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Convert currency</p>
-                        </div>
+                        <span class="font-medium text-gray-900">Exchange</span>
                     </button>
                 </div>
             </div>
@@ -525,104 +512,104 @@
             <!-- Main Content Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
                 <!-- Account Information -->
-                <div class="lg:col-span-2 animate-slide-up">
-                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 card-hover">
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-xl p-6 border border-gray-200 card-hover">
                         <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Account Information</h3>
-                            <button class="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline">View all</button>
+                            <h3 class="text-lg font-semibold text-gray-900">Account Information</h3>
+                            <button class="text-blue-600 text-sm font-medium hover:underline">View all</button>
                         </div>
                         
                         <div class="space-y-4">
-                            <div class="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-700">
+                            <div class="flex items-center justify-between py-3 border-b border-gray-100">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-crown text-blue-600 dark:text-blue-400"></i>
+                                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-crown text-blue-600"></i>
                                     </div>
                                     <div>
-                                        <p class="font-medium text-gray-900 dark:text-white">VIP Tier</p>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ vip_member.get_membership_tier_display }}</p>
+                                        <p class="font-medium text-gray-900">VIP Tier</p>
+                                        <p class="text-sm text-gray-500">{{ vip_member.get_membership_tier_display }}</p>
                                     </div>
                                 </div>
-                                <span class="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-3 py-1 rounded-full text-sm font-medium">
+                                <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
                                     {{ vip_member.get_membership_tier_display }}
                                 </span>
                             </div>
 
-                            <div class="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-700">
+                            <div class="flex items-center justify-between py-3 border-b border-gray-100">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-calendar text-green-600 dark:text-green-400"></i>
+                                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-calendar text-green-600"></i>
                                     </div>
                                     <div>
-                                        <p class="font-medium text-gray-900 dark:text-white">Member Since</p>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ vip_member.membership_start_date|date:"M Y" }}</p>
+                                        <p class="font-medium text-gray-900">Member Since</p>
+                                        <p class="text-sm text-gray-500">{{ vip_member.membership_start_date|date:"M Y" }}</p>
                                     </div>
                                 </div>
-                                <span class="text-gray-600 dark:text-gray-400 font-medium">{{ vip_member.membership_start_date|date:"M Y" }}</span>
+                                <span class="text-gray-600 font-medium">{{ vip_member.membership_start_date|date:"M Y" }}</span>
                             </div>
 
-                            <div class="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-700">
+                            <div class="flex items-center justify-between py-3 border-b border-gray-100">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-id-card text-purple-600 dark:text-purple-400"></i>
+                                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-check-circle text-green-600"></i>
                                     </div>
                                     <div>
-                                        <p class="font-medium text-gray-900 dark:text-white">Account Number</p>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">Primary Account</p>
+                                        <p class="font-medium text-gray-900">Status</p>
+                                        <p class="text-sm text-gray-500">Active</p>
                                     </div>
                                 </div>
-                                <span class="text-gray-600 dark:text-gray-400 font-mono">{{ vip_member.member_id }}</span>
+                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">Active</span>
                             </div>
 
                             <div class="flex items-center justify-between py-3">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-dollar-sign text-red-600 dark:text-red-400"></i>
+                                    <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-id-card text-purple-600"></i>
                                     </div>
                                     <div>
-                                        <p class="font-medium text-gray-900 dark:text-white">Total Investments</p>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">Portfolio Value</p>
+                                        <p class="font-medium text-gray-900">Account Number</p>
+                                        <p class="text-sm text-gray-500">Primary Account</p>
                                     </div>
                                 </div>
-                                <span class="text-gray-900 dark:text-white font-semibold">${{ vip_member.total_investments|default:"0" }}</span>
+                                <span class="text-gray-600 font-mono">{{ vip_member.member_id }}</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Account Statistics -->
-                <div class="animate-slide-up">
-                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 card-hover">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Account Statistics</h3>
+                <div>
+                    <div class="bg-white rounded-xl p-6 border border-gray-200 card-hover">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-6">Account Statistics</h3>
                         
                         <div class="space-y-6">
-                            <div>
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-sm text-gray-600 dark:text-gray-400">Transaction Limit</span>
-                                    <span class="text-sm font-medium text-gray-900 dark:text-white">$500,000</span>
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-credit-card text-blue-600"></i>
                                 </div>
-                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                    <div class="bg-blue-600 h-2 rounded-full progress-bar" style="width: 75%"></div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-sm text-gray-600 dark:text-gray-400">Pending Transactions</span>
-                                    <span class="text-sm font-medium text-gray-900 dark:text-white">3</span>
-                                </div>
-                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                    <div class="bg-yellow-500 h-2 rounded-full progress-bar" style="width: 30%"></div>
+                                <div>
+                                    <p class="font-medium text-gray-900">Transaction Limit</p>
+                                    <p class="text-sm text-gray-500">$500,000.00</p>
                                 </div>
                             </div>
 
-                            <div>
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-sm text-gray-600 dark:text-gray-400">Transaction Volume</span>
-                                    <span class="text-sm font-medium text-gray-900 dark:text-white">$125,000</span>
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-clock text-yellow-600"></i>
                                 </div>
-                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                    <div class="bg-green-500 h-2 rounded-full progress-bar" style="width: 85%"></div>
+                                <div>
+                                    <p class="font-medium text-gray-900">Pending Transactions</p>
+                                    <p class="text-sm text-gray-500">$0.00</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-chart-bar text-green-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-900">Transaction Volume</p>
+                                    <p class="text-sm text-gray-500">$0.00</p>
                                 </div>
                             </div>
                         </div>
@@ -633,46 +620,40 @@
             <!-- Bottom Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                 <!-- VIP Benefits -->
-                <div class="animate-slide-up">
-                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 card-hover">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">VIP Benefits</h3>
+                <div>
+                    <div class="bg-white rounded-xl p-6 border border-gray-200 card-hover">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                                <i class="fas fa-crown text-yellow-500"></i>
+                                VIP Benefits
+                            </h3>
+                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">Active</span>
+                        </div>
                         
                         <div class="space-y-4">
                             <div class="flex items-center gap-3">
-                                <div class="w-6 h-6 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-check text-green-600 dark:text-green-400 text-xs"></i>
+                                <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-check text-green-600 text-xs"></i>
                                 </div>
-                                <span class="text-gray-700 dark:text-gray-300">Priority Support</span>
+                                <span class="text-gray-700">Priority Support</span>
                             </div>
                             <div class="flex items-center gap-3">
-                                <div class="w-6 h-6 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-check text-green-600 dark:text-green-400 text-xs"></i>
+                                <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-check text-green-600 text-xs"></i>
                                 </div>
-                                <span class="text-gray-700 dark:text-gray-300">Dedicated Account Manager</span>
+                                <span class="text-gray-700">Dedicated Account Manager</span>
                             </div>
                             <div class="flex items-center gap-3">
-                                <div class="w-6 h-6 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-check text-green-600 dark:text-green-400 text-xs"></i>
+                                <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-check text-green-600 text-xs"></i>
                                 </div>
-                                <span class="text-gray-700 dark:text-gray-300">Exclusive Investment Opportunities</span>
+                                <span class="text-gray-700">Exclusive Investment Opportunities</span>
                             </div>
                             <div class="flex items-center gap-3">
-                                <div class="w-6 h-6 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-check text-green-600 dark:text-green-400 text-xs"></i>
+                                <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-check text-green-600 text-xs"></i>
                                 </div>
-                                <span class="text-gray-700 dark:text-gray-300">Faster Processing</span>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <div class="w-6 h-6 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-check text-green-600 dark:text-green-400 text-xs"></i>
-                                </div>
-                                <span class="text-gray-700 dark:text-gray-300">Higher Transaction Limits</span>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <div class="w-6 h-6 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-check text-green-600 dark:text-green-400 text-xs"></i>
-                                </div>
-                                <span class="text-gray-700 dark:text-gray-300">24/7 Concierge Service</span>
+                                <span class="text-gray-700">Faster Processing</span>
                             </div>
                         </div>
                     </div>
@@ -680,12 +661,9 @@
 
                 <!-- Account Manager -->
                 {% if assigned_staff %}
-                <div class="animate-slide-up">
+                <div>
                     <div class="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl p-6 text-white card-hover">
-                        <h3 class="text-lg font-semibold mb-6 flex items-center gap-2">
-                            <i class="fas fa-user-tie"></i>
-                            Your Dedicated Account Manager
-                        </h3>
+                        <h3 class="text-lg font-semibold mb-6">Your Dedicated Account Manager</h3>
                         
                         <div class="flex items-center gap-4">
                             <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-xl font-semibold">
@@ -694,9 +672,13 @@
                             <div class="flex-1">
                                 <h4 class="font-semibold">{{ assigned_staff.user.get_full_name }}</h4>
                                 <p class="text-sm opacity-90">{{ assigned_staff.department }} • {{ assigned_staff.get_role_display }}</p>
-                                <div class="flex gap-2 mt-2">
+                                <p class="text-sm opacity-90 flex items-center gap-2 mt-1">
+                                    <i class="fas fa-envelope"></i>
+                                    support@meridianassetlogistics.com
+                                </p>
+                                <div class="flex gap-2 mt-3">
                                     <button class="bg-white bg-opacity-20 hover:bg-opacity-30 border border-white border-opacity-30 px-4 py-2 rounded-lg text-sm font-medium transition-all">
-                                        <i class="fas fa-envelope mr-2"></i>
+                                        <i class="fas fa-comment mr-2"></i>
                                         Message
                                     </button>
                                     <button class="bg-white bg-opacity-20 hover:bg-opacity-30 border border-white border-opacity-30 px-4 py-2 rounded-lg text-sm font-medium transition-all">
@@ -712,18 +694,68 @@
             </div>
 
             <!-- Recent Activity -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 animate-slide-up">
+            <div class="bg-white rounded-xl p-6 border border-gray-200">
                 <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Recent Activity</h3>
-                    <button class="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline">View all</button>
+                    <h3 class="text-lg font-semibold text-gray-900">Recent Activity</h3>
+                    <button class="text-blue-600 text-sm font-medium hover:underline">View all</button>
                 </div>
                 
-                <div class="text-center py-12">
-                    <div class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-inbox text-gray-400 dark:text-gray-500 text-2xl"></i>
+                <div class="space-y-4">
+                    <div class="flex items-center gap-4 p-4 border border-gray-200 rounded-lg">
+                        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-arrow-down text-green-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-900">Investment Return</p>
+                            <p class="text-sm text-gray-500">Oct 12</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">completed</span>
+                            <span class="text-green-600 font-semibold">+$5,420.00</span>
+                        </div>
                     </div>
-                    <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No recent activity</h4>
-                    <p class="text-gray-500 dark:text-gray-400">Your transaction history will appear here</p>
+
+                    <div class="flex items-center gap-4 p-4 border border-gray-200 rounded-lg bg-blue-50">
+                        <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-arrow-up text-red-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-900">International Wire Transfer</p>
+                            <p class="text-sm text-gray-500">Oct 11</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">completed</span>
+                            <span class="text-red-600 font-semibold">-$12,500.00</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4 p-4 border border-gray-200 rounded-lg">
+                        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-arrow-down text-green-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-900">Dividend Payment</p>
+                            <p class="text-sm text-gray-500">Oct 10</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">completed</span>
+                            <span class="text-green-600 font-semibold">+$2,100.00</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4 p-4 border border-gray-200 rounded-lg">
+                        <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-arrow-up text-red-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-900">Service Fee</p>
+                            <p class="text-sm text-gray-500">Oct 9</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">pending</span>
+                            <span class="text-red-600 font-semibold">-$25.00</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
