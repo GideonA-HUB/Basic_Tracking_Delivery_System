@@ -5,991 +5,728 @@
 
 {% block extra_css %}
 <style>
-    /* VIP Dashboard - Silver Bridge Bank Inspired Design */
-    .vip-dashboard {
-        background: #f8fafc;
-        min-height: 100vh;
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    /* Global CSS Variables for Figma Design */
+    :root {
+        --background: 0 0% 100%;
+        --foreground: 222.2 84% 4.9%;
+        --card: 0 0% 100%;
+        --card-foreground: 222.2 84% 4.9%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 222.2 84% 4.9%;
+        --primary: 222.2 47.4% 11.2%;
+        --primary-foreground: 210 40% 98%;
+        --secondary: 210 40% 96%;
+        --secondary-foreground: 222.2 84% 4.9%;
+        --muted: 210 40% 96%;
+        --muted-foreground: 215.4 16.3% 46.9%;
+        --accent: 210 40% 96%;
+        --accent-foreground: 222.2 84% 4.9%;
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 210 40% 98%;
+        --border: 214.3 31.8% 91.4%;
+        --input: 214.3 31.8% 91.4%;
+        --ring: 222.2 84% 4.9%;
+        --radius: 0.5rem;
+    }
+
+    .dark {
+        --background: 222.2 84% 4.9%;
+        --foreground: 210 40% 98%;
+        --card: 222.2 84% 4.9%;
+        --card-foreground: 210 40% 98%;
+        --popover: 222.2 84% 4.9%;
+        --popover-foreground: 210 40% 98%;
+        --primary: 210 40% 98%;
+        --primary-foreground: 222.2 47.4% 11.2%;
+        --secondary: 217.2 32.6% 17.5%;
+        --secondary-foreground: 210 40% 98%;
+        --muted: 217.2 32.6% 17.5%;
+        --muted-foreground: 215 20.2% 65.1%;
+        --accent: 217.2 32.6% 17.5%;
+        --accent-foreground: 210 40% 98%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 210 40% 98%;
+        --border: 217.2 32.6% 17.5%;
+        --input: 217.2 32.6% 17.5%;
+        --ring: 212.7 26.8% 83.9%;
+    }
+
+    /* Base styles */
+    * {
+        border-color: hsl(var(--border));
+    }
+
+    body {
+        background-color: hsl(var(--background));
+        color: hsl(var(--foreground));
+    }
+
+    /* Dashboard Layout */
+    .dashboard-layout {
         display: grid;
         grid-template-columns: 280px 1fr;
-        grid-template-rows: auto 1fr;
-        grid-template-areas: 
-            "sidebar header"
-            "sidebar main";
+        min-height: 100vh;
     }
 
-    .dark .vip-dashboard {
-        background: #0f172a;
+    .dashboard-sidebar {
+        background: hsl(var(--card));
+        border-right: 1px solid hsl(var(--border));
+        overflow-y: auto;
     }
 
-    /* Header */
-    .vip-header {
-        grid-area: header;
-        background: white;
-        border-bottom: 1px solid #e2e8f0;
+    .dashboard-main {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .dashboard-header {
+        background: hsl(var(--card));
+        border-bottom: 1px solid hsl(var(--border));
         padding: 1rem 2rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        position: sticky;
-        top: 0;
-        z-index: 100;
     }
 
-    .dark .vip-header {
-        background: #1e293b;
-        border-bottom-color: #334155;
-    }
-
-    .vip-header-left {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .vip-header-date {
-        color: #64748b;
-        font-size: 0.875rem;
-        font-weight: 500;
-    }
-
-    .vip-header-right {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .vip-balance-display {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        background: #f1f5f9;
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        color: #334155;
-        font-weight: 600;
-    }
-
-    .vip-notification-icon {
-        width: 40px;
-        height: 40px;
-        background: #f1f5f9;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #64748b;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .vip-notification-icon:hover {
-        background: #e2e8f0;
-        color: #475569;
-    }
-
-    .vip-user-avatar {
-        width: 40px;
-        height: 40px;
-        background: linear-gradient(135deg, #a855f7, #9333ea);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: 600;
-        cursor: pointer;
-    }
-
-    /* Sidebar */
-    .vip-sidebar {
-        grid-area: sidebar;
-        background: #1e293b;
-        color: white;
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
-        position: sticky;
-        top: 0;
-        overflow-y: auto;
-    }
-
-    .dark .vip-sidebar {
-        background: #0f172a;
-    }
-
-    .vip-sidebar-header {
-        padding: 2rem 1.5rem;
-        border-bottom: 1px solid #334155;
-    }
-
-    .vip-sidebar-logo {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        margin-bottom: 2rem;
-    }
-
-    .vip-logo-icon {
-        width: 40px;
-        height: 40px;
-        background: linear-gradient(135deg, #fbbf24, #f59e0b);
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 1.25rem;
-        font-weight: 700;
-    }
-
-    .vip-logo-text {
-        font-size: 1.125rem;
-        font-weight: 700;
-        color: white;
-    }
-
-    .vip-user-profile {
-        background: #334155;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .vip-user-avatar-large {
-        width: 60px;
-        height: 60px;
-        background: linear-gradient(135deg, #a855f7, #9333ea);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 1.5rem;
-        font-weight: 600;
-        margin: 0 auto 1rem;
-    }
-
-    .vip-user-name {
-        text-align: center;
-        font-size: 1.125rem;
-        font-weight: 600;
-        margin-bottom: 0.25rem;
-    }
-
-    .vip-user-id {
-        text-align: center;
-        font-size: 0.875rem;
-        color: #94a3b8;
-        margin-bottom: 1rem;
-    }
-
-    .vip-verify-btn {
-        width: 100%;
-        background: #dc2626;
-        color: white;
-        border: none;
-        padding: 0.75rem;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-        transition: all 0.2s;
-    }
-
-    .vip-verify-btn:hover {
-        background: #b91c1c;
-    }
-
-    .vip-profile-actions {
-        display: flex;
-        gap: 0.5rem;
-    }
-
-    .vip-profile-btn {
+    .dashboard-content {
         flex: 1;
-        background: transparent;
-        color: white;
-        border: 1px solid #475569;
-        padding: 0.5rem;
-        border-radius: 6px;
-        font-size: 0.875rem;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .vip-profile-btn:hover {
-        background: #475569;
-    }
-
-    .vip-profile-btn.primary {
-        background: #3b82f6;
-        border-color: #3b82f6;
-    }
-
-    .vip-profile-btn.primary:hover {
-        background: #2563eb;
-    }
-
-    /* Navigation Menu */
-    .vip-nav-section {
-        margin-bottom: 2rem;
-    }
-
-    .vip-nav-title {
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: #94a3b8;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        padding: 0 1.5rem;
-        margin-bottom: 0.75rem;
-    }
-
-    .vip-nav-item {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 0.75rem 1.5rem;
-        color: #cbd5e1;
-        text-decoration: none;
-        transition: all 0.2s;
-        border-left: 3px solid transparent;
-    }
-
-    .vip-nav-item:hover {
-        background: #334155;
-        color: white;
-    }
-
-    .vip-nav-item.active {
-        background: #3b82f6;
-        color: white;
-        border-left-color: #60a5fa;
-    }
-
-    .vip-nav-icon {
-        width: 20px;
-        height: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .vip-nav-submenu {
-        margin-left: 1rem;
-    }
-
-    .vip-nav-submenu .vip-nav-item {
-        padding: 0.5rem 1.5rem;
-        font-size: 0.875rem;
-    }
-
-    /* Sidebar Footer */
-    .vip-sidebar-footer {
-        margin-top: auto;
-        padding: 1.5rem;
-        border-top: 1px solid #334155;
-    }
-
-    .vip-support-chat {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        background: #10b981;
-        padding: 0.75rem 1rem;
-        border-radius: 8px;
-        color: white;
-        text-decoration: none;
-        margin-bottom: 1rem;
-        transition: all 0.2s;
-    }
-
-    .vip-support-chat:hover {
-        background: #059669;
-    }
-
-    .vip-secure-banking {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        color: #94a3b8;
-        font-size: 0.875rem;
-        margin-bottom: 1rem;
-    }
-
-    .vip-version {
-        color: #64748b;
-        font-size: 0.75rem;
-        text-align: center;
-    }
-
-    /* Main Content */
-    .vip-main-content {
-        grid-area: main;
         padding: 2rem;
         overflow-y: auto;
     }
 
-    .vip-welcome-section {
-        margin-bottom: 2rem;
-    }
-
-    .vip-welcome-title {
-        font-size: 1.875rem;
-        font-weight: 700;
-        color: #1e293b;
-        margin-bottom: 0.5rem;
-    }
-
-    .dark .vip-welcome-title {
-        color: white;
-    }
-
-    .vip-welcome-subtitle {
-        color: #64748b;
-        font-size: 1rem;
-    }
-
-    /* Dashboard Cards */
-    .vip-cards-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .vip-card {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        border: 1px solid #e2e8f0;
-        transition: all 0.2s;
-    }
-
-    .vip-card:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        transform: translateY(-2px);
-    }
-
-    .dark .vip-card {
-        background: #1e293b;
-        border-color: #334155;
-    }
-
-    .vip-card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-    }
-
-    .vip-card-title {
-        font-size: 1.125rem;
-        font-weight: 600;
-        color: #1e293b;
-    }
-
-    .dark .vip-card-title {
-        color: white;
-    }
-
-    .vip-card-action {
-        color: #3b82f6;
-        text-decoration: none;
-        font-size: 0.875rem;
-        font-weight: 500;
-    }
-
-    .vip-card-action:hover {
-        color: #2563eb;
-    }
-
-    /* Primary Balance Card */
-    .vip-primary-card {
-        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-        color: white;
-        border-radius: 16px;
-        padding: 2rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
-    }
-
-    .vip-primary-card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 1.5rem;
-    }
-
-    .vip-greeting {
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-    }
-
-    .vip-time-display {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        text-align: right;
-    }
-
-    .vip-current-time {
-        font-size: 1.5rem;
-        font-weight: 700;
-        font-family: 'Courier New', monospace;
-        margin-bottom: 0.25rem;
-    }
-
-    .vip-current-date {
-        font-size: 0.875rem;
-        opacity: 0.9;
-    }
-
-    .vip-balance-section {
-        text-align: center;
-        margin-bottom: 1.5rem;
-    }
-
-    .vip-balance-label {
-        font-size: 0.875rem;
-        opacity: 0.9;
-        margin-bottom: 0.5rem;
-    }
-
-    .vip-balance-amount {
-        font-size: 3rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-    }
-
-    .vip-balance-actions {
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
-    }
-
-    .vip-balance-btn {
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .vip-balance-btn:hover {
-        background: rgba(255, 255, 255, 0.3);
-        border-color: rgba(255, 255, 255, 0.5);
-    }
-
-    /* Quick Actions */
-    .vip-quick-actions {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-bottom: 2rem;
-    }
-
-    .vip-action-card {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        text-align: center;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        border: 1px solid #e2e8f0;
-        cursor: pointer;
-        transition: all 0.2s;
-        text-decoration: none;
-        color: inherit;
-    }
-
-    .vip-action-card:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        transform: translateY(-2px);
-    }
-
-    .dark .vip-action-card {
-        background: #1e293b;
-        border-color: #334155;
-    }
-
-    .vip-action-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1rem;
-        font-size: 1.5rem;
-        color: white;
-    }
-
-    .vip-action-icon.blue { background: #3b82f6; }
-    .vip-action-icon.green { background: #10b981; }
-    .vip-action-icon.purple { background: #8b5cf6; }
-    .vip-action-icon.orange { background: #f59e0b; }
-
-    .vip-action-title {
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        color: #1e293b;
-    }
-
-    .dark .vip-action-title {
-        color: white;
-    }
-
-    .vip-action-description {
-        font-size: 0.875rem;
-        color: #64748b;
-    }
-
-    /* Staff Assignment Card */
-    .vip-staff-card {
-        background: linear-gradient(135deg, #fbbf24, #f59e0b);
-        color: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .vip-staff-title {
-        font-size: 1.125rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .vip-staff-info {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .vip-staff-avatar {
-        width: 48px;
-        height: 48px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 600;
-    }
-
-    .vip-staff-details h4 {
-        margin: 0 0 0.25rem 0;
-        font-size: 1rem;
-        font-weight: 600;
-    }
-
-    .vip-staff-details p {
-        margin: 0;
-        font-size: 0.875rem;
-        opacity: 0.9;
-    }
-
-    .vip-staff-contact {
-        margin-left: auto;
-    }
-
-    .vip-contact-btn {
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-        font-size: 0.875rem;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .vip-contact-btn:hover {
-        background: rgba(255, 255, 255, 0.3);
-    }
-
-    /* Responsive Design */
+    /* Mobile responsive */
     @media (max-width: 768px) {
-        .vip-dashboard {
+        .dashboard-layout {
             grid-template-columns: 1fr;
-            grid-template-areas: 
-                "header"
-                "main";
         }
-
-        .vip-sidebar {
+        
+        .dashboard-sidebar {
             display: none;
         }
-
-        .vip-main-content {
-            padding: 1rem;
-        }
-
-        .vip-cards-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .vip-quick-actions {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        .vip-balance-amount {
-            font-size: 2rem;
-        }
     }
 
-    /* Animations */
-    @keyframes fadeInUp {
-        from {
+    /* Animation classes */
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .animate-slide-up {
+        animation: slideUp 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+        from { 
             opacity: 0;
             transform: translateY(20px);
         }
-        to {
+        to { 
             opacity: 1;
             transform: translateY(0);
         }
     }
 
-    .vip-card,
-    .vip-primary-card,
-    .vip-staff-card {
-        animation: fadeInUp 0.6s ease-out;
+    /* Custom component styles */
+    .balance-card {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        position: relative;
+        overflow: hidden;
     }
 
-    .vip-card:nth-child(2) { animation-delay: 0.1s; }
-    .vip-card:nth-child(3) { animation-delay: 0.2s; }
-    .vip-card:nth-child(4) { animation-delay: 0.3s; }
+    .balance-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+        pointer-events: none;
+    }
+
+    .balance-card-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Notification badge */
+    .notification-badge {
+        position: absolute;
+        top: -2px;
+        right: -2px;
+        width: 8px;
+        height: 8px;
+        background: #ef4444;
+        border-radius: 50%;
+        border: 2px solid white;
+    }
+
+    /* Sidebar navigation active state */
+    .nav-item-active {
+        background: hsl(var(--accent));
+        color: hsl(var(--accent-foreground));
+        border-left: 3px solid #3b82f6;
+    }
+
+    /* Card hover effects */
+    .card-hover {
+        transition: all 0.2s ease-in-out;
+    }
+
+    .card-hover:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Progress bar animation */
+    .progress-bar {
+        transition: width 0.3s ease-in-out;
+    }
+
+    /* Status indicators */
+    .status-active {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .dark .status-active {
+        background: #14532d;
+        color: #bbf7d0;
+    }
+
+    .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .dark .status-pending {
+        background: #78350f;
+        color: #fde68a;
+    }
+
+    /* Custom scrollbar */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: hsl(var(--muted));
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: hsl(var(--muted-foreground));
+        border-radius: 3px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: hsl(var(--accent-foreground));
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="vip-dashboard">
-    <!-- Header -->
-    <header class="vip-header">
-        <div class="vip-header-left">
-            <div class="vip-header-date">
-                <span id="current-date"></span>
-            </div>
-        </div>
-        <div class="vip-header-right">
-            <div class="vip-balance-display">
-                <i class="fas fa-wallet"></i>
-                <span>${{ vip_member.total_investments|default:"0" }}</span>
-            </div>
-            <div class="vip-notification-icon">
-                <i class="fas fa-bell"></i>
-            </div>
-            <div class="vip-user-avatar">
-                {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
-            </div>
-        </div>
-    </header>
-
+<div class="dashboard-layout">
     <!-- Sidebar -->
-    <aside class="vip-sidebar">
-        <div class="vip-sidebar-header">
-            <div class="vip-sidebar-logo">
-                <div class="vip-logo-icon">
-                    <i class="fas fa-ship"></i>
+    <aside class="dashboard-sidebar custom-scrollbar">
+        <div class="p-6">
+            <!-- Logo Section -->
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-ship text-white text-lg"></i>
                 </div>
-                <div class="vip-logo-text">MERIDIAN VIP</div>
+                <div>
+                    <h1 class="text-lg font-bold text-gray-900 dark:text-white">MERIDIAN VIP</h1>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Banking Portal</p>
+                </div>
             </div>
-            
-            <div class="vip-user-profile">
-                <div class="vip-user-avatar-large">
-                    {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+
+            <!-- User Profile Section -->
+            <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 mb-6">
+                <div class="flex flex-col items-center text-center">
+                    <div class="w-16 h-16 bg-gradient-to-r from-purple-600 to-purple-700 rounded-full flex items-center justify-center text-white text-xl font-semibold mb-3">
+                        {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                    </div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white">{{ vip_member.full_name }}</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">ID: {{ vip_member.member_id }}</p>
+                    <button class="mt-3 w-full bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors">
+                        <i class="fas fa-shield-alt mr-2"></i>
+                        Verify KYC
+                    </button>
+                    <div class="flex gap-2 mt-3 w-full">
+                        <button class="flex-1 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm py-2 px-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                            Profile
+                        </button>
+                        <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 px-3 rounded-lg transition-colors">
+                            Logout
+                        </button>
+                    </div>
                 </div>
-                <div class="vip-user-name">{{ vip_member.full_name }}</div>
-                <div class="vip-user-id">ID: {{ vip_member.member_id }}</div>
-                <button class="vip-verify-btn">
+            </div>
+
+            <!-- Navigation Menu -->
+            <nav class="space-y-6">
+                <!-- Main Menu -->
+                <div>
+                    <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 px-3">Main Menu</h4>
+                    <div class="space-y-1">
+                        <a href="#" class="nav-item-active flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors">
+                            <i class="fas fa-home w-5 text-center"></i>
+                            Dashboard
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                            <i class="fas fa-chart-line w-5 text-center"></i>
+                            Transactions
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                            <i class="fas fa-credit-card w-5 text-center"></i>
+                            Cards
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Transfers -->
+                <div>
+                    <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 px-3">Transfers</h4>
+                    <div class="space-y-1">
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                            <i class="fas fa-paper-plane w-5 text-center"></i>
+                            Local Transfer
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                            <i class="fas fa-globe w-5 text-center"></i>
+                            International Wire
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                            <i class="fas fa-plus w-5 text-center"></i>
+                            Deposit
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Services -->
+                <div>
+                    <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 px-3">Services</h4>
+                    <div class="space-y-1">
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                            <i class="fas fa-file-alt w-5 text-center"></i>
+                            Loan Request
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                            <i class="fas fa-receipt w-5 text-center"></i>
+                            IRS Tax Refund
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                            <i class="fas fa-history w-5 text-center"></i>
+                            Loan History
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Account -->
+                <div>
+                    <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 px-3">Account</h4>
+                    <div class="space-y-1">
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                            <i class="fas fa-cog w-5 text-center"></i>
+                            Settings
+                        </a>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Footer -->
+            <div class="mt-auto pt-6 border-t border-gray-200 dark:border-gray-700">
+                <a href="#" class="flex items-center gap-3 bg-green-600 hover:bg-green-700 text-white p-3 rounded-lg transition-colors mb-3">
+                    <i class="fab fa-whatsapp"></i>
+                    <span class="text-sm font-medium">Message us</span>
+                </a>
+                <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm mb-2">
                     <i class="fas fa-shield-alt"></i>
-                    Verify KYC
-                </button>
-                <div class="vip-profile-actions">
-                    <button class="vip-profile-btn">Profile</button>
-                    <button class="vip-profile-btn primary">Logout</button>
+                    <span>Secure Banking</span>
+                </div>
+                <div class="text-xs text-gray-400 dark:text-gray-500 text-center">
+                    v2.0.0 - New Design
                 </div>
             </div>
-        </div>
-
-        <!-- Navigation Menu -->
-        <nav class="vip-nav">
-            <div class="vip-nav-section">
-                <div class="vip-nav-title">Main Menu</div>
-                <a href="#" class="vip-nav-item active">
-                    <div class="vip-nav-icon"><i class="fas fa-home"></i></div>
-                    Dashboard
-                </a>
-                <a href="#" class="vip-nav-item">
-                    <div class="vip-nav-icon"><i class="fas fa-chart-line"></i></div>
-                    Transactions
-                </a>
-                <a href="#" class="vip-nav-item">
-                    <div class="vip-nav-icon"><i class="fas fa-credit-card"></i></div>
-                    Cards
-                </a>
-            </div>
-
-            <div class="vip-nav-section">
-                <div class="vip-nav-title">Transfers</div>
-                <a href="#" class="vip-nav-item">
-                    <div class="vip-nav-icon"><i class="fas fa-paper-plane"></i></div>
-                    Local Transfer
-                </a>
-                <a href="#" class="vip-nav-item">
-                    <div class="vip-nav-icon"><i class="fas fa-globe"></i></div>
-                    International Wire
-                </a>
-                <a href="#" class="vip-nav-item">
-                    <div class="vip-nav-icon"><i class="fas fa-plus"></i></div>
-                    Deposit
-                </a>
-            </div>
-
-            <div class="vip-nav-section">
-                <div class="vip-nav-title">Services</div>
-                <a href="#" class="vip-nav-item">
-                    <div class="vip-nav-icon"><i class="fas fa-file-alt"></i></div>
-                    Loan Request
-                </a>
-                <a href="#" class="vip-nav-item">
-                    <div class="vip-nav-icon"><i class="fas fa-receipt"></i></div>
-                    IRS Tax Refund
-                </a>
-                <a href="#" class="vip-nav-item">
-                    <div class="vip-nav-icon"><i class="fas fa-history"></i></div>
-                    Loan History
-                </a>
-            </div>
-
-            <div class="vip-nav-section">
-                <div class="vip-nav-title">Account</div>
-                <a href="#" class="vip-nav-item">
-                    <div class="vip-nav-icon"><i class="fas fa-cog"></i></div>
-                    Settings
-                </a>
-            </div>
-        </nav>
-
-        <div class="vip-sidebar-footer">
-            <a href="#" class="vip-support-chat">
-                <i class="fab fa-whatsapp"></i>
-                Message us
-            </a>
-            <div class="vip-secure-banking">
-                <i class="fas fa-shield-alt"></i>
-                Secure Banking
-            </div>
-            <div class="vip-version">v2.0.0 - New Design</div>
         </div>
     </aside>
 
     <!-- Main Content -->
-    <main class="vip-main-content">
-        <div class="vip-welcome-section">
-            <h1 class="vip-welcome-title">Welcome back, {{ vip_member.full_name }}!</h1>
-            <p class="vip-welcome-subtitle">Here's what's happening with your VIP account today.</p>
-        </div>
-
-        <!-- Primary Balance Card -->
-        <div class="vip-primary-card">
-            <div class="vip-primary-card-header">
-                <div>
-                    <div class="vip-greeting">Good <span id="time-greeting"></span>, {{ vip_member.full_name }}!</div>
-                    <div class="vip-time-display">
-                        <div class="vip-current-time" id="current-time"></div>
-                        <div class="vip-current-date" id="current-date-main"></div>
-                    </div>
+    <main class="dashboard-main">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="flex items-center gap-4">
+                <div class="text-gray-600 dark:text-gray-400">
+                    <span id="current-date-header"></span>
                 </div>
             </div>
-            
-            <div class="vip-balance-section">
-                <div class="vip-balance-label">Available Balance</div>
-                <div class="vip-balance-amount">${{ vip_member.total_investments|default:"0" }} USD</div>
-                <div class="vip-balance-actions">
-                    <button class="vip-balance-btn">
-                        <i class="fas fa-chart-line"></i>
-                        Transactions
-                    </button>
-                    <button class="vip-balance-btn">
-                        <i class="fas fa-wallet"></i>
-                        Top up
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-lg">
+                    <i class="fas fa-wallet text-gray-600 dark:text-gray-400"></i>
+                    <span class="font-semibold text-gray-900 dark:text-white">${{ vip_member.total_investments|default:"0" }}</span>
+                </div>
+                <div class="relative">
+                    <button class="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge"></span>
                     </button>
                 </div>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="vip-quick-actions">
-            <a href="#" class="vip-action-card">
-                <div class="vip-action-icon blue">
-                    <i class="fas fa-building"></i>
-                </div>
-                <div class="vip-action-title">Account Info</div>
-                <div class="vip-action-description">View your account details</div>
-            </a>
-            
-            <a href="#" class="vip-action-card">
-                <div class="vip-action-icon green">
-                    <i class="fas fa-paper-plane"></i>
-                </div>
-                <div class="vip-action-title">Send Money</div>
-                <div class="vip-action-description">Transfer funds instantly</div>
-            </a>
-            
-            <a href="#" class="vip-action-card">
-                <div class="vip-action-icon purple">
-                    <i class="fas fa-plus"></i>
-                </div>
-                <div class="vip-action-title">Deposit</div>
-                <div class="vip-action-description">Add funds to your account</div>
-            </a>
-            
-            <a href="#" class="vip-action-card">
-                <div class="vip-action-icon orange">
-                    <i class="fas fa-clock"></i>
-                </div>
-                <div class="vip-action-title">History</div>
-                <div class="vip-action-description">View transaction history</div>
-            </a>
-        </div>
-
-        <!-- Dashboard Cards Grid -->
-        <div class="vip-cards-grid">
-            <!-- Account Information Card -->
-            <div class="vip-card">
-                <div class="vip-card-header">
-                    <h3 class="vip-card-title">Account Information</h3>
-                    <a href="#" class="vip-card-action">View all</a>
-                </div>
-                <div class="space-y-3">
-                    <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-400">VIP Tier</span>
-                        <span class="font-semibold">{{ vip_member.get_membership_tier_display }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-400">Member Since</span>
-                        <span class="font-semibold">{{ vip_member.membership_start_date|date:"M Y" }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-400">Status</span>
-                        <span class="font-semibold text-green-600">{{ vip_member.get_status_display }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-400">Account Number</span>
-                        <span class="font-semibold">{{ vip_member.member_id }}</span>
-                    </div>
+                <div class="w-10 h-10 bg-gradient-to-r from-purple-600 to-purple-700 rounded-full flex items-center justify-center text-white font-semibold cursor-pointer">
+                    {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
                 </div>
             </div>
+        </header>
 
-            <!-- Financial Overview Card -->
-            <div class="vip-card">
-                <div class="vip-card-header">
-                    <h3 class="vip-card-title">Financial Overview</h3>
-                    <a href="#" class="vip-card-action">View details</a>
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <!-- Welcome Section -->
+            <div class="mb-8 animate-fade-in">
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Welcome back, {{ vip_member.full_name }}!</h1>
+                <p class="text-gray-600 dark:text-gray-400">Here's what's happening with your VIP account today.</p>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-slide-up">
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 card-hover">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Current Balance</p>
+                            <p class="text-2xl font-bold text-gray-900 dark:text-white">${{ vip_member.total_investments|default:"0" }}</p>
+                        </div>
+                        <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-wallet text-blue-600 dark:text-blue-400"></i>
+                        </div>
+                    </div>
                 </div>
-                <div class="space-y-3">
-                    <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-400">Total Investments</span>
-                        <span class="font-semibold">${{ vip_member.total_investments|default:"0" }}</span>
+
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 card-hover">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Monthly Income</p>
+                            <p class="text-2xl font-bold text-gray-900 dark:text-white">${{ vip_member.monthly_income|default:"0" }}</p>
+                        </div>
+                        <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-arrow-up text-green-600 dark:text-green-400"></i>
+                        </div>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-400">Monthly Income</span>
-                        <span class="font-semibold">${{ vip_member.monthly_income|default:"0" }}</span>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 card-hover">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Monthly Outgoing</p>
+                            <p class="text-2xl font-bold text-gray-900 dark:text-white">${{ vip_member.monthly_income|default:"0" }}</p>
+                        </div>
+                        <div class="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-arrow-down text-red-600 dark:text-red-400"></i>
+                        </div>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-400">Net Worth</span>
-                        <span class="font-semibold">${{ vip_member.net_worth|default:"0" }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-400">Transaction Limit</span>
-                        <span class="font-semibold">$500,000.00</span>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 card-hover">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Transaction Limit</p>
+                            <p class="text-2xl font-bold text-gray-900 dark:text-white">$500,000</p>
+                        </div>
+                        <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-chart-line text-purple-600 dark:text-purple-400"></i>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Recent Activity Card -->
-            <div class="vip-card">
-                <div class="vip-card-header">
-                    <h3 class="vip-card-title">Recent Activity</h3>
-                    <a href="#" class="vip-card-action">View all</a>
-                </div>
-                <div class="text-center py-8">
-                    <div class="text-gray-400 text-6xl mb-4">
-                        <i class="fas fa-inbox"></i>
+            <!-- Enhanced Balance Card -->
+            <div class="balance-card rounded-2xl p-8 mb-8 text-white animate-slide-up">
+                <div class="balance-card-content">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <p class="text-lg font-semibold mb-1">Good <span id="time-greeting"></span>, {{ vip_member.full_name }}!</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-2xl font-bold font-mono" id="current-time">--:--:--</p>
+                            <p class="text-sm opacity-90" id="current-date-main">--</p>
+                        </div>
                     </div>
-                    <div class="text-gray-600 dark:text-gray-400 mb-2">No recent activity</div>
-                    <div class="text-sm text-gray-500">Your transaction history will appear here</div>
+
+                    <div class="text-center mb-6">
+                        <p class="text-sm opacity-90 mb-2">Available Balance</p>
+                        <p class="text-5xl font-bold mb-2">${{ vip_member.total_investments|default:"0" }} USD</p>
+                        <p class="text-sm opacity-90">Account: {{ vip_member.member_id }}</p>
+                        <div class="flex items-center justify-center gap-2 mt-2">
+                            <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                            <span class="text-sm">{{ vip_member.get_status_display }}</span>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center gap-4">
+                        <button class="bg-white bg-opacity-20 hover:bg-opacity-30 border border-white border-opacity-30 px-6 py-3 rounded-lg font-semibold transition-all flex items-center gap-2">
+                            <i class="fas fa-chart-line"></i>
+                            Transactions
+                        </button>
+                        <button class="bg-white bg-opacity-20 hover:bg-opacity-30 border border-white border-opacity-30 px-6 py-3 rounded-lg font-semibold transition-all flex items-center gap-2">
+                            <i class="fas fa-plus"></i>
+                            Top up
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- VIP Benefits Card -->
-            <div class="vip-card">
-                <div class="vip-card-header">
-                    <h3 class="vip-card-title">VIP Benefits</h3>
-                    <a href="#" class="vip-card-action">View all</a>
-                </div>
-                <div class="space-y-3">
-                    <div class="flex items-center gap-3">
-                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span class="text-sm">Priority Support</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span class="text-sm">Dedicated Account Manager</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span class="text-sm">Exclusive Investment Opportunities</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span class="text-sm">Faster Processing</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+            <!-- Quick Actions -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 mb-8 animate-slide-up">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <button class="flex items-center gap-3 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-paper-plane text-blue-600 dark:text-blue-400"></i>
+                        </div>
+                        <div class="text-left">
+                            <p class="font-medium text-gray-900 dark:text-white">Transfer</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Send money</p>
+                        </div>
+                    </button>
 
-        <!-- Staff Assignment Card -->
-        {% if assigned_staff %}
-        <div class="vip-staff-card">
-            <div class="vip-staff-title">
-                <i class="fas fa-user-tie"></i>
-                Your Dedicated Account Manager
-            </div>
-            <div class="vip-staff-info">
-                <div class="vip-staff-avatar">
-                    {{ assigned_staff.user.first_name|first|upper }}{{ assigned_staff.user.last_name|first|upper }}
-                </div>
-                <div class="vip-staff-details">
-                    <h4>{{ assigned_staff.user.get_full_name }}</h4>
-                    <p>{{ assigned_staff.department }} • {{ assigned_staff.get_role_display }}</p>
-                </div>
-                <div class="vip-staff-contact">
-                    <button class="vip-contact-btn">
-                        <i class="fas fa-phone"></i>
-                        Contact Manager
+                    <button class="flex items-center gap-3 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-plus text-green-600 dark:text-green-400"></i>
+                        </div>
+                        <div class="text-left">
+                            <p class="font-medium text-gray-900 dark:text-white">Deposit</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Add funds</p>
+                        </div>
+                    </button>
+
+                    <button class="flex items-center gap-3 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-chart-line text-purple-600 dark:text-purple-400"></i>
+                        </div>
+                        <div class="text-left">
+                            <p class="font-medium text-gray-900 dark:text-white">Invest</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Grow wealth</p>
+                        </div>
+                    </button>
+
+                    <button class="flex items-center gap-3 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-exchange-alt text-orange-600 dark:text-orange-400"></i>
+                        </div>
+                        <div class="text-left">
+                            <p class="font-medium text-gray-900 dark:text-white">Exchange</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Convert currency</p>
+                        </div>
                     </button>
                 </div>
             </div>
+
+            <!-- Main Content Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                <!-- Account Information -->
+                <div class="lg:col-span-2 animate-slide-up">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 card-hover">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Account Information</h3>
+                            <button class="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline">View all</button>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-700">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-crown text-blue-600 dark:text-blue-400"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-900 dark:text-white">VIP Tier</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ vip_member.get_membership_tier_display }}</p>
+                                    </div>
+                                </div>
+                                <span class="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-3 py-1 rounded-full text-sm font-medium">
+                                    {{ vip_member.get_membership_tier_display }}
+                                </span>
+                            </div>
+
+                            <div class="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-700">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-calendar text-green-600 dark:text-green-400"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-900 dark:text-white">Member Since</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ vip_member.membership_start_date|date:"M Y" }}</p>
+                                    </div>
+                                </div>
+                                <span class="text-gray-600 dark:text-gray-400 font-medium">{{ vip_member.membership_start_date|date:"M Y" }}</span>
+                            </div>
+
+                            <div class="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-700">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-id-card text-purple-600 dark:text-purple-400"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-900 dark:text-white">Account Number</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Primary Account</p>
+                                    </div>
+                                </div>
+                                <span class="text-gray-600 dark:text-gray-400 font-mono">{{ vip_member.member_id }}</span>
+                            </div>
+
+                            <div class="flex items-center justify-between py-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-dollar-sign text-red-600 dark:text-red-400"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-900 dark:text-white">Total Investments</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Portfolio Value</p>
+                                    </div>
+                                </div>
+                                <span class="text-gray-900 dark:text-white font-semibold">${{ vip_member.total_investments|default:"0" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Statistics -->
+                <div class="animate-slide-up">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 card-hover">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Account Statistics</h3>
+                        
+                        <div class="space-y-6">
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Transaction Limit</span>
+                                    <span class="text-sm font-medium text-gray-900 dark:text-white">$500,000</span>
+                                </div>
+                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                    <div class="bg-blue-600 h-2 rounded-full progress-bar" style="width: 75%"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Pending Transactions</span>
+                                    <span class="text-sm font-medium text-gray-900 dark:text-white">3</span>
+                                </div>
+                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                    <div class="bg-yellow-500 h-2 rounded-full progress-bar" style="width: 30%"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Transaction Volume</span>
+                                    <span class="text-sm font-medium text-gray-900 dark:text-white">$125,000</span>
+                                </div>
+                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                    <div class="bg-green-500 h-2 rounded-full progress-bar" style="width: 85%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- VIP Benefits -->
+                <div class="animate-slide-up">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 card-hover">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">VIP Benefits</h3>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-check text-green-600 dark:text-green-400 text-xs"></i>
+                                </div>
+                                <span class="text-gray-700 dark:text-gray-300">Priority Support</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-check text-green-600 dark:text-green-400 text-xs"></i>
+                                </div>
+                                <span class="text-gray-700 dark:text-gray-300">Dedicated Account Manager</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-check text-green-600 dark:text-green-400 text-xs"></i>
+                                </div>
+                                <span class="text-gray-700 dark:text-gray-300">Exclusive Investment Opportunities</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-check text-green-600 dark:text-green-400 text-xs"></i>
+                                </div>
+                                <span class="text-gray-700 dark:text-gray-300">Faster Processing</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-check text-green-600 dark:text-green-400 text-xs"></i>
+                                </div>
+                                <span class="text-gray-700 dark:text-gray-300">Higher Transaction Limits</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-check text-green-600 dark:text-green-400 text-xs"></i>
+                                </div>
+                                <span class="text-gray-700 dark:text-gray-300">24/7 Concierge Service</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Manager -->
+                {% if assigned_staff %}
+                <div class="animate-slide-up">
+                    <div class="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl p-6 text-white card-hover">
+                        <h3 class="text-lg font-semibold mb-6 flex items-center gap-2">
+                            <i class="fas fa-user-tie"></i>
+                            Your Dedicated Account Manager
+                        </h3>
+                        
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-xl font-semibold">
+                                {{ assigned_staff.user.first_name|first|upper }}{{ assigned_staff.user.last_name|first|upper }}
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-semibold">{{ assigned_staff.user.get_full_name }}</h4>
+                                <p class="text-sm opacity-90">{{ assigned_staff.department }} • {{ assigned_staff.get_role_display }}</p>
+                                <div class="flex gap-2 mt-2">
+                                    <button class="bg-white bg-opacity-20 hover:bg-opacity-30 border border-white border-opacity-30 px-4 py-2 rounded-lg text-sm font-medium transition-all">
+                                        <i class="fas fa-envelope mr-2"></i>
+                                        Message
+                                    </button>
+                                    <button class="bg-white bg-opacity-20 hover:bg-opacity-30 border border-white border-opacity-30 px-4 py-2 rounded-lg text-sm font-medium transition-all">
+                                        <i class="fas fa-phone mr-2"></i>
+                                        Call
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 animate-slide-up">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Recent Activity</h3>
+                    <button class="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline">View all</button>
+                </div>
+                
+                <div class="text-center py-12">
+                    <div class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-inbox text-gray-400 dark:text-gray-500 text-2xl"></i>
+                    </div>
+                    <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No recent activity</h4>
+                    <p class="text-gray-500 dark:text-gray-400">Your transaction history will appear here</p>
+                </div>
+            </div>
         </div>
-        {% endif %}
     </main>
 </div>
 
@@ -1017,15 +754,19 @@
 
 {% block extra_js %}
 <script>
-    // Real-time clock
+    // Real-time clock functionality
     function updateTime() {
         const now = new Date();
+        
+        // Format time
         const timeString = now.toLocaleTimeString('en-US', { 
             hour12: false, 
             hour: '2-digit', 
             minute: '2-digit', 
             second: '2-digit' 
         });
+        
+        // Format date
         const dateString = now.toLocaleDateString('en-US', { 
             weekday: 'long', 
             year: 'numeric', 
@@ -1033,41 +774,52 @@
             day: 'numeric' 
         });
         
-        document.getElementById('current-time').textContent = timeString;
-        document.getElementById('current-date').textContent = dateString;
-        document.getElementById('current-date-main').textContent = dateString;
+        // Update time displays
+        const timeElement = document.getElementById('current-time');
+        const dateElement = document.getElementById('current-date-main');
+        const headerDateElement = document.getElementById('current-date-header');
         
-        // Update greeting based on time
+        if (timeElement) timeElement.textContent = timeString;
+        if (dateElement) dateElement.textContent = dateString;
+        if (headerDateElement) headerDateElement.textContent = dateString;
+        
+        // Update greeting
         const hour = now.getHours();
         let greeting = 'Morning';
         if (hour >= 12 && hour < 17) greeting = 'Afternoon';
         else if (hour >= 17) greeting = 'Evening';
         
-        document.getElementById('time-greeting').textContent = greeting;
+        const greetingElement = document.getElementById('time-greeting');
+        if (greetingElement) greetingElement.textContent = greeting;
     }
     
-    // Update time immediately and then every second
+    // Initialize time and update every second
     updateTime();
     setInterval(updateTime, 1000);
     
-    // Add smooth transitions to navigation items
+    // Navigation functionality
     document.addEventListener('DOMContentLoaded', function() {
-        const navItems = document.querySelectorAll('.vip-nav-item');
+        // Add click handlers to navigation items
+        const navItems = document.querySelectorAll('.dashboard-sidebar a[href="#"]');
         
         navItems.forEach(item => {
             item.addEventListener('click', function(e) {
                 e.preventDefault();
                 
                 // Remove active class from all items
-                navItems.forEach(nav => nav.classList.remove('active'));
+                navItems.forEach(nav => {
+                    nav.classList.remove('nav-item-active');
+                    nav.classList.add('text-gray-600', 'dark:text-gray-400');
+                });
                 
                 // Add active class to clicked item
-                this.classList.add('active');
+                this.classList.add('nav-item-active');
+                this.classList.remove('text-gray-600', 'dark:text-gray-400');
             });
         });
         
         // Add hover effects to cards
-        const cards = document.querySelectorAll('.vip-card, .vip-action-card');
+        const cards = document.querySelectorAll('.card-hover');
         
         cards.forEach(card => {
             card.addEventListener('mouseenter', function() {
@@ -1077,6 +829,88 @@
             card.addEventListener('mouseleave', function() {
                 this.style.transform = 'translateY(0)';
             });
+        });
+        
+        // Balance visibility toggle (if needed)
+        const balanceElements = document.querySelectorAll('[data-balance]');
+        let balanceVisible = true;
+        
+        // Add click handler for balance toggle (if button exists)
+        const balanceToggle = document.querySelector('[data-balance-toggle]');
+        if (balanceToggle) {
+            balanceToggle.addEventListener('click', function() {
+                balanceVisible = !balanceVisible;
+                balanceElements.forEach(element => {
+                    if (balanceVisible) {
+                        element.textContent = element.dataset.balance;
+                    } else {
+                        element.textContent = '••••••';
+                    }
+                });
+            });
+        }
+    });
+    
+    // Mobile sidebar toggle (if needed)
+    function toggleMobileSidebar() {
+        const sidebar = document.querySelector('.dashboard-sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+        
+        if (sidebar && overlay) {
+            sidebar.classList.toggle('translate-x-0');
+            overlay.classList.toggle('opacity-100');
+            overlay.classList.toggle('pointer-events-auto');
+        }
+    }
+    
+    // Add mobile menu button if needed
+    function addMobileMenuButton() {
+        const header = document.querySelector('.dashboard-header');
+        if (header && window.innerWidth <= 768) {
+            const mobileButton = document.createElement('button');
+            mobileButton.innerHTML = '<i class="fas fa-bars"></i>';
+            mobileButton.className = 'lg:hidden p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400';
+            mobileButton.onclick = toggleMobileSidebar;
+            
+            const leftSection = header.querySelector('.flex.items-center.gap-4');
+            if (leftSection) {
+                leftSection.insertBefore(mobileButton, leftSection.firstChild);
+            }
+        }
+    }
+    
+    // Initialize mobile menu
+    addMobileMenuButton();
+    window.addEventListener('resize', addMobileMenuButton);
+    
+    // Progress bar animations
+    function animateProgressBars() {
+        const progressBars = document.querySelectorAll('.progress-bar');
+        
+        progressBars.forEach(bar => {
+            const width = bar.style.width;
+            bar.style.width = '0%';
+            
+            setTimeout(() => {
+                bar.style.width = width;
+            }, 500);
+        });
+    }
+    
+    // Animate progress bars on page load
+    setTimeout(animateProgressBars, 1000);
+    
+    // Add smooth scrolling for any anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
         });
     });
 </script>
