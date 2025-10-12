@@ -63,23 +63,23 @@
 
     /* Dashboard Layout */
     .dashboard-layout {
-        display: grid;
-        grid-template-columns: 280px 1fr;
+        display: flex;
         min-height: 100vh;
-        background: #f8f9fa;
+        background: white;
     }
 
     .dashboard-sidebar {
-        background: #2c3e50;
-        border-right: 1px solid #34495e;
+        width: 280px;
+        background: white;
+        border-right: 1px solid #e5e7eb;
+        padding: 2rem 1rem;
         overflow-y: auto;
-        color: white;
     }
 
     .dashboard-main {
-        display: flex;
-        flex-direction: column;
-        background: #f8f9fa;
+        flex: 1;
+        background: white;
+        overflow-y: auto;
     }
 
     .dashboard-header {
@@ -92,9 +92,7 @@
     }
 
     .dashboard-content {
-        flex: 1;
         padding: 2rem;
-        overflow-y: auto;
     }
 
     /* Mobile responsive */
@@ -134,27 +132,6 @@
     }
 
     /* Custom component styles */
-    .balance-card {
-        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .balance-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
-        pointer-events: none;
-    }
-
-    .balance-card-content {
-        position: relative;
-        z-index: 1;
-    }
 
     /* Notification badge */
     .notification-badge {
@@ -170,9 +147,9 @@
 
     /* Sidebar navigation active state */
     .nav-item-active {
-        background: #3498db;
-        color: white;
-        border-left: 3px solid #2980b9;
+        background: #e3f2fd;
+        color: #1976d2;
+        border-left: 3px solid #1976d2;
     }
 
     /* Card hover effects */
@@ -234,83 +211,43 @@
 {% block content %}
 <div class="dashboard-layout">
     <!-- Sidebar -->
-    <aside class="dashboard-sidebar custom-scrollbar">
-        <div class="p-6 h-full flex flex-col">
-            <!-- User Profile Section -->
-            <div class="mb-6">
-                <div class="flex flex-col items-center text-center mb-4">
-                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-2xl font-bold mb-3">
-                        {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
-                    </div>
-                    <h3 class="font-bold text-gray-900 text-lg">{{ vip_member.full_name }}</h3>
-                    <p class="text-sm text-gray-500">ID: {{ vip_member.member_id }}</p>
+    <aside class="dashboard-sidebar">
+        <div class="space-y-6">
+            <!-- Logo Section -->
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
+                    <span class="text-white font-bold text-sm">M</span>
                 </div>
-                
-                <button class="w-full bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium py-2 px-4 rounded-md transition-colors mb-3 flex items-center justify-center gap-2">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    Verify KYC
-                </button>
-                
-                <div class="flex items-center justify-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-md">
-                    <i class="fas fa-shield-alt"></i>
-                    <span class="text-sm font-medium">MERIDIAN VIP</span>
+                <div>
+                    <h1 class="text-sm font-bold text-gray-900">MERIDIAN VIP</h1>
+                    <p class="text-xs text-gray-500">Banking Portal</p>
                 </div>
             </div>
 
+            <!-- Active Deposit Button -->
+            <div class="mb-8">
+                <button class="w-full flex items-center gap-3 px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-700 font-medium">
+                    <i class="fas fa-dollar-sign text-blue-600"></i>
+                    <span>Deposit</span>
+                </button>
+            </div>
+
             <!-- Navigation Menu -->
-            <nav class="flex-1 space-y-6">
-                <!-- Main Menu -->
-                <div>
-                    <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">MAIN MENU</h4>
-                    <div class="space-y-1">
-                        <a href="#" class="nav-item-active flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors">
-                            <i class="fas fa-home w-4"></i>
-                            Dashboard
-                        </a>
-                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
-                            <i class="fas fa-exchange-alt w-4"></i>
-                            Transactions
-                        </a>
-                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
-                            <i class="fas fa-credit-card w-4"></i>
-                            Cards
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Transfers -->
-                <div>
-                    <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">TRANSFERS</h4>
-                    <div class="space-y-1">
-                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
-                            <i class="fas fa-desktop w-4"></i>
-                            Local Transfer
-                        </a>
-                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
-                            <i class="fas fa-globe w-4"></i>
-                            International Wire
-                        </a>
-                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
-                            <i class="fas fa-dollar-sign w-4"></i>
-                            Deposit
-                        </a>
-                    </div>
-                </div>
-
+            <nav class="space-y-6">
                 <!-- Services -->
                 <div>
-                    <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">SERVICES</h4>
+                    <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">SERVICES</h4>
                     <div class="space-y-1">
-                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
-                            <i class="fas fa-file-alt w-4"></i>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-file-alt w-4 text-gray-500"></i>
                             Loan Request
                         </a>
-                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
-                            <i class="fas fa-receipt w-4"></i>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-receipt w-4 text-gray-500"></i>
                             IRS Tax Refund
                         </a>
-                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
-                            <i class="fas fa-clock w-4"></i>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-history w-4 text-gray-500"></i>
                             Loan History
                         </a>
                     </div>
@@ -318,22 +255,22 @@
 
                 <!-- Account -->
                 <div>
-                    <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">ACCOUNT</h4>
+                    <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">ACCOUNT</h4>
                     <div class="space-y-1">
-                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
-                            <i class="fas fa-user w-4"></i>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-user w-4 text-gray-500"></i>
                             Account
                         </a>
-                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
-                            <i class="fas fa-cog w-4"></i>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-cog w-4 text-gray-500"></i>
                             Settings
                         </a>
-                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
-                            <i class="fas fa-comment w-4"></i>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-comment w-4 text-gray-500"></i>
                             Message us
                         </a>
-                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
-                            <i class="fas fa-building w-4"></i>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-building w-4 text-gray-500"></i>
                             Online Banking
                         </a>
                     </div>
@@ -376,105 +313,6 @@
 
         <!-- Dashboard Content -->
         <div class="dashboard-content">
-            <!-- Stats Overview -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white rounded-xl p-6 border border-gray-200 card-hover">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-600">Current Balance</p>
-                            <p class="text-2xl font-bold text-gray-900">$0</p>
-                        </div>
-                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-wallet text-blue-600"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl p-6 border border-gray-200 card-hover">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-600">Monthly Income</p>
-                            <p class="text-2xl font-bold text-gray-900">$0</p>
-                        </div>
-                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-chart-line text-green-600"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl p-6 border border-gray-200 card-hover">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-600">Monthly Outgoing</p>
-                            <p class="text-2xl font-bold text-gray-900">$0</p>
-                        </div>
-                        <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-chart-line-down text-red-600"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl p-6 border border-gray-200 card-hover">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-600">Transaction Limit</p>
-                            <p class="text-2xl font-bold text-gray-900">$500,000</p>
-                        </div>
-                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-credit-card text-purple-600"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Enhanced Balance Card -->
-            <div class="balance-card rounded-2xl p-8 mb-8 text-white">
-                <div class="balance-card-content">
-                    <div class="flex justify-between items-start mb-6">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                                <span class="text-gray-600 font-bold text-lg">{{ user.first_name|first|upper }}</span>
-                            </div>
-                            <div>
-                                <p class="text-lg font-semibold">Good Evening, {{ vip_member.full_name }}</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-2xl font-bold font-mono" id="current-time">22:36:54</p>
-                            <p class="text-sm opacity-90" id="current-date-main">Sunday, October 12, 2025</p>
-                        </div>
-                    </div>
-
-                    <div class="text-center mb-6">
-                        <p class="text-sm opacity-90 mb-2">Available Balance</p>
-                        <div class="flex items-center justify-center gap-2 mb-2">
-                            <p class="text-5xl font-bold">$0.00</p>
-                            <span class="text-lg">USD</span>
-                            <button class="ml-2">
-                                <i class="fas fa-eye-slash text-white opacity-70"></i>
-                            </button>
-                        </div>
-                        <div class="flex items-center justify-center gap-2 mt-4">
-                            <i class="fas fa-shield-alt text-white"></i>
-                            <span class="text-sm">Your Account Number</span>
-                            <span class="text-sm font-bold">{{ vip_member.member_id }}</span>
-                            <span class="bg-red-500 text-white px-2 py-1 rounded text-xs">Inactive</span>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-center gap-4">
-                        <button class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold transition-all flex items-center gap-2">
-                            <i class="fas fa-chart-line"></i>
-                            Transactions
-                        </button>
-                        <button class="bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold transition-all flex items-center gap-2">
-                            <i class="fas fa-arrow-up"></i>
-                            Top up
-                        </button>
-                    </div>
-                </div>
-            </div>
-
             <!-- Quick Actions -->
             <div class="bg-white rounded-xl p-6 border border-gray-200 mb-8">
                 <h3 class="text-lg font-semibold text-gray-900 mb-6">Quick Actions</h3>
@@ -511,108 +349,62 @@
 
             <!-- Main Content Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-                <!-- Account Information -->
+                <!-- Financial Overview -->
                 <div class="lg:col-span-2">
                     <div class="bg-white rounded-xl p-6 border border-gray-200 card-hover">
                         <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-lg font-semibold text-gray-900">Account Information</h3>
-                            <button class="text-blue-600 text-sm font-medium hover:underline">View all</button>
+                            <h3 class="text-lg font-semibold text-gray-900">Financial Overview</h3>
+                            <button class="text-blue-600 text-sm font-medium hover:underline">View details ></button>
                         </div>
                         
                         <div class="space-y-4">
                             <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-crown text-blue-600"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-medium text-gray-900">VIP Tier</p>
-                                        <p class="text-sm text-gray-500">{{ vip_member.get_membership_tier_display }}</p>
-                                    </div>
+                                <div>
+                                    <p class="font-medium text-gray-900">Total Investments</p>
                                 </div>
-                                <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
-                                    {{ vip_member.get_membership_tier_display }}
-                                </span>
+                                <span class="text-gray-900 font-semibold">$0.00</span>
                             </div>
 
                             <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-calendar text-green-600"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-medium text-gray-900">Member Since</p>
-                                        <p class="text-sm text-gray-500">{{ vip_member.membership_start_date|date:"M Y" }}</p>
-                                    </div>
+                                <div>
+                                    <p class="font-medium text-gray-900">Monthly Income</p>
                                 </div>
-                                <span class="text-gray-600 font-medium">{{ vip_member.membership_start_date|date:"M Y" }}</span>
+                                <span class="text-gray-900 font-semibold">$0.00</span>
                             </div>
 
                             <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-check-circle text-green-600"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-medium text-gray-900">Status</p>
-                                        <p class="text-sm text-gray-500">Active</p>
-                                    </div>
+                                <div>
+                                    <p class="font-medium text-gray-900">Net Worth</p>
                                 </div>
-                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">Active</span>
+                                <span class="text-gray-900 font-semibold">$100,000.00</span>
                             </div>
 
                             <div class="flex items-center justify-between py-3">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-id-card text-purple-600"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-medium text-gray-900">Account Number</p>
-                                        <p class="text-sm text-gray-500">Primary Account</p>
-                                    </div>
+                                <div>
+                                    <p class="font-medium text-gray-900">Transaction Limit</p>
                                 </div>
-                                <span class="text-gray-600 font-mono">{{ vip_member.member_id }}</span>
+                                <span class="text-gray-900 font-semibold">$500,000.00</span>
                             </div>
+                        </div>
+
+                        <div class="mt-6 text-center">
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+                                View all
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Account Statistics -->
+                <!-- Transaction Volume -->
                 <div>
                     <div class="bg-white rounded-xl p-6 border border-gray-200 card-hover">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-6">Account Statistics</h3>
-                        
-                        <div class="space-y-6">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-credit-card text-blue-600"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-gray-900">Transaction Limit</p>
-                                    <p class="text-sm text-gray-500">$500,000.00</p>
-                                </div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-chart-bar text-green-600"></i>
                             </div>
-
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-clock text-yellow-600"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-gray-900">Pending Transactions</p>
-                                    <p class="text-sm text-gray-500">$0.00</p>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-chart-bar text-green-600"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-gray-900">Transaction Volume</p>
-                                    <p class="text-sm text-gray-500">$0.00</p>
-                                </div>
-                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900">Transaction Volume</h3>
                         </div>
+                        <p class="text-2xl font-bold text-gray-900">$0.00</p>
                     </div>
                 </div>
             </div>
@@ -632,28 +424,40 @@
                         
                         <div class="space-y-4">
                             <div class="flex items-center gap-3">
-                                <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-check text-green-600 text-xs"></i>
+                                <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-check text-blue-600 text-xs"></i>
                                 </div>
                                 <span class="text-gray-700">Priority Support</span>
                             </div>
                             <div class="flex items-center gap-3">
-                                <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-check text-green-600 text-xs"></i>
+                                <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-check text-blue-600 text-xs"></i>
                                 </div>
                                 <span class="text-gray-700">Dedicated Account Manager</span>
                             </div>
                             <div class="flex items-center gap-3">
-                                <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-check text-green-600 text-xs"></i>
+                                <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-check text-blue-600 text-xs"></i>
                                 </div>
-                                <span class="text-gray-700">Exclusive Investment Opportunities</span>
+                                <span class="text-gray-700">Exclusive Investment</span>
                             </div>
                             <div class="flex items-center gap-3">
-                                <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-check text-green-600 text-xs"></i>
+                                <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-check text-blue-600 text-xs"></i>
                                 </div>
                                 <span class="text-gray-700">Faster Processing</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-check text-blue-600 text-xs"></i>
+                                </div>
+                                <span class="text-gray-700">Premium Transaction Limits</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-check text-blue-600 text-xs"></i>
+                                </div>
+                                <span class="text-gray-700">24/7 Concierge Service</span>
                             </div>
                         </div>
                     </div>
@@ -675,6 +479,10 @@
                                 <p class="text-sm opacity-90 flex items-center gap-2 mt-1">
                                     <i class="fas fa-envelope"></i>
                                     support@meridianassetlogistics.com
+                                </p>
+                                <p class="text-sm opacity-90 flex items-center gap-2 mt-1">
+                                    <i class="fas fa-phone"></i>
+                                    +1 (555) 123-4567
                                 </p>
                                 <div class="flex gap-2 mt-3">
                                     <button class="bg-white bg-opacity-20 hover:bg-opacity-30 border border-white border-opacity-30 px-4 py-2 rounded-lg text-sm font-medium transition-all">
