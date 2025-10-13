@@ -556,49 +556,49 @@
                     
                     <div class="transfer-methods-grid">
                         <!-- Wire Transfer -->
-                        <div class="transfer-method-card" data-method="wire_transfer">
+                        <a href="{% url 'accounts:vip_transfer_wire' %}" class="transfer-method-card" data-method="wire_transfer">
                             <div class="icon-wrapper wire-transfer">
                                 <i class="fas fa-university"></i>
                             </div>
                             <h3>Wire Transfer</h3>
                             <p>Transfer funds directly to international bank accounts.</p>
-                        </div>
+                        </a>
 
                         <!-- Cryptocurrency -->
-                        <div class="transfer-method-card" data-method="cryptocurrency">
+                        <a href="{% url 'accounts:vip_transfer_cryptocurrency' %}" class="transfer-method-card" data-method="cryptocurrency">
                             <div class="icon-wrapper cryptocurrency">
                                 <i class="fab fa-bitcoin"></i>
                             </div>
                             <h3>Cryptocurrency</h3>
                             <p>Send funds to your cryptocurrency wallet.</p>
-                        </div>
+                        </a>
 
                         <!-- PayPal -->
-                        <div class="transfer-method-card" data-method="paypal">
+                        <a href="{% url 'accounts:vip_transfer_paypal' %}" class="transfer-method-card" data-method="paypal">
                             <div class="icon-wrapper paypal">
                                 <i class="fab fa-paypal"></i>
                             </div>
                             <h3>PayPal</h3>
                             <p>Transfer funds to your PayPal account.</p>
-                        </div>
+                        </a>
 
                         <!-- Wise Transfer -->
-                        <div class="transfer-method-card" data-method="wise_transfer">
+                        <a href="{% url 'accounts:vip_transfer_wise' %}" class="transfer-method-card" data-method="wise_transfer">
                             <div class="icon-wrapper wise-transfer">
                                 <i class="fas fa-exchange-alt"></i>
                             </div>
                             <h3>Wise Transfer</h3>
                             <p>Transfer with lower fees using Wise.</p>
-                        </div>
+                        </a>
 
                         <!-- Cash App -->
-                        <div class="transfer-method-card selected" data-method="cash_app">
+                        <a href="{% url 'accounts:vip_transfer_cashapp' %}" class="transfer-method-card" data-method="cash_app">
                             <div class="icon-wrapper cash-app">
                                 <i class="fas fa-dollar-sign"></i>
                             </div>
                             <h3>Cash App</h3>
                             <p>Quick transfers to your Cash App account.</p>
-                        </div>
+                        </a>
 
                         <!-- More Options -->
                         <div class="transfer-method-card" data-method="more_options" onclick="showMoreOptions()">
@@ -642,58 +642,58 @@
                 
                 <div class="modal-grid">
                     <!-- Skrill -->
-                    <div class="transfer-method-card" data-method="skrill">
+                    <a href="{% url 'accounts:vip_transfer_skrill' %}" class="transfer-method-card" data-method="skrill">
                         <div class="icon-wrapper skrill">
                             <i class="fas fa-credit-card"></i>
                         </div>
                         <h3>Skrill</h3>
                         <p>Transfer funds to your Skrill account.</p>
-                    </div>
+                    </a>
 
                     <!-- Venmo -->
-                    <div class="transfer-method-card" data-method="venmo">
+                    <a href="{% url 'accounts:vip_transfer_venmo' %}" class="transfer-method-card" data-method="venmo">
                         <div class="icon-wrapper venmo">
                             <i class="fab fa-cc-visa"></i>
                         </div>
                         <h3>Venmo</h3>
                         <p>Send funds to your Venmo account.</p>
-                    </div>
+                    </a>
 
                     <!-- Zelle -->
-                    <div class="transfer-method-card" data-method="zelle">
+                    <a href="{% url 'accounts:vip_transfer_zelle' %}" class="transfer-method-card" data-method="zelle">
                         <div class="icon-wrapper zelle">
                             <i class="fas fa-mobile-alt"></i>
                         </div>
                         <h3>Zelle</h3>
                         <p>Quick transfers to your Zelle account.</p>
-                    </div>
+                    </a>
 
                     <!-- Revolut -->
-                    <div class="transfer-method-card" data-method="revolut">
+                    <a href="{% url 'accounts:vip_transfer_revolut' %}" class="transfer-method-card" data-method="revolut">
                         <div class="icon-wrapper revolut">
                             <i class="fas fa-globe"></i>
                         </div>
                         <h3>Revolut</h3>
                         <p>Transfer to your Revolut account with low fees.</p>
-                    </div>
+                    </a>
 
                     <!-- Alipay -->
-                    <div class="transfer-method-card selected" data-method="alipay">
+                    <a href="{% url 'accounts:vip_transfer_alipay' %}" class="transfer-method-card" data-method="alipay">
                         <div class="icon-wrapper alipay">
                             <i class="fas fa-qrcode"></i>
                         </div>
                         <h3>Alipay</h3>
                         <p>Send funds to your Alipay account.</p>
-                    </div>
+                    </a>
 
                     <!-- WeChat Pay -->
-                    <div class="transfer-method-card" data-method="wechat_pay">
+                    <a href="{% url 'accounts:vip_transfer_wechat' %}" class="transfer-method-card" data-method="wechat_pay">
                         <div class="icon-wrapper wechat-pay">
                             <i class="fab fa-weixin"></i>
                         </div>
                         <h3>WeChat Pay</h3>
                         <p>Transfer to your WeChat Pay wallet.</p>
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>

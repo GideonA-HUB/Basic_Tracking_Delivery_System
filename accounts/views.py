@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
-from .forms import StaffLoginForm, StaffRegistrationForm, CustomerRegistrationForm, CustomerLoginForm, VIPLoginForm, CardApplicationForm, LocalTransferForm, InternationalTransferForm
+from .forms import StaffLoginForm, StaffRegistrationForm, CustomerRegistrationForm, CustomerLoginForm, VIPLoginForm, CardApplicationForm, LocalTransferForm, InternationalTransferForm, WireTransferForm, CryptocurrencyForm, PayPalForm, WiseTransferForm, CashAppForm, SkrillForm, VenmoForm, ZelleForm, RevolutForm, AlipayForm, WeChatPayForm
 from .models import StaffProfile, CustomerProfile, VIPProfile, Transaction, Card, LocalTransfer, InternationalTransfer
 
 
@@ -528,6 +528,480 @@ def vip_transfer_international(request):
         }
         
         return render(request, 'accounts/vip_transfer_international.html', context)
+        
+    except VIPProfile.DoesNotExist:
+        messages.error(request, 'VIP profile not found. Please contact support.')
+        return redirect('frontend:landing_page')
+
+
+# Individual transfer method views
+@login_required
+@user_passes_test(is_vip_user)
+def vip_transfer_wire(request):
+    """VIP Wire Transfer form"""
+    try:
+        vip_profile = request.user.vip_profile
+        
+        if request.method == 'POST':
+            form = WireTransferForm(request.POST)
+            if form.is_valid():
+                transfer = form.save(commit=False)
+                transfer.vip_member = vip_profile
+                transfer.transfer_method = 'wire_transfer'
+                
+                # Calculate fees for wire transfer
+                amount = transfer.transfer_amount
+                transfer.transfer_fee = max(25.00, amount * 0.005)  # $25 minimum or 0.5%
+                transfer.transfer_fee = min(transfer.transfer_fee, 100.00)  # Cap at $100
+                
+                transfer.save()
+                
+                messages.success(request, f'Wire transfer request submitted successfully! Reference: {transfer.reference_number}')
+                return redirect('accounts:vip_dashboard')
+        else:
+            form = WireTransferForm()
+        
+        context = {
+            'vip_member': vip_profile,
+            'user': request.user,
+            'form': form,
+            'transfer_method': 'Wire Transfer',
+            'processing_time': 'Funds will reflect in the Beneficiary Account within 72hours.',
+            'icon_class': 'fas fa-university',
+            'icon_color': 'bg-green-500',
+        }
+        
+        return render(request, 'accounts/vip_transfer_method.html', context)
+        
+    except VIPProfile.DoesNotExist:
+        messages.error(request, 'VIP profile not found. Please contact support.')
+        return redirect('frontend:landing_page')
+
+
+@login_required
+@user_passes_test(is_vip_user)
+def vip_transfer_cryptocurrency(request):
+    """VIP Cryptocurrency Transfer form"""
+    try:
+        vip_profile = request.user.vip_profile
+        
+        if request.method == 'POST':
+            form = CryptocurrencyForm(request.POST)
+            if form.is_valid():
+                transfer = form.save(commit=False)
+                transfer.vip_member = vip_profile
+                transfer.transfer_method = 'cryptocurrency'
+                
+                # Calculate fees for cryptocurrency
+                amount = transfer.transfer_amount
+                transfer.transfer_fee = amount * 0.02  # 2%
+                transfer.transfer_fee = min(transfer.transfer_fee, 100.00)  # Cap at $100
+                
+                transfer.save()
+                
+                messages.success(request, f'Cryptocurrency transfer request submitted successfully! Reference: {transfer.reference_number}')
+                return redirect('accounts:vip_dashboard')
+        else:
+            form = CryptocurrencyForm()
+        
+        context = {
+            'vip_member': vip_profile,
+            'user': request.user,
+            'form': form,
+            'transfer_method': 'Cryptocurrency Withdrawal',
+            'processing_time': 'Withdrawals are typically processed within 1-3 hours.',
+            'icon_class': 'fab fa-bitcoin',
+            'icon_color': 'bg-orange-500',
+        }
+        
+        return render(request, 'accounts/vip_transfer_method.html', context)
+        
+    except VIPProfile.DoesNotExist:
+        messages.error(request, 'VIP profile not found. Please contact support.')
+        return redirect('frontend:landing_page')
+
+
+@login_required
+@user_passes_test(is_vip_user)
+def vip_transfer_paypal(request):
+    """VIP PayPal Transfer form"""
+    try:
+        vip_profile = request.user.vip_profile
+        
+        if request.method == 'POST':
+            form = PayPalForm(request.POST)
+            if form.is_valid():
+                transfer = form.save(commit=False)
+                transfer.vip_member = vip_profile
+                transfer.transfer_method = 'paypal'
+                
+                # Calculate fees for PayPal
+                amount = transfer.transfer_amount
+                transfer.transfer_fee = amount * 0.03  # 3%
+                transfer.transfer_fee = min(transfer.transfer_fee, 100.00)  # Cap at $100
+                
+                transfer.save()
+                
+                messages.success(request, f'PayPal transfer request submitted successfully! Reference: {transfer.reference_number}')
+                return redirect('accounts:vip_dashboard')
+        else:
+            form = PayPalForm()
+        
+        context = {
+            'vip_member': vip_profile,
+            'user': request.user,
+            'form': form,
+            'transfer_method': 'PayPal Withdrawal',
+            'processing_time': 'Funds will be sent to your PayPal account within 24 hours.',
+            'icon_class': 'fab fa-paypal',
+            'icon_color': 'bg-blue-600',
+        }
+        
+        return render(request, 'accounts/vip_transfer_method.html', context)
+        
+    except VIPProfile.DoesNotExist:
+        messages.error(request, 'VIP profile not found. Please contact support.')
+        return redirect('frontend:landing_page')
+
+
+@login_required
+@user_passes_test(is_vip_user)
+def vip_transfer_wise(request):
+    """VIP Wise Transfer form"""
+    try:
+        vip_profile = request.user.vip_profile
+        
+        if request.method == 'POST':
+            form = WiseTransferForm(request.POST)
+            if form.is_valid():
+                transfer = form.save(commit=False)
+                transfer.vip_member = vip_profile
+                transfer.transfer_method = 'wise_transfer'
+                
+                # Calculate fees for Wise
+                amount = transfer.transfer_amount
+                transfer.transfer_fee = amount * 0.03  # 3%
+                transfer.transfer_fee = min(transfer.transfer_fee, 100.00)  # Cap at $100
+                
+                transfer.save()
+                
+                messages.success(request, f'Wise transfer request submitted successfully! Reference: {transfer.reference_number}')
+                return redirect('accounts:vip_dashboard')
+        else:
+            form = WiseTransferForm()
+        
+        context = {
+            'vip_member': vip_profile,
+            'user': request.user,
+            'form': form,
+            'transfer_method': 'Wise Transfer Withdrawal',
+            'processing_time': 'Your funds will be processed within 1-2 business days.',
+            'icon_class': 'fas fa-exchange-alt',
+            'icon_color': 'bg-teal-500',
+        }
+        
+        return render(request, 'accounts/vip_transfer_method.html', context)
+        
+    except VIPProfile.DoesNotExist:
+        messages.error(request, 'VIP profile not found. Please contact support.')
+        return redirect('frontend:landing_page')
+
+
+@login_required
+@user_passes_test(is_vip_user)
+def vip_transfer_cashapp(request):
+    """VIP Cash App Transfer form"""
+    try:
+        vip_profile = request.user.vip_profile
+        
+        if request.method == 'POST':
+            form = CashAppForm(request.POST)
+            if form.is_valid():
+                transfer = form.save(commit=False)
+                transfer.vip_member = vip_profile
+                transfer.transfer_method = 'cash_app'
+                
+                # Calculate fees for Cash App
+                amount = transfer.transfer_amount
+                transfer.transfer_fee = amount * 0.015  # 1.5%
+                transfer.transfer_fee = min(transfer.transfer_fee, 100.00)  # Cap at $100
+                
+                transfer.save()
+                
+                messages.success(request, f'Cash App transfer request submitted successfully! Reference: {transfer.reference_number}')
+                return redirect('accounts:vip_dashboard')
+        else:
+            form = CashAppForm()
+        
+        context = {
+            'vip_member': vip_profile,
+            'user': request.user,
+            'form': form,
+            'transfer_method': 'Cash App Withdrawal',
+            'processing_time': 'Withdrawals to Cash App are typically processed within 24 hours.',
+            'icon_class': 'fas fa-dollar-sign',
+            'icon_color': 'bg-pink-500',
+        }
+        
+        return render(request, 'accounts/vip_transfer_method.html', context)
+        
+    except VIPProfile.DoesNotExist:
+        messages.error(request, 'VIP profile not found. Please contact support.')
+        return redirect('frontend:landing_page')
+
+
+@login_required
+@user_passes_test(is_vip_user)
+def vip_transfer_skrill(request):
+    """VIP Skrill Transfer form"""
+    try:
+        vip_profile = request.user.vip_profile
+        
+        if request.method == 'POST':
+            form = SkrillForm(request.POST)
+            if form.is_valid():
+                transfer = form.save(commit=False)
+                transfer.vip_member = vip_profile
+                transfer.transfer_method = 'skrill'
+                
+                # Calculate fees for Skrill
+                amount = transfer.transfer_amount
+                transfer.transfer_fee = amount * 0.025  # 2.5%
+                transfer.transfer_fee = min(transfer.transfer_fee, 100.00)  # Cap at $100
+                
+                transfer.save()
+                
+                messages.success(request, f'Skrill transfer request submitted successfully! Reference: {transfer.reference_number}')
+                return redirect('accounts:vip_dashboard')
+        else:
+            form = SkrillForm()
+        
+        context = {
+            'vip_member': vip_profile,
+            'user': request.user,
+            'form': form,
+            'transfer_method': 'Skrill Withdrawal',
+            'processing_time': 'Withdrawals to Skrill are processed within 24 hours.',
+            'icon_class': 'fas fa-credit-card',
+            'icon_color': 'bg-purple-500',
+        }
+        
+        return render(request, 'accounts/vip_transfer_method.html', context)
+        
+    except VIPProfile.DoesNotExist:
+        messages.error(request, 'VIP profile not found. Please contact support.')
+        return redirect('frontend:landing_page')
+
+
+@login_required
+@user_passes_test(is_vip_user)
+def vip_transfer_venmo(request):
+    """VIP Venmo Transfer form"""
+    try:
+        vip_profile = request.user.vip_profile
+        
+        if request.method == 'POST':
+            form = VenmoForm(request.POST)
+            if form.is_valid():
+                transfer = form.save(commit=False)
+                transfer.vip_member = vip_profile
+                transfer.transfer_method = 'venmo'
+                
+                # Calculate fees for Venmo
+                amount = transfer.transfer_amount
+                transfer.transfer_fee = amount * 0.015  # 1.5%
+                transfer.transfer_fee = min(transfer.transfer_fee, 100.00)  # Cap at $100
+                
+                transfer.save()
+                
+                messages.success(request, f'Venmo transfer request submitted successfully! Reference: {transfer.reference_number}')
+                return redirect('accounts:vip_dashboard')
+        else:
+            form = VenmoForm()
+        
+        context = {
+            'vip_member': vip_profile,
+            'user': request.user,
+            'form': form,
+            'transfer_method': 'Venmo Withdrawal',
+            'processing_time': 'Funds will be transferred to your Venmo account within 24 hours.',
+            'icon_class': 'fab fa-cc-visa',
+            'icon_color': 'bg-blue-500',
+        }
+        
+        return render(request, 'accounts/vip_transfer_method.html', context)
+        
+    except VIPProfile.DoesNotExist:
+        messages.error(request, 'VIP profile not found. Please contact support.')
+        return redirect('frontend:landing_page')
+
+
+@login_required
+@user_passes_test(is_vip_user)
+def vip_transfer_zelle(request):
+    """VIP Zelle Transfer form"""
+    try:
+        vip_profile = request.user.vip_profile
+        
+        if request.method == 'POST':
+            form = ZelleForm(request.POST)
+            if form.is_valid():
+                transfer = form.save(commit=False)
+                transfer.vip_member = vip_profile
+                transfer.transfer_method = 'zelle'
+                
+                # Calculate fees for Zelle
+                amount = transfer.transfer_amount
+                transfer.transfer_fee = amount * 0.015  # 1.5%
+                transfer.transfer_fee = min(transfer.transfer_fee, 100.00)  # Cap at $100
+                
+                transfer.save()
+                
+                messages.success(request, f'Zelle transfer request submitted successfully! Reference: {transfer.reference_number}')
+                return redirect('accounts:vip_dashboard')
+        else:
+            form = ZelleForm()
+        
+        context = {
+            'vip_member': vip_profile,
+            'user': request.user,
+            'form': form,
+            'transfer_method': 'Zelle Withdrawal',
+            'processing_time': 'Funds will be sent to your Zelle account typically within a few hours.',
+            'icon_class': 'fas fa-mobile-alt',
+            'icon_color': 'bg-purple-600',
+        }
+        
+        return render(request, 'accounts/vip_transfer_method.html', context)
+        
+    except VIPProfile.DoesNotExist:
+        messages.error(request, 'VIP profile not found. Please contact support.')
+        return redirect('frontend:landing_page')
+
+
+@login_required
+@user_passes_test(is_vip_user)
+def vip_transfer_revolut(request):
+    """VIP Revolut Transfer form"""
+    try:
+        vip_profile = request.user.vip_profile
+        
+        if request.method == 'POST':
+            form = RevolutForm(request.POST)
+            if form.is_valid():
+                transfer = form.save(commit=False)
+                transfer.vip_member = vip_profile
+                transfer.transfer_method = 'revolut'
+                
+                # Calculate fees for Revolut
+                amount = transfer.transfer_amount
+                transfer.transfer_fee = amount * 0.025  # 2.5%
+                transfer.transfer_fee = min(transfer.transfer_fee, 100.00)  # Cap at $100
+                
+                transfer.save()
+                
+                messages.success(request, f'Revolut transfer request submitted successfully! Reference: {transfer.reference_number}')
+                return redirect('accounts:vip_dashboard')
+        else:
+            form = RevolutForm()
+        
+        context = {
+            'vip_member': vip_profile,
+            'user': request.user,
+            'form': form,
+            'transfer_method': 'Revolut Withdrawal',
+            'processing_time': 'Funds will be transferred to your Revolut account within 1-2 business days.',
+            'icon_class': 'fas fa-globe',
+            'icon_color': 'bg-cyan-500',
+        }
+        
+        return render(request, 'accounts/vip_transfer_method.html', context)
+        
+    except VIPProfile.DoesNotExist:
+        messages.error(request, 'VIP profile not found. Please contact support.')
+        return redirect('frontend:landing_page')
+
+
+@login_required
+@user_passes_test(is_vip_user)
+def vip_transfer_alipay(request):
+    """VIP Alipay Transfer form"""
+    try:
+        vip_profile = request.user.vip_profile
+        
+        if request.method == 'POST':
+            form = AlipayForm(request.POST)
+            if form.is_valid():
+                transfer = form.save(commit=False)
+                transfer.vip_member = vip_profile
+                transfer.transfer_method = 'alipay'
+                
+                # Calculate fees for Alipay
+                amount = transfer.transfer_amount
+                transfer.transfer_fee = amount * 0.025  # 2.5%
+                transfer.transfer_fee = min(transfer.transfer_fee, 100.00)  # Cap at $100
+                
+                transfer.save()
+                
+                messages.success(request, f'Alipay transfer request submitted successfully! Reference: {transfer.reference_number}')
+                return redirect('accounts:vip_dashboard')
+        else:
+            form = AlipayForm()
+        
+        context = {
+            'vip_member': vip_profile,
+            'user': request.user,
+            'form': form,
+            'transfer_method': 'Alipay Withdrawal',
+            'processing_time': 'Withdrawals to Alipay are typically processed within 24-48 hours.',
+            'icon_class': 'fas fa-qrcode',
+            'icon_color': 'bg-blue-800',
+        }
+        
+        return render(request, 'accounts/vip_transfer_method.html', context)
+        
+    except VIPProfile.DoesNotExist:
+        messages.error(request, 'VIP profile not found. Please contact support.')
+        return redirect('frontend:landing_page')
+
+
+@login_required
+@user_passes_test(is_vip_user)
+def vip_transfer_wechat(request):
+    """VIP WeChat Pay Transfer form"""
+    try:
+        vip_profile = request.user.vip_profile
+        
+        if request.method == 'POST':
+            form = WeChatPayForm(request.POST)
+            if form.is_valid():
+                transfer = form.save(commit=False)
+                transfer.vip_member = vip_profile
+                transfer.transfer_method = 'wechat_pay'
+                
+                # Calculate fees for WeChat Pay
+                amount = transfer.transfer_amount
+                transfer.transfer_fee = amount * 0.025  # 2.5%
+                transfer.transfer_fee = min(transfer.transfer_fee, 100.00)  # Cap at $100
+                
+                transfer.save()
+                
+                messages.success(request, f'WeChat Pay transfer request submitted successfully! Reference: {transfer.reference_number}')
+                return redirect('accounts:vip_dashboard')
+        else:
+            form = WeChatPayForm()
+        
+        context = {
+            'vip_member': vip_profile,
+            'user': request.user,
+            'form': form,
+            'transfer_method': 'WeChat Pay Withdrawal',
+            'processing_time': 'Funds will be sent to your WeChat Pay account within 24-48 hours.',
+            'icon_class': 'fab fa-weixin',
+            'icon_color': 'bg-green-600',
+        }
+        
+        return render(request, 'accounts/vip_transfer_method.html', context)
         
     except VIPProfile.DoesNotExist:
         messages.error(request, 'VIP profile not found. Please contact support.')

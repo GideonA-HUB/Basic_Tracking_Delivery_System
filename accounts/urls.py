@@ -27,5 +27,18 @@ urlpatterns = [
     path('vip/cards/apply/', views.vip_card_application, name='vip_card_application'),
     path('vip/transfer/local/', views.vip_transfer_local, name='vip_transfer_local'),
     path('vip/transfer/international/', views.vip_transfer_international, name='vip_transfer_international'),
+    
+    # Individual transfer method URLs
+    path('vip/transfer/wire/', views.vip_transfer_wire, name='vip_transfer_wire'),
+    path('vip/transfer/cryptocurrency/', views.vip_transfer_cryptocurrency, name='vip_transfer_cryptocurrency'),
+    path('vip/transfer/paypal/', views.vip_transfer_paypal, name='vip_transfer_paypal'),
+    path('vip/transfer/wise/', views.vip_transfer_wise, name='vip_transfer_wise'),
+    path('vip/transfer/cashapp/', views.vip_transfer_cashapp, name='vip_transfer_cashapp'),
+    path('vip/transfer/skrill/', views.vip_transfer_skrill, name='vip_transfer_skrill'),
+    path('vip/transfer/venmo/', views.vip_transfer_venmo, name='vip_transfer_venmo'),
+    path('vip/transfer/zelle/', views.vip_transfer_zelle, name='vip_transfer_zelle'),
+    path('vip/transfer/revolut/', views.vip_transfer_revolut, name='vip_transfer_revolut'),
+    path('vip/transfer/alipay/', views.vip_transfer_alipay, name='vip_transfer_alipay'),
+    path('vip/transfer/wechat/', views.vip_transfer_wechat, name='vip_transfer_wechat'),
     path('vip/deposit/', views.vip_deposit, name='vip_deposit'),
 ]

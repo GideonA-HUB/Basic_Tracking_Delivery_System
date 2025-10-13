@@ -1,0 +1,950 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ transfer_method }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Base styles for the dashboard layout */
+    .dashboard-layout {
+        display: flex;
+        min-height: 100vh;
+        background-color: #f9fafb; /* Light gray background */
+    }
+
+    /* Sidebar styles */
+    .dashboard-sidebar {
+        width: 16rem; /* 256px */
+        background-color: #ffffff; /* White background */
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* Shadow */
+        flex-shrink: 0;
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        z-index: 40;
+        scroll-behavior: smooth;
+        padding-top: 0 !important; /* Ensure no top padding from parent */
+        margin-top: 0 !important; /* Ensure no top margin from parent */
+    }
+
+    /* Custom scrollbar for sidebar */
+    .dashboard-sidebar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .dashboard-sidebar::-webkit-scrollbar-track {
+        background: #f1f5f9; /* Light gray track */
+    }
+
+    .dashboard-sidebar::-webkit-scrollbar-thumb {
+        background: #cbd5e1; /* Gray thumb */
+        border-radius: 3px;
+    }
+
+    .dashboard-sidebar::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8; /* Darker gray on hover */
+    }
+
+    /* Ensure sidebar content is visible */
+    .dashboard-sidebar .p-6 {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Main content area */
+    .main-content {
+        flex-grow: 1;
+        margin-left: 16rem; /* 256px - sidebar width */
+        height: 100vh;
+        overflow-y: auto;
+        padding: 2rem; /* Overall padding for the main content */
+        background-color: #f9fafb; /* Light gray background */
+    }
+
+    /* Custom scrollbar for main content */
+    .main-content::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .main-content::-webkit-scrollbar-track {
+        background: #f1f5f9;
+    }
+
+    .main-content::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+    }
+
+    .main-content::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+
+    /* Theme compatibility for sidebar */
+    html.light .dashboard-sidebar .text-gray-600,
+    html.light .dashboard-sidebar .text-gray-500,
+    html.light .dashboard-sidebar .text-gray-400,
+    html.light .dashboard-sidebar .text-gray-300,
+    html.light .dashboard-sidebar a,
+    html.light .dashboard-sidebar p,
+    html.light .dashboard-sidebar span,
+    html.light .dashboard-sidebar div {
+        color: #374151 !important;
+        font-weight: 500 !important;
+    }
+
+    /* Fix sidebar headings */
+    html.light .sidebar-heading {
+        color: #1f2937 !important;
+        font-weight: 700 !important;
+    }
+
+    /* Fix navigation links */
+    html.light .nav-link {
+        color: #374151 !important;
+        font-weight: 500 !important;
+    }
+
+    html.light .nav-link:hover {
+        color: #1f2937 !important;
+        font-weight: 600 !important;
+    }
+
+    /* Fix copyright text */
+    html.light .copyright-text {
+        color: #6b7280 !important;
+        font-weight: 500 !important;
+    }
+
+    /* Dark theme adjustments for sidebar text */
+    html.dark .dashboard-sidebar .text-gray-600,
+    html.dark .dashboard-sidebar .text-gray-500,
+    html.dark .dashboard-sidebar .text-gray-400,
+    html.dark .dashboard-sidebar .text-gray-300,
+    html.dark .dashboard-sidebar a,
+    html.dark .dashboard-sidebar p,
+    html.dark .dashboard-sidebar span,
+    html.dark .dashboard-sidebar div {
+        color: #d1d5db !important; /* Light gray for dark theme */
+    }
+
+    html.dark .dashboard-sidebar .sidebar-heading {
+        color: #9ca3af !important; /* Lighter gray for headings */
+    }
+
+    html.dark .dashboard-sidebar .nav-link {
+        color: #d1d5db !important;
+    }
+
+    html.dark .dashboard-sidebar .nav-link:hover {
+        color: #e5e7eb !important;
+    }
+
+    html.dark .dashboard-sidebar .copyright-text {
+        color: #9ca3af !important;
+    }
+
+    /* Ensure the main content area's background is correct in dark mode */
+    html.dark .main-content {
+        background-color: #1f2937 !important; /* Dark background for main content */
+        color: #e5e7eb !important; /* Light text for dark theme */
+    }
+
+    html.dark .main-content h1,
+    html.dark .main-content h2,
+    html.dark .main-content h3,
+    html.dark .main-content h4,
+    html.dark .main-content .text-gray-900 {
+        color: #e5e7eb !important;
+    }
+
+    html.dark .main-content .text-gray-700,
+    html.dark .main-content .text-gray-600,
+    html.dark .main-content .text-gray-500 {
+        color: #d1d5db !important;
+    }
+
+    html.dark .stat-card,
+    html.dark .how-it-works-card,
+    html.dark .faq-item,
+    html.dark .transfer-card {
+        background-color: #374151 !important; /* Darker background for cards */
+        border-color: #4b5563 !important; /* Darker border */
+        color: #e5e7eb !important;
+    }
+
+    html.dark .stat-card .text-gray-900,
+    html.dark .how-it-works-card .text-gray-900,
+    html.dark .faq-item .text-gray-900,
+    html.dark .transfer-card .text-gray-900 {
+        color: #e5e7eb !important;
+    }
+
+    html.dark .stat-card .text-gray-500,
+    html.dark .how-it-works-card .text-gray-500,
+    html.dark .faq-item .text-gray-500,
+    html.dark .transfer-card .text-gray-500 {
+        color: #d1d5db !important;
+    }
+
+    /* Transfer Method Header */
+    .transfer-header {
+        background: linear-gradient(135deg, #3b82f6, #1e40af);
+        border-radius: 1rem;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .transfer-header::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 20px;
+        background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.2));
+        border-radius: 50% 50% 0 0;
+    }
+
+    .transfer-header .back-button {
+        position: absolute;
+        top: 1.5rem;
+        left: 1.5rem;
+        width: 2.5rem;
+        height: 2.5rem;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .transfer-header .back-button:hover {
+        background-color: rgba(255, 255, 255, 0.3);
+        transform: scale(1.05);
+    }
+
+    .transfer-header .icon-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 2rem 0 1rem 0;
+    }
+
+    .transfer-header .method-icon {
+        width: 4rem;
+        height: 4rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+        margin-bottom: 1rem;
+    }
+
+    .transfer-header h1 {
+        color: white;
+        font-size: 2rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .transfer-header p {
+        color: rgba(255, 255, 255, 0.9);
+        text-align: center;
+        font-size: 1rem;
+    }
+
+    /* Form styles */
+    .transfer-form {
+        background-color: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        margin-bottom: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        background-color: white;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .form-select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    /* Amount input with dollar sign */
+    .amount-input-container {
+        position: relative;
+    }
+
+    .amount-input-container::before {
+        content: '$';
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6b7280;
+        font-size: 1rem;
+        font-weight: 600;
+        z-index: 10;
+    }
+
+    .amount-input-container .form-control {
+        padding-left: 2.5rem;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    /* Quick amount buttons */
+    .quick-amounts {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .quick-amount-btn {
+        padding: 0.5rem 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        background-color: white;
+        color: #374151;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .quick-amount-btn:hover {
+        background-color: #f9fafb;
+        border-color: #9ca3af;
+    }
+
+    .quick-amount-btn.active {
+        background-color: #3b82f6;
+        border-color: #3b82f6;
+        color: white;
+    }
+
+    /* Available balance */
+    .available-balance {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+    }
+
+    /* Form field with icon */
+    .form-field-with-icon {
+        position: relative;
+    }
+
+    .form-field-with-icon .field-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6b7280;
+        font-size: 1rem;
+        z-index: 10;
+    }
+
+    .form-field-with-icon .form-control {
+        padding-left: 2.5rem;
+    }
+
+    /* Action buttons */
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn-primary {
+        background-color: #3b82f6;
+        border-color: #3b82f6;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-primary:hover {
+        background-color: #2563eb;
+        border-color: #2563eb;
+        transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+        background-color: white;
+        border: 1px solid #d1d5db;
+        color: #374151;
+        padding: 0.75rem 2rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+        background-color: #f9fafb;
+        border-color: #9ca3af;
+    }
+
+    /* Secure transaction section */
+    .secure-section {
+        background-color: #e0f2fe;
+        border: 1px solid #93c5fd;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .secure-section .icon-wrapper {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        background-color: #3b82f6;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+
+    .secure-section h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.25rem;
+    }
+
+    .secure-section p {
+        font-size: 0.875rem;
+        color: #4b5563;
+    }
+
+    /* Dark theme overrides */
+    html.dark .transfer-form {
+        background-color: #374151 !important;
+        border-color: #4b5563 !important;
+        color: #e5e7eb !important;
+    }
+
+    html.dark .transfer-form label {
+        color: #e5e7eb !important;
+    }
+
+    html.dark .form-control,
+    html.dark .form-select {
+        background-color: #4b5563 !important;
+        border-color: #6b7280 !important;
+        color: #e5e7eb !important;
+    }
+
+    html.dark .form-control:focus,
+    html.dark .form-select:focus {
+        border-color: #60a5fa !important;
+        box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1) !important;
+    }
+
+    html.dark .quick-amount-btn {
+        background-color: #4b5563 !important;
+        border-color: #6b7280 !important;
+        color: #e5e7eb !important;
+    }
+
+    html.dark .quick-amount-btn:hover {
+        background-color: #6b7280 !important;
+        border-color: #9ca3af !important;
+    }
+
+    html.dark .quick-amount-btn.active {
+        background-color: #60a5fa !important;
+        border-color: #60a5fa !important;
+    }
+
+    html.dark .available-balance {
+        color: #d1d5db !important;
+    }
+
+    html.dark .btn-secondary {
+        background-color: #4b5563 !important;
+        border-color: #6b7280 !important;
+        color: #e5e7eb !important;
+    }
+
+    html.dark .btn-secondary:hover {
+        background-color: #6b7280 !important;
+        border-color: #9ca3af !important;
+    }
+
+    html.dark .secure-section {
+        background-color: #1f2937 !important;
+        border-color: #4b5563 !important;
+    }
+
+    html.dark .secure-section h3 {
+        color: #e5e7eb !important;
+    }
+
+    html.dark .secure-section p {
+        color: #d1d5db !important;
+    }
+
+    html.dark .secure-section .icon-wrapper {
+        background-color: #60a5fa !important;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .dashboard-sidebar {
+            width: 100%;
+            height: auto;
+            position: relative;
+            box-shadow: none;
+        }
+
+        .main-content {
+            margin-left: 0;
+            padding: 1rem;
+        }
+
+        .transfer-header {
+            padding: 1.5rem;
+        }
+
+        .transfer-form {
+            padding: 1.5rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .quick-amounts {
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Dashboard Layout -->
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-white shadow-lg dashboard-sidebar" style="width: 16rem;">
+            <div class="p-6">
+                <!-- User Profile Section -->
+                <div class="mb-8">
+                    <div class="flex flex-col items-center text-center mb-4">
+                        <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-3">
+                            {{ user.first_name|first|upper }}
+                        </div>
+                        <h3 class="font-bold text-gray-900 text-lg">{{ vip_member.full_name }}</h3>
+                        <p class="text-sm text-gray-500">ID: {{ vip_member.member_id }}</p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="space-y-3 mb-8">
+                    <button class="w-full bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded-md transition-colors mb-3 flex items-center justify-center gap-2">
+                        <i class="fas fa-shield-alt"></i>
+                        Verify KYC
+                    </button>
+                    <button class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-gem"></i>
+                        MERIDIAN VIP
+                    </button>
+                </div>
+
+                <!-- Main Menu -->
+                <div class="mb-6">
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 sidebar-heading">MAIN MENU</h3>
+                    <nav class="space-y-2">
+                        <a href="{% url 'accounts:vip_dashboard' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-home w-4"></i>
+                            Dashboard
+                        </a>
+                        <a href="{% url 'accounts:vip_transactions' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-exchange-alt w-4"></i>
+                            Transactions
+                        </a>
+                        <a href="{% url 'accounts:vip_cards' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-credit-card w-4"></i>
+                            Cards
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Transfers -->
+                <div class="mb-6">
+                    <h3 class="sidebar-heading text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">TRANSFERS</h3>
+                    <nav class="space-y-2">
+                        <a href="{% url 'accounts:vip_transfer_local' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-paper-plane w-4"></i>
+                            Local Transfer
+                        </a>
+                        <a href="{% url 'accounts:vip_transfer_international' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-globe w-4"></i>
+                            International Wire
+                        </a>
+                        <a href="{% url 'accounts:vip_deposit' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-plus w-4"></i>
+                            Deposit
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Services -->
+                <div class="mb-6">
+                    <h3 class="sidebar-heading text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">SERVICES</h3>
+                    <nav class="space-y-2">
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-hand-holding-usd w-4"></i>
+                            Loan Request
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-receipt w-4"></i>
+                            IRS Tax Refund
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-history w-4"></i>
+                            Loan History
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Account -->
+                <div class="mb-6">
+                    <h3 class="sidebar-heading text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">ACCOUNT</h3>
+                    <nav class="space-y-2">
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-cog w-4"></i>
+                            Account Settings
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-envelope w-4"></i>
+                            Message us
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-university w-4"></i>
+                            Online Banking
+                        </a>
+                    </nav>
+                </div>
+
+                <div class="mt-auto text-center">
+                    <p class="text-xs text-gray-500 copyright-text">© 2025 Meridian Asset Logistics</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-y-auto bg-gray-50 main-content">
+            <div class="w-full">
+                <!-- Transfer Method Header -->
+                <div class="transfer-header">
+                    <a href="{% url 'accounts:vip_transfer_international' %}" class="back-button">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <div class="icon-container">
+                        <div class="method-icon {{ icon_color }}">
+                            <i class="{{ icon_class }}"></i>
+                        </div>
+                    </div>
+                    <h1>{{ transfer_method }}</h1>
+                    <p>{{ processing_time }}</p>
+                </div>
+
+                <!-- Transfer Form -->
+                <form method="post" class="transfer-form">
+                    {% csrf_token %}
+                    
+                    <!-- Amount to Transfer -->
+                    <div class="form-group">
+                        <label for="{{ form.transfer_amount.id_for_label }}">Amount to Transfer</label>
+                        <div class="amount-input-container">
+                            {{ form.transfer_amount }}
+                        </div>
+                        <div class="available-balance">Available balance: $0.00</div>
+                        <div class="quick-amounts">
+                            <button type="button" class="quick-amount-btn" data-amount="100">$100</button>
+                            <button type="button" class="quick-amount-btn" data-amount="500">$500</button>
+                            <button type="button" class="quick-amount-btn" data-amount="1000">$1000</button>
+                            <button type="button" class="quick-amount-btn" data-amount="max">Max</button>
+                        </div>
+                    </div>
+
+                    <!-- Currency Selection -->
+                    <div class="form-group">
+                        <label for="{{ form.currency.id_for_label }}">Currency</label>
+                        {{ form.currency }}
+                    </div>
+
+                    <!-- Dynamic form fields based on transfer method -->
+                    {% if form.recipient_name %}
+                    <div class="form-group">
+                        <label for="{{ form.recipient_name.id_for_label }}">{{ form.recipient_name.label }}</label>
+                        <div class="form-field-with-icon">
+                            <i class="fas fa-user field-icon"></i>
+                            {{ form.recipient_name }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if form.recipient_email %}
+                    <div class="form-group">
+                        <label for="{{ form.recipient_email.id_for_label }}">{{ form.recipient_email.label }}</label>
+                        <div class="form-field-with-icon">
+                            <i class="fas fa-envelope field-icon"></i>
+                            {{ form.recipient_email }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if form.recipient_phone %}
+                    <div class="form-group">
+                        <label for="{{ form.recipient_phone.id_for_label }}">{{ form.recipient_phone.label }}</label>
+                        <div class="form-field-with-icon">
+                            <i class="fas fa-phone field-icon"></i>
+                            {{ form.recipient_phone }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if form.bank_name %}
+                    <div class="form-group">
+                        <label for="{{ form.bank_name.id_for_label }}">{{ form.bank_name.label }}</label>
+                        <div class="form-field-with-icon">
+                            <i class="fas fa-university field-icon"></i>
+                            {{ form.bank_name }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if form.bank_address %}
+                    <div class="form-group">
+                        <label for="{{ form.bank_address.id_for_label }}">{{ form.bank_address.label }}</label>
+                        <div class="form-field-with-icon">
+                            <i class="fas fa-map-marker-alt field-icon"></i>
+                            {{ form.bank_address }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if form.account_number %}
+                    <div class="form-group">
+                        <label for="{{ form.account_number.id_for_label }}">{{ form.account_number.label }}</label>
+                        <div class="form-field-with-icon">
+                            <i class="fas fa-hashtag field-icon"></i>
+                            {{ form.account_number }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if form.routing_number %}
+                    <div class="form-group">
+                        <label for="{{ form.routing_number.id_for_label }}">{{ form.routing_number.label }}</label>
+                        <div class="form-field-with-icon">
+                            <i class="fas fa-sort-numeric-up field-icon"></i>
+                            {{ form.routing_number }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if form.swift_code %}
+                    <div class="form-group">
+                        <label for="{{ form.swift_code.id_for_label }}">{{ form.swift_code.label }}</label>
+                        <div class="form-field-with-icon">
+                            <i class="fas fa-code field-icon"></i>
+                            {{ form.swift_code }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if form.iban %}
+                    <div class="form-group">
+                        <label for="{{ form.iban.id_for_label }}">{{ form.iban.label }}</label>
+                        <div class="form-field-with-icon">
+                            <i class="fas fa-credit-card field-icon"></i>
+                            {{ form.iban }}
+                        </div>
+                        <small class="text-gray-500">International Bank Account Number - Format varies by country</small>
+                    </div>
+                    {% endif %}
+
+                    {% if form.wallet_address %}
+                    <div class="form-group">
+                        <label for="{{ form.wallet_address.id_for_label }}">{{ form.wallet_address.label }}</label>
+                        <div class="form-field-with-icon">
+                            <i class="fas fa-wallet field-icon"></i>
+                            {{ form.wallet_address }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if form.wallet_type %}
+                    <div class="form-group">
+                        <label for="{{ form.wallet_type.id_for_label }}">{{ form.wallet_type.label }}</label>
+                        <div class="form-field-with-icon">
+                            <i class="fas fa-coins field-icon"></i>
+                            {{ form.wallet_type }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if form.purpose_of_transfer %}
+                    <div class="form-group">
+                        <label for="{{ form.purpose_of_transfer.id_for_label }}">{{ form.purpose_of_transfer.label }}</label>
+                        <div class="form-field-with-icon">
+                            <i class="fas fa-tag field-icon"></i>
+                            {{ form.purpose_of_transfer }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if form.description %}
+                    <div class="form-group">
+                        <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+                        <div class="form-field-with-icon">
+                            <i class="fas fa-comment field-icon"></i>
+                            {{ form.description }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                            Continue to Transfer
+                        </button>
+                        <a href="{% url 'accounts:vip_dashboard' %}" class="btn-secondary">
+                            <i class="fas fa-arrow-left"></i>
+                            Back to Dashboard
+                        </a>
+                    </div>
+                </form>
+
+                <!-- Secure Transaction Section -->
+                <div class="secure-section">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div>
+                        <h3>Secure Transaction</h3>
+                        <p>All transfers are encrypted and processed securely. Never share your PIN with anyone.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Quick amount buttons functionality
+    const quickAmountBtns = document.querySelectorAll('.quick-amount-btn');
+    const amountInput = document.querySelector('input[name="transfer_amount"]');
+    
+    quickAmountBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Remove active class from all buttons
+            quickAmountBtns.forEach(b => b.classList.remove('active'));
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Set amount based on button
+            if (this.dataset.amount === 'max') {
+                // In a real app, this would get the actual available balance
+                amountInput.value = '0.00';
+            } else {
+                amountInput.value = this.dataset.amount + '.00';
+            }
+            
+            // Trigger input event to update any dependent fields
+            amountInput.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+    });
+
+    // Amount input formatting
+    if (amountInput) {
+        amountInput.addEventListener('input', function() {
+            let value = this.value.replace(/[^0-9.]/g, '');
+            
+            // Ensure only two decimal places
+            if (value.includes('.')) {
+                const parts = value.split('.');
+                if (parts[1] && parts[1].length > 2) {
+                    parts[1] = parts[1].substring(0, 2);
+                    value = parts.join('.');
+                }
+            }
+            
+            this.value = value;
+        });
+    }
+});
+</script>
+{% endblock %}

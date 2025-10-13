@@ -340,3 +340,499 @@ class InternationalTransferForm(forms.ModelForm):
                 raise forms.ValidationError('Wallet type is required for cryptocurrency transfers')
         
         return cleaned_data
+
+
+# Specific forms for each transfer method
+class WireTransferForm(forms.ModelForm):
+    """Form for Wire Transfer"""
+    
+    class Meta:
+        model = InternationalTransfer
+        fields = [
+            'transfer_amount', 'currency', 'recipient_name', 'recipient_email',
+            'bank_name', 'bank_address', 'account_number', 'routing_number',
+            'swift_code', 'iban', 'purpose_of_transfer', 'description'
+        ]
+        widgets = {
+            'transfer_amount': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0.01',
+                'step': '0.01',
+                'placeholder': '0.00'
+            }),
+            'currency': forms.Select(attrs={'class': 'form-select'}),
+            'recipient_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter beneficiary\'s full name'
+            }),
+            'recipient_email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter beneficiary\'s email address'
+            }),
+            'bank_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter bank name'
+            }),
+            'bank_address': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Enter bank address'
+            }),
+            'account_number': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter account number'
+            }),
+            'routing_number': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter routing number'
+            }),
+            'swift_code': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter SWIFT/BIC code'
+            }),
+            'iban': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter IBAN number'
+            }),
+            'purpose_of_transfer': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter purpose of transfer'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Optional payment description or note'
+            })
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['transfer_method'].initial = 'wire_transfer'
+        self.fields['currency'].choices = InternationalTransfer.CURRENCY_CHOICES
+        self.fields['description'].required = False
+
+
+class CryptocurrencyForm(forms.ModelForm):
+    """Form for Cryptocurrency Transfer"""
+    
+    class Meta:
+        model = InternationalTransfer
+        fields = [
+            'transfer_amount', 'currency', 'recipient_name', 'recipient_email',
+            'wallet_address', 'wallet_type', 'purpose_of_transfer', 'description'
+        ]
+        widgets = {
+            'transfer_amount': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0.01',
+                'step': '0.01',
+                'placeholder': '0.00'
+            }),
+            'currency': forms.Select(attrs={'class': 'form-select'}),
+            'recipient_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter recipient\'s full name'
+            }),
+            'recipient_email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter recipient\'s email address'
+            }),
+            'wallet_address': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter wallet address'
+            }),
+            'wallet_type': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter wallet type (e.g., Bitcoin, Ethereum)'
+            }),
+            'purpose_of_transfer': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter purpose of transfer'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Optional payment description or note'
+            })
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['transfer_method'].initial = 'cryptocurrency'
+        self.fields['currency'].choices = InternationalTransfer.CURRENCY_CHOICES
+        self.fields['description'].required = False
+
+
+class PayPalForm(forms.ModelForm):
+    """Form for PayPal Transfer"""
+    
+    class Meta:
+        model = InternationalTransfer
+        fields = [
+            'transfer_amount', 'currency', 'recipient_email', 'purpose_of_transfer', 'description'
+        ]
+        widgets = {
+            'transfer_amount': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0.01',
+                'step': '0.01',
+                'placeholder': '0.00'
+            }),
+            'currency': forms.Select(attrs={'class': 'form-select'}),
+            'recipient_email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter PayPal email address'
+            }),
+            'purpose_of_transfer': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter purpose of transfer'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Optional payment description or note'
+            })
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['transfer_method'].initial = 'paypal'
+        self.fields['currency'].choices = InternationalTransfer.CURRENCY_CHOICES
+        self.fields['description'].required = False
+
+
+class WiseTransferForm(forms.ModelForm):
+    """Form for Wise Transfer"""
+    
+    class Meta:
+        model = InternationalTransfer
+        fields = [
+            'transfer_amount', 'currency', 'recipient_name', 'recipient_email',
+            'purpose_of_transfer', 'description'
+        ]
+        widgets = {
+            'transfer_amount': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0.01',
+                'step': '0.01',
+                'placeholder': '0.00'
+            }),
+            'currency': forms.Select(attrs={'class': 'form-select'}),
+            'recipient_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter your full name'
+            }),
+            'recipient_email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter your email address'
+            }),
+            'purpose_of_transfer': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter purpose of transfer'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Optional payment description or note'
+            })
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['transfer_method'].initial = 'wise_transfer'
+        self.fields['currency'].choices = InternationalTransfer.CURRENCY_CHOICES
+        self.fields['description'].required = False
+
+
+class CashAppForm(forms.ModelForm):
+    """Form for Cash App Transfer"""
+    
+    class Meta:
+        model = InternationalTransfer
+        fields = [
+            'transfer_amount', 'currency', 'recipient_name', 'purpose_of_transfer', 'description'
+        ]
+        widgets = {
+            'transfer_amount': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0.01',
+                'step': '0.01',
+                'placeholder': '0.00'
+            }),
+            'currency': forms.Select(attrs={'class': 'form-select'}),
+            'recipient_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter your full name'
+            }),
+            'purpose_of_transfer': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter purpose of transfer'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Optional payment description or note'
+            })
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['transfer_method'].initial = 'cash_app'
+        self.fields['currency'].choices = InternationalTransfer.CURRENCY_CHOICES
+        self.fields['description'].required = False
+
+
+class SkrillForm(forms.ModelForm):
+    """Form for Skrill Transfer"""
+    
+    class Meta:
+        model = InternationalTransfer
+        fields = [
+            'transfer_amount', 'currency', 'recipient_name', 'recipient_email',
+            'purpose_of_transfer', 'description'
+        ]
+        widgets = {
+            'transfer_amount': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0.01',
+                'step': '0.01',
+                'placeholder': '0.00'
+            }),
+            'currency': forms.Select(attrs={'class': 'form-select'}),
+            'recipient_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter your full name'
+            }),
+            'recipient_email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter Skrill email address'
+            }),
+            'purpose_of_transfer': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter purpose of transfer'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Optional payment description or note'
+            })
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['transfer_method'].initial = 'skrill'
+        self.fields['currency'].choices = InternationalTransfer.CURRENCY_CHOICES
+        self.fields['description'].required = False
+
+
+class VenmoForm(forms.ModelForm):
+    """Form for Venmo Transfer"""
+    
+    class Meta:
+        model = InternationalTransfer
+        fields = [
+            'transfer_amount', 'currency', 'recipient_name', 'recipient_phone',
+            'purpose_of_transfer', 'description'
+        ]
+        widgets = {
+            'transfer_amount': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0.01',
+                'step': '0.01',
+                'placeholder': '0.00'
+            }),
+            'currency': forms.Select(attrs={'class': 'form-select'}),
+            'recipient_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter your full name'
+            }),
+            'recipient_phone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter phone number associated with Venmo'
+            }),
+            'purpose_of_transfer': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter purpose of transfer'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Optional payment description or note'
+            })
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['transfer_method'].initial = 'venmo'
+        self.fields['currency'].choices = InternationalTransfer.CURRENCY_CHOICES
+        self.fields['description'].required = False
+
+
+class ZelleForm(forms.ModelForm):
+    """Form for Zelle Transfer"""
+    
+    class Meta:
+        model = InternationalTransfer
+        fields = [
+            'transfer_amount', 'currency', 'recipient_name', 'recipient_email',
+            'recipient_phone', 'purpose_of_transfer', 'description'
+        ]
+        widgets = {
+            'transfer_amount': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0.01',
+                'step': '0.01',
+                'placeholder': '0.00'
+            }),
+            'currency': forms.Select(attrs={'class': 'form-select'}),
+            'recipient_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter your full name'
+            }),
+            'recipient_email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter Zelle email address'
+            }),
+            'recipient_phone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter phone number associated with Zelle'
+            }),
+            'purpose_of_transfer': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter purpose of transfer'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Optional payment description or note'
+            })
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['transfer_method'].initial = 'zelle'
+        self.fields['currency'].choices = InternationalTransfer.CURRENCY_CHOICES
+        self.fields['description'].required = False
+
+
+class RevolutForm(forms.ModelForm):
+    """Form for Revolut Transfer"""
+    
+    class Meta:
+        model = InternationalTransfer
+        fields = [
+            'transfer_amount', 'currency', 'recipient_name', 'recipient_email',
+            'recipient_phone', 'purpose_of_transfer', 'description'
+        ]
+        widgets = {
+            'transfer_amount': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0.01',
+                'step': '0.01',
+                'placeholder': '0.00'
+            }),
+            'currency': forms.Select(attrs={'class': 'form-select'}),
+            'recipient_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter your full name'
+            }),
+            'recipient_email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter your email address'
+            }),
+            'recipient_phone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter phone number associated with Revolut'
+            }),
+            'purpose_of_transfer': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter purpose of transfer'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Optional payment description or note'
+            })
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['transfer_method'].initial = 'revolut'
+        self.fields['currency'].choices = InternationalTransfer.CURRENCY_CHOICES
+        self.fields['description'].required = False
+
+
+class AlipayForm(forms.ModelForm):
+    """Form for Alipay Transfer"""
+    
+    class Meta:
+        model = InternationalTransfer
+        fields = [
+            'transfer_amount', 'currency', 'recipient_name', 'purpose_of_transfer', 'description'
+        ]
+        widgets = {
+            'transfer_amount': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0.01',
+                'step': '0.01',
+                'placeholder': '0.00'
+            }),
+            'currency': forms.Select(attrs={'class': 'form-select'}),
+            'recipient_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter your full name'
+            }),
+            'purpose_of_transfer': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter purpose of transfer'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Optional payment description or note'
+            })
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['transfer_method'].initial = 'alipay'
+        self.fields['currency'].choices = InternationalTransfer.CURRENCY_CHOICES
+        self.fields['description'].required = False
+
+
+class WeChatPayForm(forms.ModelForm):
+    """Form for WeChat Pay Transfer"""
+    
+    class Meta:
+        model = InternationalTransfer
+        fields = [
+            'transfer_amount', 'currency', 'recipient_name', 'purpose_of_transfer', 'description'
+        ]
+        widgets = {
+            'transfer_amount': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0.01',
+                'step': '0.01',
+                'placeholder': '0.00'
+            }),
+            'currency': forms.Select(attrs={'class': 'form-select'}),
+            'recipient_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter your full name'
+            }),
+            'purpose_of_transfer': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter purpose of transfer'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Optional payment description or note'
+            })
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['transfer_method'].initial = 'wechat_pay'
+        self.fields['currency'].choices = InternationalTransfer.CURRENCY_CHOICES
+        self.fields['description'].required = False
