@@ -10,6 +10,19 @@
         <!-- Sidebar -->
         <div class="w-64 bg-white shadow-lg dashboard-sidebar" style="width: 16rem;">
             <div class="p-6">
+                <!-- User Info Section -->
+                <div class="mb-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">{{ user.username|slice:":1"|upper }}</span>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">{{ user.username }}</p>
+                            <p class="text-xs text-gray-500">ID: {{ vip_member.member_id }}</p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Action Buttons -->
                 <div class="space-y-3 mb-8">
                     <button class="w-full bg-red-600 text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-red-700 transition-colors">
