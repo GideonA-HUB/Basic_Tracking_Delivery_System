@@ -8,7 +8,7 @@
     <!-- Dashboard Layout -->
     <div class="flex h-screen">
         <!-- Sidebar -->
-        <div class="w-64 bg-white shadow-lg dashboard-sidebar">
+        <div class="w-64 bg-white shadow-lg dashboard-sidebar" style="width: 16rem;">
             <div class="p-6">
                 <!-- Action Buttons -->
                 <div class="space-y-3 mb-8">
@@ -106,8 +106,8 @@
         </div>
 
         <!-- Main Content -->
-        <div class="flex-1 overflow-y-auto bg-gray-50">
-            <div class="p-8">
+        <div class="flex-1 overflow-y-auto bg-gray-50 main-content">
+            <div class="w-full">
                 <!-- Header -->
                 <div class="mb-8">
                     <div class="flex items-center justify-between">
@@ -348,11 +348,25 @@ document.addEventListener('DOMContentLoaded', function() {
     background: #94a3b8;
 }
 
-/* Main content area */
-.main-content {
-    margin-left: 16rem; /* 256px */
+/* Ensure proper positioning */
+.dashboard-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
     height: 100vh;
     overflow-y: auto;
+    z-index: 40;
+    width: 16rem; /* 256px */
+}
+
+/* Main content area */
+.main-content {
+    margin-left: 16rem; /* 256px - sidebar width */
+    height: 100vh;
+    overflow-y: auto;
+    padding-left: 2rem; /* Additional spacing from sidebar */
+    padding-right: 2rem; /* Right margin */
+    padding-top: 2rem; /* Top margin */
 }
 
 /* Theme compatibility for sidebar */
