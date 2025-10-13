@@ -222,11 +222,6 @@ class RecentActivityAdmin(admin.ModelAdmin):
             obj.direction = 'outgoing'
         super().save_model(request, obj, form, change)
     
-    class Media:
-        css = {
-            'all': ('admin/css/recent_activity_admin.css',)
-        }
-        js = ('admin/js/recent_activity_admin.js',)
 
 
 @admin.register(Transaction)
@@ -281,8 +276,3 @@ class TransactionAdmin(admin.ModelAdmin):
             obj.reference_id = f"TXN-{str(uuid.uuid4())[:8].upper()}"
         super().save_model(request, obj, form, change)
     
-    class Media:
-        css = {
-            'all': ('admin/css/transaction_admin.css',)
-        }
-        js = ('admin/js/transaction_admin.js',)
