@@ -464,6 +464,25 @@ class Card(models.Model):
         ('credit', 'Credit Card'),
     ]
     
+    CARD_BRAND_CHOICES = [
+        ('visa', 'Visa'),
+        ('mastercard', 'Mastercard'),
+        ('amex', 'American Express'),
+    ]
+    
+    CARD_LEVEL_CHOICES = [
+        ('standard', 'Standard - $5.00'),
+        ('gold', 'Gold - $15.00'),
+        ('platinum', 'Platinum - $25.00'),
+        ('black', 'Black - $50.00'),
+    ]
+    
+    CURRENCY_CHOICES = [
+        ('USD', 'USD - US Dollar'),
+        ('EUR', 'EUR - Euro'),
+        ('GBP', 'GBP - British Pound'),
+    ]
+    
     STATUS_CHOICES = [
         ('active', 'Active'),
         ('inactive', 'Inactive'),
@@ -479,6 +498,8 @@ class Card(models.Model):
     # Card details
     card_number = models.CharField(max_length=19, help_text="Masked card number (e.g., **** **** **** 1234)")
     card_type = models.CharField(max_length=20, choices=CARD_TYPE_CHOICES, default='virtual')
+    card_brand = models.CharField(max_length=20, choices=CARD_BRAND_CHOICES, default='visa', help_text="Card brand (Visa, Mastercard, etc.)")
+    card_level = models.CharField(max_length=20, choices=CARD_LEVEL_CHOICES, default='standard', help_text="Card level with associated fee")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     
     # Card information
@@ -488,8 +509,15 @@ class Card(models.Model):
     
     # Financial details
     spending_limit = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True, help_text="Monthly spending limit")
+    daily_spending_limit = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True, help_text="Daily spending limit")
     current_balance = models.DecimalField(max_digits=15, decimal_places=2, default=0.00, help_text="Current card balance")
-    currency = models.CharField(max_length=3, default='USD', help_text="Currency code")
+    currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='USD', help_text="Currency code")
+    
+    # Application details
+    cardholder_name = models.CharField(max_length=100, blank=True, null=True, help_text="Name as it will appear on the card")
+    billing_address = models.TextField(blank=True, null=True, help_text="Billing address for verification")
+    application_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, help_text="Card issuance fee")
+    terms_accepted = models.BooleanField(default=False, help_text="User accepted terms and conditions")
     
     # Dates
     issue_date = models.DateTimeField(auto_now_add=True, help_text="When the card was issued")
@@ -558,6 +586,17 @@ class Card(models.Model):
             'credit': 'bg-red-100 text-red-800',
         }
         return type_colors.get(self.card_type, 'bg-gray-100 text-gray-800')
+    
+    @property
+    def get_application_fee(self):
+        """Return application fee based on card level"""
+        fee_map = {
+            'standard': 5.00,
+            'gold': 15.00,
+            'platinum': 25.00,
+            'black': 50.00,
+        }
+        return fee_map.get(self.card_level, 5.00)
     
     def save(self, *args, **kwargs):
         """Auto-set expiry_date based on expiry_month and expiry_year"""

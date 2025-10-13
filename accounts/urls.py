@@ -24,6 +24,7 @@ urlpatterns = [
     # VIP dashboard pages
     path('vip/transactions/', views.vip_transactions, name='vip_transactions'),
     path('vip/cards/', views.vip_cards, name='vip_cards'),
+    path('vip/cards/apply/', views.vip_card_application, name='vip_card_application'),
     path('vip/transfer/local/', views.vip_transfer_local, name='vip_transfer_local'),
     path('vip/transfer/international/', views.vip_transfer_international, name='vip_transfer_international'),
     path('vip/deposit/', views.vip_deposit, name='vip_deposit'),

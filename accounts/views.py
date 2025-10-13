@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
-from .forms import StaffLoginForm, StaffRegistrationForm, CustomerRegistrationForm, CustomerLoginForm, VIPLoginForm
+from .forms import StaffLoginForm, StaffRegistrationForm, CustomerRegistrationForm, CustomerLoginForm, VIPLoginForm, CardApplicationForm
 from .models import StaffProfile, CustomerProfile, VIPProfile, Transaction, Card
 
 
@@ -396,6 +396,53 @@ def vip_deposit(request):
         }
         
         return render(request, 'accounts/vip_deposit.html', context)
+        
+    except VIPProfile.DoesNotExist:
+        messages.error(request, 'VIP profile not found. Please contact support.')
+        return redirect('frontend:landing_page')
+
+
+@login_required
+@user_passes_test(is_vip_user)
+def vip_card_application(request):
+    """VIP card application page"""
+    try:
+        vip_profile = request.user.vip_profile
+        
+        if request.method == 'POST':
+            form = CardApplicationForm(request.POST)
+            if form.is_valid():
+                # Create the card application
+                card = form.save(commit=False)
+                card.vip_member = vip_profile
+                card.card_name = form.cleaned_data['cardholder_name']
+                card.application_fee = card.get_application_fee
+                
+                # Generate a temporary card number (masked)
+                import random
+                last_four = str(random.randint(1000, 9999))
+                card.card_number = f"**** **** **** {last_four}"
+                
+                # Set expiry date (2 years from now)
+                from datetime import datetime, timedelta
+                expiry_date = datetime.now() + timedelta(days=730)
+                card.expiry_month = str(expiry_date.month).zfill(2)
+                card.expiry_year = str(expiry_date.year)
+                
+                card.save()
+                
+                messages.success(request, 'Card Application now available now')
+                return redirect('accounts:vip_cards')
+        else:
+            form = CardApplicationForm()
+        
+        context = {
+            'vip_member': vip_profile,
+            'user': request.user,
+            'form': form,
+        }
+        
+        return render(request, 'accounts/vip_card_application.html', context)
         
     except VIPProfile.DoesNotExist:
         messages.error(request, 'VIP profile not found. Please contact support.')

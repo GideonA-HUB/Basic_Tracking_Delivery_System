@@ -132,7 +132,7 @@ class CardInline(admin.TabularInline):
     """Inline admin for Card"""
     model = Card
     extra = 0
-    fields = ('card_name', 'card_number', 'card_type', 'status', 'current_balance', 'spending_limit', 'is_active')
+    fields = ('card_name', 'card_number', 'card_brand', 'card_level', 'status', 'current_balance', 'daily_spending_limit', 'is_active')
     readonly_fields = ('created_at', 'updated_at')
 
 
@@ -288,8 +288,8 @@ class TransactionAdmin(admin.ModelAdmin):
 @admin.register(Card)
 class CardAdmin(admin.ModelAdmin):
     """Admin for Card"""
-    list_display = ('vip_member', 'card_name', 'card_number', 'card_type', 'status', 'formatted_balance', 'formatted_spending_limit', 'formatted_expiry_date', 'is_active')
-    list_filter = ('card_type', 'status', 'currency', 'is_active', 'issue_date', 'expiry_date', 'created_at')
+    list_display = ('vip_member', 'card_name', 'card_number', 'card_brand', 'card_level', 'status', 'formatted_balance', 'formatted_spending_limit', 'formatted_expiry_date', 'is_active')
+    list_filter = ('card_brand', 'card_level', 'status', 'currency', 'is_active', 'issue_date', 'expiry_date', 'created_at')
     search_fields = ('vip_member__user__username', 'vip_member__user__first_name', 'vip_member__user__last_name', 
                      'card_name', 'card_number', 'description', 'notes')
     readonly_fields = ('created_at', 'updated_at')
@@ -297,27 +297,30 @@ class CardAdmin(admin.ModelAdmin):
     date_hierarchy = 'issue_date'
     
     fieldsets = (
-        ('Card Information', {
-            'fields': ('vip_member', 'card_name', 'card_number', 'card_type', 'description')
-        }),
-        ('Card Details', {
-            'fields': ('expiry_month', 'expiry_year', 'expiry_date', 'status')
-        }),
-        ('Financial Details', {
-            'fields': ('spending_limit', 'current_balance', 'currency')
-        }),
-        ('Additional Information', {
-            'fields': ('notes',),
-            'classes': ('collapse',)
-        }),
-        ('Admin Settings', {
-            'fields': ('is_active',)
-        }),
-        ('Timestamps', {
-            'fields': ('created_at', 'updated_at'),
-            'classes': ('collapse',)
-        }),
-    )
+            ('Card Information', {
+                'fields': ('vip_member', 'card_name', 'card_number', 'card_brand', 'card_level', 'description')
+            }),
+            ('Card Details', {
+                'fields': ('expiry_month', 'expiry_year', 'expiry_date', 'status')
+            }),
+            ('Financial Details', {
+                'fields': ('spending_limit', 'daily_spending_limit', 'current_balance', 'currency')
+            }),
+            ('Application Details', {
+                'fields': ('cardholder_name', 'billing_address', 'application_fee', 'terms_accepted')
+            }),
+            ('Additional Information', {
+                'fields': ('notes',),
+                'classes': ('collapse',)
+            }),
+            ('Admin Settings', {
+                'fields': ('is_active',)
+            }),
+            ('Timestamps', {
+                'fields': ('created_at', 'updated_at'),
+                'classes': ('collapse',)
+            }),
+        )
     
     def formatted_balance(self, obj):
         """Display formatted balance with color"""
