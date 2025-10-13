@@ -9,7 +9,7 @@
     <div class="flex h-screen">
         <!-- Sidebar -->
         <div class="w-64 bg-white shadow-lg dashboard-sidebar" style="width: 16rem;">
-            <div class="p-6">
+            <div class="p-6 pt-4">
                 <!-- Action Buttons -->
                 <div class="space-y-3 mb-8">
                     <button class="w-full bg-red-600 text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-red-700 transition-colors">
@@ -280,6 +280,12 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Ensure sidebar scrolls to top
+    const sidebar = document.querySelector('.dashboard-sidebar');
+    if (sidebar) {
+        sidebar.scrollTop = 0;
+    }
+    
     // Search functionality
     const searchInput = document.getElementById('searchInput');
     const typeFilter = document.getElementById('typeFilter');
@@ -332,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 /* Custom scrollbar for sidebar */
 .dashboard-sidebar::-webkit-scrollbar {
-    width: 4px;
+    width: 6px;
 }
 
 .dashboard-sidebar::-webkit-scrollbar-track {
@@ -341,11 +347,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .dashboard-sidebar::-webkit-scrollbar-thumb {
     background: #cbd5e1;
-    border-radius: 2px;
+    border-radius: 3px;
 }
 
 .dashboard-sidebar::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
+}
+
+/* Ensure sidebar content is visible */
+.dashboard-sidebar .p-6 {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Ensure proper positioning */
@@ -355,8 +368,10 @@ document.addEventListener('DOMContentLoaded', function() {
     top: 0;
     height: 100vh;
     overflow-y: auto;
+    overflow-x: hidden;
     z-index: 40;
     width: 16rem; /* 256px */
+    scroll-behavior: smooth;
 }
 
 /* Main content area */
