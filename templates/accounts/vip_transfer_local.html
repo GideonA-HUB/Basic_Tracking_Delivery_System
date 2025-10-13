@@ -1,0 +1,885 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Local Transfer{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Base styles for the dashboard layout */
+    .dashboard-layout {
+        display: flex;
+        min-height: 100vh;
+        background-color: #f9fafb; /* Light gray background */
+    }
+
+    /* Sidebar styles */
+    .dashboard-sidebar {
+        width: 16rem; /* 256px */
+        background-color: #ffffff; /* White background */
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* Shadow */
+        flex-shrink: 0;
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        z-index: 40;
+        scroll-behavior: smooth;
+        padding-top: 0 !important; /* Ensure no top padding from parent */
+        margin-top: 0 !important; /* Ensure no top margin from parent */
+    }
+
+    /* Custom scrollbar for sidebar */
+    .dashboard-sidebar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .dashboard-sidebar::-webkit-scrollbar-track {
+        background: #f1f5f9; /* Light gray track */
+    }
+
+    .dashboard-sidebar::-webkit-scrollbar-thumb {
+        background: #cbd5e1; /* Gray thumb */
+        border-radius: 3px;
+    }
+
+    .dashboard-sidebar::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8; /* Darker gray on hover */
+    }
+
+    /* Ensure sidebar content is visible */
+    .dashboard-sidebar .p-6 {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Main content area */
+    .main-content {
+        flex-grow: 1;
+        margin-left: 16rem; /* 256px - sidebar width */
+        height: 100vh;
+        overflow-y: auto;
+        padding: 2rem; /* Overall padding for the main content */
+        background-color: #f9fafb; /* Light gray background */
+    }
+
+    /* Custom scrollbar for main content */
+    .main-content::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .main-content::-webkit-scrollbar-track {
+        background: #f1f5f9;
+    }
+
+    .main-content::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+    }
+
+    .main-content::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+
+    /* Form styles */
+    .form-container {
+        background-color: #ffffff;
+        border-radius: 0.75rem;
+        padding: 2rem;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        border: 1px solid #e5e7eb;
+    }
+
+    .form-section {
+        margin-bottom: 2rem;
+    }
+
+    .form-section h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        background-color: #ffffff;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+    }
+
+    .form-select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    /* Available Balance Card */
+    .balance-card {
+        background-color: #ffffff;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        border: 1px solid #e5e7eb;
+        margin-bottom: 2rem;
+    }
+
+    /* Transfer Amount Section */
+    .amount-section {
+        background-color: #ffffff;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        border: 1px solid #e5e7eb;
+        margin-bottom: 2rem;
+    }
+
+    .amount-input-container {
+        position: relative;
+        margin-bottom: 1rem;
+    }
+
+    .amount-input {
+        width: 100%;
+        padding: 1rem;
+        padding-left: 2rem;
+        padding-right: 4rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 0.5rem;
+        font-size: 1.5rem;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .amount-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .dollar-sign {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6b7280;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .amount-suffix {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6b7280;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .quick-amount-buttons {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .quick-amount-btn {
+        padding: 0.5rem 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        background-color: #ffffff;
+        color: #374151;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s ease-in-out;
+    }
+
+    .quick-amount-btn:hover {
+        background-color: #f3f4f6;
+        border-color: #d1d5db;
+    }
+
+    .quick-amount-btn.active {
+        background-color: #3b82f6;
+        border-color: #3b82f6;
+        color: #ffffff;
+    }
+
+    /* Beneficiary Details Section */
+    .beneficiary-section {
+        background-color: #ffffff;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        border: 1px solid #e5e7eb;
+        margin-bottom: 2rem;
+    }
+
+    /* Additional Information Section */
+    .additional-info-section {
+        background-color: #ffffff;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        border: 1px solid #e5e7eb;
+        margin-bottom: 2rem;
+    }
+
+    /* Secure Transaction Section */
+    .secure-section {
+        background-color: #ffffff;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        border: 1px solid #e5e7eb;
+        margin-bottom: 2rem;
+    }
+
+    /* Action buttons */
+    .btn-primary {
+        background-color: #3b82f6;
+        color: #ffffff;
+        padding: 0.75rem 2rem;
+        border: none;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.15s ease-in-out;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-primary:hover {
+        background-color: #2563eb;
+    }
+
+    .btn-secondary {
+        background-color: #6b7280;
+        color: #ffffff;
+        padding: 0.75rem 2rem;
+        border: none;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.15s ease-in-out;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-secondary:hover {
+        background-color: #4b5563;
+        color: #ffffff;
+        text-decoration: none;
+    }
+
+    /* Banner styles */
+    .transfer-banner {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+        border-radius: 0.75rem;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .transfer-banner::before {
+        content: '';
+        position: absolute;
+        bottom: -2rem;
+        right: -2rem;
+        width: 200px;
+        height: 120px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+
+    .transfer-banner-icon {
+        width: 4rem;
+        height: 4rem;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+
+    /* Status badge */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .status-available {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+
+    /* Theme compatibility for sidebar */
+    html.light .dashboard-sidebar .text-gray-600,
+    html.light .dashboard-sidebar .text-gray-500,
+    html.light .dashboard-sidebar .text-gray-400,
+    html.light .dashboard-sidebar .text-gray-300,
+    html.light .dashboard-sidebar a,
+    html.light .dashboard-sidebar p,
+    html.light .dashboard-sidebar span,
+    html.light .dashboard-sidebar div {
+        color: #374151 !important;
+        font-weight: 500 !important;
+    }
+
+    /* Fix sidebar headings */
+    html.light .sidebar-heading {
+        color: #1f2937 !important;
+        font-weight: 700 !important;
+    }
+
+    /* Fix navigation links */
+    html.light .nav-link {
+        color: #374151 !important;
+        font-weight: 500 !important;
+    }
+
+    html.light .nav-link:hover {
+        color: #1f2937 !important;
+        font-weight: 600 !important;
+    }
+
+    /* Fix copyright text */
+    html.light .copyright-text {
+        color: #6b7280 !important;
+        font-weight: 500 !important;
+    }
+
+    /* Dark theme adjustments for sidebar text */
+    html.dark .dashboard-sidebar .text-gray-600,
+    html.dark .dashboard-sidebar .text-gray-500,
+    html.dark .dashboard-sidebar .text-gray-400,
+    html.dark .dashboard-sidebar .text-gray-300,
+    html.dark .dashboard-sidebar a,
+    html.dark .dashboard-sidebar p,
+    html.dark .dashboard-sidebar span,
+    html.dark .dashboard-sidebar div {
+        color: #d1d5db !important; /* Light gray for dark theme */
+    }
+
+    html.dark .dashboard-sidebar .sidebar-heading {
+        color: #9ca3af !important; /* Lighter gray for headings */
+    }
+
+    html.dark .dashboard-sidebar .nav-link {
+        color: #d1d5db !important;
+    }
+
+    html.dark .dashboard-sidebar .nav-link:hover {
+        color: #e5e7eb !important;
+    }
+
+    html.dark .dashboard-sidebar .copyright-text {
+        color: #9ca3af !important;
+    }
+
+    /* Ensure the main content area's background is correct in dark mode */
+    html.dark .main-content {
+        background-color: #1f2937 !important; /* Dark background for main content */
+        color: #e5e7eb !important; /* Light text for dark theme */
+    }
+
+    html.dark .main-content h1,
+    html.dark .main-content h2,
+    html.dark .main-content h3,
+    html.dark .main-content h4,
+    html.dark .main-content .text-gray-900 {
+        color: #e5e7eb !important;
+    }
+
+    html.dark .main-content .text-gray-700,
+    html.dark .main-content .text-gray-600,
+    html.dark .main-content .text-gray-500 {
+        color: #d1d5db !important;
+    }
+
+    html.dark .form-container,
+    html.dark .balance-card,
+    html.dark .amount-section,
+    html.dark .beneficiary-section,
+    html.dark .additional-info-section,
+    html.dark .secure-section {
+        background-color: #374151 !important; /* Darker background for cards */
+        border-color: #4b5563 !important; /* Darker border */
+        color: #e5e7eb !important;
+    }
+
+    html.dark .form-container .text-gray-900,
+    html.dark .balance-card .text-gray-900,
+    html.dark .amount-section .text-gray-900,
+    html.dark .beneficiary-section .text-gray-900,
+    html.dark .additional-info-section .text-gray-900,
+    html.dark .secure-section .text-gray-900 {
+        color: #e5e7eb !important;
+    }
+
+    html.dark .form-container .text-gray-500,
+    html.dark .balance-card .text-gray-500,
+    html.dark .amount-section .text-gray-500,
+    html.dark .beneficiary-section .text-gray-500,
+    html.dark .additional-info-section .text-gray-500,
+    html.dark .secure-section .text-gray-500 {
+        color: #d1d5db !important;
+    }
+
+    html.dark .form-control,
+    html.dark .form-select {
+        background-color: #4b5563 !important;
+        border-color: #6b7280 !important;
+        color: #e5e7eb !important;
+    }
+
+    html.dark .form-control::placeholder,
+    html.dark .form-select::placeholder {
+        color: #9ca3af !important;
+    }
+
+    html.dark .quick-amount-btn {
+        background-color: #4b5563 !important;
+        border-color: #6b7280 !important;
+        color: #e5e7eb !important;
+    }
+
+    html.dark .quick-amount-btn:hover {
+        background-color: #374151 !important;
+        border-color: #3b82f6 !important;
+    }
+
+    html.dark .quick-amount-btn.active {
+        background-color: #3b82f6 !important;
+        border-color: #3b82f6 !important;
+        color: #ffffff !important;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .dashboard-sidebar {
+            width: 100%;
+            height: auto;
+            position: relative;
+            box-shadow: none;
+        }
+
+        .main-content {
+            margin-left: 0;
+            padding: 1rem;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .form-container,
+        .balance-card,
+        .amount-section,
+        .beneficiary-section,
+        .additional-info-section,
+        .secure-section {
+            padding: 1rem;
+        }
+
+        .quick-amount-buttons {
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Dashboard Layout -->
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-white shadow-lg dashboard-sidebar" style="width: 16rem;">
+            <div class="p-6">
+                <!-- User Profile Section -->
+                <div class="mb-8">
+                    <div class="flex flex-col items-center text-center mb-4">
+                        <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-3">
+                            {{ user.first_name|first|upper }}
+                        </div>
+                        <h3 class="font-bold text-gray-900 text-lg">{{ vip_member.full_name }}</h3>
+                        <p class="text-sm text-gray-500">ID: {{ vip_member.member_id }}</p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="space-y-3 mb-8">
+                    <button class="w-full bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded-md transition-colors mb-3 flex items-center justify-center gap-2">
+                        <i class="fas fa-shield-alt"></i>
+                        Verify KYC
+                    </button>
+                    <button class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-gem"></i>
+                        MERIDIAN VIP
+                    </button>
+                </div>
+
+                <!-- Main Menu -->
+                <div class="mb-6">
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 sidebar-heading">MAIN MENU</h3>
+                    <nav class="space-y-2">
+                        <a href="{% url 'accounts:vip_dashboard' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-home w-4"></i>
+                            Dashboard
+                        </a>
+                        <a href="{% url 'accounts:vip_transactions' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-exchange-alt w-4"></i>
+                            Transactions
+                        </a>
+                        <a href="{% url 'accounts:vip_cards' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-credit-card w-4"></i>
+                            Cards
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Transfers -->
+                <div class="mb-6">
+                    <h3 class="sidebar-heading text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">TRANSFERS</h3>
+                    <nav class="space-y-2">
+                        <a href="{% url 'accounts:vip_transfer_local' %}" class="nav-item-active flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors">
+                            <i class="fas fa-paper-plane w-4"></i>
+                            Local Transfer
+                        </a>
+                        <a href="{% url 'accounts:vip_transfer_international' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-globe w-4"></i>
+                            International Wire
+                        </a>
+                        <a href="{% url 'accounts:vip_deposit' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-plus w-4"></i>
+                            Deposit
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Services -->
+                <div class="mb-6">
+                    <h3 class="sidebar-heading text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">SERVICES</h3>
+                    <nav class="space-y-2">
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-hand-holding-usd w-4"></i>
+                            Loan Request
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-receipt w-4"></i>
+                            IRS Tax Refund
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-history w-4"></i>
+                            Loan History
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Account -->
+                <div class="mb-6">
+                    <h3 class="sidebar-heading text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">ACCOUNT</h3>
+                    <nav class="space-y-2">
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-cog w-4"></i>
+                            Account Settings
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-envelope w-4"></i>
+                            Message us
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-university w-4"></i>
+                            Online Banking
+                        </a>
+                    </nav>
+                </div>
+
+                <div class="mt-auto text-center">
+                    <p class="text-xs text-gray-500 copyright-text">© 2025 Meridian Asset Logistics</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-y-auto bg-gray-50 main-content">
+            <div class="w-full">
+                <!-- Header -->
+                <div class="mb-8">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <nav class="flex items-center space-x-2 text-sm text-gray-500 mb-2">
+                                <a href="{% url 'accounts:vip_dashboard' %}" class="hover:text-blue-600">Dashboard</a>
+                                <span>></span>
+                                <span class="text-gray-900">Local Transfer</span>
+                            </nav>
+                            <h1 class="text-3xl font-bold text-gray-900 mb-2">Local Transfer</h1>
+                        </div>
+                        <a href="{% url 'accounts:vip_dashboard' %}" class="btn-secondary">
+                            ← Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Transfer Banner -->
+                <div class="transfer-banner">
+                    <div class="transfer-banner-icon">
+                        <i class="fas fa-paper-plane text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold mb-2">Local Bank Transfer</h2>
+                    <p class="text-blue-100">Send money to any local bank account securely.</p>
+                </div>
+
+                <!-- Available Balance -->
+                <div class="balance-card">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Available Balance</p>
+                                <p class="text-2xl font-bold text-gray-900">$0.00</p>
+                            </div>
+                        </div>
+                        <span class="status-badge status-available">Available</span>
+                    </div>
+                </div>
+
+                <!-- Transfer Form -->
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <!-- Transfer Amount Section -->
+                    <div class="amount-section">
+                        <h3 class="flex items-center gap-2">
+                            <i class="fas fa-dollar-sign text-blue-600"></i>
+                            Transfer Amount
+                        </h3>
+                        
+                        <div class="amount-input-container">
+                            <span class="dollar-sign">$</span>
+                            {{ form.transfer_amount }}
+                            <span class="amount-suffix">.00</span>
+                        </div>
+                        
+                        <div class="quick-amount-buttons">
+                            <button type="button" class="quick-amount-btn" data-amount="100">$100</button>
+                            <button type="button" class="quick-amount-btn" data-amount="500">$500</button>
+                            <button type="button" class="quick-amount-btn" data-amount="1000">$1000</button>
+                            <button type="button" class="quick-amount-btn" data-amount="all">All</button>
+                        </div>
+                    </div>
+
+                    <!-- Beneficiary Details Section -->
+                    <div class="beneficiary-section">
+                        <h3 class="flex items-center gap-2">
+                            <i class="fas fa-user text-blue-600"></i>
+                            Beneficiary Details
+                        </h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="{{ form.beneficiary_name.id_for_label }}">Beneficiary Account Name</label>
+                                <div class="relative">
+                                    <i class="fas fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                    {{ form.beneficiary_name }}
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="{{ form.beneficiary_account_number.id_for_label }}">Beneficiary Account Number</label>
+                                <div class="relative">
+                                    <i class="fas fa-hashtag absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                    {{ form.beneficiary_account_number }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="{{ form.bank_name.id_for_label }}">Bank Name</label>
+                                <div class="relative">
+                                    <i class="fas fa-university absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                    {{ form.bank_name }}
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="{{ form.transfer_type.id_for_label }}">Transfer Type</label>
+                                <div class="relative">
+                                    <i class="fas fa-credit-card absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                    {{ form.transfer_type }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Information Section -->
+                    <div class="additional-info-section">
+                        <h3 class="flex items-center gap-2">
+                            <i class="fas fa-info-circle text-blue-600"></i>
+                            Additional Information
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.description.id_for_label }}">Description/Memo</label>
+                            <div class="relative">
+                                <i class="fas fa-comment absolute left-3 top-3 text-gray-400"></i>
+                                {{ form.description }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Errors -->
+                    {% if form.errors %}
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                            <h4 class="text-red-800 font-medium mb-2">Please correct the following errors:</h4>
+                            <ul class="text-red-700 text-sm">
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li>{{ field|title }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <!-- Action Buttons -->
+                    <div class="flex justify-between items-center">
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-eye"></i>
+                            Preview Transfer
+                        </button>
+                        <a href="{% url 'accounts:vip_dashboard' %}" class="btn-secondary">
+                            <i class="fas fa-arrow-left"></i>
+                            Back to Dashboard
+                        </a>
+                    </div>
+                </form>
+
+                <!-- Secure Transaction Section -->
+                <div class="secure-section">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">Secure Transaction</h4>
+                            <p class="text-sm text-gray-600">All transfers are encrypted and processed securely. Your financial information is never stored on our servers.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Ensure sidebar scrolls to top and shows all content
+    const sidebar = document.querySelector('.dashboard-sidebar');
+    if (sidebar) {
+        // Force scroll to very top
+        sidebar.scrollTop = 0;
+        sidebar.scrollTo(0, 0);
+        
+        // Ensure sidebar is at the very top of the viewport
+        sidebar.style.top = '0px';
+        sidebar.style.transform = 'translateY(0)';
+        
+        // Force a reflow to ensure changes take effect
+        sidebar.offsetHeight;
+    }
+    
+    // Additional check after a short delay
+    setTimeout(function() {
+        const sidebar = document.querySelector('.dashboard-sidebar');
+        if (sidebar) {
+            sidebar.scrollTop = 0;
+        }
+    }, 100);
+    
+    // Quick amount buttons functionality
+    const quickAmountBtns = document.querySelectorAll('.quick-amount-btn');
+    const amountInput = document.querySelector('#id_transfer_amount');
+    
+    quickAmountBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Remove active class from all buttons
+            quickAmountBtns.forEach(b => b.classList.remove('active'));
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Set amount based on button
+            const amount = this.dataset.amount;
+            if (amount === 'all') {
+                // Set to available balance (for now, we'll use 0)
+                amountInput.value = '0.00';
+            } else {
+                amountInput.value = amount + '.00';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

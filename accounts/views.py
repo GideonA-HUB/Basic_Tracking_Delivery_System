@@ -6,8 +6,8 @@ from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
-from .forms import StaffLoginForm, StaffRegistrationForm, CustomerRegistrationForm, CustomerLoginForm, VIPLoginForm, CardApplicationForm
-from .models import StaffProfile, CustomerProfile, VIPProfile, Transaction, Card
+from .forms import StaffLoginForm, StaffRegistrationForm, CustomerRegistrationForm, CustomerLoginForm, VIPLoginForm, CardApplicationForm, LocalTransferForm
+from .models import StaffProfile, CustomerProfile, VIPProfile, Transaction, Card, LocalTransfer
 
 
 def is_staff_user(user):
@@ -350,13 +350,39 @@ def vip_transfer_local(request):
     try:
         vip_profile = request.user.vip_profile
         
+        if request.method == 'POST':
+            form = LocalTransferForm(request.POST)
+            if form.is_valid():
+                # Create the transfer
+                transfer = form.save(commit=False)
+                transfer.vip_member = vip_profile
+                
+                # Calculate transfer fee (example: 1% of amount, minimum $5, maximum $50)
+                amount = transfer.transfer_amount
+                fee_percentage = 0.01  # 1%
+                calculated_fee = amount * fee_percentage
+                transfer.transfer_fee = max(5.00, min(calculated_fee, 50.00))
+                
+                transfer.save()
+                
+                messages.success(request, f'Transfer request submitted successfully! Reference: {transfer.reference_number}')
+                return redirect('accounts:vip_dashboard')
+        else:
+            form = LocalTransferForm()
+        
+        # Get recent transfers for this VIP member
+        recent_transfers = vip_profile.local_transfers.filter(
+            is_active=True
+        ).order_by('-created_at')[:5]
+        
         context = {
             'vip_member': vip_profile,
             'user': request.user,
-            'transfer_type': 'local',
+            'form': form,
+            'recent_transfers': recent_transfers,
         }
         
-        return render(request, 'accounts/vip_transfer.html', context)
+        return render(request, 'accounts/vip_transfer_local.html', context)
         
     except VIPProfile.DoesNotExist:
         messages.error(request, 'VIP profile not found. Please contact support.')

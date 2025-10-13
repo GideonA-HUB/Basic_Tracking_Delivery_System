@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
-from .models import StaffProfile, CustomerProfile, VIPProfile, RecentActivity, Transaction, Card
+from .models import StaffProfile, CustomerProfile, VIPProfile, RecentActivity, Transaction, Card, LocalTransfer
 
 
 class StaffProfileInline(admin.StackedInline):
@@ -136,6 +136,14 @@ class CardInline(admin.TabularInline):
     readonly_fields = ('created_at', 'updated_at')
 
 
+class LocalTransferInline(admin.TabularInline):
+    """Inline admin for LocalTransfer"""
+    model = LocalTransfer
+    extra = 0
+    fields = ('reference_number', 'transfer_amount', 'beneficiary_name', 'status', 'transfer_date', 'is_active')
+    readonly_fields = ('created_at', 'updated_at')
+
+
 @admin.register(VIPProfile)
 class VIPProfileAdmin(admin.ModelAdmin):
     """Admin for VIPProfile"""
@@ -143,7 +151,7 @@ class VIPProfileAdmin(admin.ModelAdmin):
     list_filter = ('membership_tier', 'status', 'assigned_staff', 'priority_support', 'dedicated_account_manager', 'created_at')
     search_fields = ('user__username', 'user__first_name', 'user__last_name', 'user__email', 'member_id', 'phone')
     readonly_fields = ('created_at', 'updated_at', 'membership_start_date')
-    inlines = [RecentActivityInline, TransactionInline, CardInline]
+    inlines = [RecentActivityInline, TransactionInline, CardInline, LocalTransferInline]
     
     fieldsets = (
         ('User Information', {
@@ -346,5 +354,53 @@ class CardAdmin(admin.ModelAdmin):
                 obj.expiry_date = datetime(int(obj.expiry_year), int(obj.expiry_month), 1)
             except (ValueError, TypeError):
                 pass
+        super().save_model(request, obj, form, change)
+
+
+@admin.register(LocalTransfer)
+class LocalTransferAdmin(admin.ModelAdmin):
+    """Admin for LocalTransfer"""
+    list_display = ('vip_member', 'reference_number', 'formatted_amount', 'beneficiary_name', 'bank_name', 'status', 'transfer_date', 'is_active')
+    list_filter = ('status', 'transfer_type', 'currency', 'is_active', 'transfer_date', 'created_at')
+    search_fields = ('vip_member__user__username', 'vip_member__user__first_name', 'vip_member__user__last_name', 
+                     'reference_number', 'beneficiary_name', 'beneficiary_account_number', 'bank_name')
+    readonly_fields = ('created_at', 'updated_at', 'reference_number', 'total_amount')
+    list_editable = ('is_active',)
+    date_hierarchy = 'transfer_date'
+    
+    fieldsets = (
+        ('Transfer Information', {
+            'fields': ('vip_member', 'reference_number', 'transfer_amount', 'currency', 'transfer_type')
+        }),
+        ('Beneficiary Details', {
+            'fields': ('beneficiary_name', 'beneficiary_account_number', 'bank_name')
+        }),
+        ('Transfer Details', {
+            'fields': ('status', 'transfer_fee', 'total_amount', 'transfer_date', 'processed_date')
+        }),
+        ('Additional Information', {
+            'fields': ('description', 'notes'),
+            'classes': ('collapse',)
+        }),
+        ('Admin Settings', {
+            'fields': ('is_active',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def formatted_amount(self, obj):
+        """Display formatted amount with color"""
+        return f'<span style="color: green;">{obj.formatted_amount}</span>'
+    formatted_amount.allow_tags = True
+    formatted_amount.short_description = 'Amount'
+    
+    def save_model(self, request, obj, form, change):
+        """Auto-generate reference_number if not provided"""
+        if not obj.reference_number:
+            import uuid
+            obj.reference_number = f"LT-{str(uuid.uuid4())[:8].upper()}"
         super().save_model(request, obj, form, change)
     

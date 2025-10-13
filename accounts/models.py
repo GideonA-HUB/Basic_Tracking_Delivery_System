@@ -607,3 +607,115 @@ class Card(models.Model):
             except (ValueError, TypeError):
                 pass
         super().save(*args, **kwargs)
+
+
+class LocalTransfer(models.Model):
+    """Local Transfer model for VIP dashboard"""
+    
+    TRANSFER_TYPE_CHOICES = [
+        ('online_banking', 'Online Banking'),
+        ('joint_account', 'Joint Account'),
+        ('checking', 'Checking'),
+        ('savings', 'Savings Account'),
+    ]
+    
+    CURRENCY_CHOICES = [
+        ('USD', 'USD - US Dollar'),
+        ('EUR', 'EUR - Euro'),
+        ('GBP', 'GBP - British Pound'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('processing', 'Processing'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+        ('cancelled', 'Cancelled'),
+    ]
+    
+    # VIP member making the transfer
+    vip_member = models.ForeignKey(VIPProfile, on_delete=models.CASCADE, related_name='local_transfers')
+    
+    # Transfer details
+    transfer_amount = models.DecimalField(max_digits=15, decimal_places=2, help_text="Amount to transfer")
+    currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='USD', help_text="Currency code")
+    
+    # Beneficiary details
+    beneficiary_name = models.CharField(max_length=100, help_text="Full name of the beneficiary")
+    beneficiary_account_number = models.CharField(max_length=50, help_text="Account number of the beneficiary")
+    bank_name = models.CharField(max_length=100, help_text="Name of the beneficiary's bank")
+    transfer_type = models.CharField(max_length=20, choices=TRANSFER_TYPE_CHOICES, default='online_banking', help_text="Type of transfer")
+    
+    # Additional information
+    description = models.TextField(blank=True, null=True, help_text="Transaction description or purpose")
+    
+    # Transfer status and tracking
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    reference_number = models.CharField(max_length=50, unique=True, blank=True, help_text="Unique transfer reference number")
+    
+    # Fees and charges
+    transfer_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, help_text="Fee charged for the transfer")
+    total_amount = models.DecimalField(max_digits=15, decimal_places=2, help_text="Total amount including fees")
+    
+    # Dates
+    transfer_date = models.DateTimeField(auto_now_add=True, help_text="When the transfer was initiated")
+    processed_date = models.DateTimeField(blank=True, null=True, help_text="When the transfer was processed")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    # Additional information
+    notes = models.TextField(blank=True, null=True, help_text="Internal notes about this transfer")
+    
+    # Admin fields
+    is_active = models.BooleanField(default=True, help_text="Whether this transfer should be displayed")
+    
+    class Meta:
+        verbose_name = 'Local Transfer'
+        verbose_name_plural = 'Local Transfers'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['vip_member', '-created_at']),
+            models.Index(fields=['status', '-created_at']),
+            models.Index(fields=['transfer_type', '-created_at']),
+        ]
+    
+    def __str__(self):
+        return f"{self.vip_member.user.username} - {self.formatted_amount} to {self.beneficiary_name}"
+    
+    @property
+    def formatted_amount(self):
+        """Return formatted amount with currency"""
+        return f"${self.transfer_amount:,.2f} {self.currency}"
+    
+    @property
+    def formatted_total_amount(self):
+        """Return formatted total amount with currency"""
+        return f"${self.total_amount:,.2f} {self.currency}"
+    
+    @property
+    def formatted_fee(self):
+        """Return formatted fee with currency"""
+        return f"${self.transfer_fee:,.2f} {self.currency}"
+    
+    @property
+    def status_color_class(self):
+        """Return CSS class for status badge color"""
+        status_colors = {
+            'pending': 'bg-yellow-100 text-yellow-800',
+            'processing': 'bg-blue-100 text-blue-800',
+            'completed': 'bg-green-100 text-green-800',
+            'failed': 'bg-red-100 text-red-800',
+            'cancelled': 'bg-gray-100 text-gray-800',
+        }
+        return status_colors.get(self.status, 'bg-gray-100 text-gray-800')
+    
+    def save(self, *args, **kwargs):
+        """Auto-generate reference number and calculate total amount"""
+        if not self.reference_number:
+            import uuid
+            self.reference_number = f"LT-{str(uuid.uuid4())[:8].upper()}"
+        
+        # Calculate total amount (transfer amount + fees)
+        self.total_amount = self.transfer_amount + self.transfer_fee
+        
+        super().save(*args, **kwargs)

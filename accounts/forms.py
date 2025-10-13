@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
-from .models import Card, StaffProfile, CustomerProfile, VIPProfile
+from .models import Card, StaffProfile, CustomerProfile, VIPProfile, LocalTransfer
 
 
 class StaffLoginForm(AuthenticationForm):
@@ -141,3 +141,74 @@ class CardApplicationForm(forms.ModelForm):
         if not terms:
             raise forms.ValidationError('You must accept the terms and conditions to apply for a card.')
         return terms
+
+
+class LocalTransferForm(forms.ModelForm):
+    """Form for local transfer"""
+    
+    class Meta:
+        model = LocalTransfer
+        fields = [
+            'transfer_amount', 'currency', 'beneficiary_name', 
+            'beneficiary_account_number', 'bank_name', 'transfer_type', 'description'
+        ]
+        widgets = {
+            'transfer_amount': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0.01',
+                'step': '0.01',
+                'placeholder': '0.00'
+            }),
+            'currency': forms.Select(attrs={'class': 'form-select'}),
+            'beneficiary_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter beneficiary\'s full name'
+            }),
+            'beneficiary_account_number': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter account number'
+            }),
+            'bank_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter bank name'
+            }),
+            'transfer_type': forms.Select(attrs={'class': 'form-select'}),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Enter transaction description or purpose of payment'
+            })
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Set choices for form fields
+        self.fields['currency'].choices = LocalTransfer.CURRENCY_CHOICES
+        self.fields['transfer_type'].choices = LocalTransfer.TRANSFER_TYPE_CHOICES
+        
+        # Set initial values
+        self.fields['currency'].initial = 'USD'
+        self.fields['transfer_type'].initial = 'online_banking'
+    
+    def clean_transfer_amount(self):
+        """Validate transfer amount"""
+        amount = self.cleaned_data.get('transfer_amount')
+        if amount:
+            if amount <= 0:
+                raise forms.ValidationError('Transfer amount must be greater than $0.00')
+            if amount > 50000:
+                raise forms.ValidationError('Transfer amount cannot exceed $50,000.00')
+        return amount
+    
+    def clean_beneficiary_account_number(self):
+        """Validate account number"""
+        account_number = self.cleaned_data.get('beneficiary_account_number')
+        if account_number:
+            # Remove any spaces or dashes
+            account_number = account_number.replace(' ', '').replace('-', '')
+            if not account_number.isdigit():
+                raise forms.ValidationError('Account number must contain only digits')
+            if len(account_number) < 8:
+                raise forms.ValidationError('Account number must be at least 8 digits long')
+        return account_number
