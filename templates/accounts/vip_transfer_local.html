@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load widget_tweaks %}
 
 {% block title %}Local Transfer{% endblock %}
 
@@ -763,7 +762,8 @@
                                 <label for="{{ form.beneficiary_name.id_for_label }}">Beneficiary Account Name</label>
                                 <div class="relative">
                                     <i class="fas fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                                    {{ form.beneficiary_name|add_class:"form-control with-icon" }}
+                                    <input type="text" name="{{ form.beneficiary_name.name }}" id="{{ form.beneficiary_name.id_for_label }}" 
+                                        class="form-control with-icon" placeholder="Enter beneficiary's full name" value="{{ form.beneficiary_name.value|default_if_none:'' }}">
                                 </div>
                             </div>
                             
@@ -771,7 +771,8 @@
                                 <label for="{{ form.beneficiary_account_number.id_for_label }}">Beneficiary Account Number</label>
                                 <div class="relative">
                                     <i class="fas fa-hashtag absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                                    {{ form.beneficiary_account_number|add_class:"form-control with-icon" }}
+                                    <input type="text" name="{{ form.beneficiary_account_number.name }}" id="{{ form.beneficiary_account_number.id_for_label }}" 
+                                        class="form-control with-icon" placeholder="Enter account number" value="{{ form.beneficiary_account_number.value|default_if_none:'' }}">
                                 </div>
                             </div>
                         </div>
@@ -781,7 +782,8 @@
                                 <label for="{{ form.bank_name.id_for_label }}">Bank Name</label>
                                 <div class="relative">
                                     <i class="fas fa-university absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                                    {{ form.bank_name|add_class:"form-control with-icon" }}
+                                    <input type="text" name="{{ form.bank_name.name }}" id="{{ form.bank_name.id_for_label }}" 
+                                        class="form-control with-icon" placeholder="Enter bank name" value="{{ form.bank_name.value|default_if_none:'' }}">
                                 </div>
                             </div>
                             
@@ -789,7 +791,11 @@
                                 <label for="{{ form.transfer_type.id_for_label }}">Transfer Type</label>
                                 <div class="relative">
                                     <i class="fas fa-credit-card absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                                    {{ form.transfer_type|add_class:"form-select with-icon" }}
+                                    <select name="{{ form.transfer_type.name }}" id="{{ form.transfer_type.id_for_label }}" class="form-select with-icon">
+                                        {% for value, label in form.transfer_type.field.choices %}
+                                            <option value="{{ value }}" {% if form.transfer_type.value == value %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -806,7 +812,8 @@
                             <label for="{{ form.description.id_for_label }}">Description/Memo</label>
                             <div class="relative">
                                 <i class="fas fa-comment absolute left-3 top-3 text-gray-400"></i>
-                                {{ form.description|add_class:"form-control with-icon" }}
+                                <textarea name="{{ form.description.name }}" id="{{ form.description.id_for_label }}" 
+                                    class="form-control with-icon" rows="3" placeholder="Enter transaction description or purpose of payment">{{ form.description.value|default_if_none:'' }}</textarea>
                             </div>
                         </div>
                     </div>
