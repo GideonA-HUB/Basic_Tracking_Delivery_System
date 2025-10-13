@@ -719,6 +719,11 @@
                 <form method="post" class="transfer-form">
                     {% csrf_token %}
                     
+                    <!-- Hidden transfer method field -->
+                    {% if form.transfer_method %}
+                        {{ form.transfer_method }}
+                    {% endif %}
+                    
                     <!-- Amount to Transfer -->
                     <div class="form-group">
                         <label for="{{ form.transfer_amount.id_for_label }}">Amount to Transfer</label>

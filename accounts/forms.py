@@ -349,11 +349,12 @@ class WireTransferForm(forms.ModelForm):
     class Meta:
         model = InternationalTransfer
         fields = [
-            'transfer_amount', 'currency', 'recipient_name', 'recipient_email',
+            'transfer_method', 'transfer_amount', 'currency', 'recipient_name', 'recipient_email',
             'bank_name', 'bank_address', 'account_number', 'routing_number',
             'swift_code', 'iban', 'purpose_of_transfer', 'description'
         ]
         widgets = {
+            'transfer_method': forms.HiddenInput(),  # Hidden field since it's set automatically
             'transfer_amount': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'min': '0.01',
@@ -418,10 +419,11 @@ class CryptocurrencyForm(forms.ModelForm):
     class Meta:
         model = InternationalTransfer
         fields = [
-            'transfer_amount', 'currency', 'recipient_name', 'recipient_email',
+            'transfer_method', 'transfer_amount', 'currency', 'recipient_name', 'recipient_email',
             'wallet_address', 'wallet_type', 'purpose_of_transfer', 'description'
         ]
         widgets = {
+            'transfer_method': forms.HiddenInput(),  # Hidden field since it's set automatically
             'transfer_amount': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'min': '0.01',
@@ -469,9 +471,10 @@ class PayPalForm(forms.ModelForm):
     class Meta:
         model = InternationalTransfer
         fields = [
-            'transfer_amount', 'currency', 'recipient_email', 'purpose_of_transfer', 'description'
+            'transfer_method', 'transfer_amount', 'currency', 'recipient_email', 'purpose_of_transfer', 'description'
         ]
         widgets = {
+            'transfer_method': forms.HiddenInput(),  # Hidden field since it's set automatically
             'transfer_amount': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'min': '0.01',
@@ -507,10 +510,11 @@ class WiseTransferForm(forms.ModelForm):
     class Meta:
         model = InternationalTransfer
         fields = [
-            'transfer_amount', 'currency', 'recipient_name', 'recipient_email',
+            'transfer_method', 'transfer_amount', 'currency', 'recipient_name', 'recipient_email',
             'purpose_of_transfer', 'description'
         ]
         widgets = {
+            'transfer_method': forms.HiddenInput(),  # Hidden field since it's set automatically
             'transfer_amount': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'min': '0.01',
@@ -550,9 +554,10 @@ class CashAppForm(forms.ModelForm):
     class Meta:
         model = InternationalTransfer
         fields = [
-            'transfer_amount', 'currency', 'recipient_name', 'purpose_of_transfer', 'description'
+            'transfer_method', 'transfer_amount', 'currency', 'recipient_name', 'purpose_of_transfer', 'description'
         ]
         widgets = {
+            'transfer_method': forms.HiddenInput(),  # Hidden field since it's set automatically
             'transfer_amount': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'min': '0.01',
@@ -588,10 +593,11 @@ class SkrillForm(forms.ModelForm):
     class Meta:
         model = InternationalTransfer
         fields = [
-            'transfer_amount', 'currency', 'recipient_name', 'recipient_email',
+            'transfer_method', 'transfer_amount', 'currency', 'recipient_name', 'recipient_email',
             'purpose_of_transfer', 'description'
         ]
         widgets = {
+            'transfer_method': forms.HiddenInput(),  # Hidden field since it's set automatically
             'transfer_amount': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'min': '0.01',
@@ -631,10 +637,11 @@ class VenmoForm(forms.ModelForm):
     class Meta:
         model = InternationalTransfer
         fields = [
-            'transfer_amount', 'currency', 'recipient_name', 'recipient_phone',
+            'transfer_method', 'transfer_amount', 'currency', 'recipient_name', 'recipient_phone',
             'purpose_of_transfer', 'description'
         ]
         widgets = {
+            'transfer_method': forms.HiddenInput(),  # Hidden field since it's set automatically
             'transfer_amount': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'min': '0.01',
@@ -674,10 +681,11 @@ class ZelleForm(forms.ModelForm):
     class Meta:
         model = InternationalTransfer
         fields = [
-            'transfer_amount', 'currency', 'recipient_name', 'recipient_email',
+            'transfer_method', 'transfer_amount', 'currency', 'recipient_name', 'recipient_email',
             'recipient_phone', 'purpose_of_transfer', 'description'
         ]
         widgets = {
+            'transfer_method': forms.HiddenInput(),  # Hidden field since it's set automatically
             'transfer_amount': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'min': '0.01',
@@ -721,10 +729,11 @@ class RevolutForm(forms.ModelForm):
     class Meta:
         model = InternationalTransfer
         fields = [
-            'transfer_amount', 'currency', 'recipient_name', 'recipient_email',
+            'transfer_method', 'transfer_amount', 'currency', 'recipient_name', 'recipient_email',
             'recipient_phone', 'purpose_of_transfer', 'description'
         ]
         widgets = {
+            'transfer_method': forms.HiddenInput(),  # Hidden field since it's set automatically
             'transfer_amount': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'min': '0.01',
@@ -768,9 +777,10 @@ class AlipayForm(forms.ModelForm):
     class Meta:
         model = InternationalTransfer
         fields = [
-            'transfer_amount', 'currency', 'recipient_name', 'purpose_of_transfer', 'description'
+            'transfer_method', 'transfer_amount', 'currency', 'recipient_name', 'purpose_of_transfer', 'description'
         ]
         widgets = {
+            'transfer_method': forms.HiddenInput(),  # Hidden field since it's set automatically
             'transfer_amount': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'min': '0.01',
@@ -806,9 +816,10 @@ class WeChatPayForm(forms.ModelForm):
     class Meta:
         model = InternationalTransfer
         fields = [
-            'transfer_amount', 'currency', 'recipient_name', 'purpose_of_transfer', 'description'
+            'transfer_method', 'transfer_amount', 'currency', 'recipient_name', 'purpose_of_transfer', 'description'
         ]
         widgets = {
+            'transfer_method': forms.HiddenInput(),  # Hidden field since it's set automatically
             'transfer_amount': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'min': '0.01',
