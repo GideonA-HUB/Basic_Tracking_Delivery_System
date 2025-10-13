@@ -148,36 +148,36 @@
         height: 100% !important;
         overflow-x: hidden !important;
         background: white !important;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     }
 
-    /* Force the dashboard to take full viewport */
+    /* Force the dashboard to take full viewport with proper layout */
     .dashboard-layout {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
+        display: flex !important;
         width: 100vw !important;
         height: 100vh !important;
         background: white !important;
-        display: grid !important;
-        grid-template-columns: 280px 1fr !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        z-index: 9999 !important;
     }
 
     /* CRITICAL: Override any dark theme classes */
-    .dark, .dark * {
+    .dark, .dark *, [class*="dark"] {
         background: white !important;
         color: #374151 !important;
     }
 
-    /* Force all elements to be white */
+    /* Force all elements to be white except specific colored elements */
     * {
         background-color: white !important;
         color: #374151 !important;
     }
 
     /* Exception for specific elements that need colors */
-    .bg-blue-600, .bg-red-600, .bg-green-600, .bg-yellow-500, .bg-purple-600 {
+    .bg-blue-600, .bg-red-600, .bg-green-600, .bg-yellow-500, .bg-purple-600, 
+    .bg-blue-500, .bg-gradient-to-r, .balance-card, .balance-card * {
         background-color: inherit !important;
     }
 
@@ -201,40 +201,68 @@
         color: #374151 !important;
     }
 
-    /* Force the layout to work */
-    .dashboard-layout {
-        display: grid !important;
-        grid-template-columns: 280px 1fr !important;
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100vw !important;
-        height: 100vh !important;
-        background: white !important;
-        z-index: 9999 !important;
-    }
-
     .dashboard-sidebar {
         width: 280px !important;
         background: white !important;
         border-right: 1px solid #e5e7eb !important;
         padding: 2rem 1.5rem !important;
         overflow-y: auto !important;
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
+        overflow-x: hidden !important;
+        position: relative !important;
         height: 100vh !important;
-        z-index: 1000 !important;
+        z-index: 1 !important;
+        flex-shrink: 0 !important;
+        /* Custom scrollbar */
+        scrollbar-width: thin !important;
+        scrollbar-color: #cbd5e1 #f1f5f9 !important;
+    }
+
+    .dashboard-sidebar::-webkit-scrollbar {
+        width: 6px !important;
+    }
+
+    .dashboard-sidebar::-webkit-scrollbar-track {
+        background: #f1f5f9 !important;
+    }
+
+    .dashboard-sidebar::-webkit-scrollbar-thumb {
+        background: #cbd5e1 !important;
+        border-radius: 3px !important;
+    }
+
+    .dashboard-sidebar::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8 !important;
     }
 
     .dashboard-main {
         background: white !important;
-        min-height: 100vh !important;
+        height: 100vh !important;
         display: flex !important;
         flex-direction: column !important;
-        width: calc(100vw - 280px) !important;
-        margin-left: 280px !important;
+        flex: 1 !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
         position: relative !important;
+        /* Custom scrollbar */
+        scrollbar-width: thin !important;
+        scrollbar-color: #cbd5e1 #f1f5f9 !important;
+    }
+
+    .dashboard-main::-webkit-scrollbar {
+        width: 6px !important;
+    }
+
+    .dashboard-main::-webkit-scrollbar-track {
+        background: #f1f5f9 !important;
+    }
+
+    .dashboard-main::-webkit-scrollbar-thumb {
+        background: #cbd5e1 !important;
+        border-radius: 3px !important;
+    }
+
+    .dashboard-main::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8 !important;
     }
 
     .dashboard-header {
@@ -250,8 +278,16 @@
     .dashboard-content {
         flex: 1 !important;
         padding: 2rem !important;
-        overflow-y: auto !important;
         background: white !important;
+        max-width: 100% !important;
+        margin: 0 auto !important;
+    }
+
+    /* Add proper margins to content */
+    .dashboard-content > * {
+        margin-left: auto !important;
+        margin-right: auto !important;
+        max-width: 1200px !important;
     }
 
     /* Mobile responsive */
@@ -982,39 +1018,62 @@
         document.documentElement.className = 'light';
         document.body.style.background = 'white';
         document.body.style.color = '#374151';
+        document.body.style.margin = '0';
+        document.body.style.padding = '0';
+        document.body.style.overflow = 'hidden';
         
-        // Force layout
+        // Force layout with flexbox
         const layout = document.querySelector('.dashboard-layout');
         if (layout) {
-            layout.style.display = 'grid';
-            layout.style.gridTemplateColumns = '280px 1fr';
+            layout.style.display = 'flex';
             layout.style.width = '100vw';
             layout.style.height = '100vh';
             layout.style.position = 'fixed';
             layout.style.top = '0';
             layout.style.left = '0';
             layout.style.background = 'white';
+            layout.style.margin = '0';
+            layout.style.padding = '0';
         }
         
-        // Force sidebar
+        // Force sidebar with proper scrolling
         const sidebar = document.querySelector('.dashboard-sidebar');
         if (sidebar) {
-            sidebar.style.position = 'fixed';
-            sidebar.style.left = '0';
-            sidebar.style.top = '0';
             sidebar.style.width = '280px';
             sidebar.style.height = '100vh';
             sidebar.style.background = 'white';
-            sidebar.style.zIndex = '1000';
+            sidebar.style.overflowY = 'auto';
+            sidebar.style.overflowX = 'hidden';
+            sidebar.style.position = 'relative';
+            sidebar.style.flexShrink = '0';
+            sidebar.style.borderRight = '1px solid #e5e7eb';
         }
         
-        // Force main content
+        // Force main content with proper scrolling and margins
         const main = document.querySelector('.dashboard-main');
         if (main) {
-            main.style.marginLeft = '280px';
-            main.style.width = 'calc(100vw - 280px)';
+            main.style.flex = '1';
+            main.style.height = '100vh';
             main.style.background = 'white';
+            main.style.overflowY = 'auto';
+            main.style.overflowX = 'hidden';
+            main.style.position = 'relative';
         }
+        
+        // Force content margins
+        const content = document.querySelector('.dashboard-content');
+        if (content) {
+            content.style.padding = '2rem';
+            content.style.maxWidth = '1200px';
+            content.style.margin = '0 auto';
+        }
+        
+        // Remove any dark theme classes
+        document.querySelectorAll('*').forEach(el => {
+            if (el.classList.contains('dark')) {
+                el.classList.remove('dark');
+            }
+        });
     });
 
     // Real-time clock functionality
