@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
-from .models import Card, StaffProfile, CustomerProfile, VIPProfile, LocalTransfer
+from .models import Card, StaffProfile, CustomerProfile, VIPProfile, LocalTransfer, InternationalTransfer
 
 
 class StaffLoginForm(AuthenticationForm):
@@ -212,3 +212,131 @@ class LocalTransferForm(forms.ModelForm):
             if len(account_number) < 8:
                 raise forms.ValidationError('Account number must be at least 8 digits long')
         return account_number
+
+
+class InternationalTransferForm(forms.ModelForm):
+    """Form for international transfer"""
+    
+    class Meta:
+        model = InternationalTransfer
+        fields = [
+            'transfer_amount', 'currency', 'transfer_method', 'recipient_name', 
+            'recipient_email', 'recipient_phone', 'bank_name', 'bank_address',
+            'account_number', 'routing_number', 'swift_code', 'iban',
+            'wallet_address', 'wallet_type', 'purpose_of_transfer', 'description'
+        ]
+        widgets = {
+            'transfer_amount': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0.01',
+                'step': '0.01',
+                'placeholder': '0.00'
+            }),
+            'currency': forms.Select(attrs={'class': 'form-select'}),
+            'transfer_method': forms.Select(attrs={'class': 'form-select'}),
+            'recipient_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter recipient\'s full name'
+            }),
+            'recipient_email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter recipient\'s email address'
+            }),
+            'recipient_phone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter recipient\'s phone number (optional)'
+            }),
+            'bank_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter bank name'
+            }),
+            'bank_address': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Enter bank address'
+            }),
+            'account_number': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter account number'
+            }),
+            'routing_number': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter routing number'
+            }),
+            'swift_code': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter SWIFT/BIC code'
+            }),
+            'iban': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter IBAN'
+            }),
+            'wallet_address': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter wallet address'
+            }),
+            'wallet_type': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter wallet type (e.g., Bitcoin, Ethereum)'
+            }),
+            'purpose_of_transfer': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter purpose of transfer'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Enter additional description (optional)'
+            })
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Set choices for form fields
+        self.fields['currency'].choices = InternationalTransfer.CURRENCY_CHOICES
+        self.fields['transfer_method'].choices = InternationalTransfer.TRANSFER_METHOD_CHOICES
+        
+        # Set initial values
+        self.fields['currency'].initial = 'USD'
+        
+        # Make some fields optional
+        self.fields['recipient_phone'].required = False
+        self.fields['bank_name'].required = False
+        self.fields['bank_address'].required = False
+        self.fields['account_number'].required = False
+        self.fields['routing_number'].required = False
+        self.fields['swift_code'].required = False
+        self.fields['iban'].required = False
+        self.fields['wallet_address'].required = False
+        self.fields['wallet_type'].required = False
+        self.fields['description'].required = False
+    
+    def clean_transfer_amount(self):
+        """Validate transfer amount"""
+        amount = self.cleaned_data.get('transfer_amount')
+        if amount:
+            if amount <= 0:
+                raise forms.ValidationError('Transfer amount must be greater than $0.00')
+            if amount > 100000:
+                raise forms.ValidationError('Transfer amount cannot exceed $100,000.00')
+        return amount
+    
+    def clean(self):
+        """Cross-field validation"""
+        cleaned_data = super().clean()
+        transfer_method = cleaned_data.get('transfer_method')
+        
+        # Validate based on transfer method
+        if transfer_method == 'wire_transfer':
+            if not cleaned_data.get('bank_name'):
+                raise forms.ValidationError('Bank name is required for wire transfers')
+            if not cleaned_data.get('account_number'):
+                raise forms.ValidationError('Account number is required for wire transfers')
+        elif transfer_method == 'cryptocurrency':
+            if not cleaned_data.get('wallet_address'):
+                raise forms.ValidationError('Wallet address is required for cryptocurrency transfers')
+            if not cleaned_data.get('wallet_type'):
+                raise forms.ValidationError('Wallet type is required for cryptocurrency transfers')
+        
+        return cleaned_data

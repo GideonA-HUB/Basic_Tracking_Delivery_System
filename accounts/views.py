@@ -6,8 +6,8 @@ from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
-from .forms import StaffLoginForm, StaffRegistrationForm, CustomerRegistrationForm, CustomerLoginForm, VIPLoginForm, CardApplicationForm, LocalTransferForm
-from .models import StaffProfile, CustomerProfile, VIPProfile, Transaction, Card, LocalTransfer
+from .forms import StaffLoginForm, StaffRegistrationForm, CustomerRegistrationForm, CustomerLoginForm, VIPLoginForm, CardApplicationForm, LocalTransferForm, InternationalTransferForm
+from .models import StaffProfile, CustomerProfile, VIPProfile, Transaction, Card, LocalTransfer, InternationalTransfer
 
 
 def is_staff_user(user):
@@ -469,6 +469,65 @@ def vip_card_application(request):
         }
         
         return render(request, 'accounts/vip_card_application.html', context)
+        
+    except VIPProfile.DoesNotExist:
+        messages.error(request, 'VIP profile not found. Please contact support.')
+        return redirect('frontend:landing_page')
+
+
+@login_required
+@user_passes_test(is_vip_user)
+def vip_transfer_international(request):
+    """VIP international transfer page"""
+    try:
+        vip_profile = request.user.vip_profile
+        
+        if request.method == 'POST':
+            form = InternationalTransferForm(request.POST)
+            if form.is_valid():
+                # Create the transfer
+                transfer = form.save(commit=False)
+                transfer.vip_member = vip_profile
+                
+                # Calculate transfer fee based on method (example rates)
+                amount = transfer.transfer_amount
+                method = transfer.transfer_method
+                
+                # Different fee structures for different methods
+                if method == 'wire_transfer':
+                    transfer.transfer_fee = max(25.00, amount * 0.005)  # $25 minimum or 0.5%
+                elif method == 'cryptocurrency':
+                    transfer.transfer_fee = amount * 0.02  # 2%
+                elif method in ['paypal', 'wise_transfer']:
+                    transfer.transfer_fee = amount * 0.03  # 3%
+                elif method in ['cash_app', 'venmo', 'zelle']:
+                    transfer.transfer_fee = amount * 0.015  # 1.5%
+                else:
+                    transfer.transfer_fee = amount * 0.025  # 2.5% default
+                
+                # Cap fees at $100
+                transfer.transfer_fee = min(transfer.transfer_fee, 100.00)
+                
+                transfer.save()
+                
+                messages.success(request, f'International transfer request submitted successfully! Reference: {transfer.reference_number}')
+                return redirect('accounts:vip_dashboard')
+        else:
+            form = InternationalTransferForm()
+        
+        # Get recent international transfers for this VIP member
+        recent_transfers = vip_profile.international_transfers.filter(
+            is_active=True
+        ).order_by('-created_at')[:5]
+        
+        context = {
+            'vip_member': vip_profile,
+            'user': request.user,
+            'form': form,
+            'recent_transfers': recent_transfers,
+        }
+        
+        return render(request, 'accounts/vip_transfer_international.html', context)
         
     except VIPProfile.DoesNotExist:
         messages.error(request, 'VIP profile not found. Please contact support.')

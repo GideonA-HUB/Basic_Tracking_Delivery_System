@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
-from .models import StaffProfile, CustomerProfile, VIPProfile, RecentActivity, Transaction, Card, LocalTransfer
+from .models import StaffProfile, CustomerProfile, VIPProfile, RecentActivity, Transaction, Card, LocalTransfer, InternationalTransfer
 
 
 class StaffProfileInline(admin.StackedInline):
@@ -144,6 +144,18 @@ class LocalTransferInline(admin.TabularInline):
     readonly_fields = ('created_at', 'updated_at')
 
 
+class InternationalTransferInline(admin.TabularInline):
+    """Inline admin for InternationalTransfer"""
+    model = InternationalTransfer
+    extra = 0
+    readonly_fields = ('reference_number', 'created_at', 'updated_at')
+    fields = (
+        'transfer_method', 'transfer_amount', 'currency', 'recipient_name', 
+        'status', 'reference_number', 'transfer_fee', 'total_amount', 
+        'transfer_date', 'created_at'
+    )
+
+
 @admin.register(VIPProfile)
 class VIPProfileAdmin(admin.ModelAdmin):
     """Admin for VIPProfile"""
@@ -151,7 +163,7 @@ class VIPProfileAdmin(admin.ModelAdmin):
     list_filter = ('membership_tier', 'status', 'assigned_staff', 'priority_support', 'dedicated_account_manager', 'created_at')
     search_fields = ('user__username', 'user__first_name', 'user__last_name', 'user__email', 'member_id', 'phone')
     readonly_fields = ('created_at', 'updated_at', 'membership_start_date')
-    inlines = [RecentActivityInline, TransactionInline, CardInline, LocalTransferInline]
+    inlines = [RecentActivityInline, TransactionInline, CardInline, LocalTransferInline, InternationalTransferInline]
     
     fieldsets = (
         ('User Information', {
@@ -403,4 +415,88 @@ class LocalTransferAdmin(admin.ModelAdmin):
             import uuid
             obj.reference_number = f"LT-{str(uuid.uuid4())[:8].upper()}"
         super().save_model(request, obj, form, change)
+
+
+@admin.register(InternationalTransfer)
+class InternationalTransferAdmin(admin.ModelAdmin):
+    """Admin interface for InternationalTransfer"""
+    list_display = (
+        'reference_number', 'vip_member', 'transfer_method', 'transfer_amount', 
+        'currency', 'recipient_name', 'status', 'transfer_fee', 'total_amount', 
+        'transfer_date', 'created_at'
+    )
+    list_filter = (
+        'status', 'transfer_method', 'currency', 'transfer_date', 'created_at'
+    )
+    search_fields = (
+        'reference_number', 'vip_member__user__username', 'vip_member__user__first_name',
+        'vip_member__user__last_name', 'recipient_name', 'recipient_email',
+        'bank_name', 'tracking_number'
+    )
+    readonly_fields = (
+        'reference_number', 'tracking_number', 'created_at', 'updated_at',
+        'processed_date', 'completed_date'
+    )
+    ordering = ['-created_at']
+    date_hierarchy = 'created_at'
+    
+    fieldsets = (
+        ('Transfer Information', {
+            'fields': (
+                'vip_member', 'transfer_method', 'transfer_amount', 'currency',
+                'reference_number', 'tracking_number', 'status'
+            )
+        }),
+        ('Recipient Details', {
+            'fields': (
+                'recipient_name', 'recipient_email', 'recipient_phone'
+            )
+        }),
+        ('Bank Details', {
+            'fields': (
+                'bank_name', 'bank_address', 'account_number', 'routing_number',
+                'swift_code', 'iban'
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Wallet Details', {
+            'fields': (
+                'wallet_address', 'wallet_type'
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Transfer Details', {
+            'fields': (
+                'purpose_of_transfer', 'description'
+            )
+        }),
+        ('Fees and Amounts', {
+            'fields': (
+                'transfer_fee', 'exchange_rate', 'total_amount'
+            )
+        }),
+        ('Dates', {
+            'fields': (
+                'transfer_date', 'processed_date', 'completed_date',
+                'created_at', 'updated_at'
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Additional Information', {
+            'fields': (
+                'notes', 'compliance_notes', 'requires_approval', 'is_active'
+            ),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def get_queryset(self, request):
+        """Filter transfers for current VIP member"""
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(vip_member__user=request.user)
+
+
+# Admin classes are registered using decorators above
     

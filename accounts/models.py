@@ -709,11 +709,174 @@ class LocalTransfer(models.Model):
         }
         return status_colors.get(self.status, 'bg-gray-100 text-gray-800')
     
+        def save(self, *args, **kwargs):
+            """Auto-generate reference number and calculate total amount"""
+            if not self.reference_number:
+                import uuid
+                self.reference_number = f"LT-{str(uuid.uuid4())[:8].upper()}"
+            
+            # Calculate total amount (transfer amount + fees)
+            self.total_amount = self.transfer_amount + self.transfer_fee
+            
+            super().save(*args, **kwargs)
+
+
+class InternationalTransfer(models.Model):
+    """International Transfer model for VIP dashboard"""
+    
+    TRANSFER_METHOD_CHOICES = [
+        ('wire_transfer', 'Wire Transfer'),
+        ('cryptocurrency', 'Cryptocurrency'),
+        ('paypal', 'PayPal'),
+        ('wise_transfer', 'Wise Transfer'),
+        ('cash_app', 'Cash App'),
+        ('skrill', 'Skrill'),
+        ('venmo', 'Venmo'),
+        ('zelle', 'Zelle'),
+        ('revolut', 'Revolut'),
+        ('alipay', 'Alipay'),
+        ('wechat_pay', 'WeChat Pay'),
+    ]
+    
+    CURRENCY_CHOICES = [
+        ('USD', 'USD - US Dollar'),
+        ('EUR', 'EUR - Euro'),
+        ('GBP', 'GBP - British Pound'),
+        ('CAD', 'CAD - Canadian Dollar'),
+        ('AUD', 'AUD - Australian Dollar'),
+        ('JPY', 'JPY - Japanese Yen'),
+        ('CHF', 'CHF - Swiss Franc'),
+        ('CNY', 'CNY - Chinese Yuan'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('processing', 'Processing'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+        ('cancelled', 'Cancelled'),
+        ('on_hold', 'On Hold'),
+    ]
+    
+    # VIP member making the transfer
+    vip_member = models.ForeignKey(VIPProfile, on_delete=models.CASCADE, related_name='international_transfers')
+    
+    # Transfer details
+    transfer_amount = models.DecimalField(max_digits=15, decimal_places=2, help_text="Amount to transfer")
+    currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='USD', help_text="Currency code")
+    transfer_method = models.CharField(max_length=20, choices=TRANSFER_METHOD_CHOICES, help_text="Method of international transfer")
+    
+    # Recipient details
+    recipient_name = models.CharField(max_length=100, help_text="Full name of the recipient")
+    recipient_email = models.EmailField(help_text="Email address of the recipient")
+    recipient_phone = models.CharField(max_length=20, blank=True, null=True, help_text="Phone number of the recipient")
+    
+    # Bank details (for wire transfers)
+    bank_name = models.CharField(max_length=100, blank=True, null=True, help_text="Name of the recipient's bank")
+    bank_address = models.TextField(blank=True, null=True, help_text="Bank address")
+    account_number = models.CharField(max_length=50, blank=True, null=True, help_text="Account number")
+    routing_number = models.CharField(max_length=20, blank=True, null=True, help_text="Bank routing number")
+    swift_code = models.CharField(max_length=11, blank=True, null=True, help_text="SWIFT/BIC code")
+    iban = models.CharField(max_length=34, blank=True, null=True, help_text="IBAN (International Bank Account Number)")
+    
+    # Wallet details (for crypto/other methods)
+    wallet_address = models.CharField(max_length=200, blank=True, null=True, help_text="Cryptocurrency wallet address")
+    wallet_type = models.CharField(max_length=50, blank=True, null=True, help_text="Type of wallet (Bitcoin, Ethereum, etc.)")
+    
+    # Transfer information
+    purpose_of_transfer = models.CharField(max_length=100, help_text="Purpose of the transfer")
+    description = models.TextField(blank=True, null=True, help_text="Additional transfer description")
+    
+    # Transfer status and tracking
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    reference_number = models.CharField(max_length=50, unique=True, blank=True, help_text="Unique transfer reference number")
+    tracking_number = models.CharField(max_length=50, blank=True, null=True, help_text="Tracking number for the transfer")
+    
+    # Fees and charges
+    transfer_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, help_text="Fee charged for the transfer")
+    exchange_rate = models.DecimalField(max_digits=10, decimal_places=6, default=1.000000, help_text="Exchange rate applied")
+    total_amount = models.DecimalField(max_digits=15, decimal_places=2, help_text="Total amount including fees")
+    
+    # Dates
+    transfer_date = models.DateTimeField(auto_now_add=True, help_text="When the transfer was initiated")
+    processed_date = models.DateTimeField(blank=True, null=True, help_text="When the transfer was processed")
+    completed_date = models.DateTimeField(blank=True, null=True, help_text="When the transfer was completed")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    # Additional information
+    notes = models.TextField(blank=True, null=True, help_text="Internal notes about this transfer")
+    compliance_notes = models.TextField(blank=True, null=True, help_text="Compliance and regulatory notes")
+    
+    # Admin fields
+    is_active = models.BooleanField(default=True, help_text="Whether this transfer should be displayed")
+    requires_approval = models.BooleanField(default=False, help_text="Whether this transfer requires manual approval")
+    
+    class Meta:
+        verbose_name = 'International Transfer'
+        verbose_name_plural = 'International Transfers'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['vip_member', '-created_at']),
+            models.Index(fields=['status', '-created_at']),
+            models.Index(fields=['transfer_method', '-created_at']),
+            models.Index(fields=['currency', '-created_at']),
+        ]
+    
+    def __str__(self):
+        return f"{self.vip_member.user.username} - {self.formatted_amount} via {self.get_transfer_method_display()}"
+    
+    @property
+    def formatted_amount(self):
+        """Return formatted amount with currency"""
+        return f"{self.currency} {self.transfer_amount:,.2f}"
+    
+    @property
+    def formatted_total_amount(self):
+        """Return formatted total amount with currency"""
+        return f"{self.currency} {self.total_amount:,.2f}"
+    
+    @property
+    def formatted_fee(self):
+        """Return formatted fee with currency"""
+        return f"{self.currency} {self.transfer_fee:,.2f}"
+    
+    @property
+    def status_color_class(self):
+        """Return CSS class for status badge color"""
+        status_colors = {
+            'pending': 'bg-yellow-100 text-yellow-800',
+            'processing': 'bg-blue-100 text-blue-800',
+            'completed': 'bg-green-100 text-green-800',
+            'failed': 'bg-red-100 text-red-800',
+            'cancelled': 'bg-gray-100 text-gray-800',
+            'on_hold': 'bg-orange-100 text-orange-800',
+        }
+        return status_colors.get(self.status, 'bg-gray-100 text-gray-800')
+    
+    @property
+    def transfer_method_icon(self):
+        """Return icon class for transfer method"""
+        icons = {
+            'wire_transfer': 'fas fa-university',
+            'cryptocurrency': 'fab fa-bitcoin',
+            'paypal': 'fab fa-paypal',
+            'wise_transfer': 'fas fa-exchange-alt',
+            'cash_app': 'fas fa-dollar-sign',
+            'skrill': 'fas fa-credit-card',
+            'venmo': 'fab fa-cc-visa',
+            'zelle': 'fas fa-mobile-alt',
+            'revolut': 'fas fa-globe',
+            'alipay': 'fas fa-qrcode',
+            'wechat_pay': 'fab fa-weixin',
+        }
+        return icons.get(self.transfer_method, 'fas fa-exchange-alt')
+    
     def save(self, *args, **kwargs):
         """Auto-generate reference number and calculate total amount"""
         if not self.reference_number:
             import uuid
-            self.reference_number = f"LT-{str(uuid.uuid4())[:8].upper()}"
+            self.reference_number = f"IT-{str(uuid.uuid4())[:8].upper()}"
         
         # Calculate total amount (transfer amount + fees)
         self.total_amount = self.transfer_amount + self.transfer_fee
