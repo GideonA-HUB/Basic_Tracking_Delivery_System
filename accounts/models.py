@@ -451,3 +451,120 @@ class Transaction(models.Model):
             import uuid
             self.reference_id = f"TXN-{str(uuid.uuid4())[:8].upper()}"
         super().save(*args, **kwargs)
+
+
+class Card(models.Model):
+    """Virtual Card model for VIP dashboard"""
+    
+    CARD_TYPE_CHOICES = [
+        ('virtual', 'Virtual Card'),
+        ('physical', 'Physical Card'),
+        ('prepaid', 'Prepaid Card'),
+        ('debit', 'Debit Card'),
+        ('credit', 'Credit Card'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('active', 'Active'),
+        ('inactive', 'Inactive'),
+        ('pending', 'Pending'),
+        ('suspended', 'Suspended'),
+        ('expired', 'Expired'),
+        ('cancelled', 'Cancelled'),
+    ]
+    
+    # VIP member this card belongs to
+    vip_member = models.ForeignKey(VIPProfile, on_delete=models.CASCADE, related_name='cards')
+    
+    # Card details
+    card_number = models.CharField(max_length=19, help_text="Masked card number (e.g., **** **** **** 1234)")
+    card_type = models.CharField(max_length=20, choices=CARD_TYPE_CHOICES, default='virtual')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    
+    # Card information
+    card_name = models.CharField(max_length=100, help_text="Name on the card")
+    expiry_month = models.CharField(max_length=2, help_text="Expiry month (01-12)")
+    expiry_year = models.CharField(max_length=4, help_text="Expiry year (YYYY)")
+    
+    # Financial details
+    spending_limit = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True, help_text="Monthly spending limit")
+    current_balance = models.DecimalField(max_digits=15, decimal_places=2, default=0.00, help_text="Current card balance")
+    currency = models.CharField(max_length=3, default='USD', help_text="Currency code")
+    
+    # Dates
+    issue_date = models.DateTimeField(auto_now_add=True, help_text="When the card was issued")
+    expiry_date = models.DateTimeField(help_text="When the card expires")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    # Additional information
+    description = models.TextField(blank=True, null=True, help_text="Card description or purpose")
+    notes = models.TextField(blank=True, null=True, help_text="Internal notes about this card")
+    
+    # Admin fields
+    is_active = models.BooleanField(default=True, help_text="Whether this card should be displayed")
+    
+    class Meta:
+        verbose_name = 'Card'
+        verbose_name_plural = 'Cards'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['vip_member', '-created_at']),
+            models.Index(fields=['status', '-created_at']),
+            models.Index(fields=['card_type', '-created_at']),
+        ]
+    
+    def __str__(self):
+        return f"{self.vip_member.user.username} - {self.card_name} ({self.card_number})"
+    
+    @property
+    def formatted_expiry_date(self):
+        """Return formatted expiry date (e.g., '12/25')"""
+        return f"{self.expiry_month}/{self.expiry_year}"
+    
+    @property
+    def formatted_balance(self):
+        """Return formatted balance with currency"""
+        return f"${self.current_balance:,.2f} {self.currency}"
+    
+    @property
+    def formatted_spending_limit(self):
+        """Return formatted spending limit with currency"""
+        if self.spending_limit:
+            return f"${self.spending_limit:,.2f} {self.currency}"
+        return "No limit"
+    
+    @property
+    def status_color_class(self):
+        """Return CSS class for status badge color"""
+        status_colors = {
+            'active': 'bg-green-100 text-green-800',
+            'inactive': 'bg-gray-100 text-gray-800',
+            'pending': 'bg-yellow-100 text-yellow-800',
+            'suspended': 'bg-red-100 text-red-800',
+            'expired': 'bg-orange-100 text-orange-800',
+            'cancelled': 'bg-gray-100 text-gray-800',
+        }
+        return status_colors.get(self.status, 'bg-gray-100 text-gray-800')
+    
+    @property
+    def card_type_color_class(self):
+        """Return CSS class for card type badge color"""
+        type_colors = {
+            'virtual': 'bg-blue-100 text-blue-800',
+            'physical': 'bg-purple-100 text-purple-800',
+            'prepaid': 'bg-green-100 text-green-800',
+            'debit': 'bg-orange-100 text-orange-800',
+            'credit': 'bg-red-100 text-red-800',
+        }
+        return type_colors.get(self.card_type, 'bg-gray-100 text-gray-800')
+    
+    def save(self, *args, **kwargs):
+        """Auto-set expiry_date based on expiry_month and expiry_year"""
+        if self.expiry_month and self.expiry_year:
+            from datetime import datetime
+            try:
+                self.expiry_date = datetime(int(self.expiry_year), int(self.expiry_month), 1)
+            except (ValueError, TypeError):
+                pass
+        super().save(*args, **kwargs)

@@ -7,7 +7,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
 from .forms import StaffLoginForm, StaffRegistrationForm, CustomerRegistrationForm, CustomerLoginForm, VIPLoginForm
-from .models import StaffProfile, CustomerProfile, VIPProfile, Transaction
+from .models import StaffProfile, CustomerProfile, VIPProfile, Transaction, Card
 
 
 def is_staff_user(user):
@@ -319,9 +319,21 @@ def vip_cards(request):
     try:
         vip_profile = request.user.vip_profile
         
+        # Get cards for this VIP member
+        cards = vip_profile.cards.filter(is_active=True)
+        
+        # Calculate statistics
+        active_cards = cards.filter(status='active').count()
+        pending_applications = cards.filter(status='pending').count()
+        total_balance = sum(card.current_balance for card in cards.filter(status='active'))
+        
         context = {
             'vip_member': vip_profile,
             'user': request.user,
+            'cards': cards,
+            'active_cards_count': active_cards,
+            'pending_applications_count': pending_applications,
+            'total_balance': total_balance,
         }
         
         return render(request, 'accounts/vip_cards.html', context)

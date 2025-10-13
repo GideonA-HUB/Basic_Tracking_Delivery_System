@@ -1,0 +1,511 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cards - VIP Dashboard{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Dashboard Layout -->
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-white shadow-lg dashboard-sidebar" style="width: 16rem;">
+            <div class="p-6">
+                <!-- User Profile Section -->
+                <div class="mb-8">
+                    <div class="flex flex-col items-center text-center mb-4">
+                        <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-3">
+                            {{ user.first_name|first|upper }}
+                        </div>
+                        <h3 class="font-bold text-gray-900 text-lg">{{ vip_member.full_name }}</h3>
+                        <p class="text-sm text-gray-500">ID: {{ vip_member.member_id }}</p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="space-y-3 mb-8">
+                    <button class="w-full bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded-md transition-colors mb-3 flex items-center justify-center gap-2">
+                        <i class="fas fa-shield-alt"></i>
+                        Verify KYC
+                    </button>
+                    <button class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-gem"></i>
+                        MERIDIAN VIP
+                    </button>
+                </div>
+
+                <!-- Main Menu -->
+                <div class="mb-6">
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 sidebar-heading">MAIN MENU</h3>
+                    <nav class="space-y-2">
+                        <a href="{% url 'accounts:vip_dashboard' %}" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-home"></i>
+                            Dashboard
+                        </a>
+                        <a href="{% url 'accounts:vip_transactions' %}" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-exchange-alt"></i>
+                            Transactions
+                        </a>
+                        <a href="{% url 'accounts:vip_cards' %}" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg bg-blue-50 text-blue-600 font-medium">
+                            <i class="fas fa-credit-card"></i>
+                            Cards
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Transfers -->
+                <div class="mb-6">
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 sidebar-heading">TRANSFERS</h3>
+                    <nav class="space-y-2">
+                        <a href="{% url 'accounts:vip_transfer_local' %}" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-paper-plane"></i>
+                            Local Transfer
+                        </a>
+                        <a href="{% url 'accounts:vip_transfer_international' %}" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-globe"></i>
+                            International Wire
+                        </a>
+                        <a href="{% url 'accounts:vip_deposit' %}" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-plus"></i>
+                            Deposit
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Services -->
+                <div class="mb-6">
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 sidebar-heading">SERVICES</h3>
+                    <nav class="space-y-2">
+                        <a href="#" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                            Loan Request
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-receipt"></i>
+                            IRS Tax Refund
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-history"></i>
+                            Loan History
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Account -->
+                <div class="mb-6">
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 sidebar-heading">ACCOUNT</h3>
+                    <nav class="space-y-2">
+                        <a href="#" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-cog"></i>
+                            Settings
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-envelope"></i>
+                            Message us
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-university"></i>
+                            Online Banking
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Footer -->
+                <div class="mt-auto pt-6 border-t border-gray-200">
+                    <p class="text-xs text-gray-500 copyright-text">© 2025 Meridian Asset Logistics</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-y-auto bg-gray-50 main-content">
+            <div class="w-full">
+                <!-- Header -->
+                <div class="mb-8">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-900 mb-2">Virtual Cards</h1>
+                            <nav class="flex items-center space-x-2 text-sm text-gray-500">
+                                <a href="{% url 'accounts:vip_dashboard' %}" class="hover:text-blue-600">Dashboard</a>
+                                <span>></span>
+                                <span class="text-gray-900">Cards</span>
+                            </nav>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2">
+                                <i class="fas fa-plus"></i>
+                                Apply for Card
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white rounded-xl p-6 border border-gray-200">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-credit-card text-blue-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-600">Active Cards</h3>
+                                <p class="text-2xl font-bold text-gray-900">{{ active_cards_count }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-6 border border-gray-200">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-hourglass-half text-yellow-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-600">Pending Applications</h3>
+                                <p class="text-2xl font-bold text-gray-900">{{ pending_applications_count }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-6 border border-gray-200">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-wallet text-green-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-600">Total Card Balance</h3>
+                                <p class="text-2xl font-bold text-gray-900">${{ total_balance|floatformat:2 }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Virtual Cards Made Easy Section -->
+                <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-8 mb-8 relative overflow-hidden">
+                    <div class="relative z-10">
+                        <div class="max-w-2xl">
+                            <h2 class="text-3xl font-bold text-white mb-4">Virtual Cards Made Easy</h2>
+                            <p class="text-blue-100 text-lg mb-6">
+                                Create virtual cards for secure online payments, subscription management, and more. 
+                                Our virtual cards offer enhanced security and control over your spending.
+                            </p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-shield-alt text-white text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold text-white mb-1">Secure Payments</h3>
+                                        <p class="text-blue-100 text-sm">Protect your main account with separate virtual cards</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start gap-3">
+                                    <div class="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-chart-bar text-white text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold text-white mb-1">Spending Controls</h3>
+                                        <p class="text-blue-100 text-sm">Set limits and monitor transactions in real-time</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start gap-3">
+                                    <div class="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-globe text-white text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold text-white mb-1">Global Acceptance</h3>
+                                        <p class="text-blue-100 text-sm">Use anywhere major cards are accepted online</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start gap-3">
+                                    <div class="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-bolt text-white text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold text-white mb-1">Instant Issuance</h3>
+                                        <p class="text-blue-100 text-sm">Create and use cards within minutes</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors">
+                                Apply Now
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Virtual Card Graphic -->
+                    <div class="absolute top-4 right-4 w-48 h-32 bg-gradient-to-r from-blue-500 to-blue-700 rounded-lg transform rotate-12 shadow-xl">
+                        <div class="p-4 h-full flex flex-col justify-between text-white">
+                            <div class="flex justify-between items-start">
+                                <span class="text-xs font-medium">Virtual Card</span>
+                                <div class="w-6 h-4 bg-white bg-opacity-20 rounded flex items-center justify-center">
+                                    <div class="w-3 h-2 bg-white rounded-sm"></div>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-sm font-mono mb-1">•••• •••• •••• 1234</div>
+                                <div class="flex justify-between text-xs">
+                                    <span>VALID THRU</span>
+                                    <span>12/25</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Your Cards Section -->
+                <div class="bg-white rounded-xl border border-gray-200 mb-8">
+                    <div class="p-6 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-xl font-semibold text-gray-900">Your Cards</h2>
+                            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2">
+                                <i class="fas fa-plus"></i>
+                                New Card
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="p-8">
+                        {% if cards %}
+                            <!-- Cards Grid -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {% for card in cards %}
+                                    <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg p-6 text-white relative">
+                                        <div class="flex justify-between items-start mb-4">
+                                            <div>
+                                                <h3 class="font-semibold">{{ card.card_name }}</h3>
+                                                <p class="text-blue-200 text-sm">{{ card.get_card_type_display }}</p>
+                                            </div>
+                                            <span class="{{ card.status_color_class }} px-2 py-1 rounded text-xs">
+                                                {{ card.get_status_display }}
+                                            </span>
+                                        </div>
+                                        
+                                        <div class="mb-4">
+                                            <div class="text-lg font-mono">{{ card.card_number }}</div>
+                                            <div class="flex justify-between text-sm mt-2">
+                                                <span>VALID THRU</span>
+                                                <span>{{ card.formatted_expiry_date }}</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex justify-between items-center">
+                                            <div>
+                                                <p class="text-blue-200 text-xs">Balance</p>
+                                                <p class="font-semibold">{{ card.formatted_balance }}</p>
+                                            </div>
+                                            <div class="text-right">
+                                                <p class="text-blue-200 text-xs">Limit</p>
+                                                <p class="font-semibold text-sm">{{ card.formatted_spending_limit }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <!-- Empty State -->
+                            <div class="text-center py-12">
+                                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-credit-card text-gray-400 text-2xl"></i>
+                                </div>
+                                <h3 class="text-lg font-medium text-gray-900 mb-2">No cards yet</h3>
+                                <p class="text-gray-500 mb-6">
+                                    You haven't applied for any virtual cards yet. Apply for a new card to get started with secure online payments.
+                                </p>
+                                <button class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold">
+                                    Apply for Card
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- How Virtual Cards Work Section -->
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">How Virtual Cards Work</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white rounded-xl p-6 border border-gray-200 text-center">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-file-alt text-blue-600 text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">1. Apply</h3>
+                            <p class="text-gray-600">
+                                Complete the application form for your virtual card. Select your preferred card type and set your spending limits.
+                            </p>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl p-6 border border-gray-200 text-center">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-check text-blue-600 text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">2. Activate</h3>
+                            <p class="text-gray-600">
+                                Once approved, your virtual card will be ready to use. View the card details and activate it from your dashboard.
+                            </p>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl p-6 border border-gray-200 text-center">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-shopping-cart text-blue-600 text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">3. Use</h3>
+                            <p class="text-gray-600">
+                                Use your virtual card for online transactions anywhere major credit cards are accepted. Monitor transactions in real-time.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Section -->
+                <div class="bg-white rounded-xl p-8 border border-gray-200">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="font-semibold text-gray-900 mb-2">What is a virtual card?</h3>
+                            <p class="text-gray-600">
+                                A virtual card is a digital payment card that can be used for online transactions. It works just like a physical card but exists only in digital form, providing enhanced security for online purchases.
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <h3 class="font-semibold text-gray-900 mb-2">How secure are virtual cards?</h3>
+                            <p class="text-gray-600">
+                                Virtual cards offer additional security as they're separate from your primary account. You can create cards with specific spending limits and even create single-use cards for enhanced protection against fraud.
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <h3 class="font-semibold text-gray-900 mb-2">Can I have multiple virtual cards?</h3>
+                            <p class="text-gray-600">
+                                Yes, you can apply for multiple virtual cards for different purposes - such as one for subscriptions, another for shopping, etc. Each card can have its own limits and settings.
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <h3 class="font-semibold text-gray-900 mb-2">How long does it take to get a virtual card?</h3>
+                            <p class="text-gray-600">
+                                Virtual cards are typically issued within minutes after approval. Once approved, you can immediately view and use the card details for online transactions.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Ensure sidebar scrolls to top and shows all content
+    const sidebar = document.querySelector('.dashboard-sidebar');
+    if (sidebar) {
+        // Force scroll to very top
+        sidebar.scrollTop = 0;
+        sidebar.scrollTo(0, 0);
+        
+        // Ensure sidebar is at the very top of the viewport
+        sidebar.style.top = '0px';
+        sidebar.style.transform = 'translateY(0)';
+        
+        // Force a reflow to ensure changes take effect
+        sidebar.offsetHeight;
+    }
+    
+    // Additional check after a short delay
+    setTimeout(function() {
+        const sidebar = document.querySelector('.dashboard-sidebar');
+        if (sidebar) {
+            sidebar.scrollTop = 0;
+        }
+    }, 100);
+});
+</script>
+
+<style>
+/* Ensure proper positioning */
+.dashboard-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 40;
+    width: 16rem; /* 256px */
+    scroll-behavior: smooth;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+/* Main content area */
+.main-content {
+    margin-left: 16rem; /* 256px - sidebar width */
+    height: 100vh;
+    overflow-y: auto;
+    padding-left: 2rem; /* Additional spacing from sidebar */
+    padding-right: 2rem; /* Right margin */
+    padding-top: 2rem; /* Top margin */
+}
+
+/* Custom scrollbar for sidebar */
+.dashboard-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.dashboard-sidebar::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.dashboard-sidebar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+.dashboard-sidebar::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Ensure sidebar content is visible */
+.dashboard-sidebar .p-6 {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Theme compatibility for sidebar */
+html.light .dashboard-sidebar .text-gray-600,
+html.light .dashboard-sidebar .text-gray-500,
+html.light .dashboard-sidebar .text-gray-400,
+html.light .dashboard-sidebar .text-gray-300,
+html.light .dashboard-sidebar a,
+html.light .dashboard-sidebar p,
+html.light .dashboard-sidebar span,
+html.light .dashboard-sidebar div {
+    color: #374151 !important;
+    font-weight: 500 !important;
+}
+
+html.light .sidebar-heading {
+    color: #1f2937 !important;
+    font-weight: 700 !important;
+}
+
+html.light .nav-link {
+    color: #374151 !important;
+    font-weight: 500 !important;
+}
+
+html.light .nav-link:hover {
+    color: #1f2937 !important;
+    font-weight: 600 !important;
+}
+
+html.light .copyright-text {
+    color: #6b7280 !important;
+    font-weight: 500 !important;
+}
+</style>
+{% endblock %}
