@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'channels',
+    'widget_tweaks',
     'tracking',
     'accounts',
     'investments',

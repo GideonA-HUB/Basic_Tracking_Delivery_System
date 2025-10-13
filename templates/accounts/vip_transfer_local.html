@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load widget_tweaks %}
 
 {% block title %}Local Transfer{% endblock %}
 
@@ -126,6 +127,7 @@
     .form-control {
         width: 100%;
         padding: 0.75rem;
+        padding-left: 2.5rem;
         border: 1px solid #d1d5db;
         border-radius: 0.5rem;
         font-size: 1rem;
@@ -136,6 +138,15 @@
         outline: none;
         border-color: #3b82f6;
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    /* Special styling for form controls with icons */
+    .form-control.with-icon {
+        padding-left: 2.5rem;
+    }
+
+    .form-control.with-icon::placeholder {
+        margin-left: 0.5rem;
     }
 
     .form-select {
@@ -156,6 +167,17 @@
         outline: none;
         border-color: #3b82f6;
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    /* Special styling for form selects with icons */
+    .form-select.with-icon {
+        padding-left: 2.5rem;
+    }
+
+    /* Special styling for textarea with icons */
+    .form-control.with-icon[rows] {
+        padding-left: 2.5rem;
+        padding-top: 2rem;
     }
 
     /* Available Balance Card */
@@ -186,8 +208,8 @@
     .amount-input {
         width: 100%;
         padding: 1rem;
-        padding-left: 2rem;
-        padding-right: 4rem;
+        padding-left: 3rem;
+        padding-right: 5rem;
         border: 2px solid #e5e7eb;
         border-radius: 0.5rem;
         font-size: 1.5rem;
@@ -203,7 +225,7 @@
 
     .dollar-sign {
         position: absolute;
-        left: 1rem;
+        left: 1.25rem;
         top: 50%;
         transform: translateY(-50%);
         color: #6b7280;
@@ -213,7 +235,7 @@
 
     .amount-suffix {
         position: absolute;
-        right: 1rem;
+        right: 1.25rem;
         top: 50%;
         transform: translateY(-50%);
         color: #6b7280;
@@ -741,7 +763,7 @@
                                 <label for="{{ form.beneficiary_name.id_for_label }}">Beneficiary Account Name</label>
                                 <div class="relative">
                                     <i class="fas fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                                    {{ form.beneficiary_name }}
+                                    {{ form.beneficiary_name|add_class:"form-control with-icon" }}
                                 </div>
                             </div>
                             
@@ -749,7 +771,7 @@
                                 <label for="{{ form.beneficiary_account_number.id_for_label }}">Beneficiary Account Number</label>
                                 <div class="relative">
                                     <i class="fas fa-hashtag absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                                    {{ form.beneficiary_account_number }}
+                                    {{ form.beneficiary_account_number|add_class:"form-control with-icon" }}
                                 </div>
                             </div>
                         </div>
@@ -759,7 +781,7 @@
                                 <label for="{{ form.bank_name.id_for_label }}">Bank Name</label>
                                 <div class="relative">
                                     <i class="fas fa-university absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                                    {{ form.bank_name }}
+                                    {{ form.bank_name|add_class:"form-control with-icon" }}
                                 </div>
                             </div>
                             
@@ -767,7 +789,7 @@
                                 <label for="{{ form.transfer_type.id_for_label }}">Transfer Type</label>
                                 <div class="relative">
                                     <i class="fas fa-credit-card absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                                    {{ form.transfer_type }}
+                                    {{ form.transfer_type|add_class:"form-select with-icon" }}
                                 </div>
                             </div>
                         </div>
@@ -784,7 +806,7 @@
                             <label for="{{ form.description.id_for_label }}">Description/Memo</label>
                             <div class="relative">
                                 <i class="fas fa-comment absolute left-3 top-3 text-gray-400"></i>
-                                {{ form.description }}
+                                {{ form.description|add_class:"form-control with-icon" }}
                             </div>
                         </div>
                     </div>
@@ -804,7 +826,7 @@
                     {% endif %}
 
                     <!-- Action Buttons -->
-                    <div class="flex justify-between items-center">
+                    <div class="flex justify-between items-center mb-8">
                         <button type="submit" class="btn-primary">
                             <i class="fas fa-eye"></i>
                             Preview Transfer
