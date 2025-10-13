@@ -177,14 +177,92 @@
 
     /* Exception for specific elements that need colors */
     .bg-blue-600, .bg-red-600, .bg-green-600, .bg-yellow-500, .bg-purple-600, 
-    .bg-blue-500, .bg-gradient-to-r, .balance-card, .balance-card * {
+    .bg-blue-500, .bg-gradient-to-r, .balance-card {
         background-color: inherit !important;
+    }
+
+    /* CRITICAL: Fix text visibility in balance card */
+    .balance-card, .balance-card * {
+        color: white !important;
+    }
+
+    .balance-card h1, .balance-card h2, .balance-card h3, .balance-card h4, .balance-card h5, .balance-card h6,
+    .balance-card p, .balance-card span, .balance-card div, .balance-card button {
+        color: white !important;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    /* Fix stats cards text visibility */
+    .card-hover, .card-hover * {
+        color: #374151 !important;
+    }
+
+    .card-hover h1, .card-hover h2, .card-hover h3, .card-hover h4, .card-hover h5, .card-hover h6,
+    .card-hover p, .card-hover span, .card-hover div {
+        color: #374151 !important;
+    }
+
+    /* THEME COMPATIBILITY - LIGHT THEME */
+    body.light, html.light {
+        background: white !important;
+        color: #374151 !important;
+    }
+
+    body.light .dashboard-layout,
+    body.light .dashboard-sidebar,
+    body.light .dashboard-main,
+    body.light .dashboard-content {
+        background: white !important;
+        color: #374151 !important;
+    }
+
+    body.light .card-hover {
+        background: white !important;
+        color: #374151 !important;
+    }
+
+    body.light .card-hover * {
+        color: #374151 !important;
+    }
+
+    /* THEME COMPATIBILITY - DARK THEME */
+    body.dark, html.dark {
+        background: #1f2937 !important;
+        color: #f9fafb !important;
+    }
+
+    body.dark .dashboard-layout {
+        background: #1f2937 !important;
+    }
+
+    body.dark .dashboard-sidebar {
+        background: #374151 !important;
+        color: #f9fafb !important;
+    }
+
+    body.dark .dashboard-main {
+        background: #1f2937 !important;
+        color: #f9fafb !important;
+    }
+
+    body.dark .dashboard-content {
+        background: #1f2937 !important;
+        color: #f9fafb !important;
+    }
+
+    body.dark .card-hover {
+        background: #374151 !important;
+        color: #f9fafb !important;
+    }
+
+    body.dark .card-hover * {
+        color: #f9fafb !important;
     }
 
     /* FINAL OVERRIDE - NUCLEAR OPTION */
     body.dark, html.dark {
-        background: white !important;
-        color: #374151 !important;
+        background: #1f2937 !important;
+        color: #f9fafb !important;
     }
 
     /* Force all containers to be full width */
@@ -353,6 +431,43 @@
         z-index: 1;
     }
 
+    /* CRITICAL: Balance card text visibility */
+    .balance-card, .balance-card * {
+        color: white !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    .balance-card h1, .balance-card h2, .balance-card h3, .balance-card h4, .balance-card h5, .balance-card h6,
+    .balance-card p, .balance-card span, .balance-card div, .balance-card button {
+        color: white !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+        font-weight: 600 !important;
+    }
+
+    /* Specific fixes for balance card elements */
+    .balance-card #current-time,
+    .balance-card #current-date-main,
+    .balance-card .text-5xl,
+    .balance-card .text-lg,
+    .balance-card .text-sm {
+        color: white !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+        font-weight: 600 !important;
+    }
+
+    /* Balance card buttons */
+    .balance-card button {
+        background: rgba(255, 255, 255, 0.2) !important;
+        color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    .balance-card button:hover {
+        background: rgba(255, 255, 255, 0.3) !important;
+        color: white !important;
+    }
+
     /* Notification badge */
     .notification-badge {
         position: absolute;
@@ -363,6 +478,39 @@
         background: #ef4444;
         border-radius: 50%;
         border: 2px solid white;
+    }
+
+    /* CRITICAL: Ensure all text is visible */
+    .text-gray-900, .text-gray-800, .text-gray-700, .text-gray-600, .text-gray-500 {
+        color: inherit !important;
+    }
+
+    /* Force text visibility in all cards */
+    .bg-white, .bg-gray-50, .bg-gray-100 {
+        color: #374151 !important;
+    }
+
+    .bg-white *, .bg-gray-50 *, .bg-gray-100 * {
+        color: #374151 !important;
+    }
+
+    /* Dark theme card text */
+    .dark .bg-white, .dark .bg-gray-50, .dark .bg-gray-100 {
+        background: #374151 !important;
+        color: #f9fafb !important;
+    }
+
+    .dark .bg-white *, .dark .bg-gray-50 *, .dark .bg-gray-100 * {
+        color: #f9fafb !important;
+    }
+
+    /* Ensure button text is visible */
+    button {
+        color: inherit !important;
+    }
+
+    .dark button {
+        color: #f9fafb !important;
     }
 
     /* Sidebar navigation active state */
@@ -1068,10 +1216,50 @@
             content.style.margin = '0 auto';
         }
         
-        // Remove any dark theme classes
-        document.querySelectorAll('*').forEach(el => {
-            if (el.classList.contains('dark')) {
-                el.classList.remove('dark');
+        // Detect and apply theme
+        const isDarkTheme = document.documentElement.classList.contains('dark') || 
+                           document.body.classList.contains('dark') ||
+                           window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (isDarkTheme) {
+            // Apply dark theme
+            document.body.classList.add('dark');
+            document.documentElement.classList.add('dark');
+        } else {
+            // Apply light theme
+            document.body.classList.add('light');
+            document.documentElement.classList.add('light');
+        }
+        
+        // Force balance card text visibility
+        const balanceCard = document.querySelector('.balance-card');
+        if (balanceCard) {
+            balanceCard.style.color = 'white';
+            balanceCard.style.textShadow = '0 1px 3px rgba(0, 0, 0, 0.5)';
+            
+            // Apply to all child elements
+            balanceCard.querySelectorAll('*').forEach(el => {
+                el.style.color = 'white';
+                el.style.textShadow = '0 1px 3px rgba(0, 0, 0, 0.5)';
+                el.style.fontWeight = '600';
+            });
+        }
+        
+        // Force stats cards text visibility
+        const statsCards = document.querySelectorAll('.card-hover');
+        statsCards.forEach(card => {
+            if (isDarkTheme) {
+                card.style.backgroundColor = '#374151';
+                card.style.color = '#f9fafb';
+                card.querySelectorAll('*').forEach(el => {
+                    el.style.color = '#f9fafb';
+                });
+            } else {
+                card.style.backgroundColor = 'white';
+                card.style.color = '#374151';
+                card.querySelectorAll('*').forEach(el => {
+                    el.style.color = '#374151';
+                });
             }
         });
     });
