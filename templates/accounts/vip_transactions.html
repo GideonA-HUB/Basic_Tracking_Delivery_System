@@ -10,22 +10,20 @@
         <!-- Sidebar -->
         <div class="w-64 bg-white shadow-lg dashboard-sidebar" style="width: 16rem;">
             <div class="p-6">
-                <!-- User Info Section -->
-                <div class="mb-6">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                            <span class="text-white font-bold text-sm">{{ user.username|slice:":1"|upper }}</span>
+                <!-- User Profile Section -->
+                <div class="mb-8">
+                    <div class="flex flex-col items-center text-center mb-4">
+                        <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-3">
+                            {{ user.first_name|first|upper }}
                         </div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-900">{{ user.username }}</p>
-                            <p class="text-xs text-gray-500">ID: {{ vip_member.member_id }}</p>
-                        </div>
+                        <h3 class="font-bold text-gray-900 text-lg">{{ vip_member.full_name }}</h3>
+                        <p class="text-sm text-gray-500">ID: {{ vip_member.member_id }}</p>
                     </div>
                 </div>
 
                 <!-- Action Buttons -->
                 <div class="space-y-3 mb-8">
-                    <button class="w-full bg-red-600 text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-red-700 transition-colors">
+                    <button class="w-full bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded-md transition-colors mb-3 flex items-center justify-center gap-2">
                         <i class="fas fa-shield-alt"></i>
                         Verify KYC
                     </button>
