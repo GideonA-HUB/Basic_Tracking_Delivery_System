@@ -760,15 +760,15 @@
                 <div>
                     <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">MAIN MENU</h4>
                     <div class="space-y-1">
-                        <a href="#" class="nav-item-active flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors">
+                        <a href="{% url 'accounts:vip_dashboard' %}" class="nav-item-active flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors">
                             <i class="fas fa-home w-4"></i>
                             Dashboard
                         </a>
-                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                        <a href="{% url 'accounts:vip_transactions' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
                             <i class="fas fa-exchange-alt w-4"></i>
                             Transactions
                         </a>
-                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                        <a href="{% url 'accounts:vip_cards' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
                             <i class="fas fa-credit-card w-4"></i>
                             Cards
                         </a>
@@ -779,15 +779,15 @@
                 <div>
                     <h4 class="sidebar-heading text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">TRANSFERS</h4>
                     <div class="space-y-1">
-                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                        <a href="{% url 'accounts:vip_transfer_local' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
                             <i class="fas fa-paper-plane w-4"></i>
                             Local Transfer
                         </a>
-                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                        <a href="{% url 'accounts:vip_transfer_international' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
                             <i class="fas fa-globe w-4"></i>
                             International Wire
                         </a>
-                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                        <a href="{% url 'accounts:vip_deposit' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
                             <i class="fas fa-plus w-4"></i>
                             Deposit
                         </a>
@@ -960,10 +960,10 @@
                     </div>
 
                     <div class="flex justify-center gap-4">
-                        <button class="bg-white bg-opacity-20 hover:bg-opacity-30 border border-white border-opacity-30 px-6 py-3 rounded-lg font-semibold transition-all flex items-center gap-2">
+                        <a href="{% url 'accounts:vip_transactions' %}" class="bg-white bg-opacity-20 hover:bg-opacity-30 border border-white border-opacity-30 px-6 py-3 rounded-lg font-semibold transition-all flex items-center gap-2">
                             <i class="fas fa-chart-line"></i>
                             Transactions
-                        </button>
+                        </a>
                         <button class="bg-white bg-opacity-20 hover:bg-opacity-30 border border-white border-opacity-30 px-6 py-3 rounded-lg font-semibold transition-all flex items-center gap-2">
                             <i class="fas fa-plus"></i>
                             Top up
@@ -1247,61 +1247,31 @@
                 </div>
                 
                 <div class="space-y-4">
-                    <div class="flex items-center gap-4 p-4 border border-gray-200 rounded-lg">
-                        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                            <i class="fas fa-arrow-down text-green-600"></i>
+                    {% if recent_activities %}
+                        {% for activity in recent_activities %}
+                            <div class="flex items-center gap-4 p-4 border border-gray-200 rounded-lg {% if activity.is_featured %}bg-blue-50{% endif %}">
+                                <div class="w-10 h-10 {{ activity.icon_color_class }} rounded-full flex items-center justify-center">
+                                    <i class="{{ activity.icon_class }}"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-medium text-gray-900">{{ activity.title }}</p>
+                                    <p class="text-sm text-gray-500">{{ activity.short_date }}</p>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="{{ activity.status_color_class }} px-2 py-1 rounded text-xs">{{ activity.status }}</span>
+                                    <span class="{{ activity.amount_color_class }} font-semibold">{{ activity.formatted_amount }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-8">
+                            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-history text-gray-400 text-xl"></i>
+                            </div>
+                            <p class="text-gray-500 text-lg font-medium mb-2">No Recent Activity</p>
+                            <p class="text-gray-400 text-sm">Your recent transactions and activities will appear here.</p>
                         </div>
-                        <div class="flex-1">
-                            <p class="font-medium text-gray-900">Investment Return</p>
-                            <p class="text-sm text-gray-500">Oct 12</p>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">completed</span>
-                            <span class="text-green-600 font-semibold">+$5,420.00</span>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-4 p-4 border border-gray-200 rounded-lg bg-blue-50">
-                        <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                            <i class="fas fa-arrow-up text-red-600"></i>
-                        </div>
-                        <div class="flex-1">
-                            <p class="font-medium text-gray-900">International Wire Transfer</p>
-                            <p class="text-sm text-gray-500">Oct 11</p>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">completed</span>
-                            <span class="text-red-600 font-semibold">-$12,500.00</span>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-4 p-4 border border-gray-200 rounded-lg">
-                        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                            <i class="fas fa-arrow-down text-green-600"></i>
-                        </div>
-                        <div class="flex-1">
-                            <p class="font-medium text-gray-900">Dividend Payment</p>
-                            <p class="text-sm text-gray-500">Oct 10</p>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">completed</span>
-                            <span class="text-green-600 font-semibold">+$2,100.00</span>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-4 p-4 border border-gray-200 rounded-lg">
-                        <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                            <i class="fas fa-arrow-up text-red-600"></i>
-                        </div>
-                        <div class="flex-1">
-                            <p class="font-medium text-gray-900">Service Fee</p>
-                            <p class="text-sm text-gray-500">Oct 9</p>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">pending</span>
-                            <span class="text-red-600 font-semibold">-$25.00</span>
-                        </div>
-                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

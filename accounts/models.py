@@ -170,3 +170,284 @@ def save_staff_profile(sender, instance, **kwargs):
     """Save staff profile when user is saved"""
     if hasattr(instance, 'staff_profile'):
         instance.staff_profile.save()
+
+
+class RecentActivity(models.Model):
+    """Recent activity entries for VIP dashboard"""
+    
+    ACTIVITY_TYPE_CHOICES = [
+        ('investment_return', 'Investment Return'),
+        ('wire_transfer', 'International Wire Transfer'),
+        ('dividend_payment', 'Dividend Payment'),
+        ('service_fee', 'Service Fee'),
+        ('deposit', 'Deposit'),
+        ('withdrawal', 'Withdrawal'),
+        ('loan_payment', 'Loan Payment'),
+        ('interest_payment', 'Interest Payment'),
+        ('refund', 'Refund'),
+        ('commission', 'Commission'),
+        ('bonus', 'Bonus'),
+        ('penalty', 'Penalty'),
+        ('other', 'Other'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('completed', 'Completed'),
+        ('pending', 'Pending'),
+        ('failed', 'Failed'),
+        ('cancelled', 'Cancelled'),
+        ('processing', 'Processing'),
+    ]
+    
+    TRANSACTION_DIRECTION_CHOICES = [
+        ('incoming', 'Incoming'),
+        ('outgoing', 'Outgoing'),
+    ]
+    
+    # VIP member this activity belongs to
+    vip_member = models.ForeignKey(VIPProfile, on_delete=models.CASCADE, related_name='recent_activities')
+    
+    # Activity details
+    activity_type = models.CharField(max_length=30, choices=ACTIVITY_TYPE_CHOICES, default='other')
+    title = models.CharField(max_length=200, help_text="Display title for the activity")
+    description = models.TextField(blank=True, null=True, help_text="Detailed description of the activity")
+    
+    # Transaction details
+    amount = models.DecimalField(max_digits=15, decimal_places=2, help_text="Transaction amount (positive for incoming, negative for outgoing)")
+    currency = models.CharField(max_length=3, default='USD', help_text="Currency code (USD, EUR, etc.)")
+    direction = models.CharField(max_length=10, choices=TRANSACTION_DIRECTION_CHOICES, 
+                                help_text="Whether this is an incoming or outgoing transaction")
+    
+    # Status and dates
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='completed')
+    activity_date = models.DateTimeField(help_text="When this activity occurred")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    # Additional information
+    reference_number = models.CharField(max_length=100, blank=True, null=True, 
+                                      help_text="Transaction reference number")
+    notes = models.TextField(blank=True, null=True, help_text="Internal notes about this activity")
+    
+    # Display order
+    display_order = models.PositiveIntegerField(default=0, help_text="Order for displaying activities (higher numbers first)")
+    
+    # Admin fields
+    is_active = models.BooleanField(default=True, help_text="Whether this activity should be displayed")
+    is_featured = models.BooleanField(default=False, help_text="Whether this activity should be highlighted")
+    
+    class Meta:
+        verbose_name = 'Recent Activity'
+        verbose_name_plural = 'Recent Activities'
+        ordering = ['-display_order', '-activity_date', '-created_at']
+        indexes = [
+            models.Index(fields=['vip_member', '-activity_date']),
+            models.Index(fields=['status', '-activity_date']),
+            models.Index(fields=['is_active', '-activity_date']),
+        ]
+    
+    def __str__(self):
+        return f"{self.vip_member.user.username} - {self.title} ({self.amount} {self.currency})"
+    
+    @property
+    def formatted_amount(self):
+        """Return formatted amount with currency and direction"""
+        if self.amount >= 0:
+            return f"+${self.amount:,.2f}"
+        else:
+            return f"-${abs(self.amount):,.2f}"
+    
+    @property
+    def amount_color_class(self):
+        """Return CSS class for amount color based on direction"""
+        if self.direction == 'incoming' or self.amount >= 0:
+            return 'text-green-600'
+        else:
+            return 'text-red-600'
+    
+    @property
+    def icon_class(self):
+        """Return FontAwesome icon class based on activity type"""
+        icon_map = {
+            'investment_return': 'fas fa-chart-line',
+            'wire_transfer': 'fas fa-exchange-alt',
+            'dividend_payment': 'fas fa-coins',
+            'service_fee': 'fas fa-receipt',
+            'deposit': 'fas fa-plus-circle',
+            'withdrawal': 'fas fa-minus-circle',
+            'loan_payment': 'fas fa-hand-holding-usd',
+            'interest_payment': 'fas fa-percentage',
+            'refund': 'fas fa-undo',
+            'commission': 'fas fa-percentage',
+            'bonus': 'fas fa-gift',
+            'penalty': 'fas fa-exclamation-triangle',
+            'other': 'fas fa-file-alt',
+        }
+        return icon_map.get(self.activity_type, 'fas fa-file-alt')
+    
+    @property
+    def icon_color_class(self):
+        """Return CSS class for icon color based on direction"""
+        if self.direction == 'incoming' or self.amount >= 0:
+            return 'text-green-600 bg-green-100'
+        else:
+            return 'text-red-600 bg-red-100'
+    
+    @property
+    def status_color_class(self):
+        """Return CSS class for status badge color"""
+        status_colors = {
+            'completed': 'bg-gray-100 text-gray-800',
+            'pending': 'bg-yellow-100 text-yellow-800',
+            'failed': 'bg-red-100 text-red-800',
+            'cancelled': 'bg-gray-100 text-gray-800',
+            'processing': 'bg-blue-100 text-blue-800',
+        }
+        return status_colors.get(self.status, 'bg-gray-100 text-gray-800')
+    
+    @property
+    def short_date(self):
+        """Return short formatted date (e.g., 'Oct 12')"""
+        from django.utils import timezone
+        if self.activity_date:
+            return self.activity_date.strftime('%b %d')
+        return ''
+    
+    def save(self, *args, **kwargs):
+        """Auto-set direction based on amount"""
+        if self.amount >= 0:
+            self.direction = 'incoming'
+        else:
+            self.direction = 'outgoing'
+        super().save(*args, **kwargs)
+
+
+class Transaction(models.Model):
+    """Transaction model for VIP dashboard"""
+    
+    TRANSACTION_TYPE_CHOICES = [
+        ('deposit', 'Deposit'),
+        ('withdrawal', 'Withdrawal'),
+        ('transfer', 'Transfer'),
+        ('investment', 'Investment'),
+        ('loan', 'Loan'),
+        ('payment', 'Payment'),
+        ('refund', 'Refund'),
+        ('fee', 'Fee'),
+        ('interest', 'Interest'),
+        ('dividend', 'Dividend'),
+        ('bonus', 'Bonus'),
+        ('commission', 'Commission'),
+        ('other', 'Other'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+        ('cancelled', 'Cancelled'),
+        ('processing', 'Processing'),
+        ('reversed', 'Reversed'),
+    ]
+    
+    SCOPE_CHOICES = [
+        ('internal', 'Internal'),
+        ('external', 'External'),
+        ('international', 'International'),
+        ('local', 'Local'),
+    ]
+    
+    # VIP member this transaction belongs to
+    vip_member = models.ForeignKey(VIPProfile, on_delete=models.CASCADE, related_name='transactions')
+    
+    # Transaction details
+    amount = models.DecimalField(max_digits=15, decimal_places=2, help_text="Transaction amount")
+    currency = models.CharField(max_length=3, default='USD', help_text="Currency code (USD, EUR, etc.)")
+    transaction_type = models.CharField(max_length=20, choices=TRANSACTION_TYPE_CHOICES, default='other')
+    
+    # Status and scope
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    scope = models.CharField(max_length=20, choices=SCOPE_CHOICES, default='internal')
+    
+    # Identification and description
+    reference_id = models.CharField(max_length=100, unique=True, help_text="Unique transaction reference ID")
+    description = models.TextField(help_text="Transaction description")
+    
+    # Dates
+    transaction_date = models.DateTimeField(help_text="When the transaction occurred")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    # Additional information
+    notes = models.TextField(blank=True, null=True, help_text="Internal notes about this transaction")
+    metadata = models.JSONField(blank=True, null=True, help_text="Additional transaction metadata")
+    
+    # Admin fields
+    is_active = models.BooleanField(default=True, help_text="Whether this transaction should be displayed")
+    
+    class Meta:
+        verbose_name = 'Transaction'
+        verbose_name_plural = 'Transactions'
+        ordering = ['-transaction_date', '-created_at']
+        indexes = [
+            models.Index(fields=['vip_member', '-transaction_date']),
+            models.Index(fields=['status', '-transaction_date']),
+            models.Index(fields=['transaction_type', '-transaction_date']),
+            models.Index(fields=['reference_id']),
+        ]
+    
+    def __str__(self):
+        return f"{self.vip_member.user.username} - {self.reference_id} ({self.amount} {self.currency})"
+    
+    @property
+    def formatted_amount(self):
+        """Return formatted amount with currency"""
+        return f"{self.amount:,.2f} {self.currency}"
+    
+    @property
+    def amount_color_class(self):
+        """Return CSS class for amount color based on transaction type"""
+        if self.transaction_type in ['deposit', 'refund', 'dividend', 'interest', 'bonus', 'commission']:
+            return 'text-green-600'
+        elif self.transaction_type in ['withdrawal', 'fee', 'payment']:
+            return 'text-red-600'
+        else:
+            return 'text-gray-600'
+    
+    @property
+    def status_color_class(self):
+        """Return CSS class for status badge color"""
+        status_colors = {
+            'pending': 'bg-yellow-100 text-yellow-800',
+            'completed': 'bg-green-100 text-green-800',
+            'failed': 'bg-red-100 text-red-800',
+            'cancelled': 'bg-gray-100 text-gray-800',
+            'processing': 'bg-blue-100 text-blue-800',
+            'reversed': 'bg-orange-100 text-orange-800',
+        }
+        return status_colors.get(self.status, 'bg-gray-100 text-gray-800')
+    
+    @property
+    def scope_color_class(self):
+        """Return CSS class for scope badge color"""
+        scope_colors = {
+            'internal': 'bg-blue-100 text-blue-800',
+            'external': 'bg-purple-100 text-purple-800',
+            'international': 'bg-green-100 text-green-800',
+            'local': 'bg-gray-100 text-gray-800',
+        }
+        return scope_colors.get(self.scope, 'bg-gray-100 text-gray-800')
+    
+    @property
+    def short_date(self):
+        """Return short formatted date (e.g., 'Oct 13, 2025')"""
+        if self.transaction_date:
+            return self.transaction_date.strftime('%b %d, %Y')
+        return ''
+    
+    def save(self, *args, **kwargs):
+        """Auto-generate reference_id if not provided"""
+        if not self.reference_id:
+            import uuid
+            self.reference_id = f"TXN-{str(uuid.uuid4())[:8].upper()}"
+        super().save(*args, **kwargs)

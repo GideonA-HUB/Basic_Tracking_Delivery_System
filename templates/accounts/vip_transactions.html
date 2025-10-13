@@ -1,0 +1,391 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Transactions - VIP Dashboard{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Dashboard Layout -->
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-white shadow-lg dashboard-sidebar">
+            <div class="p-6">
+                <!-- Action Buttons -->
+                <div class="space-y-3 mb-8">
+                    <button class="w-full bg-red-600 text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-red-700 transition-colors">
+                        <i class="fas fa-shield-alt"></i>
+                        Verify KYC
+                    </button>
+                    <button class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-gem"></i>
+                        MERIDIAN VIP
+                    </button>
+                </div>
+
+                <!-- Main Menu -->
+                <div class="mb-6">
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 sidebar-heading">MAIN MENU</h3>
+                    <nav class="space-y-2">
+                        <a href="{% url 'accounts:vip_dashboard' %}" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                            <i class="fas fa-home"></i>
+                            Dashboard
+                        </a>
+                        <a href="{% url 'accounts:vip_transactions' %}" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg bg-blue-50 text-blue-600 font-medium">
+                            <i class="fas fa-exchange-alt"></i>
+                            Transactions
+                        </a>
+                        <a href="{% url 'accounts:vip_cards' %}" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                            <i class="fas fa-credit-card"></i>
+                            Cards
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Transfers -->
+                <div class="mb-6">
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 sidebar-heading">TRANSFERS</h3>
+                    <nav class="space-y-2">
+                        <a href="{% url 'accounts:vip_transfer_local' %}" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                            <i class="fas fa-paper-plane"></i>
+                            Local Transfer
+                        </a>
+                        <a href="{% url 'accounts:vip_transfer_international' %}" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                            <i class="fas fa-globe"></i>
+                            International Wire
+                        </a>
+                        <a href="{% url 'accounts:vip_deposit' %}" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                            <i class="fas fa-plus"></i>
+                            Deposit
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Services -->
+                <div class="mb-6">
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 sidebar-heading">SERVICES</h3>
+                    <nav class="space-y-2">
+                        <a href="#" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                            Loan Request
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                            <i class="fas fa-receipt"></i>
+                            IRS Tax Refund
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                            <i class="fas fa-history"></i>
+                            Loan History
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Account -->
+                <div class="mb-6">
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 sidebar-heading">ACCOUNT</h3>
+                    <nav class="space-y-2">
+                        <a href="#" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                            <i class="fas fa-cog"></i>
+                            Settings
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                            <i class="fas fa-envelope"></i>
+                            Message us
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                            <i class="fas fa-university"></i>
+                            Online Banking
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Footer -->
+                <div class="mt-auto pt-6 border-t border-gray-200">
+                    <p class="text-xs text-gray-500 copyright-text">© 2025 Meridian Asset Logistics</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-y-auto bg-gray-50">
+            <div class="p-8">
+                <!-- Header -->
+                <div class="mb-8">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-900 mb-2">Transactions</h1>
+                            <nav class="flex items-center space-x-2 text-sm text-gray-500">
+                                <a href="{% url 'accounts:vip_dashboard' %}" class="hover:text-blue-600">Dashboard</a>
+                                <span>></span>
+                                <span class="text-gray-900">Transactions</span>
+                            </nav>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                                <i class="fas fa-filter"></i>
+                                Filter
+                            </button>
+                            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2">
+                                <i class="fas fa-download"></i>
+                                Export
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="mb-6">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-search text-gray-400"></i>
+                        </div>
+                        <input 
+                            type="text" 
+                            class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Search by transaction reference..."
+                            value="{{ search_query }}"
+                            id="searchInput"
+                        >
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="mb-6 flex items-center space-x-4">
+                    <select class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" id="typeFilter">
+                        <option value="">All Types</option>
+                        {% for type_code, type_name in transaction_types %}
+                            <option value="{{ type_code }}" {% if selected_type == type_code %}selected{% endif %}>{{ type_name }}</option>
+                        {% endfor %}
+                    </select>
+                    
+                    <select class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" id="statusFilter">
+                        <option value="">All Status</option>
+                        {% for status_code, status_name in status_choices %}
+                            <option value="{{ status_code }}" {% if selected_status == status_code %}selected{% endif %}>{{ status_name }}</option>
+                        {% endfor %}
+                    </select>
+                    
+                    <select class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" id="scopeFilter">
+                        <option value="">All Scopes</option>
+                        {% for scope_code, scope_name in scope_choices %}
+                            <option value="{{ scope_code }}" {% if selected_scope == scope_code %}selected{% endif %}>{{ scope_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Transactions Table -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                    {% if transactions %}
+                        <!-- Table Headers -->
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <div class="grid grid-cols-8 gap-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                <div>AMOUNT</div>
+                                <div>TYPE</div>
+                                <div>STATUS</div>
+                                <div>REFERENCE ID</div>
+                                <div>DESCRIPTION</div>
+                                <div>SCOPE</div>
+                                <div>CREATED</div>
+                                <div>ACTION</div>
+                            </div>
+                        </div>
+
+                        <!-- Table Body -->
+                        <div class="divide-y divide-gray-200">
+                            {% for transaction in transactions %}
+                                <div class="px-6 py-4 hover:bg-gray-50">
+                                    <div class="grid grid-cols-8 gap-4 items-center">
+                                        <div class="{{ transaction.amount_color_class }} font-semibold">
+                                            {{ transaction.formatted_amount }}
+                                        </div>
+                                        <div class="text-gray-900 capitalize">
+                                            {{ transaction.get_transaction_type_display }}
+                                        </div>
+                                        <div>
+                                            <span class="{{ transaction.status_color_class }} px-2 py-1 rounded-full text-xs font-medium">
+                                                {{ transaction.get_status_display }}
+                                            </span>
+                                        </div>
+                                        <div class="text-gray-900 font-mono text-sm">
+                                            {{ transaction.reference_id }}
+                                        </div>
+                                        <div class="text-gray-600">
+                                            {{ transaction.description|truncatechars:30 }}
+                                        </div>
+                                        <div>
+                                            <span class="{{ transaction.scope_color_class }} px-2 py-1 rounded-full text-xs font-medium">
+                                                {{ transaction.get_scope_display }}
+                                            </span>
+                                        </div>
+                                        <div class="text-gray-500 text-sm">
+                                            {{ transaction.short_date }}
+                                        </div>
+                                        <div>
+                                            <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                                View Details
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Pagination -->
+                        {% if transactions.has_other_pages %}
+                            <div class="px-6 py-4 border-t border-gray-200">
+                                <div class="flex items-center justify-between">
+                                    <div class="text-sm text-gray-500">
+                                        Showing {{ transactions.start_index }} to {{ transactions.end_index }} of {{ total_transactions }} transactions
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        {% if transactions.has_previous %}
+                                            <a href="?page={{ transactions.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_type %}&type={{ selected_type }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_scope %}&scope={{ selected_scope }}{% endif %}" 
+                                               class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">Previous</a>
+                                        {% endif %}
+                                        
+                                        {% for num in transactions.paginator.page_range %}
+                                            {% if num == transactions.number %}
+                                                <span class="px-3 py-1 bg-blue-600 text-white rounded text-sm">{{ num }}</span>
+                                            {% elif num > transactions.number|add:'-3' and num < transactions.number|add:'3' %}
+                                                <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_type %}&type={{ selected_type }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_scope %}&scope={{ selected_scope }}{% endif %}" 
+                                                   class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">{{ num }}</a>
+                                            {% endif %}
+                                        {% endfor %}
+                                        
+                                        {% if transactions.has_next %}
+                                            <a href="?page={{ transactions.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_type %}&type={{ selected_type }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_scope %}&scope={{ selected_scope }}{% endif %}" 
+                                               class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">Next</a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <!-- Empty State -->
+                        <div class="text-center py-16">
+                            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-inbox text-gray-400 text-2xl"></i>
+                            </div>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">No transactions found</h3>
+                            <p class="text-gray-500 mb-4">Try adjusting your search or filter parameters.</p>
+                            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                Clear Filters
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const typeFilter = document.getElementById('typeFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const scopeFilter = document.getElementById('scopeFilter');
+    
+    function applyFilters() {
+        const search = searchInput.value;
+        const type = typeFilter.value;
+        const status = statusFilter.value;
+        const scope = scopeFilter.value;
+        
+        const params = new URLSearchParams();
+        if (search) params.append('search', search);
+        if (type) params.append('type', type);
+        if (status) params.append('status', status);
+        if (scope) params.append('scope', scope);
+        
+        window.location.href = '{% url "accounts:vip_transactions" %}' + '?' + params.toString();
+    }
+    
+    // Add event listeners
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            applyFilters();
+        }
+    });
+    
+    typeFilter.addEventListener('change', applyFilters);
+    statusFilter.addEventListener('change', applyFilters);
+    scopeFilter.addEventListener('change', applyFilters);
+    
+    // Clear filters button
+    document.querySelector('.px-4.py-2.bg-blue-600').addEventListener('click', function() {
+        window.location.href = '{% url "accounts:vip_transactions" %}';
+    });
+});
+</script>
+
+<style>
+/* Ensure sidebar and main content have independent scrolling */
+.dashboard-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 40;
+}
+
+/* Custom scrollbar for sidebar */
+.dashboard-sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.dashboard-sidebar::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.dashboard-sidebar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 2px;
+}
+
+.dashboard-sidebar::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Main content area */
+.main-content {
+    margin-left: 16rem; /* 256px */
+    height: 100vh;
+    overflow-y: auto;
+}
+
+/* Theme compatibility for sidebar */
+html.light .dashboard-sidebar .text-gray-600,
+html.light .dashboard-sidebar .text-gray-500,
+html.light .dashboard-sidebar .text-gray-400,
+html.light .dashboard-sidebar .text-gray-300,
+html.light .dashboard-sidebar a,
+html.light .dashboard-sidebar p,
+html.light .dashboard-sidebar span,
+html.light .dashboard-sidebar div {
+    color: #374151 !important;
+    font-weight: 500 !important;
+}
+
+html.light .sidebar-heading {
+    color: #1f2937 !important;
+    font-weight: 700 !important;
+}
+
+html.light .nav-link {
+    color: #374151 !important;
+    font-weight: 500 !important;
+}
+
+html.light .nav-link:hover {
+    color: #1f2937 !important;
+    font-weight: 600 !important;
+}
+
+html.light .copyright-text {
+    color: #6b7280 !important;
+    font-weight: 500 !important;
+}
+</style>
+{% endblock %}

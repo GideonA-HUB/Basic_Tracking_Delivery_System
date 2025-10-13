@@ -20,4 +20,11 @@ urlpatterns = [
     path('vip/login/', views.vip_login, name='vip_login'),
     path('vip/dashboard/', views.vip_dashboard, name='vip_dashboard'),
     path('vip/logout/', views.vip_logout, name='vip_logout'),
+    
+    # VIP dashboard pages
+    path('vip/transactions/', views.vip_transactions, name='vip_transactions'),
+    path('vip/cards/', views.vip_cards, name='vip_cards'),
+    path('vip/transfer/local/', views.vip_transfer_local, name='vip_transfer_local'),
+    path('vip/transfer/international/', views.vip_transfer_international, name='vip_transfer_international'),
+    path('vip/deposit/', views.vip_deposit, name='vip_deposit'),
 ]
