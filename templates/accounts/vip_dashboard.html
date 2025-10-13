@@ -203,60 +203,90 @@
     }
 
     /* THEME COMPATIBILITY - LIGHT THEME */
-    body.light, html.light {
+    html.light, body.light {
         background: white !important;
         color: #374151 !important;
     }
 
-    body.light .dashboard-layout,
-    body.light .dashboard-sidebar,
-    body.light .dashboard-main,
-    body.light .dashboard-content {
+    html.light .dashboard-layout,
+    html.light .dashboard-sidebar,
+    html.light .dashboard-main,
+    html.light .dashboard-content {
         background: white !important;
         color: #374151 !important;
     }
 
-    body.light .card-hover {
+    html.light .card-hover {
         background: white !important;
         color: #374151 !important;
     }
 
-    body.light .card-hover * {
+    html.light .card-hover * {
         color: #374151 !important;
     }
 
     /* THEME COMPATIBILITY - DARK THEME */
-    body.dark, html.dark {
+    html.dark, body.dark {
         background: #1f2937 !important;
         color: #f9fafb !important;
     }
 
-    body.dark .dashboard-layout {
+    html.dark .dashboard-layout {
         background: #1f2937 !important;
     }
 
-    body.dark .dashboard-sidebar {
+    html.dark .dashboard-sidebar {
         background: #374151 !important;
         color: #f9fafb !important;
     }
 
-    body.dark .dashboard-main {
+    html.dark .dashboard-main {
         background: #1f2937 !important;
         color: #f9fafb !important;
     }
 
-    body.dark .dashboard-content {
+    html.dark .dashboard-content {
         background: #1f2937 !important;
         color: #f9fafb !important;
     }
 
-    body.dark .card-hover {
+    html.dark .card-hover {
         background: #374151 !important;
         color: #f9fafb !important;
     }
 
-    body.dark .card-hover * {
+    html.dark .card-hover * {
         color: #f9fafb !important;
+    }
+
+    /* CRITICAL: Balance card ALWAYS stays blue with white text (matches third image) */
+    .balance-card {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
+        color: white !important;
+    }
+
+    .balance-card * {
+        color: white !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+        font-weight: 600 !important;
+    }
+
+    /* Override any theme changes to balance card */
+    html.light .balance-card,
+    html.dark .balance-card,
+    body.light .balance-card,
+    body.dark .balance-card {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
+        color: white !important;
+    }
+
+    html.light .balance-card *,
+    html.dark .balance-card *,
+    body.light .balance-card *,
+    body.dark .balance-card * {
+        color: white !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+        font-weight: 600 !important;
     }
 
     /* FINAL OVERRIDE - NUCLEAR OPTION */
@@ -1216,52 +1246,120 @@
             content.style.margin = '0 auto';
         }
         
-        // Detect and apply theme
-        const isDarkTheme = document.documentElement.classList.contains('dark') || 
-                           document.body.classList.contains('dark') ||
-                           window.matchMedia('(prefers-color-scheme: dark)').matches;
+        // Integrate with the main theme system
+        const html = document.documentElement;
+        const currentTheme = localStorage.getItem('theme') || 'light';
         
-        if (isDarkTheme) {
-            // Apply dark theme
+        // Apply the current theme from localStorage
+        if (currentTheme === 'dark') {
+            html.className = 'dark';
             document.body.classList.add('dark');
-            document.documentElement.classList.add('dark');
         } else {
-            // Apply light theme
+            html.className = 'light';
             document.body.classList.add('light');
-            document.documentElement.classList.add('light');
         }
         
-        // Force balance card text visibility
-        const balanceCard = document.querySelector('.balance-card');
-        if (balanceCard) {
-            balanceCard.style.color = 'white';
-            balanceCard.style.textShadow = '0 1px 3px rgba(0, 0, 0, 0.5)';
-            
-            // Apply to all child elements
-            balanceCard.querySelectorAll('*').forEach(el => {
-                el.style.color = 'white';
-                el.style.textShadow = '0 1px 3px rgba(0, 0, 0, 0.5)';
-                el.style.fontWeight = '600';
+        // Listen for theme changes from the main toggle
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                    const isDarkTheme = html.classList.contains('dark');
+                    updateVIPDashboardTheme(isDarkTheme);
+                }
             });
-        }
+        });
         
-        // Force stats cards text visibility
-        const statsCards = document.querySelectorAll('.card-hover');
-        statsCards.forEach(card => {
+        observer.observe(html, { attributes: true, attributeFilter: ['class'] });
+        
+        // Function to update VIP dashboard theme
+        function updateVIPDashboardTheme(isDarkTheme) {
+            // Update dashboard layout colors
+            const layout = document.querySelector('.dashboard-layout');
+            const sidebar = document.querySelector('.dashboard-sidebar');
+            const main = document.querySelector('.dashboard-main');
+            const content = document.querySelector('.dashboard-content');
+            
             if (isDarkTheme) {
-                card.style.backgroundColor = '#374151';
-                card.style.color = '#f9fafb';
-                card.querySelectorAll('*').forEach(el => {
+                // Dark theme colors
+                if (layout) layout.style.background = '#1f2937';
+                if (sidebar) {
+                    sidebar.style.background = '#374151';
+                    sidebar.style.color = '#f9fafb';
+                }
+                if (main) {
+                    main.style.background = '#1f2937';
+                    main.style.color = '#f9fafb';
+                }
+                if (content) {
+                    content.style.background = '#1f2937';
+                    content.style.color = '#f9fafb';
+                }
+                
+                // Update stats cards for dark theme
+                const statsCards = document.querySelectorAll('.card-hover');
+                statsCards.forEach(card => {
+                    card.style.backgroundColor = '#374151';
+                    card.style.color = '#f9fafb';
+                    card.querySelectorAll('*').forEach(el => {
+                        el.style.color = '#f9fafb';
+                    });
+                });
+                
+                // Update text colors for dark theme
+                document.querySelectorAll('.text-gray-900, .text-gray-800, .text-gray-700, .text-gray-600, .text-gray-500').forEach(el => {
                     el.style.color = '#f9fafb';
                 });
+                
             } else {
-                card.style.backgroundColor = 'white';
-                card.style.color = '#374151';
-                card.querySelectorAll('*').forEach(el => {
+                // Light theme colors
+                if (layout) layout.style.background = 'white';
+                if (sidebar) {
+                    sidebar.style.background = 'white';
+                    sidebar.style.color = '#374151';
+                }
+                if (main) {
+                    main.style.background = 'white';
+                    main.style.color = '#374151';
+                }
+                if (content) {
+                    content.style.background = 'white';
+                    content.style.color = '#374151';
+                }
+                
+                // Update stats cards for light theme
+                const statsCards = document.querySelectorAll('.card-hover');
+                statsCards.forEach(card => {
+                    card.style.backgroundColor = 'white';
+                    card.style.color = '#374151';
+                    card.querySelectorAll('*').forEach(el => {
+                        el.style.color = '#374151';
+                    });
+                });
+                
+                // Update text colors for light theme
+                document.querySelectorAll('.text-gray-900, .text-gray-800, .text-gray-700, .text-gray-600, .text-gray-500').forEach(el => {
                     el.style.color = '#374151';
                 });
             }
-        });
+            
+            // ALWAYS keep balance card as blue with white text (matches third image)
+            const balanceCard = document.querySelector('.balance-card');
+            if (balanceCard) {
+                balanceCard.style.background = 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)';
+                balanceCard.style.color = 'white';
+                balanceCard.style.textShadow = '0 1px 3px rgba(0, 0, 0, 0.5)';
+                
+                // Apply to all child elements
+                balanceCard.querySelectorAll('*').forEach(el => {
+                    el.style.color = 'white';
+                    el.style.textShadow = '0 1px 3px rgba(0, 0, 0, 0.5)';
+                    el.style.fontWeight = '600';
+                });
+            }
+        }
+        
+        // Initial theme application
+        updateVIPDashboardTheme(currentTheme === 'dark');
     });
 
     // Real-time clock functionality
