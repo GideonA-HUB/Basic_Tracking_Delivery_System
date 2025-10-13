@@ -3,8 +3,40 @@
 
 {% block title %}VIP Dashboard - {{ vip_member.full_name }}{% endblock %}
 
+{% block extra_head %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<style>
+    /* FORCE FULL VIEWPORT - CRITICAL */
+    html, body {
+        width: 100vw !important;
+        height: 100vh !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow-x: hidden !important;
+        background: white !important;
+    }
+    
+    /* Override any existing styles */
+    * {
+        box-sizing: border-box !important;
+    }
+</style>
+{% endblock %}
+
 {% block extra_css %}
 <style>
+    /* CRITICAL OVERRIDE - FORCE WHITE THEME FIRST */
+    html, body, * {
+        background: white !important;
+        color: #374151 !important;
+    }
+
+    /* Override dark theme completely */
+    .dark, .dark *, [class*="dark"] {
+        background: white !important;
+        color: #374151 !important;
+    }
+
     /* Global CSS Variables for Figma Design */
     :root {
         --background: 0 0% 100%;
@@ -115,6 +147,7 @@
         width: 100% !important;
         height: 100% !important;
         overflow-x: hidden !important;
+        background: white !important;
     }
 
     /* Force the dashboard to take full viewport */
@@ -126,6 +159,59 @@
         bottom: 0 !important;
         width: 100vw !important;
         height: 100vh !important;
+        background: white !important;
+        display: grid !important;
+        grid-template-columns: 280px 1fr !important;
+    }
+
+    /* CRITICAL: Override any dark theme classes */
+    .dark, .dark * {
+        background: white !important;
+        color: #374151 !important;
+    }
+
+    /* Force all elements to be white */
+    * {
+        background-color: white !important;
+        color: #374151 !important;
+    }
+
+    /* Exception for specific elements that need colors */
+    .bg-blue-600, .bg-red-600, .bg-green-600, .bg-yellow-500, .bg-purple-600 {
+        background-color: inherit !important;
+    }
+
+    /* FINAL OVERRIDE - NUCLEAR OPTION */
+    body.dark, html.dark {
+        background: white !important;
+        color: #374151 !important;
+    }
+
+    /* Force all containers to be full width */
+    .container, .max-w-7xl, .mx-auto {
+        max-width: none !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Override any Tailwind dark classes */
+    .dark\:bg-gray-900, .dark\:bg-gray-800, .dark\:text-white {
+        background: white !important;
+        color: #374151 !important;
+    }
+
+    /* Force the layout to work */
+    .dashboard-layout {
+        display: grid !important;
+        grid-template-columns: 280px 1fr !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        background: white !important;
+        z-index: 9999 !important;
     }
 
     .dashboard-sidebar {
@@ -890,6 +976,47 @@
 
 {% block extra_js %}
 <script>
+    // CRITICAL: Force layout immediately
+    document.addEventListener('DOMContentLoaded', function() {
+        // Force white theme
+        document.documentElement.className = 'light';
+        document.body.style.background = 'white';
+        document.body.style.color = '#374151';
+        
+        // Force layout
+        const layout = document.querySelector('.dashboard-layout');
+        if (layout) {
+            layout.style.display = 'grid';
+            layout.style.gridTemplateColumns = '280px 1fr';
+            layout.style.width = '100vw';
+            layout.style.height = '100vh';
+            layout.style.position = 'fixed';
+            layout.style.top = '0';
+            layout.style.left = '0';
+            layout.style.background = 'white';
+        }
+        
+        // Force sidebar
+        const sidebar = document.querySelector('.dashboard-sidebar');
+        if (sidebar) {
+            sidebar.style.position = 'fixed';
+            sidebar.style.left = '0';
+            sidebar.style.top = '0';
+            sidebar.style.width = '280px';
+            sidebar.style.height = '100vh';
+            sidebar.style.background = 'white';
+            sidebar.style.zIndex = '1000';
+        }
+        
+        // Force main content
+        const main = document.querySelector('.dashboard-main');
+        if (main) {
+            main.style.marginLeft = '280px';
+            main.style.width = 'calc(100vw - 280px)';
+            main.style.background = 'white';
+        }
+    });
+
     // Real-time clock functionality
     function updateTime() {
         const now = new Date();
