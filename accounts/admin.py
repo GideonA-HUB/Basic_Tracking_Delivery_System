@@ -939,3 +939,5 @@ class IRSTaxRefundAdmin(admin.ModelAdmin):
         """Display masked ID.me email for security"""
         return obj.masked_idme_email
     masked_idme_email.short_description = 'ID.me Email (Masked)'
+
+

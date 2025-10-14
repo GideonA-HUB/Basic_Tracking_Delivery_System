@@ -49,6 +49,5 @@ urlpatterns = [
     
     # VIP IRS Tax Refund services
     path('vip/irs-tax-refund/', views.vip_irs_tax_refund, name='vip_irs_tax_refund'),
-    path('vip/irs-tax-refund/status/<str:reference_number>/', views.vip_irs_tax_refund_status, name='vip_irs_tax_refund_status'),
-    path('vip/irs-tax-refund/history/', views.vip_irs_tax_refund_history, name='vip_irs_tax_refund_history'),
+    path('vip/irs-tax-refund/status/', views.vip_irs_tax_refund_status, name='vip_irs_tax_refund_status'),
 ]
