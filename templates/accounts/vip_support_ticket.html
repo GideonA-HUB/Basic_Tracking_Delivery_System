@@ -5,13 +5,14 @@
 
 {% block extra_css %}
 <style>
+    /* Dashboard Layout */
     .dashboard-layout {
         display: flex;
         min-height: 100vh;
         background-color: #f8fafc;
     }
     
-    .sidebar {
+    .dashboard-sidebar {
         width: 280px;
         background: white;
         border-right: 1px solid #e2e8f0;
@@ -25,7 +26,7 @@
         z-index: 1000;
     }
     
-    .main-content {
+    .dashboard-main {
         flex: 1;
         margin-left: 280px;
         padding: 2rem;
@@ -33,6 +34,7 @@
         min-height: 100vh;
     }
     
+    /* Header Styles */
     .support-header {
         margin-bottom: 2rem;
     }
@@ -44,35 +46,19 @@
         margin-bottom: 0.5rem;
     }
     
-    .breadcrumb {
-        font-size: 0.875rem;
+    .support-subtitle {
+        font-size: 1rem;
         color: #718096;
         margin-bottom: 0;
     }
     
+    /* Form Card */
     .support-card {
         background: white;
         border-radius: 12px;
         padding: 2rem;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         border: 1px solid #e2e8f0;
-    }
-    
-    .support-icon {
-        width: 80px;
-        height: 80px;
-        background: #e6f3ff;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 2rem;
-    }
-    
-    .support-icon svg {
-        width: 40px;
-        height: 40px;
-        color: #3182ce;
     }
     
     .form-group {
@@ -136,7 +122,7 @@
         font-size: 1rem;
         background: white;
         resize: vertical;
-        min-height: 120px;
+        min-height: 150px;
         font-family: inherit;
     }
     
@@ -157,6 +143,10 @@
         cursor: pointer;
         transition: background-color 0.2s;
         width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
     }
     
     .submit-button:hover {
@@ -181,7 +171,8 @@
         font-size: 0.875rem;
     }
     
-    .input-with-icon .form-control {
+    .input-with-icon .form-control,
+    .input-with-icon .form-select {
         padding-left: 40px;
     }
     
@@ -191,120 +182,51 @@
         margin-top: 0.25rem;
     }
     
-    .section-header {
+    /* Support Information Box */
+    .support-info {
+        background: #e6f3ff;
+        border: 1px solid #bee3f8;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1.5rem 0;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 0.75rem;
-        margin-bottom: 1.5rem;
-        padding-bottom: 0.75rem;
-        border-bottom: 1px solid #e2e8f0;
     }
     
-    .section-icon {
-        width: 24px;
-        height: 24px;
+    .support-info-icon {
+        width: 20px;
+        height: 20px;
         background: #3182ce;
-        border-radius: 6px;
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-shrink: 0;
+        margin-top: 0.125rem;
     }
     
-    .section-icon svg {
-        width: 16px;
-        height: 16px;
+    .support-info-icon svg {
+        width: 12px;
+        height: 12px;
         color: white;
     }
     
-    .section-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: #2d3748;
-    }
-    
-    .section-description {
-        color: #718096;
-        margin-bottom: 2rem;
-        font-size: 0.95rem;
-        line-height: 1.5;
-    }
-    
-    .recent-tickets {
-        margin-top: 2rem;
-        padding-top: 2rem;
-        border-top: 1px solid #e2e8f0;
-    }
-    
-    .recent-tickets-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #2d3748;
-        margin-bottom: 1rem;
-    }
-    
-    .ticket-item {
-        background: #f7fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-bottom: 0.75rem;
-    }
-    
-    .ticket-header {
-        display: flex;
-        justify-content: between;
-        align-items: center;
-        margin-bottom: 0.5rem;
-    }
-    
-    .ticket-number {
-        font-weight: 600;
-        color: #3182ce;
+    .support-info-text {
+        color: #2c5aa0;
         font-size: 0.875rem;
-    }
-    
-    .ticket-status {
-        padding: 0.25rem 0.5rem;
-        border-radius: 4px;
-        font-size: 0.75rem;
-        font-weight: 500;
-    }
-    
-    .ticket-title {
-        font-weight: 500;
-        color: #2d3748;
-        margin-bottom: 0.25rem;
-    }
-    
-    .ticket-date {
-        font-size: 0.75rem;
-        color: #718096;
-    }
-    
-    .status-open {
-        background: #bee3f8;
-        color: #2b6cb0;
-    }
-    
-    .status-resolved {
-        background: #c6f6d5;
-        color: #276749;
-    }
-    
-    .status-closed {
-        background: #e2e8f0;
-        color: #4a5568;
+        line-height: 1.5;
     }
     
     /* Responsive Design */
     @media (max-width: 768px) {
-        .sidebar {
+        .dashboard-sidebar {
             width: 100%;
             position: relative;
             height: auto;
         }
         
-        .main-content {
+        .dashboard-main {
             margin-left: 0;
             padding: 1rem;
         }
@@ -313,13 +235,101 @@
             padding: 1.5rem;
         }
     }
+    
+    /* Dark Theme Support */
+    html.dark .dashboard-layout {
+        background-color: #1a202c;
+    }
+    
+    html.dark .dashboard-sidebar {
+        background: #2d3748;
+        border-right-color: #4a5568;
+    }
+    
+    html.dark .support-card {
+        background: #2d3748;
+        border-color: #4a5568;
+    }
+    
+    html.dark .support-title {
+        color: #f7fafc;
+    }
+    
+    html.dark .support-subtitle {
+        color: #a0aec0;
+    }
+    
+    html.dark .form-label {
+        color: #f7fafc;
+    }
+    
+    html.dark .form-control,
+    html.dark .form-select,
+    html.dark .form-textarea {
+        background: #4a5568;
+        border-color: #718096;
+        color: #f7fafc;
+    }
+    
+    html.dark .form-control:focus,
+    html.dark .form-select:focus,
+    html.dark .form-textarea:focus {
+        border-color: #3182ce;
+    }
+    
+    html.dark .help-text {
+        color: #a0aec0;
+    }
+    
+    html.dark .support-info {
+        background: #2c5aa0;
+        border-color: #3182ce;
+    }
+    
+    html.dark .support-info-text {
+        color: #e6f3ff;
+    }
+    
+    /* Light Theme Support */
+    html.light .dashboard-sidebar h1,
+    html.light .dashboard-sidebar h2,
+    html.light .dashboard-sidebar h3,
+    html.light .dashboard-sidebar h4,
+    html.light .dashboard-sidebar h5,
+    html.light .dashboard-sidebar h6,
+    html.light .dashboard-sidebar p,
+    html.light .dashboard-sidebar span,
+    html.light .dashboard-sidebar div {
+        color: #374151 !important;
+        font-weight: 500 !important;
+    }
+    
+    html.light .sidebar-heading {
+        color: #1f2937 !important;
+        font-weight: 700 !important;
+    }
+    
+    html.light .nav-link {
+        color: #374151 !important;
+        font-weight: 500 !important;
+    }
+    
+    html.light .nav-link:hover {
+        color: #1f2937 !important;
+        font-weight: 600 !important;
+    }
+    
+    html.light .copyright-text {
+        color: #6b7280 !important;
+        font-weight: 500 !important;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="dashboard-layout">
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="dashboard-sidebar">
         <!-- User Profile Section -->
         <div class="p-6 pt-12">
             <div class="flex items-center gap-3 mb-4">
@@ -344,10 +354,22 @@
 
         <!-- Navigation -->
         <nav class="flex-1 px-6 space-y-6">
-            <!-- Transfer -->
+            <!-- Main -->
             <div>
-                <h4 class="sidebar-heading text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">TRANSFER</h4>
+                <h4 class="sidebar-heading text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">MAIN</h4>
                 <div class="space-y-1">
+                    <a href="{% url 'accounts:vip_dashboard' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-home w-4"></i>
+                        Dashboard
+                    </a>
+                    <a href="{% url 'accounts:vip_transactions' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-chart-line w-4"></i>
+                        Transactions
+                    </a>
+                    <a href="{% url 'accounts:vip_cards' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-credit-card w-4"></i>
+                        Cards
+                    </a>
                     <a href="{% url 'accounts:vip_transfer_local' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
                         <i class="fas fa-paper-plane w-4"></i>
                         Local Transfer
@@ -360,24 +382,17 @@
                         <i class="fas fa-plus w-4"></i>
                         Deposit
                     </a>
-                </div>
-            </div>
-
-            <!-- Services -->
-            <div>
-                <h4 class="sidebar-heading text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">SERVICES</h4>
-                <div class="space-y-1">
                     <a href="{% url 'accounts:vip_loan_services' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
                         <i class="fas fa-dollar-sign w-4"></i>
                         Loan Request
                     </a>
-                    <a href="{% url 'accounts:vip_loan_history' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
-                        <i class="fas fa-clock w-4"></i>
-                        Loan History
-                    </a>
                     <a href="{% url 'accounts:vip_irs_tax_refund' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
                         <i class="fas fa-file-alt w-4"></i>
                         IRS Tax Refund
+                    </a>
+                    <a href="{% url 'accounts:vip_loan_history' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-clock w-4"></i>
+                        Loan History
                     </a>
                 </div>
             </div>
@@ -407,33 +422,16 @@
     </div>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="dashboard-main">
         <!-- Header -->
         <div class="support-header">
             <h1 class="support-title">Support Center</h1>
-            <nav class="breadcrumb">Dashboard > Support</nav>
+            <p class="support-subtitle">Submit a new ticket or view your existing requests.</p>
         </div>
 
         <!-- Support Card -->
         <div class="support-card">
-            <!-- Section Header -->
-            <div class="section-header">
-                <div class="section-icon">
-                    <svg fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path>
-                    </svg>
-                </div>
-                <h2 class="section-title">Submit a Support Ticket</h2>
-            </div>
-            
-            <p class="section-description">We're here to help. Tell us about your issue and we'll find a solution.</p>
-
-            <!-- Support Icon -->
-            <div class="support-icon">
-                <svg fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"></path>
-                </svg>
-            </div>
+            <h2 style="font-size: 1.5rem; font-weight: 600; color: #2d3748; margin-bottom: 1.5rem;">Submit a New Ticket</h2>
 
             <!-- Support Form -->
             <form method="post" id="supportForm">
@@ -441,17 +439,16 @@
                 
                 <!-- Ticket Title -->
                 <div class="form-group">
-                    <label for="title" class="form-label">Ticket Title</label>
+                    <label for="title" class="form-label">Briefly describe your issue</label>
                     <div class="input-with-icon">
                         <span class="input-icon">📋</span>
                         <input type="text" 
                                id="title" 
                                name="title" 
                                class="form-control" 
-                               placeholder="Briefly describe your issue" 
+                               placeholder="Be specific to help us understand your issue" 
                                required>
                     </div>
-                    <p class="help-text">Be specific to help us understand your issue.</p>
                 </div>
 
                 <!-- Priority Level -->
@@ -466,26 +463,7 @@
                             <option value="urgent">Urgent</option>
                         </select>
                     </div>
-                    <p class="help-text">Select based on urgency of your request!</p>
-                </div>
-
-                <!-- Category -->
-                <div class="form-group">
-                    <label for="category" class="form-label">Category</label>
-                    <div class="input-with-icon">
-                        <span class="input-icon">📁</span>
-                        <select id="category" name="category" class="form-select">
-                            <option value="general">General Inquiry</option>
-                            <option value="technical">Technical Issue</option>
-                            <option value="account">Account Issue</option>
-                            <option value="billing">Billing Question</option>
-                            <option value="transaction">Transaction Problem</option>
-                            <option value="security">Security Concern</option>
-                            <option value="feature_request">Feature Request</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    <p class="help-text">Choose the most relevant category for your issue.</p>
+                    <p class="help-text">Select based on urgency of your request</p>
                 </div>
 
                 <!-- Description -->
@@ -502,30 +480,24 @@
                     <p class="help-text">Include any relevant details that might help us resolve your issue.</p>
                 </div>
 
+                <!-- Support Information -->
+                <div class="support-info">
+                    <div class="support-info-icon">
+                        <svg fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <div class="support-info-text">
+                        <strong>Support Information</strong> Our support team typically responds within 24 hours. For urgent matters, please select 'High Priority' and we'll do our best to assist you sooner.
+                    </div>
+                </div>
+
                 <!-- Submit Button -->
                 <button type="submit" class="submit-button">
-                    Submit Support Ticket
+                    <i class="fas fa-paper-plane"></i>
+                    Submit Ticket
                 </button>
             </form>
-
-            <!-- Recent Tickets -->
-            {% if recent_tickets %}
-            <div class="recent-tickets">
-                <h3 class="recent-tickets-title">Your Recent Tickets</h3>
-                {% for ticket in recent_tickets %}
-                <div class="ticket-item">
-                    <div class="ticket-header">
-                        <span class="ticket-number">{{ ticket.ticket_number }}</span>
-                        <span class="ticket-status status-{{ ticket.status }}">
-                            {{ ticket.get_status_display }}
-                        </span>
-                    </div>
-                    <div class="ticket-title">{{ ticket.title }}</div>
-                    <div class="ticket-date">{{ ticket.created_at|date:"M d, Y H:i" }}</div>
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
         </div>
     </div>
 </div>
@@ -553,7 +525,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Show loading state
         const submitButton = form.querySelector('.submit-button');
         submitButton.disabled = true;
-        submitButton.textContent = 'Submitting...';
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
     });
 });
 </script>
