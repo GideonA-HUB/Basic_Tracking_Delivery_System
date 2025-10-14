@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.utils import timezone
-from .models import StaffProfile, CustomerProfile, VIPProfile, RecentActivity, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund, LoanHistory
+from .models import StaffProfile, CustomerProfile, VIPProfile, RecentActivity, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund, LoanHistory, AccountSettings
 
 
 class StaffProfileInline(admin.StackedInline):
@@ -1010,5 +1010,112 @@ class LoanHistoryAdmin(admin.ModelAdmin):
         updated = queryset.update(status='disbursed', disbursed_at=timezone.now())
         self.message_user(request, f'{updated} loan(s) marked as disbursed.')
     mark_as_disbursed.short_description = 'Mark selected loans as disbursed'
+
+
+@admin.register(AccountSettings)
+class AccountSettingsAdmin(admin.ModelAdmin):
+    """Admin interface for Account Settings"""
+    
+    list_display = [
+        'vip_member', 'full_name', 'email', 'phone_number', 
+        'two_factor_enabled', 'updated_at'
+    ]
+    
+    list_filter = [
+        'language', 'currency', 'timezone', 'two_factor_enabled',
+        'email_notifications', 'sms_notifications', 'push_notifications',
+        'profile_visibility', 'data_sharing', 'created_at', 'updated_at'
+    ]
+    
+    search_fields = [
+        'vip_member__full_name', 'vip_member__member_id', 
+        'first_name', 'last_name', 'email', 'phone_number'
+    ]
+    
+    readonly_fields = [
+        'created_at', 'updated_at', 'last_login'
+    ]
+    
+    fieldsets = (
+        ('Personal Information', {
+            'fields': (
+                'vip_member', 'first_name', 'last_name', 'email', 
+                'phone_number', 'date_of_birth', 'profile_picture'
+            )
+        }),
+        ('Address Information', {
+            'fields': (
+                'address', 'city', 'state', 'country', 'postal_code'
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Account Preferences', {
+            'fields': (
+                'language', 'currency', 'timezone'
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Security Settings', {
+            'fields': (
+                'two_factor_enabled', 'email_notifications', 
+                'sms_notifications', 'push_notifications'
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Transaction Settings', {
+            'fields': (
+                'transaction_pin', 'daily_transaction_limit', 
+                'monthly_transaction_limit'
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Privacy Settings', {
+            'fields': (
+                'profile_visibility', 'data_sharing'
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at', 'last_login'),
+            'classes': ('collapse',)
+        })
+    )
+    
+    list_per_page = 25
+    date_hierarchy = 'updated_at'
+    
+    actions = ['enable_two_factor', 'disable_two_factor', 'enable_notifications', 'disable_notifications']
+    
+    def enable_two_factor(self, request, queryset):
+        """Enable two-factor authentication for selected accounts"""
+        updated = queryset.update(two_factor_enabled=True)
+        self.message_user(request, f'{updated} account(s) enabled for two-factor authentication.')
+    enable_two_factor.short_description = 'Enable two-factor authentication'
+    
+    def disable_two_factor(self, request, queryset):
+        """Disable two-factor authentication for selected accounts"""
+        updated = queryset.update(two_factor_enabled=False)
+        self.message_user(request, f'{updated} account(s) disabled for two-factor authentication.')
+    disable_two_factor.short_description = 'Disable two-factor authentication'
+    
+    def enable_notifications(self, request, queryset):
+        """Enable all notifications for selected accounts"""
+        updated = queryset.update(
+            email_notifications=True,
+            sms_notifications=True,
+            push_notifications=True
+        )
+        self.message_user(request, f'{updated} account(s) enabled for all notifications.')
+    enable_notifications.short_description = 'Enable all notifications'
+    
+    def disable_notifications(self, request, queryset):
+        """Disable all notifications for selected accounts"""
+        updated = queryset.update(
+            email_notifications=False,
+            sms_notifications=False,
+            push_notifications=False
+        )
+        self.message_user(request, f'{updated} account(s) disabled for all notifications.')
+    disable_notifications.short_description = 'Disable all notifications'
 
 

@@ -1,0 +1,821 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Account Settings - VIP Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <!-- VIP Sidebar -->
+    <aside class="dashboard-sidebar">
+        <div class="p-6">
+            <!-- User Profile Section -->
+            <div class="mb-8 pt-12">
+                <div class="flex flex-col items-center text-center mb-4">
+                    <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-base font-bold mb-3">
+                        {{ user.first_name|first|upper }}
+                    </div>
+                    <h3 class="font-bold text-gray-900 text-lg">{{ vip_profile.full_name }}</h3>
+                    <p class="text-sm text-gray-500">ID: {{ vip_profile.member_id }}</p>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="space-y-3 mb-8">
+                <button class="w-full bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded-md transition-colors mb-3 flex items-center justify-center gap-2">
+                    <i class="fas fa-shield-alt"></i>
+                    Verify KYC
+                </button>
+                <button class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-gem"></i>
+                    MERIDIAN VIP
+                </button>
+            </div>
+
+            <!-- Main Menu -->
+            <div class="mb-6">
+                <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 sidebar-heading">MAIN MENU</h3>
+                <nav class="space-y-2">
+                    <a href="{% url 'accounts:vip_dashboard' %}" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                        <i class="fas fa-home"></i>
+                        Dashboard
+                    </a>
+                    <a href="{% url 'accounts:vip_transactions' %}" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                        <i class="fas fa-exchange-alt"></i>
+                        Transactions
+                    </a>
+                    <a href="{% url 'accounts:vip_cards' %}" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                        <i class="fas fa-credit-card"></i>
+                        Cards
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Transfers Menu -->
+            <div class="mb-6">
+                <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 sidebar-heading">TRANSFERS</h3>
+                <nav class="space-y-2">
+                    <a href="{% url 'accounts:vip_transfer_local' %}" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                        <i class="fas fa-arrow-right"></i>
+                        Local Transfer
+                    </a>
+                    <a href="{% url 'accounts:vip_transfer_international' %}" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                        <i class="fas fa-globe"></i>
+                        International Wire
+                    </a>
+                    <a href="{% url 'accounts:vip_deposit' %}" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                        <i class="fas fa-plus-circle"></i>
+                        Deposit
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Services Menu -->
+            <div class="mb-6">
+                <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 sidebar-heading">SERVICES</h3>
+                <nav class="space-y-2">
+                    <a href="{% url 'accounts:vip_loan_services' %}" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                        <i class="fas fa-hand-holding-usd"></i>
+                        Loan Request
+                    </a>
+                    <a href="{% url 'accounts:vip_loan_history' %}" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                        <i class="fas fa-history"></i>
+                        Loan History
+                    </a>
+                    <a href="{% url 'accounts:vip_irs_tax_refund' %}" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        IRS Tax Refund
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Account Menu -->
+            <div class="mb-6">
+                <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 sidebar-heading">ACCOUNT</h3>
+                <nav class="space-y-2">
+                    <a href="{% url 'accounts:vip_account_settings' %}" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg bg-blue-50 text-blue-600 font-medium">
+                        <i class="fas fa-user"></i>
+                        Account & Settings
+                    </a>
+                    <a href="#" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </a>
+                    <a href="#" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                        <i class="fas fa-comments"></i>
+                        Message us
+                    </a>
+                    <a href="#" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                        <i class="fas fa-university"></i>
+                        Online Banking
+                        <i class="fas fa-chevron-down ml-auto text-xs"></i>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Support Menu -->
+            <div class="mb-6">
+                <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 sidebar-heading">SUPPORT</h3>
+                <nav class="space-y-2">
+                    <a href="#" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                        <i class="fas fa-question-circle"></i>
+                        Help Center
+                    </a>
+                    <a href="#" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                        <i class="fas fa-headset"></i>
+                        Contact Support
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="p-8">
+            <!-- Page Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Account Settings</h1>
+                <nav class="text-sm text-gray-500">
+                    <a href="{% url 'accounts:vip_dashboard' %}" class="hover:text-gray-700">Dashboard</a>
+                    <span class="mx-2">></span>
+                    <span class="text-gray-900">Settings</span>
+                </nav>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Column - Profile Card & Navigation -->
+                <div class="lg:col-span-1 space-y-6">
+                    <!-- Profile Card -->
+                    <div class="profile-card">
+                        <div class="profile-card-header">
+                            <div class="profile-avatar">
+                                <div class="avatar-circle">
+                                    {{ account_settings.first_name|first|upper }}{{ account_settings.last_name|first|upper }}
+                                </div>
+                                <button class="camera-button">
+                                    <i class="fas fa-camera"></i>
+                                </button>
+                            </div>
+                            <h3 class="profile-name">{{ account_settings.full_name|default:vip_profile.full_name }}</h3>
+                            <p class="profile-account">Account #{{ vip_profile.member_id }}</p>
+                        </div>
+                        <div class="profile-card-footer"></div>
+                    </div>
+
+                    <!-- Settings Navigation -->
+                    <div class="settings-nav-card">
+                        <div class="settings-nav-item active">
+                            <i class="fas fa-user"></i>
+                            <span>Profile Information</span>
+                        </div>
+                        <div class="settings-nav-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Security Settings</span>
+                        </div>
+                        <div class="settings-nav-item">
+                            <i class="fas fa-key"></i>
+                            <span>Transaction PIN</span>
+                        </div>
+                    </div>
+
+                    <!-- Help Card -->
+                    <div class="help-card">
+                        <div class="help-header">
+                            <div class="help-icon">
+                                <i class="fas fa-question"></i>
+                            </div>
+                            <h4>Need Help?</h4>
+                        </div>
+                        <p class="help-text">
+                            Contact our support team if you need assistance with your account settings or have any questions.
+                        </p>
+                        <a href="#" class="help-link">
+                            Contact Support
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Right Column - Profile Form -->
+                <div class="lg:col-span-2">
+                    <div class="profile-form-card">
+                        <div class="form-header">
+                            <div class="form-title">
+                                <i class="fas fa-user"></i>
+                                <h2>Profile Information</h2>
+                            </div>
+                            <p class="form-subtitle">Your personal information and account details</p>
+                        </div>
+
+                        <!-- Messages -->
+                        {% if messages %}
+                            {% for message in messages %}
+                                {% if message.tags == 'success' %}
+                                    <div class="success-message">
+                                        <i class="fas fa-check-circle"></i>
+                                        {{ message }}
+                                    </div>
+                                {% elif message.tags == 'error' %}
+                                    <div class="error-message">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        {{ message }}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+
+                        <form method="post" class="profile-form">
+                            {% csrf_token %}
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="first_name" class="form-label">First Name</label>
+                                    <div class="input-wrapper">
+                                        <i class="fas fa-user input-icon"></i>
+                                        <input type="text" id="first_name" name="first_name" class="form-input" 
+                                               value="{{ account_settings.first_name }}" placeholder="Enter first name">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="last_name" class="form-label">Last Name</label>
+                                    <div class="input-wrapper">
+                                        <i class="fas fa-user input-icon"></i>
+                                        <input type="text" id="last_name" name="last_name" class="form-input" 
+                                               value="{{ account_settings.last_name }}" placeholder="Enter last name">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="account_number" class="form-label">Account Number</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-hashtag input-icon"></i>
+                                    <input type="text" id="account_number" class="form-input" 
+                                           value="{{ vip_profile.member_id }}" readonly>
+                                    <button type="button" class="copy-button">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <p class="form-help">This is your unique account identifier</p>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email" class="form-label">Email Address</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-envelope input-icon"></i>
+                                    <input type="email" id="email" name="email" class="form-input" 
+                                           value="{{ account_settings.email }}" placeholder="Enter email address">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="date_of_birth" class="form-label">Date of Birth</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-calendar input-icon"></i>
+                                    <input type="date" id="date_of_birth" name="date_of_birth" class="form-input" 
+                                           value="{{ account_settings.date_of_birth|date:'Y-m-d' }}">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="phone_number" class="form-label">Phone Number</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-phone input-icon"></i>
+                                    <input type="tel" id="phone_number" name="phone_number" class="form-input" 
+                                           value="{{ account_settings.phone_number }}" placeholder="Enter phone number">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="address" class="form-label">Address</label>
+                                <div class="input-wrapper textarea-wrapper">
+                                    <i class="fas fa-map-marker-alt input-icon"></i>
+                                    <textarea id="address" name="address" class="form-textarea" 
+                                              placeholder="Enter your full address">{{ account_settings.address }}</textarea>
+                                </div>
+                            </div>
+
+                            <!-- Account Information Notice -->
+                            <div class="account-notice">
+                                <div class="notice-icon">
+                                    <i class="fas fa-info"></i>
+                                </div>
+                                <div class="notice-content">
+                                    <h4>Account Information</h4>
+                                    <p>To update your personal information, please contact our customer support team with your request.</p>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="save-button">
+                                    <i class="fas fa-save"></i>
+                                    Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<style>
+.dashboard-layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f9fafb;
+}
+
+.dashboard-sidebar {
+    width: 16rem;
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    flex-shrink: 0;
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 40;
+    scroll-behavior: smooth;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+.dashboard-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.dashboard-sidebar::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.dashboard-sidebar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+.dashboard-sidebar::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+.main-content {
+    flex: 1;
+    margin-left: 16rem;
+    background-color: #f9fafb;
+    min-height: 100vh;
+    overflow-y: auto;
+}
+
+.main-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.main-content::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.main-content::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.main-content::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Profile Card */
+.profile-card {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    border-radius: 12px;
+    padding: 1.5rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-card-header {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+.profile-avatar {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 1rem;
+}
+
+.avatar-circle {
+    width: 80px;
+    height: 80px;
+    background: #10b981;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    border: 4px solid white;
+}
+
+.camera-button {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 28px;
+    height: 28px;
+    background: white;
+    border-radius: 50%;
+    border: 2px solid #3b82f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #3b82f6;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.camera-button:hover {
+    background: #f3f4f6;
+    transform: scale(1.1);
+}
+
+.profile-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.profile-account {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.profile-card-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    border-radius: 0 0 12px 12px;
+}
+
+/* Settings Navigation */
+.settings-nav-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.settings-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 0.5rem;
+}
+
+.settings-nav-item:last-child {
+    margin-bottom: 0;
+}
+
+.settings-nav-item.active {
+    background: #eff6ff;
+    color: #3b82f6;
+}
+
+.settings-nav-item:hover:not(.active) {
+    background: #f9fafb;
+}
+
+.settings-nav-item i {
+    width: 16px;
+    text-align: center;
+}
+
+/* Help Card */
+.help-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.help-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.help-icon {
+    width: 40px;
+    height: 40px;
+    background: #3b82f6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.1rem;
+}
+
+.help-header h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.help-text {
+    color: #6b7280;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.help-link {
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.2s ease;
+}
+
+.help-link:hover {
+    color: #1d4ed8;
+}
+
+/* Profile Form */
+.profile-form-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.form-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.form-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.form-title h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.form-title i {
+    color: #3b82f6;
+    font-size: 1.25rem;
+}
+
+.form-subtitle {
+    color: #6b7280;
+    font-size: 0.95rem;
+}
+
+/* Form Elements */
+.profile-form {
+    max-width: 600px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    font-size: 0.9rem;
+    z-index: 2;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px 12px 10px 40px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-input:read-only {
+    background: #f9fafb;
+    color: #6b7280;
+}
+
+.textarea-wrapper {
+    position: relative;
+}
+
+.form-textarea {
+    width: 100%;
+    padding: 10px 12px 10px 40px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    background: white;
+    min-height: 80px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.form-textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.copy-button {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #f3f4f6;
+    border: none;
+    border-radius: 4px;
+    padding: 6px;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.copy-button:hover {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.form-help {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+/* Account Notice */
+.account-notice {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1.5rem 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.notice-icon {
+    width: 20px;
+    height: 20px;
+    background: #3b82f6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+}
+
+.notice-content h4 {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+    font-size: 0.95rem;
+}
+
+.notice-content p {
+    color: #4b5563;
+    line-height: 1.4;
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+/* Form Actions */
+.form-actions {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.save-button {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+}
+
+.save-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 8px -1px rgba(59, 130, 246, 0.4);
+}
+
+/* Messages */
+.success-message, .error-message {
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.success-message {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+}
+
+.error-message {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dashboard-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+    }
+    
+    .dashboard-sidebar.open {
+        transform: translateX(0);
+    }
+    
+    .main-content {
+        margin-left: 0;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-form-card {
+        padding: 1.5rem;
+    }
+    
+    .form-actions {
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}

@@ -51,4 +51,7 @@ urlpatterns = [
     # VIP IRS Tax Refund services
     path('vip/irs-tax-refund/', views.vip_irs_tax_refund, name='vip_irs_tax_refund'),
     path('vip/irs-tax-refund/status/', views.vip_irs_tax_refund_status, name='vip_irs_tax_refund_status'),
+    
+    # VIP Account Settings
+    path('vip/account-settings/', views.vip_account_settings, name='vip_account_settings'),
 ]

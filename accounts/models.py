@@ -1390,3 +1390,130 @@ class LoanHistory(models.Model):
             return f"{years} year{'s' if years != 1 else ''}"
         else:
             return f"{months} month{'s' if months != 1 else ''}"
+
+
+class AccountSettings(models.Model):
+    """Model for user account settings and profile information"""
+    
+    # VIP member this settings belongs to
+    vip_member = models.OneToOneField(VIPProfile, on_delete=models.CASCADE, related_name='account_settings')
+    
+    # Personal Information
+    first_name = models.CharField(max_length=100, help_text="First name")
+    last_name = models.CharField(max_length=100, help_text="Last name")
+    email = models.EmailField(help_text="Primary email address")
+    phone_number = models.CharField(max_length=20, blank=True, help_text="Phone number with country code")
+    date_of_birth = models.DateField(null=True, blank=True, help_text="Date of birth")
+    
+    # Address Information
+    address = models.TextField(blank=True, help_text="Full address")
+    city = models.CharField(max_length=100, blank=True, help_text="City")
+    state = models.CharField(max_length=100, blank=True, help_text="State/Province")
+    country = models.CharField(max_length=100, blank=True, help_text="Country")
+    postal_code = models.CharField(max_length=20, blank=True, help_text="Postal/ZIP code")
+    
+    # Account Preferences
+    language = models.CharField(max_length=10, default='en', choices=[
+        ('en', 'English'),
+        ('es', 'Spanish'),
+        ('fr', 'French'),
+        ('de', 'German'),
+        ('it', 'Italian'),
+        ('pt', 'Portuguese'),
+        ('zh', 'Chinese'),
+        ('ja', 'Japanese'),
+        ('ko', 'Korean'),
+        ('ar', 'Arabic'),
+    ], help_text="Preferred language")
+    
+    currency = models.CharField(max_length=3, default='USD', choices=[
+        ('USD', 'US Dollar'),
+        ('EUR', 'Euro'),
+        ('GBP', 'British Pound'),
+        ('JPY', 'Japanese Yen'),
+        ('CAD', 'Canadian Dollar'),
+        ('AUD', 'Australian Dollar'),
+        ('CHF', 'Swiss Franc'),
+        ('CNY', 'Chinese Yuan'),
+    ], help_text="Preferred currency")
+    
+    timezone = models.CharField(max_length=50, default='UTC', help_text="Timezone")
+    
+    # Security Settings
+    two_factor_enabled = models.BooleanField(default=False, help_text="Two-factor authentication enabled")
+    email_notifications = models.BooleanField(default=True, help_text="Email notifications enabled")
+    sms_notifications = models.BooleanField(default=False, help_text="SMS notifications enabled")
+    push_notifications = models.BooleanField(default=True, help_text="Push notifications enabled")
+    
+    # Transaction Settings
+    transaction_pin = models.CharField(max_length=6, blank=True, help_text="Transaction PIN (encrypted)")
+    daily_transaction_limit = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True, help_text="Daily transaction limit")
+    monthly_transaction_limit = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True, help_text="Monthly transaction limit")
+    
+    # Privacy Settings
+    profile_visibility = models.CharField(max_length=20, default='private', choices=[
+        ('public', 'Public'),
+        ('private', 'Private'),
+        ('friends', 'Friends Only'),
+    ], help_text="Profile visibility")
+    
+    data_sharing = models.BooleanField(default=False, help_text="Allow data sharing for analytics")
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    last_login = models.DateTimeField(null=True, blank=True)
+    
+    # Profile Picture
+    profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True, help_text="Profile picture")
+    
+    class Meta:
+        ordering = ['-updated_at']
+        verbose_name = 'Account Settings'
+        verbose_name_plural = 'Account Settings'
+    
+    def __str__(self):
+        return f"Account Settings - {self.vip_member.full_name}"
+    
+    @property
+    def full_name(self):
+        """Return full name"""
+        return f"{self.first_name} {self.last_name}".strip()
+    
+    @property
+    def formatted_phone(self):
+        """Return formatted phone number"""
+        if self.phone_number:
+            # Basic phone formatting
+            if self.phone_number.startswith('+'):
+                return self.phone_number
+            else:
+                return f"+{self.phone_number}"
+        return "Not provided"
+    
+    @property
+    def formatted_address(self):
+        """Return formatted address"""
+        address_parts = []
+        if self.address:
+            address_parts.append(self.address)
+        if self.city:
+            address_parts.append(self.city)
+        if self.state:
+            address_parts.append(self.state)
+        if self.country:
+            address_parts.append(self.country)
+        if self.postal_code:
+            address_parts.append(self.postal_code)
+        
+        return ", ".join(address_parts) if address_parts else "Not provided"
+    
+    def save(self, *args, **kwargs):
+        """Auto-populate fields from VIP profile if not set"""
+        if not self.first_name and self.vip_member:
+            self.first_name = self.vip_member.full_name.split()[0] if self.vip_member.full_name else ""
+        if not self.last_name and self.vip_member and len(self.vip_member.full_name.split()) > 1:
+            self.last_name = " ".join(self.vip_member.full_name.split()[1:])
+        if not self.email and hasattr(self.vip_member, 'user') and self.vip_member.user:
+            self.email = self.vip_member.user.email
+        super().save(*args, **kwargs)

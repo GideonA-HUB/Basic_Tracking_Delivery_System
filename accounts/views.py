@@ -7,7 +7,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
 from .forms import StaffLoginForm, StaffRegistrationForm, CustomerRegistrationForm, CustomerLoginForm, VIPLoginForm, CardApplicationForm, LocalTransferForm, InternationalTransferForm, WireTransferForm, CryptocurrencyForm, PayPalForm, WiseTransferForm, CashAppForm, SkrillForm, VenmoForm, ZelleForm, RevolutForm, AlipayForm, WeChatPayForm, DepositForm, LoanApplicationForm, IRSTaxRefundForm
-from .models import StaffProfile, CustomerProfile, VIPProfile, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund, LoanHistory
+from .models import StaffProfile, CustomerProfile, VIPProfile, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund, LoanHistory, AccountSettings
 
 
 def is_staff_user(user):
@@ -1208,3 +1208,58 @@ def vip_loan_history(request):
     }
     
     return render(request, 'accounts/vip_loan_history.html', context)
+
+
+@login_required
+def vip_account_settings(request):
+    """Account Settings page"""
+    if not hasattr(request.user, 'vip_profile'):
+        messages.error(request, 'Access denied. VIP membership required.')
+        return redirect('accounts:vip_dashboard')
+    
+    vip_profile = request.user.vip_profile
+    
+    # Get or create account settings
+    account_settings, created = AccountSettings.objects.get_or_create(
+        vip_member=vip_profile,
+        defaults={
+            'first_name': vip_profile.full_name.split()[0] if vip_profile.full_name else "",
+            'last_name': " ".join(vip_profile.full_name.split()[1:]) if vip_profile.full_name and len(vip_profile.full_name.split()) > 1 else "",
+            'email': request.user.email if request.user.email else "",
+        }
+    )
+    
+    if request.method == 'POST':
+        # Handle form submission
+        first_name = request.POST.get('first_name', '')
+        last_name = request.POST.get('last_name', '')
+        email = request.POST.get('email', '')
+        phone_number = request.POST.get('phone_number', '')
+        date_of_birth = request.POST.get('date_of_birth', '')
+        address = request.POST.get('address', '')
+        
+        # Update account settings
+        account_settings.first_name = first_name
+        account_settings.last_name = last_name
+        account_settings.email = email
+        account_settings.phone_number = phone_number
+        
+        if date_of_birth:
+            try:
+                from datetime import datetime
+                account_settings.date_of_birth = datetime.strptime(date_of_birth, '%Y-%m-%d').date()
+            except ValueError:
+                pass
+        
+        account_settings.address = address
+        account_settings.save()
+        
+        messages.success(request, 'Your account settings have been updated successfully!')
+        return redirect('accounts:vip_account_settings')
+    
+    context = {
+        'vip_profile': vip_profile,
+        'account_settings': account_settings,
+    }
+    
+    return render(request, 'accounts/vip_account_settings.html', context)
