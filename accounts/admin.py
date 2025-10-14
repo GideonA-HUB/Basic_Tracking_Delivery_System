@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
-from .models import StaffProfile, CustomerProfile, VIPProfile, RecentActivity, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund
+from django.utils import timezone
+from .models import StaffProfile, CustomerProfile, VIPProfile, RecentActivity, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund, LoanHistory
 
 
 class StaffProfileInline(admin.StackedInline):
@@ -939,5 +940,75 @@ class IRSTaxRefundAdmin(admin.ModelAdmin):
         """Display masked ID.me email for security"""
         return obj.masked_idme_email
     masked_idme_email.short_description = 'ID.me Email (Masked)'
+
+
+@admin.register(LoanHistory)
+class LoanHistoryAdmin(admin.ModelAdmin):
+    """Admin interface for Loan History"""
+    
+    list_display = [
+        'reference_number', 'vip_member', 'loan_type', 'amount', 
+        'purpose', 'duration_months', 'status', 'date_applied'
+    ]
+    
+    list_filter = [
+        'status', 'loan_type', 'purpose', 'date_applied', 
+        'duration_months', 'vip_member'
+    ]
+    
+    search_fields = [
+        'reference_number', 'vip_member__full_name', 
+        'vip_member__member_id', 'purpose', 'loan_type'
+    ]
+    
+    readonly_fields = [
+        'reference_number', 'date_applied', 'updated_at'
+    ]
+    
+    fieldsets = (
+        ('Loan Information', {
+            'fields': (
+                'vip_member', 'reference_number', 'loan_type', 
+                'amount', 'purpose', 'duration_months'
+            )
+        }),
+        ('Status & Processing', {
+            'fields': (
+                'status', 'interest_rate', 'monthly_payment',
+                'approved_at', 'disbursed_at', 'completed_at'
+            )
+        }),
+        ('Timestamps', {
+            'fields': ('date_applied', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+        ('Admin Notes', {
+            'fields': ('admin_notes',),
+            'classes': ('collapse',)
+        })
+    )
+    
+    list_per_page = 25
+    date_hierarchy = 'date_applied'
+    
+    actions = ['mark_as_approved', 'mark_as_rejected', 'mark_as_disbursed']
+    
+    def mark_as_approved(self, request, queryset):
+        """Mark selected loans as approved"""
+        updated = queryset.update(status='approved', approved_at=timezone.now())
+        self.message_user(request, f'{updated} loan(s) marked as approved.')
+    mark_as_approved.short_description = 'Mark selected loans as approved'
+    
+    def mark_as_rejected(self, request, queryset):
+        """Mark selected loans as rejected"""
+        updated = queryset.update(status='rejected')
+        self.message_user(request, f'{updated} loan(s) marked as rejected.')
+    mark_as_rejected.short_description = 'Mark selected loans as rejected'
+    
+    def mark_as_disbursed(self, request, queryset):
+        """Mark selected loans as disbursed"""
+        updated = queryset.update(status='disbursed', disbursed_at=timezone.now())
+        self.message_user(request, f'{updated} loan(s) marked as disbursed.')
+    mark_as_disbursed.short_description = 'Mark selected loans as disbursed'
 
 

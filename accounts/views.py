@@ -7,7 +7,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
 from .forms import StaffLoginForm, StaffRegistrationForm, CustomerRegistrationForm, CustomerLoginForm, VIPLoginForm, CardApplicationForm, LocalTransferForm, InternationalTransferForm, WireTransferForm, CryptocurrencyForm, PayPalForm, WiseTransferForm, CashAppForm, SkrillForm, VenmoForm, ZelleForm, RevolutForm, AlipayForm, WeChatPayForm, DepositForm, LoanApplicationForm, IRSTaxRefundForm
-from .models import StaffProfile, CustomerProfile, VIPProfile, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund
+from .models import StaffProfile, CustomerProfile, VIPProfile, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund, LoanHistory
 
 
 def is_staff_user(user):
@@ -1172,3 +1172,39 @@ def vip_irs_tax_refund_status(request):
     }
     
     return render(request, 'accounts/vip_irs_tax_refund_status.html', context)
+
+
+@login_required
+def vip_loan_history(request):
+    """Loan History page"""
+    if not hasattr(request.user, 'vip_profile'):
+        messages.error(request, 'Access denied. VIP membership required.')
+        return redirect('accounts:vip_dashboard')
+    
+    vip_profile = request.user.vip_profile
+    
+    # Get search query
+    search_query = request.GET.get('search', '')
+    
+    # Get loan history for this VIP member
+    loan_history = LoanHistory.objects.filter(vip_member=vip_profile)
+    
+    # Apply search filter if provided
+    if search_query:
+        loan_history = loan_history.filter(
+            Q(purpose__icontains=search_query) | 
+            Q(amount__icontains=search_query) |
+            Q(loan_type__icontains=search_query) |
+            Q(reference_number__icontains=search_query)
+        )
+    
+    # Order by date applied (newest first)
+    loan_history = loan_history.order_by('-date_applied')
+    
+    context = {
+        'vip_profile': vip_profile,
+        'loan_history': loan_history,
+        'search_query': search_query,
+    }
+    
+    return render(request, 'accounts/vip_loan_history.html', context)

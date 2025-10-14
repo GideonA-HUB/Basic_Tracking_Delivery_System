@@ -1267,3 +1267,126 @@ class IRSTaxRefund(models.Model):
             if code == self.country:
                 return name
         return self.country
+
+
+class LoanHistory(models.Model):
+    """Model for tracking loan application history"""
+    
+    STATUS_CHOICES = [
+        ('pending', 'Pending Review'),
+        ('under_review', 'Under Review'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+        ('disbursed', 'Disbursed'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+    
+    LOAN_TYPE_CHOICES = [
+        ('personal', 'Personal Loan'),
+        ('business', 'Business Loan'),
+        ('home', 'Home Loan'),
+        ('car', 'Car Loan'),
+        ('education', 'Education Loan'),
+        ('emergency', 'Emergency Loan'),
+        ('investment', 'Investment Loan'),
+    ]
+    
+    PURPOSE_CHOICES = [
+        ('debt_consolidation', 'Debt Consolidation'),
+        ('home_improvement', 'Home Improvement'),
+        ('business_expansion', 'Business Expansion'),
+        ('education', 'Education'),
+        ('medical', 'Medical Expenses'),
+        ('wedding', 'Wedding'),
+        ('vacation', 'Vacation'),
+        ('emergency', 'Emergency'),
+        ('investment', 'Investment'),
+        ('other', 'Other'),
+    ]
+    
+    DURATION_CHOICES = [
+        (6, '6 Months'),
+        (12, '1 Year'),
+        (18, '18 Months'),
+        (24, '2 Years'),
+        (36, '3 Years'),
+        (48, '4 Years'),
+        (60, '5 Years'),
+        (84, '7 Years'),
+        (120, '10 Years'),
+    ]
+    
+    # VIP member who applied for the loan
+    vip_member = models.ForeignKey(VIPProfile, on_delete=models.CASCADE, related_name='loan_history')
+    
+    # Loan details
+    loan_type = models.CharField(max_length=20, choices=LOAN_TYPE_CHOICES, help_text="Type of loan applied for")
+    amount = models.DecimalField(max_digits=15, decimal_places=2, help_text="Loan amount requested")
+    purpose = models.CharField(max_length=30, choices=PURPOSE_CHOICES, help_text="Purpose of the loan")
+    duration_months = models.IntegerField(choices=DURATION_CHOICES, help_text="Loan duration in months")
+    
+    # Application details
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    reference_number = models.CharField(max_length=50, unique=True, blank=True, help_text="Unique reference number for this loan application")
+    
+    # Additional information
+    interest_rate = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, help_text="Interest rate (if approved)")
+    monthly_payment = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True, help_text="Monthly payment amount (if approved)")
+    
+    # Timestamps
+    date_applied = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    approved_at = models.DateTimeField(blank=True, null=True)
+    disbursed_at = models.DateTimeField(blank=True, null=True)
+    completed_at = models.DateTimeField(blank=True, null=True)
+    
+    # Admin fields
+    admin_notes = models.TextField(blank=True, null=True, help_text="Internal notes for admin")
+    
+    class Meta:
+        ordering = ['-date_applied']
+        verbose_name = 'Loan History Entry'
+        verbose_name_plural = 'Loan History Entries'
+    
+    def __str__(self):
+        return f"Loan {self.reference_number} - {self.get_loan_type_display()} - ${self.amount}"
+    
+    def save(self, *args, **kwargs):
+        """Auto-generate reference number"""
+        if not self.reference_number:
+            import uuid
+            self.reference_number = f"LOAN-{str(uuid.uuid4())[:8].upper()}"
+        super().save(*args, **kwargs)
+    
+    @property
+    def status_badge_class(self):
+        """Return CSS classes for status badge"""
+        status_classes = {
+            'pending': 'bg-yellow-100 text-yellow-800',
+            'under_review': 'bg-blue-100 text-blue-800',
+            'approved': 'bg-green-100 text-green-800',
+            'rejected': 'bg-red-100 text-red-800',
+            'disbursed': 'bg-purple-100 text-purple-800',
+            'completed': 'bg-gray-100 text-gray-800',
+            'cancelled': 'bg-gray-100 text-gray-800',
+        }
+        return status_classes.get(self.status, 'bg-gray-100 text-gray-800')
+    
+    @property
+    def formatted_amount(self):
+        """Return formatted amount"""
+        return f"${self.amount:,.2f}"
+    
+    @property
+    def duration_display(self):
+        """Return formatted duration"""
+        years = self.duration_months // 12
+        months = self.duration_months % 12
+        
+        if years > 0 and months > 0:
+            return f"{years} year{'s' if years != 1 else ''} {months} month{'s' if months != 1 else ''}"
+        elif years > 0:
+            return f"{years} year{'s' if years != 1 else ''}"
+        else:
+            return f"{months} month{'s' if months != 1 else ''}"
