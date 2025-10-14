@@ -854,11 +854,8 @@ class DepositForm(forms.ModelForm):
     
     class Meta:
         model = Deposit
-        fields = ['deposit_method', 'amount', 'currency', 'notes']
+        fields = ['amount', 'currency', 'notes']
         widgets = {
-            'deposit_method': forms.RadioSelect(attrs={
-                'class': 'deposit-method-radio'
-            }),
             'amount': forms.NumberInput(attrs={
                 'class': 'form-control amount-input',
                 'min': '1.00',
@@ -879,12 +876,6 @@ class DepositForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['currency'].choices = [('USD', 'USD'), ('EUR', 'EUR'), ('GBP', 'GBP')]
         self.fields['notes'].required = False
-        
-        # Customize the radio select widget for deposit methods
-        self.fields['deposit_method'].widget.attrs.update({
-            'class': 'deposit-method-radio',
-            'style': 'display: none;'  # Hide default radio styling
-        })
     
     def clean_amount(self):
         amount = self.cleaned_data.get('amount')

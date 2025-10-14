@@ -418,10 +418,13 @@ def vip_deposit(request):
         
         if request.method == 'POST':
             form = DepositForm(request.POST)
-            if form.is_valid():
+            deposit_method = request.POST.get('deposit_method')
+            
+            if form.is_valid() and deposit_method:
                 # Create the deposit
                 deposit = form.save(commit=False)
                 deposit.vip_member = vip_profile
+                deposit.deposit_method = deposit_method
                 deposit.status = 'pending'
                 
                 # Update VIP member's balance (in a real app, this would be done after payment confirmation)
@@ -431,6 +434,8 @@ def vip_deposit(request):
                 messages.success(request, f'Deposit request submitted successfully! Reference: {deposit.reference_number}')
                 return redirect('accounts:vip_dashboard')
             else:
+                if not deposit_method:
+                    messages.error(request, 'Please select a deposit method.')
                 messages.error(request, 'Please correct the errors below.')
         else:
             form = DepositForm()

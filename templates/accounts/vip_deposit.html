@@ -265,6 +265,7 @@
         align-items: center;
         gap: 1rem;
         position: relative;
+        height: 100px;
     }
 
     html.dark .deposit-method-card {
@@ -322,6 +323,8 @@
         font-size: 1rem;
         font-weight: 600;
         color: #1f2937;
+        text-align: center;
+        margin: 0;
     }
 
     html.dark .deposit-method-card .method-name {
@@ -337,6 +340,7 @@
         align-items: center;
         justify-content: center;
         transition: all 0.2s ease-in-out;
+        flex-shrink: 0;
     }
 
     .deposit-method-card.selected .radio-wrapper {
@@ -375,8 +379,17 @@
     }
 
     .amount-input-container {
-        position: relative;
         margin-bottom: 1.5rem;
+    }
+
+    .amount-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        border: 2px solid #e5e7eb;
+        border-radius: 0.75rem;
+        background-color: #ffffff;
+        overflow: hidden;
     }
 
     .amount-input {
@@ -384,21 +397,24 @@
         padding: 1rem 3rem 1rem 2.5rem;
         font-size: 1.5rem;
         font-weight: 600;
-        border: 2px solid #e5e7eb;
-        border-radius: 0.75rem;
-        background-color: #ffffff;
+        border: none;
+        background-color: transparent;
         color: #1f2937;
         transition: all 0.2s ease-in-out;
+        outline: none;
+    }
+
+    html.dark .amount-input-wrapper {
+        background-color: #4b5563 !important;
+        border-color: #6b7280 !important;
     }
 
     html.dark .amount-input {
-        background-color: #4b5563 !important;
-        border-color: #6b7280 !important;
+        background-color: transparent !important;
         color: #e5e7eb !important;
     }
 
-    .amount-input:focus {
-        outline: none;
+    .amount-input-wrapper:focus-within {
         border-color: #3b82f6;
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
@@ -407,33 +423,31 @@
         color: #9ca3af;
     }
 
-    .amount-input .currency-symbol {
+    .amount-input-wrapper .currency-symbol {
         position: absolute;
         left: 1rem;
-        top: 50%;
-        transform: translateY(-50%);
         font-size: 1.5rem;
         font-weight: 600;
         color: #6b7280;
         pointer-events: none;
+        z-index: 1;
     }
 
-    html.dark .amount-input .currency-symbol {
+    html.dark .amount-input-wrapper .currency-symbol {
         color: #9ca3af !important;
     }
 
-    .amount-suffix {
+    .amount-input-wrapper .amount-suffix {
         position: absolute;
         right: 1rem;
-        top: 50%;
-        transform: translateY(-50%);
         font-size: 1.5rem;
         font-weight: 600;
         color: #6b7280;
         pointer-events: none;
+        z-index: 1;
     }
 
-    html.dark .amount-suffix {
+    html.dark .amount-input-wrapper .amount-suffix {
         color: #9ca3af !important;
     }
 
@@ -824,9 +838,8 @@
                                         <i class="fas fa-wallet"></i>
                                     </div>
                                     <div class="method-name">USDT</div>
-                                    <div class="radio-wrapper">
-                                        {{ form.deposit_method.0 }}
-                                    </div>
+                                    <div class="radio-wrapper"></div>
+                                    <input type="radio" name="deposit_method" value="usdt" id="id_deposit_method_0" style="display: none;">
                                 </div>
 
                                 <!-- Bank Transfer -->
@@ -835,9 +848,8 @@
                                         <i class="fas fa-university"></i>
                                     </div>
                                     <div class="method-name">Bank Transfer</div>
-                                    <div class="radio-wrapper">
-                                        {{ form.deposit_method.1 }}
-                                    </div>
+                                    <div class="radio-wrapper"></div>
+                                    <input type="radio" name="deposit_method" value="bank_transfer" id="id_deposit_method_1" style="display: none;">
                                 </div>
 
                                 <!-- PayPal -->
@@ -846,9 +858,8 @@
                                         <i class="fab fa-paypal"></i>
                                     </div>
                                     <div class="method-name">PayPal</div>
-                                    <div class="radio-wrapper">
-                                        {{ form.deposit_method.2 }}
-                                    </div>
+                                    <div class="radio-wrapper"></div>
+                                    <input type="radio" name="deposit_method" value="paypal" id="id_deposit_method_2" style="display: none;">
                                 </div>
 
                                 <!-- Bitcoin -->
@@ -857,16 +868,10 @@
                                         <i class="fab fa-bitcoin"></i>
                                     </div>
                                     <div class="method-name">Bitcoin</div>
-                                    <div class="radio-wrapper">
-                                        {{ form.deposit_method.3 }}
-                                    </div>
+                                    <div class="radio-wrapper"></div>
+                                    <input type="radio" name="deposit_method" value="bitcoin" id="id_deposit_method_3" style="display: none;">
                                 </div>
                             </div>
-                            
-                            <!-- Hidden radio inputs for form submission -->
-                            {% for choice in form.deposit_method %}
-                                <div style="display: none;">{{ choice }}</div>
-                            {% endfor %}
                             
                             {% if form.deposit_method.errors %}
                                 <div class="form-error">
@@ -881,9 +886,11 @@
                         <div class="amount-section">
                             <h2>Deposit Amount</h2>
                             <div class="amount-input-container">
-                                <span class="currency-symbol">$</span>
-                                {{ form.amount }}
-                                <span class="amount-suffix">.00</span>
+                                <div class="amount-input-wrapper">
+                                    <span class="currency-symbol">$</span>
+                                    <input type="number" name="amount" step="0.01" min="1.00" class="amount-input" id="id_amount" placeholder="0.00">
+                                    <span class="amount-suffix">.00</span>
+                                </div>
                             </div>
                             {% if form.amount.errors %}
                                 <div class="form-error">
@@ -900,6 +907,10 @@
                                 <button type="button" class="quick-amount-btn" onclick="setAmount(5000)">$5000</button>
                                 <button type="button" class="quick-amount-btn" onclick="setAmount(10000)">$10000</button>
                             </div>
+                            
+                            <!-- Hidden fields for currency and notes -->
+                            <input type="hidden" name="currency" value="USD">
+                            <input type="hidden" name="notes" value="">
                         </div>
 
                         <!-- Action Buttons -->
@@ -949,7 +960,7 @@
     }
 
     function setAmount(amount) {
-        const amountInput = document.getElementById('{{ form.amount.id_for_label }}');
+        const amountInput = document.getElementById('id_amount');
         if (amountInput) {
             amountInput.value = amount.toFixed(2);
         }
@@ -958,7 +969,7 @@
     // Form validation
     document.getElementById('depositForm').addEventListener('submit', function(e) {
         const selectedMethod = document.querySelector('input[name="deposit_method"]:checked');
-        const amount = document.getElementById('{{ form.amount.id_for_label }}').value;
+        const amount = document.getElementById('id_amount').value;
         
         if (!selectedMethod) {
             e.preventDefault();
