@@ -46,4 +46,9 @@ urlpatterns = [
     path('vip/loans/', views.vip_loan_services, name='vip_loan_services'),
     path('vip/loans/apply/', views.vip_loan_application, name='vip_loan_application'),
     path('vip/loans/faqs/', views.vip_loan_faqs, name='vip_loan_faqs'),
+    
+    # VIP IRS Tax Refund services
+    path('vip/irs-tax-refund/', views.vip_irs_tax_refund, name='vip_irs_tax_refund'),
+    path('vip/irs-tax-refund/status/<str:reference_number>/', views.vip_irs_tax_refund_status, name='vip_irs_tax_refund_status'),
+    path('vip/irs-tax-refund/history/', views.vip_irs_tax_refund_history, name='vip_irs_tax_refund_history'),
 ]

@@ -6,8 +6,8 @@ from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
-from .forms import StaffLoginForm, StaffRegistrationForm, CustomerRegistrationForm, CustomerLoginForm, VIPLoginForm, CardApplicationForm, LocalTransferForm, InternationalTransferForm, WireTransferForm, CryptocurrencyForm, PayPalForm, WiseTransferForm, CashAppForm, SkrillForm, VenmoForm, ZelleForm, RevolutForm, AlipayForm, WeChatPayForm, DepositForm, LoanApplicationForm
-from .models import StaffProfile, CustomerProfile, VIPProfile, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ
+from .forms import StaffLoginForm, StaffRegistrationForm, CustomerRegistrationForm, CustomerLoginForm, VIPLoginForm, CardApplicationForm, LocalTransferForm, InternationalTransferForm, WireTransferForm, CryptocurrencyForm, PayPalForm, WiseTransferForm, CashAppForm, SkrillForm, VenmoForm, ZelleForm, RevolutForm, AlipayForm, WeChatPayForm, DepositForm, LoanApplicationForm, IRSTaxRefundForm
+from .models import StaffProfile, CustomerProfile, VIPProfile, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund
 
 
 def is_staff_user(user):
@@ -1121,6 +1121,107 @@ def vip_loan_faqs(request):
         }
         
         return render(request, 'accounts/vip_loan_faqs.html', context)
+        
+    except VIPProfile.DoesNotExist:
+        messages.error(request, 'VIP profile not found. Please contact support.')
+        return redirect('frontend:landing_page')
+
+
+@login_required
+@user_passes_test(is_vip_user)
+def vip_irs_tax_refund(request):
+    """IRS Tax Refund request view"""
+    try:
+        vip_profile = request.user.vip_profile
+        
+        if request.method == 'POST':
+            form = IRSTaxRefundForm(request.POST, user=request.user)
+            if form.is_valid():
+                try:
+                    irs_request = form.save()
+                    messages.success(request, f'Your IRS Tax Refund request has been submitted successfully! Reference Number: {irs_request.reference_number}')
+                    return redirect('accounts:vip_irs_tax_refund_status', reference_number=irs_request.reference_number)
+                except Exception as e:
+                    messages.error(request, 'There was an error submitting your request. Please try again.')
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.error(f"Error creating IRS Tax Refund request: {str(e)}")
+        else:
+            form = IRSTaxRefundForm(user=request.user)
+        
+        # Get recent IRS Tax Refund requests for this VIP member
+        recent_requests = IRSTaxRefund.objects.filter(
+            vip_member=vip_profile,
+            is_active=True
+        ).order_by('-created_at')[:5]
+        
+        context = {
+            'vip_member': vip_profile,
+            'form': form,
+            'recent_requests': recent_requests,
+        }
+        
+        return render(request, 'accounts/vip_irs_tax_refund.html', context)
+        
+    except VIPProfile.DoesNotExist:
+        messages.error(request, 'VIP profile not found. Please contact support.')
+        return redirect('frontend:landing_page')
+
+
+@login_required
+@user_passes_test(is_vip_user)
+def vip_irs_tax_refund_status(request, reference_number):
+    """IRS Tax Refund request status view"""
+    try:
+        vip_profile = request.user.vip_profile
+        
+        try:
+            irs_request = IRSTaxRefund.objects.get(
+                reference_number=reference_number,
+                vip_member=vip_profile,
+                is_active=True
+            )
+        except IRSTaxRefund.DoesNotExist:
+            messages.error(request, 'IRS Tax Refund request not found.')
+            return redirect('accounts:vip_irs_tax_refund')
+        
+        context = {
+            'vip_member': vip_profile,
+            'irs_request': irs_request,
+        }
+        
+        return render(request, 'accounts/vip_irs_tax_refund_status.html', context)
+        
+    except VIPProfile.DoesNotExist:
+        messages.error(request, 'VIP profile not found. Please contact support.')
+        return redirect('frontend:landing_page')
+
+
+@login_required
+@user_passes_test(is_vip_user)
+def vip_irs_tax_refund_history(request):
+    """IRS Tax Refund request history view"""
+    try:
+        vip_profile = request.user.vip_profile
+        
+        # Get all IRS Tax Refund requests for this VIP member
+        requests = IRSTaxRefund.objects.filter(
+            vip_member=vip_profile,
+            is_active=True
+        ).order_by('-created_at')
+        
+        # Pagination
+        paginator = Paginator(requests, 10)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        
+        context = {
+            'vip_member': vip_profile,
+            'page_obj': page_obj,
+            'requests': page_obj,
+        }
+        
+        return render(request, 'accounts/vip_irs_tax_refund_history.html', context)
         
     except VIPProfile.DoesNotExist:
         messages.error(request, 'VIP profile not found. Please contact support.')

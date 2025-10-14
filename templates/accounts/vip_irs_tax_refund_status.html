@@ -1,0 +1,742 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}IRS Tax Refund Status - {{ irs_request.reference_number }}{% endblock %}
+
+{% block extra_head %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<style>
+    /* FORCE FULL VIEWPORT - CRITICAL */
+    html, body {
+        width: 100vw !important;
+        height: 100vh !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow-x: hidden !important;
+        background: #F8FAFC !important;
+    }
+    
+    /* Override any existing styles */
+    * {
+        box-sizing: border-box !important;
+    }
+</style>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* CRITICAL OVERRIDE - FORCE LIGHT THEME FIRST */
+    html, body, * {
+        background: #F8FAFC !important;
+        color: #374151 !important;
+    }
+
+    /* Override dark theme completely */
+    .dark, .dark *, [class*="dark"] {
+        background: #F8FAFC !important;
+        color: #374151 !important;
+    }
+
+    /* Dashboard Layout - FORCE SIDE BY SIDE */
+    .dashboard-layout {
+        display: flex !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        background: #F8FAFC !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        z-index: 9999 !important;
+    }
+
+    .dashboard-sidebar {
+        width: 280px !important;
+        background: white !important;
+        border-right: 1px solid #e5e7eb !important;
+        padding: 2rem 1.5rem !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        position: relative !important;
+        height: 100vh !important;
+        z-index: 1 !important;
+        flex-shrink: 0 !important;
+    }
+
+    .dashboard-main {
+        background: #F8FAFC !important;
+        height: 100vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1 !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        position: relative !important;
+    }
+
+    .dashboard-header {
+        background: white !important;
+        border-bottom: 1px solid #e5e7eb !important;
+        padding: 1rem 2rem !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        width: 100% !important;
+    }
+
+    .dashboard-content {
+        flex: 1 !important;
+        padding: 2rem !important;
+        background: #F8FAFC !important;
+        max-width: 100% !important;
+        margin: 0 auto !important;
+    }
+
+    .dashboard-content > * {
+        margin-left: auto !important;
+        margin-right: auto !important;
+        max-width: 1200px !important;
+    }
+
+    /* Status specific styles */
+    .status-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .status-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        margin-bottom: 2rem;
+    }
+
+    .status-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .status-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 2rem;
+    }
+
+    .status-icon.pending {
+        background: #FEF3C7;
+        color: #92400E;
+    }
+
+    .status-icon.under-review {
+        background: #DBEAFE;
+        color: #1E40AF;
+    }
+
+    .status-icon.approved {
+        background: #D1FAE5;
+        color: #065F46;
+    }
+
+    .status-icon.rejected {
+        background: #FEE2E2;
+        color: #991B1B;
+    }
+
+    .status-icon.processing {
+        background: #E0E7FF;
+        color: #3730A3;
+    }
+
+    .status-icon.completed {
+        background: #F3F4F6;
+        color: #374151;
+    }
+
+    .status-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+
+    .status-subtitle {
+        font-size: 1rem;
+        color: #6B7280;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 2rem;
+    }
+
+    .status-badge.pending {
+        background: #FEF3C7;
+        color: #92400E;
+    }
+
+    .status-badge.under-review {
+        background: #DBEAFE;
+        color: #1E40AF;
+    }
+
+    .status-badge.approved {
+        background: #D1FAE5;
+        color: #065F46;
+    }
+
+    .status-badge.rejected {
+        background: #FEE2E2;
+        color: #991B1B;
+    }
+
+    .status-badge.processing {
+        background: #E0E7FF;
+        color: #3730A3;
+    }
+
+    .status-badge.completed {
+        background: #F3F4F6;
+        color: #374151;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-section {
+        background: #F9FAFB;
+        border-radius: 8px;
+        padding: 1.5rem;
+    }
+
+    .info-section h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #E5E7EB;
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-weight: 500;
+        color: #6B7280;
+    }
+
+    .info-value {
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .progress-steps {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    .progress-steps::before {
+        content: '';
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        right: 20px;
+        height: 2px;
+        background: #E5E7EB;
+        z-index: 1;
+    }
+
+    .progress-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+        flex: 1;
+    }
+
+    .progress-step-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+        background: #E5E7EB;
+        color: #9CA3AF;
+    }
+
+    .progress-step-icon.active {
+        background: #3498DB;
+        color: white;
+    }
+
+    .progress-step-icon.completed {
+        background: #10B981;
+        color: white;
+    }
+
+    .progress-step-label {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #6B7280;
+        text-align: center;
+    }
+
+    .progress-step-label.active {
+        color: #3498DB;
+        font-weight: 600;
+    }
+
+    .progress-step-label.completed {
+        color: #10B981;
+        font-weight: 600;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease-in-out;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn-primary {
+        background: #3498DB;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #2980b9;
+        transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+        background: #6B7280;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: #4B5563;
+        transform: translateY(-1px);
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        .dashboard-layout {
+            flex-direction: column !important;
+        }
+        
+        .dashboard-sidebar {
+            display: none !important;
+        }
+        
+        .dashboard-main {
+            width: 100vw !important;
+        }
+
+        .progress-steps {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .progress-steps::before {
+            display: none;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="dashboard-sidebar">
+        <div class="h-full flex flex-col">
+            <!-- User Profile Section -->
+            <div class="mb-8">
+                <div class="flex flex-col items-center text-center mb-4">
+                    <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-3">
+                        {{ user.first_name|first|upper }}
+                    </div>
+                    <h3 class="font-bold text-gray-900 text-lg">{{ vip_member.full_name }}</h3>
+                    <p class="text-sm text-gray-500">ID: {{ vip_member.member_id }}</p>
+                </div>
+                
+                <button class="w-full bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded-md transition-colors mb-3 flex items-center justify-center gap-2">
+                    <i class="fas fa-shield-alt"></i>
+                    Verify KYC
+                </button>
+                
+                <div class="flex items-center justify-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-md">
+                    <i class="fas fa-shield-alt"></i>
+                    <span class="text-sm font-medium">MERIDIAN VIP</span>
+                </div>
+            </div>
+
+            <!-- Navigation Menu -->
+            <nav class="flex-1 space-y-6">
+                <!-- Main Menu -->
+                <div>
+                    <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">MAIN MENU</h4>
+                    <div class="space-y-1">
+                        <a href="{% url 'accounts:vip_dashboard' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-home w-4"></i>
+                            Dashboard
+                        </a>
+                        <a href="{% url 'accounts:vip_transactions' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-exchange-alt w-4"></i>
+                            Transactions
+                        </a>
+                        <a href="{% url 'accounts:vip_cards' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-credit-card w-4"></i>
+                            Cards
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Transfers -->
+                <div>
+                    <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">TRANSFERS</h4>
+                    <div class="space-y-1">
+                        <a href="{% url 'accounts:vip_transfer_local' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-paper-plane w-4"></i>
+                            Local Transfer
+                        </a>
+                        <a href="{% url 'accounts:vip_transfer_international' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-globe w-4"></i>
+                            International Wire
+                        </a>
+                        <a href="{% url 'accounts:vip_deposit' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-plus w-4"></i>
+                            Deposit
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Services -->
+                <div>
+                    <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">SERVICES</h4>
+                    <div class="space-y-1">
+                        <a href="{% url 'accounts:vip_loan_services' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-hand-holding-usd w-4"></i>
+                            Loan Request
+                        </a>
+                        <a href="{% url 'accounts:vip_irs_tax_refund' %}" class="nav-item-active flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors">
+                            <i class="fas fa-receipt w-4"></i>
+                            IRS Tax Refund
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-history w-4"></i>
+                            Loan History
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Account -->
+                <div>
+                    <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">ACCOUNT</h4>
+                    <div class="space-y-1">
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-user w-4"></i>
+                            Account
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-cog w-4"></i>
+                            Settings
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-comment w-4"></i>
+                            Message us
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-building w-4"></i>
+                            Online Banking
+                        </a>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Footer -->
+            <div class="mt-auto pt-6 border-t border-gray-200">
+                <div class="text-xs text-gray-400 text-center">
+                    © 2025 Meridian Asset Logistics
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">M</span>
+                    </div>
+                    <span class="text-gray-900 font-semibold">Meridian Asset Logistics</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <button class="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-gray-900 transition-colors">
+                        <i class="fas fa-bell text-lg"></i>
+                        <span class="absolute -top-1 -right-1 w-5 h-5 bg-blue-600 text-white text-xs rounded-full flex items-center justify-center">3</span>
+                    </button>
+                </div>
+                <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                    <i class="fas fa-user text-gray-600"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <div class="status-container">
+                <!-- Status Header -->
+                <div class="status-card">
+                    <div class="status-header">
+                        <div class="status-icon {{ irs_request.status }}">
+                            {% if irs_request.status == 'pending' %}
+                                <i class="fas fa-clock"></i>
+                            {% elif irs_request.status == 'under_review' %}
+                                <i class="fas fa-search"></i>
+                            {% elif irs_request.status == 'approved' %}
+                                <i class="fas fa-check"></i>
+                            {% elif irs_request.status == 'rejected' %}
+                                <i class="fas fa-times"></i>
+                            {% elif irs_request.status == 'processing' %}
+                                <i class="fas fa-cog fa-spin"></i>
+                            {% elif irs_request.status == 'completed' %}
+                                <i class="fas fa-check-circle"></i>
+                            {% endif %}
+                        </div>
+                        <h1 class="status-title">{{ irs_request.get_status_display }}</h1>
+                        <p class="status-subtitle">Reference Number: {{ irs_request.reference_number }}</p>
+                        <div class="status-badge {{ irs_request.status }}">
+                            {{ irs_request.get_status_display }}
+                        </div>
+                    </div>
+
+                    <!-- Progress Steps -->
+                    <div class="progress-steps">
+                        <div class="progress-step">
+                            <div class="progress-step-icon {% if irs_request.status != 'pending' %}completed{% else %}active{% endif %}">
+                                <i class="fas fa-paper-plane"></i>
+                            </div>
+                            <div class="progress-step-label {% if irs_request.status != 'pending' %}completed{% else %}active{% endif %}">Submitted</div>
+                        </div>
+                        <div class="progress-step">
+                            <div class="progress-step-icon {% if irs_request.status == 'under_review' or irs_request.status == 'approved' or irs_request.status == 'processing' or irs_request.status == 'completed' %}active{% elif irs_request.status == 'rejected' %}active{% elif irs_request.status == 'approved' or irs_request.status == 'processing' or irs_request.status == 'completed' %}completed{% endif %}">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <div class="progress-step-label {% if irs_request.status == 'under_review' or irs_request.status == 'approved' or irs_request.status == 'processing' or irs_request.status == 'completed' %}active{% elif irs_request.status == 'rejected' %}active{% elif irs_request.status == 'approved' or irs_request.status == 'processing' or irs_request.status == 'completed' %}completed{% endif %}">Under Review</div>
+                        </div>
+                        <div class="progress-step">
+                            <div class="progress-step-icon {% if irs_request.status == 'approved' or irs_request.status == 'processing' or irs_request.status == 'completed' %}active{% elif irs_request.status == 'approved' or irs_request.status == 'processing' or irs_request.status == 'completed' %}completed{% endif %}">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="progress-step-label {% if irs_request.status == 'approved' or irs_request.status == 'processing' or irs_request.status == 'completed' %}active{% elif irs_request.status == 'approved' or irs_request.status == 'processing' or irs_request.status == 'completed' %}completed{% endif %}">Approved</div>
+                        </div>
+                        <div class="progress-step">
+                            <div class="progress-step-icon {% if irs_request.status == 'processing' %}active{% elif irs_request.status == 'completed' %}completed{% endif %}">
+                                <i class="fas fa-cog"></i>
+                            </div>
+                            <div class="progress-step-label {% if irs_request.status == 'processing' %}active{% elif irs_request.status == 'completed' %}completed{% endif %}">Processing</div>
+                        </div>
+                        <div class="progress-step">
+                            <div class="progress-step-icon {% if irs_request.status == 'completed' %}completed{% endif %}">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="progress-step-label {% if irs_request.status == 'completed' %}completed{% endif %}">Completed</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Request Information -->
+                <div class="info-grid">
+                    <div class="info-section">
+                        <h3>
+                            <i class="fas fa-user"></i>
+                            Personal Information
+                        </h3>
+                        <div class="info-item">
+                            <span class="info-label">Full Name</span>
+                            <span class="info-value">{{ irs_request.full_name }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">SSN</span>
+                            <span class="info-value">{{ irs_request.masked_ssn }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Country</span>
+                            <span class="info-value">{{ irs_request.country_display }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <h3>
+                            <i class="fas fa-calendar"></i>
+                            Request Details
+                        </h3>
+                        <div class="info-item">
+                            <span class="info-label">Tax Year</span>
+                            <span class="info-value">{{ irs_request.tax_year }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Expected Amount</span>
+                            <span class="info-value">{% if irs_request.expected_refund_amount %}${{ irs_request.expected_refund_amount|floatformat:2 }}{% else %}Not specified{% endif %}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Submitted</span>
+                            <span class="info-value">{{ irs_request.created_at|date:"M d, Y H:i" }}</span>
+                        </div>
+                    </div>
+
+                    {% if irs_request.processed_at %}
+                    <div class="info-section">
+                        <h3>
+                            <i class="fas fa-clock"></i>
+                            Processing Information
+                        </h3>
+                        <div class="info-item">
+                            <span class="info-label">Last Updated</span>
+                            <span class="info-value">{{ irs_request.updated_at|date:"M d, Y H:i" }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Processed At</span>
+                            <span class="info-value">{{ irs_request.processed_at|date:"M d, Y H:i" }}</span>
+                        </div>
+                        {% if irs_request.processed_by %}
+                        <div class="info-item">
+                            <span class="info-label">Processed By</span>
+                            <span class="info-value">{{ irs_request.processed_by.get_full_name }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <a href="{% url 'accounts:vip_irs_tax_refund' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        New Request
+                    </a>
+                    <a href="{% url 'accounts:vip_irs_tax_refund_history' %}" class="btn btn-secondary">
+                        <i class="fas fa-history"></i>
+                        View History
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // CRITICAL: Force layout immediately
+    document.addEventListener('DOMContentLoaded', function() {
+        // Force light theme
+        document.documentElement.className = 'light';
+        document.body.style.background = '#F8FAFC';
+        document.body.style.color = '#374151';
+        document.body.style.margin = '0';
+        document.body.style.padding = '0';
+        document.body.style.overflow = 'hidden';
+        
+        // Force layout with flexbox
+        const layout = document.querySelector('.dashboard-layout');
+        if (layout) {
+            layout.style.display = 'flex';
+            layout.style.width = '100vw';
+            layout.style.height = '100vh';
+            layout.style.position = 'fixed';
+            layout.style.top = '0';
+            layout.style.left = '0';
+            layout.style.background = '#F8FAFC';
+            layout.style.margin = '0';
+            layout.style.padding = '0';
+        }
+        
+        // Force sidebar with proper scrolling
+        const sidebar = document.querySelector('.dashboard-sidebar');
+        if (sidebar) {
+            sidebar.style.width = '280px';
+            sidebar.style.height = '100vh';
+            sidebar.style.background = 'white';
+            sidebar.style.overflowY = 'auto';
+            sidebar.style.overflowX = 'hidden';
+            sidebar.style.position = 'relative';
+            sidebar.style.flexShrink = '0';
+            sidebar.style.borderRight = '1px solid #e5e7eb';
+        }
+        
+        // Force main content with proper scrolling and margins
+        const main = document.querySelector('.dashboard-main');
+        if (main) {
+            main.style.flex = '1';
+            main.style.height = '100vh';
+            main.style.background = '#F8FAFC';
+            main.style.overflowY = 'auto';
+            main.style.overflowX = 'hidden';
+            main.style.position = 'relative';
+        }
+        
+        // Force content margins
+        const content = document.querySelector('.dashboard-content');
+        if (content) {
+            content.style.padding = '2rem';
+            content.style.maxWidth = '1200px';
+            content.style.margin = '0 auto';
+        }
+    });
+</script>
+{% endblock %}

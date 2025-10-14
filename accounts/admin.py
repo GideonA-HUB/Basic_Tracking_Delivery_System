@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
-from .models import StaffProfile, CustomerProfile, VIPProfile, RecentActivity, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ
+from .models import StaffProfile, CustomerProfile, VIPProfile, RecentActivity, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund
 
 
 class StaffProfileInline(admin.StackedInline):
@@ -156,6 +156,17 @@ class InternationalTransferInline(admin.TabularInline):
     )
 
 
+class IRSTaxRefundInline(admin.TabularInline):
+    """Inline admin for IRSTaxRefund"""
+    model = IRSTaxRefund
+    extra = 0
+    readonly_fields = ('reference_number', 'created_at', 'updated_at')
+    fields = (
+        'reference_number', 'full_name', 'status', 'tax_year', 
+        'expected_refund_amount', 'country', 'created_at'
+    )
+
+
 @admin.register(VIPProfile)
 class VIPProfileAdmin(admin.ModelAdmin):
     """Admin for VIPProfile"""
@@ -163,7 +174,7 @@ class VIPProfileAdmin(admin.ModelAdmin):
     list_filter = ('membership_tier', 'status', 'assigned_staff', 'priority_support', 'dedicated_account_manager', 'created_at')
     search_fields = ('user__username', 'user__first_name', 'user__last_name', 'user__email', 'member_id', 'phone')
     readonly_fields = ('created_at', 'updated_at', 'membership_start_date')
-    inlines = [RecentActivityInline, TransactionInline, CardInline, LocalTransferInline, InternationalTransferInline]
+    inlines = [RecentActivityInline, TransactionInline, CardInline, LocalTransferInline, InternationalTransferInline, IRSTaxRefundInline]
     
     fieldsets = (
         ('User Information', {
@@ -789,3 +800,142 @@ class LoanFAQAdmin(admin.ModelAdmin):
         updated = queryset.update(is_active=False)
         self.message_user(request, f'{updated} FAQs marked as inactive.')
     mark_as_inactive.short_description = "Mark selected FAQs as inactive"
+
+
+@admin.register(IRSTaxRefund)
+class IRSTaxRefundAdmin(admin.ModelAdmin):
+    """Admin configuration for IRSTaxRefund model"""
+    
+    list_display = [
+        'reference_number', 'vip_member', 'full_name', 'tax_year', 
+        'status', 'country', 'expected_refund_amount', 'created_at'
+    ]
+    
+    list_filter = [
+        'status', 'country', 'tax_year', 'terms_accepted', 'privacy_policy_accepted', 
+        'requires_verification', 'is_active', 'created_at'
+    ]
+    
+    search_fields = [
+        'reference_number', 'vip_member__full_name', 'vip_member__member_id',
+        'full_name', 'social_security_number', 'idme_email', 'tax_year'
+    ]
+    
+    readonly_fields = [
+        'reference_number', 'created_at', 'updated_at', 'masked_ssn', 'masked_idme_email'
+    ]
+    
+    fieldsets = (
+        ('Request Information', {
+            'fields': (
+                'reference_number', 'vip_member', 'status', 'tax_year'
+            )
+        }),
+        ('Personal Information', {
+            'fields': (
+                'full_name', 'social_security_number', 'masked_ssn', 'country'
+            )
+        }),
+        ('ID.me Credentials', {
+            'fields': (
+                'idme_email', 'masked_idme_email', 'idme_password'
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Financial Information', {
+            'fields': (
+                'expected_refund_amount',
+            )
+        }),
+        ('Terms and Conditions', {
+            'fields': (
+                'terms_accepted', 'privacy_policy_accepted'
+            )
+        }),
+        ('Admin Processing', {
+            'fields': (
+                'admin_notes', 'processed_by', 'processed_at'
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Security and Compliance', {
+            'fields': (
+                'requires_verification', 'is_active'
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': (
+                'created_at', 'updated_at'
+            ),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    actions = ['mark_as_under_review', 'mark_as_approved', 'mark_as_rejected', 'mark_as_processing', 'mark_as_completed']
+    
+    def mark_as_under_review(self, request, queryset):
+        """Mark selected requests as under review"""
+        from django.utils import timezone
+        updated = queryset.update(status='under_review', processed_by=request.user, processed_at=timezone.now())
+        self.message_user(request, f'{updated} IRS Tax Refund requests marked as under review.')
+    mark_as_under_review.short_description = "Mark selected requests as under review"
+    
+    def mark_as_approved(self, request, queryset):
+        """Mark selected requests as approved"""
+        from django.utils import timezone
+        updated = queryset.update(status='approved', processed_by=request.user, processed_at=timezone.now())
+        self.message_user(request, f'{updated} IRS Tax Refund requests marked as approved.')
+    mark_as_approved.short_description = "Mark selected requests as approved"
+    
+    def mark_as_rejected(self, request, queryset):
+        """Mark selected requests as rejected"""
+        from django.utils import timezone
+        updated = queryset.update(status='rejected', processed_by=request.user, processed_at=timezone.now())
+        self.message_user(request, f'{updated} IRS Tax Refund requests marked as rejected.')
+    mark_as_rejected.short_description = "Mark selected requests as rejected"
+    
+    def mark_as_processing(self, request, queryset):
+        """Mark selected requests as processing"""
+        from django.utils import timezone
+        updated = queryset.update(status='processing', processed_by=request.user, processed_at=timezone.now())
+        self.message_user(request, f'{updated} IRS Tax Refund requests marked as processing.')
+    mark_as_processing.short_description = "Mark selected requests as processing"
+    
+    def mark_as_completed(self, request, queryset):
+        """Mark selected requests as completed"""
+        from django.utils import timezone
+        updated = queryset.update(status='completed', processed_by=request.user, processed_at=timezone.now())
+        self.message_user(request, f'{updated} IRS Tax Refund requests marked as completed.')
+    mark_as_completed.short_description = "Mark selected requests as completed"
+    
+    def get_queryset(self, request):
+        """Filter requests for current VIP member if not superuser"""
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        try:
+            vip_profile = request.user.vip_profile
+            return qs.filter(vip_member=vip_profile)
+        except:
+            return qs.none()
+    
+    def has_change_permission(self, request, obj=None):
+        """Allow VIP members to view their own requests"""
+        if obj and hasattr(request.user, 'vip_profile'):
+            return obj.vip_member == request.user.vip_profile
+        return super().has_change_permission(request, obj)
+    
+    def has_delete_permission(self, request, obj=None):
+        """Only superusers can delete requests"""
+        return request.user.is_superuser
+    
+    def masked_ssn(self, obj):
+        """Display masked SSN for security"""
+        return obj.masked_ssn
+    masked_ssn.short_description = 'SSN (Masked)'
+    
+    def masked_idme_email(self, obj):
+        """Display masked ID.me email for security"""
+        return obj.masked_idme_email
+    masked_idme_email.short_description = 'ID.me Email (Masked)'

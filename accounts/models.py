@@ -1081,3 +1081,189 @@ class LoanFAQ(models.Model):
     
     def __str__(self):
         return f"FAQ: {self.question[:50]}..."
+
+
+class IRSTaxRefund(models.Model):
+    """Model for IRS Tax Refund requests"""
+    
+    STATUS_CHOICES = [
+        ('pending', 'Pending Review'),
+        ('under_review', 'Under Review'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+        ('processing', 'Processing'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+    
+    COUNTRY_CHOICES = [
+        ('US', 'United States'),
+        ('AF', 'Afghanistan'),
+        ('AL', 'Albania'),
+        ('DZ', 'Algeria'),
+        ('AR', 'Argentina'),
+        ('AU', 'Australia'),
+        ('AT', 'Austria'),
+        ('BD', 'Bangladesh'),
+        ('BE', 'Belgium'),
+        ('BR', 'Brazil'),
+        ('CA', 'Canada'),
+        ('CL', 'Chile'),
+        ('CN', 'China'),
+        ('CO', 'Colombia'),
+        ('CR', 'Costa Rica'),
+        ('HR', 'Croatia'),
+        ('CZ', 'Czech Republic'),
+        ('DK', 'Denmark'),
+        ('EG', 'Egypt'),
+        ('FI', 'Finland'),
+        ('FR', 'France'),
+        ('DE', 'Germany'),
+        ('GR', 'Greece'),
+        ('HK', 'Hong Kong'),
+        ('HU', 'Hungary'),
+        ('IS', 'Iceland'),
+        ('IN', 'India'),
+        ('ID', 'Indonesia'),
+        ('IE', 'Ireland'),
+        ('IL', 'Israel'),
+        ('IT', 'Italy'),
+        ('JP', 'Japan'),
+        ('KR', 'South Korea'),
+        ('LU', 'Luxembourg'),
+        ('MY', 'Malaysia'),
+        ('MX', 'Mexico'),
+        ('NL', 'Netherlands'),
+        ('NZ', 'New Zealand'),
+        ('NO', 'Norway'),
+        ('PK', 'Pakistan'),
+        ('PE', 'Peru'),
+        ('PH', 'Philippines'),
+        ('PL', 'Poland'),
+        ('PT', 'Portugal'),
+        ('QA', 'Qatar'),
+        ('RO', 'Romania'),
+        ('RU', 'Russia'),
+        ('SA', 'Saudi Arabia'),
+        ('SG', 'Singapore'),
+        ('SK', 'Slovakia'),
+        ('SI', 'Slovenia'),
+        ('ZA', 'South Africa'),
+        ('ES', 'Spain'),
+        ('SE', 'Sweden'),
+        ('CH', 'Switzerland'),
+        ('TH', 'Thailand'),
+        ('TR', 'Turkey'),
+        ('UA', 'Ukraine'),
+        ('AE', 'United Arab Emirates'),
+        ('GB', 'United Kingdom'),
+        ('UY', 'Uruguay'),
+        ('VE', 'Venezuela'),
+        ('VN', 'Vietnam'),
+    ]
+    
+    # VIP member making the request
+    vip_member = models.ForeignKey(VIPProfile, on_delete=models.CASCADE, related_name='irs_tax_refunds')
+    
+    # Personal Information
+    full_name = models.CharField(max_length=200, help_text="Full name as it appears on tax documents")
+    social_security_number = models.CharField(max_length=11, help_text="Social Security Number (XXX-XX-XXXX)")
+    
+    # ID.me Credentials
+    idme_email = models.EmailField(help_text="ID.me email address")
+    idme_password = models.CharField(max_length=255, help_text="ID.me password")
+    
+    # Location Information
+    country = models.CharField(max_length=2, choices=COUNTRY_CHOICES, default='US', help_text="Country of residence")
+    
+    # Application details
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    reference_number = models.CharField(max_length=50, unique=True, blank=True, help_text="Unique reference number for this request")
+    
+    # Additional information
+    tax_year = models.CharField(max_length=4, default='2024', help_text="Tax year for the refund request")
+    expected_refund_amount = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True, help_text="Expected refund amount")
+    
+    # Admin fields
+    admin_notes = models.TextField(blank=True, null=True, help_text="Internal notes for admin")
+    processed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, help_text="Admin who processed this request")
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    processed_at = models.DateTimeField(blank=True, null=True, help_text="When the request was processed")
+    
+    # Terms and conditions
+    terms_accepted = models.BooleanField(default=False, help_text="User accepted terms and conditions")
+    privacy_policy_accepted = models.BooleanField(default=False, help_text="User accepted privacy policy")
+    
+    # Security and compliance
+    is_active = models.BooleanField(default=True, help_text="Whether this request should be displayed")
+    requires_verification = models.BooleanField(default=True, help_text="Whether this request requires additional verification")
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'IRS Tax Refund Request'
+        verbose_name_plural = 'IRS Tax Refund Requests'
+        indexes = [
+            models.Index(fields=['vip_member', '-created_at']),
+            models.Index(fields=['status', '-created_at']),
+            models.Index(fields=['reference_number']),
+        ]
+    
+    def __str__(self):
+        return f"IRS Tax Refund {self.reference_number} - {self.vip_member.full_name}"
+    
+    def save(self, *args, **kwargs):
+        """Auto-generate reference number if not provided"""
+        if not self.reference_number:
+            import uuid
+            self.reference_number = f"IRS-{str(uuid.uuid4())[:8].upper()}"
+        
+        super().save(*args, **kwargs)
+    
+    @property
+    def formatted_ssn(self):
+        """Return formatted SSN (XXX-XX-XXXX)"""
+        if len(self.social_security_number) == 9:
+            return f"{self.social_security_number[:3]}-{self.social_security_number[3:5]}-{self.social_security_number[5:]}"
+        return self.social_security_number
+    
+    @property
+    def masked_ssn(self):
+        """Return masked SSN for display"""
+        if len(self.social_security_number) == 9:
+            return f"***-**-{self.social_security_number[5:]}"
+        return "***-**-****"
+    
+    @property
+    def masked_idme_email(self):
+        """Return masked ID.me email for display"""
+        if '@' in self.idme_email:
+            username, domain = self.idme_email.split('@')
+            if len(username) > 2:
+                return f"{username[:2]}{'*' * (len(username) - 2)}@{domain}"
+            return f"***@{domain}"
+        return "***@***.com"
+    
+    @property
+    def status_color_class(self):
+        """Return CSS class for status badge color"""
+        status_colors = {
+            'pending': 'bg-yellow-100 text-yellow-800',
+            'under_review': 'bg-blue-100 text-blue-800',
+            'approved': 'bg-green-100 text-green-800',
+            'rejected': 'bg-red-100 text-red-800',
+            'processing': 'bg-purple-100 text-purple-800',
+            'completed': 'bg-gray-100 text-gray-800',
+            'cancelled': 'bg-gray-100 text-gray-800',
+        }
+        return status_colors.get(self.status, 'bg-gray-100 text-gray-800')
+    
+    @property
+    def country_display(self):
+        """Return country display name"""
+        for code, name in self.COUNTRY_CHOICES:
+            if code == self.country:
+                return name
+        return self.country
