@@ -102,17 +102,9 @@
                             <i class="fas fa-user"></i>
                             Account & Settings
                         </a>
-                        <a href="#" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
-                            <i class="fas fa-cog"></i>
-                            Settings
-                        </a>
-                        <a href="#" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
-                            <i class="fas fa-envelope"></i>
-                            Message us
-                        </a>
-                        <a href="#" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
-                            <i class="fas fa-university"></i>
-                            Online Banking
+                        <a href="{% url 'accounts:vip_support_ticket' %}" class="nav-link flex items-center gap-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                            <i class="fas fa-comment"></i>
+                            Support Ticket
                         </a>
                     </nav>
                 </div>

@@ -1517,3 +1517,108 @@ class AccountSettings(models.Model):
         if not self.email and hasattr(self.vip_member, 'user') and self.vip_member.user:
             self.email = self.vip_member.user.email
         super().save(*args, **kwargs)
+
+
+class SupportTicket(models.Model):
+    """Model for support ticket submissions"""
+    
+    PRIORITY_CHOICES = [
+        ('low', 'Low Priority'),
+        ('medium', 'Medium Priority'),
+        ('high', 'High Priority'),
+        ('urgent', 'Urgent'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('open', 'Open'),
+        ('in_progress', 'In Progress'),
+        ('waiting_customer', 'Waiting for Customer'),
+        ('resolved', 'Resolved'),
+        ('closed', 'Closed'),
+    ]
+    
+    CATEGORY_CHOICES = [
+        ('general', 'General Inquiry'),
+        ('technical', 'Technical Issue'),
+        ('account', 'Account Issue'),
+        ('billing', 'Billing Question'),
+        ('transaction', 'Transaction Problem'),
+        ('security', 'Security Concern'),
+        ('feature_request', 'Feature Request'),
+        ('other', 'Other'),
+    ]
+    
+    # VIP member who submitted the ticket
+    vip_member = models.ForeignKey(VIPProfile, on_delete=models.CASCADE, related_name='support_tickets')
+    
+    # Ticket details
+    title = models.CharField(max_length=200, help_text="Brief description of the issue")
+    description = models.TextField(help_text="Detailed description of the issue")
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='low', help_text="Priority level of the ticket")
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='general', help_text="Category of the issue")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open', help_text="Current status of the ticket")
+    
+    # Ticket identification
+    ticket_number = models.CharField(max_length=20, unique=True, blank=True, help_text="Unique ticket number")
+    
+    # Additional information
+    attachments = models.JSONField(default=list, blank=True, help_text="File attachments (stored as JSON)")
+    internal_notes = models.TextField(blank=True, help_text="Internal notes for staff")
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    resolved_at = models.DateTimeField(blank=True, null=True)
+    closed_at = models.DateTimeField(blank=True, null=True)
+    
+    # Response tracking
+    last_response_at = models.DateTimeField(blank=True, null=True)
+    response_count = models.PositiveIntegerField(default=0, help_text="Number of responses")
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Support Ticket'
+        verbose_name_plural = 'Support Tickets'
+    
+    def __str__(self):
+        return f"Ticket {self.ticket_number} - {self.title}"
+    
+    def save(self, *args, **kwargs):
+        """Auto-generate ticket number"""
+        if not self.ticket_number:
+            import uuid
+            self.ticket_number = f"ST-{str(uuid.uuid4())[:8].upper()}"
+        super().save(*args, **kwargs)
+    
+    @property
+    def priority_badge_class(self):
+        """Return CSS classes for priority badge"""
+        priority_classes = {
+            'low': 'bg-green-100 text-green-800',
+            'medium': 'bg-yellow-100 text-yellow-800',
+            'high': 'bg-orange-100 text-orange-800',
+            'urgent': 'bg-red-100 text-red-800',
+        }
+        return priority_classes.get(self.priority, 'bg-gray-100 text-gray-800')
+    
+    @property
+    def status_badge_class(self):
+        """Return CSS classes for status badge"""
+        status_classes = {
+            'open': 'bg-blue-100 text-blue-800',
+            'in_progress': 'bg-yellow-100 text-yellow-800',
+            'waiting_customer': 'bg-orange-100 text-orange-800',
+            'resolved': 'bg-green-100 text-green-800',
+            'closed': 'bg-gray-100 text-gray-800',
+        }
+        return status_classes.get(self.status, 'bg-gray-100 text-gray-800')
+    
+    @property
+    def is_urgent(self):
+        """Check if ticket is urgent"""
+        return self.priority == 'urgent'
+    
+    @property
+    def is_resolved(self):
+        """Check if ticket is resolved"""
+        return self.status in ['resolved', 'closed']

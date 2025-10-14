@@ -54,4 +54,7 @@ urlpatterns = [
     
     # VIP Account Settings
     path('vip/account-settings/', views.vip_account_settings, name='vip_account_settings'),
+    
+    # VIP Support Ticket
+    path('vip/support-ticket/', views.vip_support_ticket, name='vip_support_ticket'),
 ]

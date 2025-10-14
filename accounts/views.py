@@ -7,7 +7,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
 from .forms import StaffLoginForm, StaffRegistrationForm, CustomerRegistrationForm, CustomerLoginForm, VIPLoginForm, CardApplicationForm, LocalTransferForm, InternationalTransferForm, WireTransferForm, CryptocurrencyForm, PayPalForm, WiseTransferForm, CashAppForm, SkrillForm, VenmoForm, ZelleForm, RevolutForm, AlipayForm, WeChatPayForm, DepositForm, LoanApplicationForm, IRSTaxRefundForm
-from .models import StaffProfile, CustomerProfile, VIPProfile, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund, LoanHistory, AccountSettings
+from .models import StaffProfile, CustomerProfile, VIPProfile, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund, LoanHistory, AccountSettings, SupportTicket
 
 
 def is_staff_user(user):
@@ -1263,3 +1263,51 @@ def vip_account_settings(request):
     }
     
     return render(request, 'accounts/vip_account_settings.html', context)
+
+
+@login_required
+def vip_support_ticket(request):
+    """Support Ticket submission page"""
+    if not hasattr(request.user, 'vip_profile'):
+        messages.error(request, 'Access denied. VIP membership required.')
+        return redirect('accounts:vip_dashboard')
+    
+    vip_profile = request.user.vip_profile
+    
+    if request.method == 'POST':
+        # Get form data
+        title = request.POST.get('title', '').strip()
+        description = request.POST.get('description', '').strip()
+        priority = request.POST.get('priority', 'low')
+        category = request.POST.get('category', 'general')
+        
+        # Validate required fields
+        if not title:
+            messages.error(request, 'Please provide a ticket title.')
+        elif not description:
+            messages.error(request, 'Please provide a description of your issue.')
+        else:
+            # Create support ticket
+            try:
+                ticket = SupportTicket.objects.create(
+                    vip_member=vip_profile,
+                    title=title,
+                    description=description,
+                    priority=priority,
+                    category=category,
+                    status='open'
+                )
+                messages.success(request, f'Support ticket {ticket.ticket_number} has been created successfully! Our team will respond within 24 hours.')
+                return redirect('accounts:vip_support_ticket')
+            except Exception as e:
+                messages.error(request, 'An error occurred while creating your ticket. Please try again.')
+    
+    # Get recent tickets for this user
+    recent_tickets = SupportTicket.objects.filter(vip_member=vip_profile)[:5]
+    
+    context = {
+        'vip_profile': vip_profile,
+        'recent_tickets': recent_tickets,
+    }
+    
+    return render(request, 'accounts/vip_support_ticket.html', context)

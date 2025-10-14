@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.utils import timezone
-from .models import StaffProfile, CustomerProfile, VIPProfile, RecentActivity, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund, LoanHistory, AccountSettings
+from .models import StaffProfile, CustomerProfile, VIPProfile, RecentActivity, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund, LoanHistory, AccountSettings, SupportTicket
 
 
 class StaffProfileInline(admin.StackedInline):
@@ -1116,6 +1116,93 @@ class AccountSettingsAdmin(admin.ModelAdmin):
             push_notifications=False
         )
         self.message_user(request, f'{updated} account(s) disabled for all notifications.')
-    disable_notifications.short_description = 'Disable all notifications'
+        disable_notifications.short_description = 'Disable all notifications'
+
+
+@admin.register(SupportTicket)
+class SupportTicketAdmin(admin.ModelAdmin):
+    """Admin interface for Support Tickets"""
+    
+    list_display = [
+        'ticket_number', 'title', 'vip_member', 'priority', 'status', 
+        'category', 'created_at', 'updated_at'
+    ]
+    
+    list_filter = [
+        'priority', 'status', 'category', 'created_at', 'updated_at'
+    ]
+    
+    search_fields = [
+        'ticket_number', 'title', 'vip_member__full_name', 
+        'vip_member__member_id', 'description'
+    ]
+    
+    readonly_fields = [
+        'ticket_number', 'created_at', 'updated_at', 'resolved_at', 'closed_at'
+    ]
+    
+    fieldsets = (
+        ('Ticket Information', {
+            'fields': (
+                'ticket_number', 'vip_member', 'title', 'description', 
+                'category', 'priority', 'status'
+            )
+        }),
+        ('Additional Information', {
+            'fields': (
+                'attachments', 'internal_notes', 'response_count'
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': (
+                'created_at', 'updated_at', 'resolved_at', 'closed_at', 
+                'last_response_at'
+            ),
+            'classes': ('collapse',)
+        })
+    )
+    
+    list_per_page = 25
+    date_hierarchy = 'created_at'
+    ordering = ['-created_at']
+    
+    actions = ['mark_as_resolved', 'mark_as_closed', 'mark_as_urgent', 'mark_as_in_progress']
+    
+    def mark_as_resolved(self, request, queryset):
+        """Mark selected tickets as resolved"""
+        from django.utils import timezone
+        updated = queryset.update(
+            status='resolved', 
+            resolved_at=timezone.now()
+        )
+        self.message_user(request, f'{updated} ticket(s) marked as resolved.')
+    mark_as_resolved.short_description = 'Mark as resolved'
+    
+    def mark_as_closed(self, request, queryset):
+        """Mark selected tickets as closed"""
+        from django.utils import timezone
+        updated = queryset.update(
+            status='closed', 
+            closed_at=timezone.now()
+        )
+        self.message_user(request, f'{updated} ticket(s) marked as closed.')
+    mark_as_closed.short_description = 'Mark as closed'
+    
+    def mark_as_urgent(self, request, queryset):
+        """Mark selected tickets as urgent"""
+        updated = queryset.update(priority='urgent')
+        self.message_user(request, f'{updated} ticket(s) marked as urgent.')
+    mark_as_urgent.short_description = 'Mark as urgent'
+    
+    def mark_as_in_progress(self, request, queryset):
+        """Mark selected tickets as in progress"""
+        updated = queryset.update(status='in_progress')
+        self.message_user(request, f'{updated} ticket(s) marked as in progress.')
+    mark_as_in_progress.short_description = 'Mark as in progress'
+    
+    def get_queryset(self, request):
+        """Optimize queryset"""
+        return super().get_queryset(request).select_related('vip_member')
 
 

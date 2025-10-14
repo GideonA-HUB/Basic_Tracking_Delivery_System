@@ -1,0 +1,560 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Support Center - Meridian Asset Logistics{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-layout {
+        display: flex;
+        min-height: 100vh;
+        background-color: #f8fafc;
+    }
+    
+    .sidebar {
+        width: 280px;
+        background: white;
+        border-right: 1px solid #e2e8f0;
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        height: 100vh;
+        left: 0;
+        top: 0;
+        overflow-y: auto;
+        z-index: 1000;
+    }
+    
+    .main-content {
+        flex: 1;
+        margin-left: 280px;
+        padding: 2rem;
+        overflow-y: auto;
+        min-height: 100vh;
+    }
+    
+    .support-header {
+        margin-bottom: 2rem;
+    }
+    
+    .support-title {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #1a202c;
+        margin-bottom: 0.5rem;
+    }
+    
+    .breadcrumb {
+        font-size: 0.875rem;
+        color: #718096;
+        margin-bottom: 0;
+    }
+    
+    .support-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+    }
+    
+    .support-icon {
+        width: 80px;
+        height: 80px;
+        background: #e6f3ff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+    }
+    
+    .support-icon svg {
+        width: 40px;
+        height: 40px;
+        color: #3182ce;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        display: block;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 1rem;
+        background: white;
+        transition: border-color 0.2s;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #3182ce;
+        box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+    }
+    
+    .form-control::placeholder {
+        color: #a0aec0;
+    }
+    
+    .form-select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 1rem;
+        background: white;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 12px center;
+        background-repeat: no-repeat;
+        background-size: 16px;
+        appearance: none;
+        cursor: pointer;
+    }
+    
+    .form-select:focus {
+        outline: none;
+        border-color: #3182ce;
+        box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+    }
+    
+    .form-textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 1rem;
+        background: white;
+        resize: vertical;
+        min-height: 120px;
+        font-family: inherit;
+    }
+    
+    .form-textarea:focus {
+        outline: none;
+        border-color: #3182ce;
+        box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+    }
+    
+    .submit-button {
+        background: #3182ce;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        width: 100%;
+    }
+    
+    .submit-button:hover {
+        background: #2c5aa0;
+    }
+    
+    .submit-button:disabled {
+        background: #a0aec0;
+        cursor: not-allowed;
+    }
+    
+    .input-with-icon {
+        position: relative;
+    }
+    
+    .input-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #a0aec0;
+        font-size: 0.875rem;
+    }
+    
+    .input-with-icon .form-control {
+        padding-left: 40px;
+    }
+    
+    .help-text {
+        font-size: 0.75rem;
+        color: #718096;
+        margin-top: 0.25rem;
+    }
+    
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .section-icon {
+        width: 24px;
+        height: 24px;
+        background: #3182ce;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .section-icon svg {
+        width: 16px;
+        height: 16px;
+        color: white;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #2d3748;
+    }
+    
+    .section-description {
+        color: #718096;
+        margin-bottom: 2rem;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+    
+    .recent-tickets {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e2e8f0;
+    }
+    
+    .recent-tickets-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 1rem;
+    }
+    
+    .ticket-item {
+        background: #f7fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .ticket-header {
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    .ticket-number {
+        font-weight: 600;
+        color: #3182ce;
+        font-size: 0.875rem;
+    }
+    
+    .ticket-status {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    
+    .ticket-title {
+        font-weight: 500;
+        color: #2d3748;
+        margin-bottom: 0.25rem;
+    }
+    
+    .ticket-date {
+        font-size: 0.75rem;
+        color: #718096;
+    }
+    
+    .status-open {
+        background: #bee3f8;
+        color: #2b6cb0;
+    }
+    
+    .status-resolved {
+        background: #c6f6d5;
+        color: #276749;
+    }
+    
+    .status-closed {
+        background: #e2e8f0;
+        color: #4a5568;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .sidebar {
+            width: 100%;
+            position: relative;
+            height: auto;
+        }
+        
+        .main-content {
+            margin-left: 0;
+            padding: 1rem;
+        }
+        
+        .support-card {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- User Profile Section -->
+        <div class="p-6 pt-12">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-base">
+                    {{ vip_profile.full_name|first|upper }}
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-900 text-sm">{{ vip_profile.full_name }}</h3>
+                    <p class="text-xs text-gray-500">{{ vip_profile.member_id }}</p>
+                </div>
+            </div>
+            
+            <div class="flex gap-2 mb-6">
+                <button class="bg-red-500 text-white text-xs px-3 py-1 rounded-full hover:bg-red-600 transition-colors">
+                    Verify KYC
+                </button>
+                <button class="bg-blue-500 text-white text-xs px-3 py-1 rounded-full hover:bg-blue-600 transition-colors">
+                    MERIDIAN VIP
+                </button>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 px-6 space-y-6">
+            <!-- Transfer -->
+            <div>
+                <h4 class="sidebar-heading text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">TRANSFER</h4>
+                <div class="space-y-1">
+                    <a href="{% url 'accounts:vip_transfer_local' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-paper-plane w-4"></i>
+                        Local Transfer
+                    </a>
+                    <a href="{% url 'accounts:vip_transfer_international' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-globe w-4"></i>
+                        International Wire
+                    </a>
+                    <a href="{% url 'accounts:vip_deposit' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-plus w-4"></i>
+                        Deposit
+                    </a>
+                </div>
+            </div>
+
+            <!-- Services -->
+            <div>
+                <h4 class="sidebar-heading text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">SERVICES</h4>
+                <div class="space-y-1">
+                    <a href="{% url 'accounts:vip_loan_services' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-dollar-sign w-4"></i>
+                        Loan Request
+                    </a>
+                    <a href="{% url 'accounts:vip_loan_history' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-clock w-4"></i>
+                        Loan History
+                    </a>
+                    <a href="{% url 'accounts:vip_irs_tax_refund' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-file-alt w-4"></i>
+                        IRS Tax Refund
+                    </a>
+                </div>
+            </div>
+
+            <!-- Account -->
+            <div>
+                <h4 class="sidebar-heading text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">ACCOUNT</h4>
+                <div class="space-y-1">
+                    <a href="{% url 'accounts:vip_account_settings' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-user w-4"></i>
+                        Account & Settings
+                    </a>
+                    <a href="{% url 'accounts:vip_support_ticket' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-blue-600 bg-blue-50 transition-colors">
+                        <i class="fas fa-comment w-4"></i>
+                        Support Ticket
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Footer -->
+        <div class="mt-auto pt-6 border-t border-gray-200">
+            <div class="copyright-text text-xs text-gray-400 text-center">
+                © 2024 Meridian Asset Logistics. All rights reserved.
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="support-header">
+            <h1 class="support-title">Support Center</h1>
+            <nav class="breadcrumb">Dashboard > Support</nav>
+        </div>
+
+        <!-- Support Card -->
+        <div class="support-card">
+            <!-- Section Header -->
+            <div class="section-header">
+                <div class="section-icon">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <h2 class="section-title">Submit a Support Ticket</h2>
+            </div>
+            
+            <p class="section-description">We're here to help. Tell us about your issue and we'll find a solution.</p>
+
+            <!-- Support Icon -->
+            <div class="support-icon">
+                <svg fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"></path>
+                </svg>
+            </div>
+
+            <!-- Support Form -->
+            <form method="post" id="supportForm">
+                {% csrf_token %}
+                
+                <!-- Ticket Title -->
+                <div class="form-group">
+                    <label for="title" class="form-label">Ticket Title</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">📋</span>
+                        <input type="text" 
+                               id="title" 
+                               name="title" 
+                               class="form-control" 
+                               placeholder="Briefly describe your issue" 
+                               required>
+                    </div>
+                    <p class="help-text">Be specific to help us understand your issue.</p>
+                </div>
+
+                <!-- Priority Level -->
+                <div class="form-group">
+                    <label for="priority" class="form-label">Priority Level</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">🏷️</span>
+                        <select id="priority" name="priority" class="form-select">
+                            <option value="low">Low Priority</option>
+                            <option value="medium">Medium Priority</option>
+                            <option value="high">High Priority</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+                    <p class="help-text">Select based on urgency of your request!</p>
+                </div>
+
+                <!-- Category -->
+                <div class="form-group">
+                    <label for="category" class="form-label">Category</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">📁</span>
+                        <select id="category" name="category" class="form-select">
+                            <option value="general">General Inquiry</option>
+                            <option value="technical">Technical Issue</option>
+                            <option value="account">Account Issue</option>
+                            <option value="billing">Billing Question</option>
+                            <option value="transaction">Transaction Problem</option>
+                            <option value="security">Security Concern</option>
+                            <option value="feature_request">Feature Request</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <p class="help-text">Choose the most relevant category for your issue.</p>
+                </div>
+
+                <!-- Description -->
+                <div class="form-group">
+                    <label for="description" class="form-label">Describe Your Issue</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">💬</span>
+                        <textarea id="description" 
+                                  name="description" 
+                                  class="form-textarea" 
+                                  placeholder="Please provide all relevant details about your issue so we can help you better" 
+                                  required></textarea>
+                    </div>
+                    <p class="help-text">Include any relevant details that might help us resolve your issue.</p>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="submit-button">
+                    Submit Support Ticket
+                </button>
+            </form>
+
+            <!-- Recent Tickets -->
+            {% if recent_tickets %}
+            <div class="recent-tickets">
+                <h3 class="recent-tickets-title">Your Recent Tickets</h3>
+                {% for ticket in recent_tickets %}
+                <div class="ticket-item">
+                    <div class="ticket-header">
+                        <span class="ticket-number">{{ ticket.ticket_number }}</span>
+                        <span class="ticket-status status-{{ ticket.status }}">
+                            {{ ticket.get_status_display }}
+                        </span>
+                    </div>
+                    <div class="ticket-title">{{ ticket.title }}</div>
+                    <div class="ticket-date">{{ ticket.created_at|date:"M d, Y H:i" }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('supportForm');
+    
+    form.addEventListener('submit', function(e) {
+        const title = document.getElementById('title').value.trim();
+        const description = document.getElementById('description').value.trim();
+        
+        if (!title) {
+            e.preventDefault();
+            alert('Please provide a ticket title.');
+            return;
+        }
+        
+        if (!description) {
+            e.preventDefault();
+            alert('Please provide a description of your issue.');
+            return;
+        }
+        
+        // Show loading state
+        const submitButton = form.querySelector('.submit-button');
+        submitButton.disabled = true;
+        submitButton.textContent = 'Submitting...';
+    });
+});
+</script>
+{% endblock %}
