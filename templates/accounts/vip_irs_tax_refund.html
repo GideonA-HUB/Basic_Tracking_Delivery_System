@@ -411,11 +411,23 @@
             <div class="mb-8">
                 <div class="flex flex-col items-center text-center mb-4">
                     <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-3">
-                        M
+                        {{ user.first_name|first|upper }}
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-800">{{ user.first_name|default:"VIP" }} {{ user.last_name|default:"Member" }}</h3>
-                    <p class="text-sm text-gray-500">VIP Member</p>
+                    <h3 class="font-bold text-gray-900 text-lg">{{ vip_profile.full_name }}</h3>
+                    <p class="text-sm text-gray-500">ID: {{ vip_profile.member_id }}</p>
                 </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="space-y-3 mb-8">
+                <button class="w-full bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded-md transition-colors mb-3 flex items-center justify-center gap-2">
+                    <i class="fas fa-shield-alt"></i>
+                    Verify KYC
+                </button>
+                <button class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-gem"></i>
+                    MERIDIAN VIP
+                </button>
             </div>
 
             <!-- Navigation Links -->
