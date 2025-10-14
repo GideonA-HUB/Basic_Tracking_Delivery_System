@@ -1,21 +1,161 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}IRS Tax Refund Request - VIP Dashboard{% endblock %}
+{% block title %}IRS Tax Refund Request{% endblock %}
 
-{% block extra_css %}
+{% block extra_head %}
 <style>
-    .irs-container {
+    /* Base styles for the dashboard layout */
+    .dashboard-layout {
+        display: flex;
+        min-height: 100vh;
+        background-color: #f9fafb; /* Light gray background */
+    }
+
+    /* Sidebar styles */
+    .dashboard-sidebar {
+        width: 16rem; /* 256px */
+        background-color: #ffffff; /* White background */
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* Shadow */
+        flex-shrink: 0;
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        z-index: 40;
+        scroll-behavior: smooth;
+        padding-top: 0 !important; /* Ensure no top padding from parent */
+        margin-top: 0 !important; /* Ensure no top margin from parent */
+    }
+
+    /* Custom scrollbar for sidebar */
+    .dashboard-sidebar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .dashboard-sidebar::-webkit-scrollbar-track {
+        background: #f1f5f9; /* Light gray track */
+    }
+
+    .dashboard-sidebar::-webkit-scrollbar-thumb {
+        background: #cbd5e1; /* Gray thumb */
+        border-radius: 3px;
+    }
+
+    .dashboard-sidebar::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8; /* Darker gray on hover */
+    }
+
+    /* Ensure sidebar content is visible */
+    .dashboard-sidebar .p-6 {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Main content area */
+    .main-content {
+        flex-grow: 1;
+        margin-left: 16rem; /* 256px - sidebar width */
+        height: 100vh;
+        overflow-y: auto;
+        padding: 2rem; /* Overall padding for the main content */
+        background-color: #f9fafb; /* Light gray background */
+    }
+
+    /* Custom scrollbar for main content */
+    .main-content::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .main-content::-webkit-scrollbar-track {
+        background: #f1f5f9;
+    }
+
+    .main-content::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+    }
+
+    .main-content::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+
+    /* Theme compatibility for sidebar */
+    html.light .dashboard-sidebar .text-gray-600,
+    html.light .dashboard-sidebar .text-gray-500,
+    html.light .dashboard-sidebar .text-gray-400,
+    html.light .dashboard-sidebar .text-gray-300,
+    html.light .dashboard-sidebar a,
+    html.light .dashboard-sidebar p,
+    html.light .dashboard-sidebar span,
+    html.light .dashboard-sidebar div {
+        color: #374151 !important;
+        font-weight: 500 !important;
+    }
+
+    /* Fix sidebar headings */
+    html.light .sidebar-heading {
+        color: #1f2937 !important;
+        font-weight: 700 !important;
+    }
+
+    /* Fix navigation links */
+    html.light .dashboard-sidebar .nav-link {
+        color: #374151 !important;
+        font-weight: 500 !important;
+    }
+
+    html.light .dashboard-sidebar .nav-link:hover {
+        background-color: #f3f4f6 !important;
+        color: #1f2937 !important;
+    }
+
+    /* Dark theme compatibility */
+    html.dark .dashboard-sidebar {
+        background-color: #374151 !important;
+        color: #f9fafb !important;
+    }
+
+    html.dark .dashboard-sidebar .text-gray-600,
+    html.dark .dashboard-sidebar .text-gray-500,
+    html.dark .dashboard-sidebar .text-gray-400,
+    html.dark .dashboard-sidebar .text-gray-300,
+    html.dark .dashboard-sidebar a,
+    html.dark .dashboard-sidebar p,
+    html.dark .dashboard-sidebar span,
+    html.dark .dashboard-sidebar div {
+        color: #f9fafb !important;
+        font-weight: 500 !important;
+    }
+
+    html.dark .dashboard-sidebar .sidebar-heading {
+        color: #f9fafb !important;
+        font-weight: 700 !important;
+    }
+
+    html.dark .dashboard-sidebar .nav-link {
+        color: #f9fafb !important;
+        font-weight: 500 !important;
+    }
+
+    html.dark .dashboard-sidebar .nav-link:hover {
+        background-color: #4b5563 !important;
+        color: #ffffff !important;
+    }
+
+    /* IRS Form Styles */
+    .irs-form-container {
         max-width: 800px;
         margin: 0 auto;
-        padding: 2rem;
     }
-    
+
     .irs-header {
         text-align: center;
         margin-bottom: 2rem;
     }
-    
+
     .irs-icon {
         width: 80px;
         height: 80px;
@@ -27,26 +167,26 @@
         margin: 0 auto 1rem;
         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
-    
+
     .irs-icon svg {
         width: 40px;
         height: 40px;
         color: white;
     }
-    
+
     .irs-title {
         font-size: 2rem;
         font-weight: 700;
         color: #1f2937;
         margin-bottom: 0.5rem;
     }
-    
+
     .irs-subtitle {
         font-size: 1.1rem;
         color: #6b7280;
         line-height: 1.5;
     }
-    
+
     .irs-form-card {
         background: white;
         border-radius: 12px;
@@ -54,7 +194,7 @@
         padding: 2rem;
         margin-bottom: 2rem;
     }
-    
+
     .section-header {
         display: flex;
         align-items: center;
@@ -62,35 +202,35 @@
         padding-bottom: 0.75rem;
         border-bottom: 2px solid #e5e7eb;
     }
-    
+
     .section-icon {
         width: 24px;
         height: 24px;
         margin-right: 0.75rem;
         color: #3b82f6;
     }
-    
+
     .section-title {
         font-size: 1.25rem;
         font-weight: 600;
         color: #1f2937;
     }
-    
+
     .form-group {
         margin-bottom: 1.5rem;
     }
-    
+
     .form-label {
         display: block;
         font-weight: 500;
         color: #374151;
         margin-bottom: 0.5rem;
     }
-    
+
     .input-wrapper {
         position: relative;
     }
-    
+
     .input-icon {
         position: absolute;
         left: 12px;
@@ -101,7 +241,7 @@
         color: #9ca3af;
         z-index: 2;
     }
-    
+
     .form-control {
         width: 100%;
         padding: 12px 12px 12px 44px;
@@ -111,17 +251,17 @@
         transition: all 0.2s ease;
         background: white;
     }
-    
+
     .form-control:focus {
         outline: none;
         border-color: #3b82f6;
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
-    
+
     .form-control::placeholder {
         color: #9ca3af;
     }
-    
+
     .form-select {
         width: 100%;
         padding: 12px 12px 12px 44px;
@@ -137,13 +277,13 @@
         background-size: 16px;
         padding-right: 40px;
     }
-    
+
     .form-select:focus {
         outline: none;
         border-color: #3b82f6;
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
-    
+
     .notice-box {
         background: #eff6ff;
         border: 1px solid #bfdbfe;
@@ -153,7 +293,7 @@
         display: flex;
         align-items: flex-start;
     }
-    
+
     .notice-icon {
         width: 20px;
         height: 20px;
@@ -162,19 +302,19 @@
         margin-top: 0.125rem;
         flex-shrink: 0;
     }
-    
+
     .notice-content h4 {
         font-weight: 600;
         color: #1f2937;
         margin-bottom: 0.5rem;
     }
-    
+
     .notice-content p {
         color: #4b5563;
         line-height: 1.5;
         margin: 0;
     }
-    
+
     .submit-button {
         background: linear-gradient(135deg, #3b82f6, #1d4ed8);
         color: white;
@@ -191,22 +331,22 @@
         margin-left: auto;
         box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
     }
-    
+
     .submit-button:hover {
         transform: translateY(-1px);
         box-shadow: 0 6px 8px -1px rgba(59, 130, 246, 0.4);
     }
-    
+
     .submit-button:active {
         transform: translateY(0);
     }
-    
+
     .error-message {
         color: #dc2626;
         font-size: 0.875rem;
         margin-top: 0.25rem;
     }
-    
+
     .success-message {
         background: #f0fdf4;
         border: 1px solid #bbf7d0;
@@ -215,7 +355,7 @@
         border-radius: 8px;
         margin-bottom: 1.5rem;
     }
-    
+
     .alert-message {
         background: #fef2f2;
         border: 1px solid #fecaca;
@@ -224,20 +364,36 @@
         border-radius: 8px;
         margin-bottom: 1.5rem;
     }
-    
+
+    /* Responsive design */
     @media (max-width: 768px) {
-        .irs-container {
+        .dashboard-layout {
+            flex-direction: column;
+        }
+
+        .dashboard-sidebar {
+            position: relative;
+            width: 100%;
+            height: auto;
+        }
+
+        .main-content {
+            margin-left: 0;
             padding: 1rem;
         }
-        
+
+        .irs-form-container {
+            padding: 0;
+        }
+
         .irs-title {
             font-size: 1.5rem;
         }
-        
+
         .irs-form-card {
             padding: 1.5rem;
         }
-        
+
         .submit-button {
             width: 100%;
             justify-content: center;
@@ -247,84 +403,112 @@
 {% endblock %}
 
 {% block content %}
-<div class="dashboard-container">
+<div class="dashboard-layout">
     <!-- VIP Sidebar -->
-    <div class="vip-sidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-logo">
-                <div class="logo-icon">M</div>
-                <span class="logo-text">Meridian</span>
+    <aside class="dashboard-sidebar">
+        <div class="p-6">
+            <!-- User Profile Section -->
+            <div class="mb-8">
+                <div class="flex flex-col items-center text-center mb-4">
+                    <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-3">
+                        M
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800">{{ user.first_name|default:"VIP" }} {{ user.last_name|default:"Member" }}</h3>
+                    <p class="text-sm text-gray-500">VIP Member</p>
+                </div>
             </div>
-            <div class="sidebar-subtitle">VIP Dashboard</div>
+
+            <!-- Navigation Links -->
+            <nav class="flex-1 space-y-6">
+                <!-- Main Navigation -->
+                <div>
+                    <h4 class="sidebar-heading text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">MAIN</h4>
+                    <div class="space-y-1">
+                        <a href="{% url 'accounts:vip_dashboard' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-home w-4"></i>
+                            Dashboard
+                        </a>
+                        <a href="{% url 'accounts:vip_transactions' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-exchange-alt w-4"></i>
+                            Transactions
+                        </a>
+                        <a href="{% url 'accounts:vip_cards' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-credit-card w-4"></i>
+                            Cards
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Transfers Section -->
+                <div>
+                    <h4 class="sidebar-heading text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">TRANSFERS</h4>
+                    <div class="space-y-1">
+                        <a href="{% url 'accounts:vip_transfer_local' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-paper-plane w-4"></i>
+                            Local Transfer
+                        </a>
+                        <a href="{% url 'accounts:vip_transfer_international' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-globe w-4"></i>
+                            International Wire
+                        </a>
+                        <a href="{% url 'accounts:vip_deposit' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-plus w-4"></i>
+                            Deposit
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Services Section -->
+                <div>
+                    <h4 class="sidebar-heading text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">SERVICES</h4>
+                    <div class="space-y-1">
+                        <a href="{% url 'accounts:vip_loan_services' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-hand-holding-usd w-4"></i>
+                            Loan Request
+                        </a>
+                        <a href="{% url 'accounts:vip_irs_tax_refund' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-blue-600 bg-blue-50 transition-colors">
+                            <i class="fas fa-receipt w-4"></i>
+                            IRS Tax Refund
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-history w-4"></i>
+                            Loan History
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Account Section -->
+                <div>
+                    <h4 class="sidebar-heading text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">ACCOUNT</h4>
+                    <div class="space-y-1">
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-user w-4"></i>
+                            Account
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-cog w-4"></i>
+                            Settings
+                        </a>
+                        <a href="{% url 'accounts:logout' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors">
+                            <i class="fas fa-sign-out-alt w-4"></i>
+                            Logout
+                        </a>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Footer -->
+            <div class="mt-auto pt-6 border-t border-gray-200">
+                <p class="text-xs text-gray-500 text-center">
+                    © 2024 Meridian Asset Logistics
+                </p>
+            </div>
         </div>
-        
-        <nav class="sidebar-nav">
-            <a href="{% url 'accounts:vip_dashboard' %}" class="nav-item">
-                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"></path>
-                </svg>
-                <span>Dashboard</span>
-            </a>
-            
-            <a href="{% url 'accounts:vip_transactions' %}" class="nav-item">
-                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                </svg>
-                <span>Transactions</span>
-            </a>
-            
-            <a href="{% url 'accounts:vip_cards' %}" class="nav-item">
-                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-                </svg>
-                <span>Cards</span>
-            </a>
-            
-            <a href="{% url 'accounts:vip_transfer_local' %}" class="nav-item">
-                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-                </svg>
-                <span>Local Transfer</span>
-            </a>
-            
-            <a href="{% url 'accounts:vip_transfer_international' %}" class="nav-item">
-                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <span>International Wire</span>
-            </a>
-            
-            <a href="{% url 'accounts:vip_deposit' %}" class="nav-item">
-                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                </svg>
-                <span>Deposit</span>
-            </a>
-            
-            <a href="{% url 'accounts:vip_loan_services' %}" class="nav-item">
-                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                </svg>
-                <span>Loan Request</span>
-            </a>
-            
-            <a href="{% url 'accounts:vip_irs_tax_refund' %}" class="nav-item active">
-                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-                <span>IRS Tax Refund</span>
-            </a>
-        </nav>
-        
-        <div class="sidebar-footer">
-            <div class="copyright">© 2024 Meridian Asset Logistics</div>
-        </div>
-    </div>
-    
+    </aside>
+
     <!-- Main Content -->
-    <div class="main-content">
-        <div class="irs-container">
+    <main class="main-content">
+        <div class="irs-form-container">
             <!-- Header Section -->
             <div class="irs-header">
                 <div class="irs-icon">
@@ -336,7 +520,7 @@
                 <h1 class="irs-title">IRS Tax Refund Request</h1>
                 <p class="irs-subtitle">Please fill out the form below to submit your IRS tax refund request.</p>
             </div>
-            
+
             <!-- Form Card -->
             <div class="irs-form-card">
                 <form method="post">
@@ -471,21 +655,26 @@
                 </form>
             </div>
         </div>
-    </div>
+    </main>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
     // SSN formatting
-    document.getElementById('{{ form.social_security_number.id_for_label }}').addEventListener('input', function(e) {
-        let value = e.target.value.replace(/\D/g, '');
-        if (value.length >= 6) {
-            value = value.substring(0, 3) + '-' + value.substring(3, 5) + '-' + value.substring(5, 9);
-        } else if (value.length >= 3) {
-            value = value.substring(0, 3) + '-' + value.substring(3);
+    document.addEventListener('DOMContentLoaded', function() {
+        const ssnInput = document.getElementById('{{ form.social_security_number.id_for_label }}');
+        if (ssnInput) {
+            ssnInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length >= 6) {
+                    value = value.substring(0, 3) + '-' + value.substring(3, 5) + '-' + value.substring(5, 9);
+                } else if (value.length >= 3) {
+                    value = value.substring(0, 3) + '-' + value.substring(3);
+                }
+                e.target.value = value;
+            });
         }
-        e.target.value = value;
     });
 </script>
 {% endblock %}
