@@ -1,0 +1,966 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Loan Services{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Base styles for the dashboard layout */
+    .dashboard-layout {
+        display: flex;
+        min-height: 100vh;
+        background-color: #f9fafb; /* Light gray background */
+    }
+
+    /* Sidebar styles */
+    .dashboard-sidebar {
+        width: 16rem; /* 256px */
+        background-color: #ffffff; /* White background */
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* Shadow */
+        flex-shrink: 0;
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        z-index: 40;
+        scroll-behavior: smooth;
+        padding-top: 0 !important; /* Ensure no top padding from parent */
+        margin-top: 0 !important; /* Ensure no top margin from parent */
+    }
+
+    /* Custom scrollbar for sidebar */
+    .dashboard-sidebar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .dashboard-sidebar::-webkit-scrollbar-track {
+        background: #f1f5f9; /* Light gray track */
+    }
+
+    .dashboard-sidebar::-webkit-scrollbar-thumb {
+        background: #cbd5e1; /* Gray thumb */
+        border-radius: 3px;
+    }
+
+    .dashboard-sidebar::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8; /* Darker gray on hover */
+    }
+
+    /* Ensure sidebar content is visible */
+    .dashboard-sidebar .p-6 {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Main content area */
+    .main-content {
+        flex-grow: 1;
+        margin-left: 16rem; /* 256px - sidebar width */
+        height: 100vh;
+        overflow-y: auto;
+        padding: 2rem; /* Overall padding for the main content */
+        background-color: #f9fafb; /* Light gray background */
+    }
+
+    /* Custom scrollbar for main content */
+    .main-content::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .main-content::-webkit-scrollbar-track {
+        background: #f1f5f9;
+    }
+
+    .main-content::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+    }
+
+    .main-content::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+
+    /* Theme compatibility for sidebar */
+    html.light .dashboard-sidebar .text-gray-600,
+    html.light .dashboard-sidebar .text-gray-500,
+    html.light .dashboard-sidebar .text-gray-400,
+    html.light .dashboard-sidebar .text-gray-300,
+    html.light .dashboard-sidebar a,
+    html.light .dashboard-sidebar p,
+    html.light .dashboard-sidebar span,
+    html.light .dashboard-sidebar div {
+        color: #374151 !important;
+        font-weight: 500 !important;
+    }
+
+    /* Fix sidebar headings */
+    html.light .sidebar-heading {
+        color: #1f2937 !important;
+        font-weight: 700 !important;
+    }
+
+    /* Fix navigation links */
+    html.light .nav-link {
+        color: #374151 !important;
+        font-weight: 500 !important;
+    }
+
+    html.light .nav-link:hover {
+        color: #1f2937 !important;
+        font-weight: 600 !important;
+    }
+
+    /* Fix copyright text */
+    html.light .copyright-text {
+        color: #6b7280 !important;
+        font-weight: 500 !important;
+    }
+
+    /* Dark theme adjustments for sidebar text */
+    html.dark .dashboard-sidebar .text-gray-600,
+    html.dark .dashboard-sidebar .text-gray-500,
+    html.dark .dashboard-sidebar .text-gray-400,
+    html.dark .dashboard-sidebar .text-gray-300,
+    html.dark .dashboard-sidebar a,
+    html.dark .dashboard-sidebar p,
+    html.dark .dashboard-sidebar span,
+    html.dark .dashboard-sidebar div {
+        color: #d1d5db !important; /* Light gray for dark theme */
+    }
+
+    html.dark .dashboard-sidebar .sidebar-heading {
+        color: #9ca3af !important; /* Lighter gray for headings */
+    }
+
+    html.dark .dashboard-sidebar .nav-link {
+        color: #d1d5db !important;
+    }
+
+    html.dark .dashboard-sidebar .nav-link:hover {
+        color: #e5e7eb !important;
+    }
+
+    html.dark .dashboard-sidebar .copyright-text {
+        color: #9ca3af !important;
+    }
+
+    /* Ensure the main content area's background is correct in dark mode */
+    html.dark .main-content {
+        background-color: #1f2937 !important; /* Dark background for main content */
+        color: #e5e7eb !important; /* Light text for dark theme */
+    }
+
+    html.dark .main-content h1,
+    html.dark .main-content h2,
+    html.dark .main-content h3,
+    html.dark .main-content h4,
+    html.dark .main-content .text-gray-900 {
+        color: #e5e7eb !important;
+    }
+
+    html.dark .main-content .text-gray-700,
+    html.dark .main-content .text-gray-600,
+    html.dark .main-content .text-gray-500 {
+        color: #d1d5db !important;
+    }
+
+    /* Loan services specific styles */
+    .loan-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* Hero Banner */
+    .loan-hero-banner {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        padding: 4rem 2rem;
+        text-align: center;
+        color: #ffffff;
+        position: relative;
+        overflow: hidden;
+        border-radius: 1rem 1rem 0 0;
+    }
+
+    .loan-hero-banner::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 30px;
+        background: linear-gradient(to bottom, transparent, #ffffff);
+    }
+
+    html.dark .loan-hero-banner::after {
+        background: linear-gradient(to bottom, transparent, #1f2937);
+    }
+
+    .loan-hero-banner .icon-circle {
+        width: 6rem;
+        height: 6rem;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        margin: 0 auto 2rem auto;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .loan-hero-banner h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #ffffff;
+    }
+
+    .loan-hero-banner p {
+        font-size: 1.25rem;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 0;
+    }
+
+    /* Content Card */
+    .loan-content-card {
+        background-color: #ffffff;
+        border-radius: 0 0 1rem 1rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+    }
+
+    html.dark .loan-content-card {
+        background-color: #374151 !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .loan-content {
+        padding: 3rem 2rem;
+    }
+
+    /* Section Headers */
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .section-header .icon-circle {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 50%;
+        background-color: #3b82f6;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+
+    html.dark .section-header .icon-circle {
+        background-color: #60a5fa;
+    }
+
+    .section-header h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0;
+    }
+
+    html.dark .section-header h2 {
+        color: #e5e7eb !important;
+    }
+
+    /* Feature Cards Grid */
+    .feature-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .feature-card {
+        background-color: #f8fafc;
+        border-radius: 0.75rem;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.2s ease-in-out;
+        border: 1px solid #e2e8f0;
+    }
+
+    html.dark .feature-card {
+        background-color: #4b5563 !important;
+        border-color: #6b7280 !important;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    html.dark .feature-card:hover {
+        box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -5px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .feature-card .icon-circle {
+        width: 4rem;
+        height: 4rem;
+        border-radius: 50%;
+        background-color: #3b82f6;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin: 0 auto 1.5rem auto;
+    }
+
+    html.dark .feature-card .icon-circle {
+        background-color: #60a5fa;
+    }
+
+    .feature-card h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.75rem;
+    }
+
+    html.dark .feature-card h3 {
+        color: #e5e7eb !important;
+    }
+
+    .feature-card p {
+        font-size: 0.875rem;
+        color: #6b7280;
+        line-height: 1.5;
+    }
+
+    html.dark .feature-card p {
+        color: #d1d5db !important;
+    }
+
+    /* Loan Types Grid */
+    .loan-types-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .loan-type-card {
+        background-color: #f8fafc;
+        border-radius: 0.75rem;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.2s ease-in-out;
+        border: 1px solid #e2e8f0;
+    }
+
+    html.dark .loan-type-card {
+        background-color: #4b5563 !important;
+        border-color: #6b7280 !important;
+    }
+
+    .loan-type-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    html.dark .loan-type-card:hover {
+        box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -5px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .loan-type-card .icon-circle {
+        width: 4rem;
+        height: 4rem;
+        border-radius: 50%;
+        background-color: #3b82f6;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin: 0 auto 1.5rem auto;
+    }
+
+    html.dark .loan-type-card .icon-circle {
+        background-color: #60a5fa;
+    }
+
+    .loan-type-card h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.75rem;
+    }
+
+    html.dark .loan-type-card h3 {
+        color: #e5e7eb !important;
+    }
+
+    .loan-type-card p {
+        font-size: 0.875rem;
+        color: #6b7280;
+        line-height: 1.5;
+    }
+
+    html.dark .loan-type-card p {
+        color: #d1d5db !important;
+    }
+
+    /* How It Works Section */
+    .how-it-works {
+        margin-bottom: 3rem;
+    }
+
+    .steps-container {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .step-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1.5rem;
+        position: relative;
+    }
+
+    .step-item:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        left: 1.5rem;
+        top: 4rem;
+        bottom: -2rem;
+        width: 2px;
+        background-color: #e5e7eb;
+    }
+
+    html.dark .step-item:not(:last-child)::after {
+        background-color: #4b5563;
+    }
+
+    .step-number {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 50%;
+        background-color: #3b82f6;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        font-weight: 600;
+        flex-shrink: 0;
+    }
+
+    html.dark .step-number {
+        background-color: #60a5fa;
+    }
+
+    .step-content h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+
+    html.dark .step-content h3 {
+        color: #e5e7eb !important;
+    }
+
+    .step-content p {
+        font-size: 0.875rem;
+        color: #6b7280;
+        line-height: 1.6;
+    }
+
+    html.dark .step-content p {
+        color: #d1d5db !important;
+    }
+
+    /* FAQ Section */
+    .faq-section {
+        background-color: #f8fafc;
+        border-radius: 0.75rem;
+        padding: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    html.dark .faq-section {
+        background-color: #4b5563 !important;
+    }
+
+    .faq-item {
+        margin-bottom: 1.5rem;
+    }
+
+    .faq-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .faq-question {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+
+    html.dark .faq-question {
+        color: #e5e7eb !important;
+    }
+
+    .faq-answer {
+        font-size: 0.875rem;
+        color: #6b7280;
+        line-height: 1.6;
+    }
+
+    html.dark .faq-answer {
+        color: #d1d5db !important;
+    }
+
+    .faq-link {
+        color: #3b82f6;
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        margin-top: 1rem;
+    }
+
+    html.dark .faq-link {
+        color: #60a5fa !important;
+    }
+
+    .faq-link:hover {
+        text-decoration: underline;
+    }
+
+    /* Call to Action Section */
+    .cta-section {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        border-radius: 1rem;
+        padding: 3rem 2rem;
+        text-align: center;
+        color: #ffffff;
+        margin-bottom: 2rem;
+    }
+
+    .cta-section h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #ffffff;
+    }
+
+    .cta-section p {
+        font-size: 1.125rem;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 2rem;
+    }
+
+    .cta-button {
+        background-color: #ffffff;
+        color: #3b82f6;
+        padding: 1rem 2rem;
+        border-radius: 0.75rem;
+        font-size: 1.125rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .cta-button:hover {
+        background-color: #f8fafc;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        color: #1d4ed8;
+        text-decoration: none;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .dashboard-sidebar {
+            width: 100%;
+            height: auto;
+            position: relative;
+            box-shadow: none;
+        }
+
+        .main-content {
+            margin-left: 0;
+            padding: 1rem;
+        }
+
+        .loan-hero-banner {
+            padding: 2rem 1rem;
+        }
+
+        .loan-hero-banner h1 {
+            font-size: 2rem;
+        }
+
+        .loan-content {
+            padding: 2rem 1rem;
+        }
+
+        .feature-cards-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .loan-types-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .steps-container {
+            gap: 1.5rem;
+        }
+
+        .step-item {
+            gap: 1rem;
+        }
+
+        .step-number {
+            width: 2.5rem;
+            height: 2.5rem;
+            font-size: 1rem;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .loan-container {
+            margin: 0.5rem;
+        }
+
+        .loan-hero-banner {
+            padding: 1.5rem 1rem;
+        }
+
+        .loan-hero-banner .icon-circle {
+            width: 4rem;
+            height: 4rem;
+            font-size: 2rem;
+        }
+
+        .loan-content {
+            padding: 1.5rem 1rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+        }
+
+        .cta-section {
+            padding: 2rem 1rem;
+        }
+
+        .cta-section h2 {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Dashboard Layout -->
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-white shadow-lg dashboard-sidebar" style="width: 16rem;">
+            <div class="p-6">
+                <!-- User Profile Section -->
+                <div class="mb-8">
+                    <div class="flex flex-col items-center text-center mb-4">
+                        <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-3">
+                            {{ user.first_name|first|upper }}
+                        </div>
+                        <h3 class="font-bold text-gray-900 text-lg">{{ vip_member.full_name }}</h3>
+                        <p class="text-sm text-gray-500">ID: {{ vip_member.member_id }}</p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="space-y-3 mb-8">
+                    <button class="w-full bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded-md transition-colors mb-3 flex items-center justify-center gap-2">
+                        <i class="fas fa-shield-alt"></i>
+                        Verify KYC
+                    </button>
+                    <button class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-gem"></i>
+                        MERIDIAN VIP
+                    </button>
+                </div>
+
+                <!-- Main Menu -->
+                <div class="mb-6">
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 sidebar-heading">MAIN MENU</h3>
+                    <nav class="space-y-2">
+                        <a href="{% url 'accounts:vip_dashboard' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-home w-4"></i>
+                            Dashboard
+                        </a>
+                        <a href="{% url 'accounts:vip_transactions' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-exchange-alt w-4"></i>
+                            Transactions
+                        </a>
+                        <a href="{% url 'accounts:vip_cards' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-credit-card w-4"></i>
+                            Cards
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Transfers -->
+                <div class="mb-6">
+                    <h3 class="sidebar-heading text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">TRANSFERS</h3>
+                    <nav class="space-y-2">
+                        <a href="{% url 'accounts:vip_transfer_local' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-paper-plane w-4"></i>
+                            Local Transfer
+                        </a>
+                        <a href="{% url 'accounts:vip_transfer_international' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-globe w-4"></i>
+                            International Wire
+                        </a>
+                        <a href="{% url 'accounts:vip_deposit' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-plus w-4"></i>
+                            Deposit
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Services -->
+                <div class="mb-6">
+                    <h3 class="sidebar-heading text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">SERVICES</h3>
+                    <nav class="space-y-2">
+                        <a href="{% url 'accounts:vip_loan_services' %}" class="nav-item-active flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors">
+                            <i class="fas fa-hand-holding-usd w-4"></i>
+                            Loan Request
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-receipt w-4"></i>
+                            IRS Tax Refund
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-history w-4"></i>
+                            Loan History
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Account -->
+                <div class="mb-6">
+                    <h3 class="sidebar-heading text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">ACCOUNT</h3>
+                    <nav class="space-y-2">
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-cog w-4"></i>
+                            Account Settings
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-envelope w-4"></i>
+                            Message us
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-university w-4"></i>
+                            Online Banking
+                        </a>
+                    </nav>
+                </div>
+
+                <div class="mt-auto text-center">
+                    <p class="text-xs text-gray-500 copyright-text">© 2025 Meridian Asset Logistics</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-y-auto bg-gray-50 main-content">
+            <div class="loan-container">
+                <!-- Header -->
+                <div class="mb-8">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-900 mb-2">Loan Services</h1>
+                            <p class="text-sm text-gray-500">Dashboard > Loan Services</p>
+                        </div>
+                        <a href="{% url 'accounts:vip_dashboard' %}" class="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg flex items-center gap-2 hover:bg-gray-300 transition-colors">
+                            <i class="fas fa-arrow-left"></i>
+                            Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Hero Banner -->
+                <div class="loan-hero-banner">
+                    <div class="icon-circle">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <h1>Loan Services</h1>
+                    <p>Financial solutions to help you achieve your goals</p>
+                </div>
+
+                <!-- Content Card -->
+                <div class="loan-content-card">
+                    <div class="loan-content">
+                        <!-- Why Choose Our Loan Services -->
+                        <div class="section-header">
+                            <div class="icon-circle">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <h2>Why Choose Our Loan Services</h2>
+                        </div>
+
+                        <div class="feature-cards-grid">
+                            <div class="feature-card">
+                                <div class="icon-circle">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <h3>Quick Approval</h3>
+                                <p>Get a decision within hours and funds within days</p>
+                            </div>
+
+                            <div class="feature-card">
+                                <div class="icon-circle">
+                                    <i class="fas fa-percentage"></i>
+                                </div>
+                                <h3>Competitive Rates</h3>
+                                <p>Low interest rates tailored to your credit profile</p>
+                            </div>
+
+                            <div class="feature-card">
+                                <div class="icon-circle">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <h3>Simple Process</h3>
+                                <p>Straightforward application with minimal paperwork</p>
+                            </div>
+
+                            <div class="feature-card">
+                                <div class="icon-circle">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <h3>Secure & Confidential</h3>
+                                <p>Your information is protected with bank-level security</p>
+                            </div>
+                        </div>
+
+                        <!-- Available Loan Types -->
+                        <div class="section-header">
+                            <div class="icon-circle">
+                                <i class="fas fa-list"></i>
+                            </div>
+                            <h2>Available Loan Types</h2>
+                        </div>
+
+                        <div class="loan-types-grid">
+                            <div class="loan-type-card">
+                                <div class="icon-circle">
+                                    <i class="fas fa-home"></i>
+                                </div>
+                                <h3>Personal Home Loans</h3>
+                                <p>Finance your dream home with competitive rates</p>
+                            </div>
+
+                            <div class="loan-type-card">
+                                <div class="icon-circle">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <h3>Automobile Loans</h3>
+                                <p>Get on the road with flexible auto financing</p>
+                            </div>
+
+                            <div class="loan-type-card">
+                                <div class="icon-circle">
+                                    <i class="fas fa-briefcase"></i>
+                                </div>
+                                <h3>Business Loans</h3>
+                                <p>Grow your business with tailored financing solutions</p>
+                            </div>
+                        </div>
+
+                        <!-- How It Works -->
+                        <div class="section-header">
+                            <div class="icon-circle">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <h2>How It Works</h2>
+                        </div>
+
+                        <div class="how-it-works">
+                            <div class="steps-container">
+                                <div class="step-item">
+                                    <div class="step-number">1</div>
+                                    <div class="step-content">
+                                        <h3>Apply Online</h3>
+                                        <p>Complete our simple online application form with your details and loan requirements</p>
+                                    </div>
+                                </div>
+
+                                <div class="step-item">
+                                    <div class="step-number">2</div>
+                                    <div class="step-content">
+                                        <h3>Quick Review</h3>
+                                        <p>Our team reviews your application and may contact you for additional information</p>
+                                    </div>
+                                </div>
+
+                                <div class="step-item">
+                                    <div class="step-number">3</div>
+                                    <div class="step-content">
+                                        <h3>Approval & Disbursement</h3>
+                                        <p>Once approved, the loan amount will be transferred to your account</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FAQ Section -->
+                        <div class="faq-section">
+                            <div class="section-header">
+                                <div class="icon-circle">
+                                    <i class="fas fa-question"></i>
+                                </div>
+                                <h2>Frequently Asked Questions</h2>
+                            </div>
+
+                            {% for faq in faqs %}
+                            <div class="faq-item">
+                                <div class="faq-question">{{ faq.question }}</div>
+                                <div class="faq-answer">{{ faq.answer }}</div>
+                            </div>
+                            {% endfor %}
+
+                            <a href="{% url 'accounts:vip_loan_faqs' %}" class="faq-link">
+                                View all FAQs <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </div>
+
+                        <!-- Call to Action -->
+                        <div class="cta-section">
+                            <h2>Ready to get started?</h2>
+                            <p>Apply now and get a decision on your loan application quickly</p>
+                            <a href="{% url 'accounts:vip_loan_application' %}" class="cta-button">
+                                <i class="fas fa-paper-plane"></i>
+                                Apply for a Loan
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

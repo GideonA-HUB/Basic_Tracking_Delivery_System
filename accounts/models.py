@@ -944,3 +944,140 @@ class Deposit(models.Model):
     @property
     def member_id(self):
         return self.vip_member.member_id
+
+
+class Loan(models.Model):
+    """Model for different types of loans offered"""
+    
+    LOAN_TYPE_CHOICES = [
+        ('personal_home', 'Personal Home Loans'),
+        ('automobile', 'Automobile Loans'),
+        ('business', 'Business Loans'),
+        ('joint_mortgage', 'Joint Mortgage'),
+        ('secured_overdraft', 'Secured Overdraft'),
+        ('health_finance', 'Health Finance'),
+    ]
+    
+    loan_type = models.CharField(max_length=30, choices=LOAN_TYPE_CHOICES, unique=True)
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+    icon_class = models.CharField(max_length=50, help_text="Font Awesome icon class")
+    icon_color = models.CharField(max_length=20, default='bg-blue-500', help_text="Tailwind CSS color class")
+    is_active = models.BooleanField(default=True)
+    min_amount = models.DecimalField(max_digits=15, decimal_places=2, default=1000.00)
+    max_amount = models.DecimalField(max_digits=15, decimal_places=2, default=1000000.00)
+    interest_rate_min = models.DecimalField(max_digits=5, decimal_places=2, default=3.50)
+    interest_rate_max = models.DecimalField(max_digits=5, decimal_places=2, default=15.00)
+    term_min_months = models.IntegerField(default=12)
+    term_max_months = models.IntegerField(default=360)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['loan_type']
+        verbose_name = 'Loan Type'
+        verbose_name_plural = 'Loan Types'
+    
+    def __str__(self):
+        return self.title
+
+
+class LoanApplication(models.Model):
+    """Model for VIP member loan applications"""
+    
+    STATUS_CHOICES = [
+        ('pending', 'Pending Review'),
+        ('under_review', 'Under Review'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+        ('disbursed', 'Disbursed'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+    
+    vip_member = models.ForeignKey(VIPProfile, on_delete=models.CASCADE, related_name='loan_applications')
+    loan_type = models.ForeignKey(Loan, on_delete=models.CASCADE, related_name='applications')
+    
+    # Application details
+    loan_amount = models.DecimalField(max_digits=15, decimal_places=2)
+    loan_purpose = models.TextField()
+    employment_status = models.CharField(max_length=20, choices=[
+        ('employed', 'Employed'),
+        ('self_employed', 'Self Employed'),
+        ('unemployed', 'Unemployed'),
+        ('retired', 'Retired'),
+        ('student', 'Student'),
+    ])
+    monthly_income = models.DecimalField(max_digits=15, decimal_places=2)
+    employment_company = models.CharField(max_length=200, blank=True, null=True)
+    employment_position = models.CharField(max_length=100, blank=True, null=True)
+    
+    # Personal information
+    phone_number = models.CharField(max_length=20)
+    address = models.TextField()
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    zip_code = models.CharField(max_length=20)
+    country = models.CharField(max_length=100, default='United States')
+    
+    # Application status and tracking
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    reference_number = models.CharField(max_length=50, unique=True, blank=True)
+    
+    # Admin fields
+    admin_notes = models.TextField(blank=True, null=True, help_text="Internal notes for admin")
+    approved_amount = models.DecimalField(max_digits=15, decimal_places=2, blank=True, null=True)
+    approved_interest_rate = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    approved_term_months = models.IntegerField(blank=True, null=True)
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    reviewed_at = models.DateTimeField(blank=True, null=True)
+    approved_at = models.DateTimeField(blank=True, null=True)
+    disbursed_at = models.DateTimeField(blank=True, null=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Loan Application'
+        verbose_name_plural = 'Loan Applications'
+    
+    def __str__(self):
+        return f"Loan Application {self.reference_number} - {self.vip_member.full_name}"
+    
+    def save(self, *args, **kwargs):
+        """Auto-generate reference number"""
+        if not self.reference_number:
+            import uuid
+            self.reference_number = f"LOAN-{str(uuid.uuid4())[:8].upper()}"
+        
+        super().save(*args, **kwargs)
+    
+    @property
+    def full_name(self):
+        return self.vip_member.full_name
+    
+    @property
+    def member_id(self):
+        return self.vip_member.member_id
+
+
+class LoanFAQ(models.Model):
+    """Model for loan frequently asked questions"""
+    
+    question = models.CharField(max_length=500)
+    answer = models.TextField()
+    order = models.PositiveIntegerField(default=0, help_text="Order in which FAQ appears")
+    is_active = models.BooleanField(default=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['order', 'created_at']
+        verbose_name = 'Loan FAQ'
+        verbose_name_plural = 'Loan FAQs'
+    
+    def __str__(self):
+        return f"FAQ: {self.question[:50]}..."

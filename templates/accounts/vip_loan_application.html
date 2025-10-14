@@ -1,0 +1,788 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Apply for Loan{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Base styles for the dashboard layout */
+    .dashboard-layout {
+        display: flex;
+        min-height: 100vh;
+        background-color: #f9fafb; /* Light gray background */
+    }
+
+    /* Sidebar styles */
+    .dashboard-sidebar {
+        width: 16rem; /* 256px */
+        background-color: #ffffff; /* White background */
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* Shadow */
+        flex-shrink: 0;
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        z-index: 40;
+        scroll-behavior: smooth;
+        padding-top: 0 !important; /* Ensure no top padding from parent */
+        margin-top: 0 !important; /* Ensure no top margin from parent */
+    }
+
+    /* Custom scrollbar for sidebar */
+    .dashboard-sidebar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .dashboard-sidebar::-webkit-scrollbar-track {
+        background: #f1f5f9; /* Light gray track */
+    }
+
+    .dashboard-sidebar::-webkit-scrollbar-thumb {
+        background: #cbd5e1; /* Gray thumb */
+        border-radius: 3px;
+    }
+
+    .dashboard-sidebar::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8; /* Darker gray on hover */
+    }
+
+    /* Ensure sidebar content is visible */
+    .dashboard-sidebar .p-6 {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Main content area */
+    .main-content {
+        flex-grow: 1;
+        margin-left: 16rem; /* 256px - sidebar width */
+        height: 100vh;
+        overflow-y: auto;
+        padding: 2rem; /* Overall padding for the main content */
+        background-color: #f9fafb; /* Light gray background */
+    }
+
+    /* Custom scrollbar for main content */
+    .main-content::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .main-content::-webkit-scrollbar-track {
+        background: #f1f5f9;
+    }
+
+    .main-content::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+    }
+
+    .main-content::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+
+    /* Theme compatibility for sidebar */
+    html.light .dashboard-sidebar .text-gray-600,
+    html.light .dashboard-sidebar .text-gray-500,
+    html.light .dashboard-sidebar .text-gray-400,
+    html.light .dashboard-sidebar .text-gray-300,
+    html.light .dashboard-sidebar a,
+    html.light .dashboard-sidebar p,
+    html.light .dashboard-sidebar span,
+    html.light .dashboard-sidebar div {
+        color: #374151 !important;
+        font-weight: 500 !important;
+    }
+
+    /* Fix sidebar headings */
+    html.light .sidebar-heading {
+        color: #1f2937 !important;
+        font-weight: 700 !important;
+    }
+
+    /* Fix navigation links */
+    html.light .nav-link {
+        color: #374151 !important;
+        font-weight: 500 !important;
+    }
+
+    html.light .nav-link:hover {
+        color: #1f2937 !important;
+        font-weight: 600 !important;
+    }
+
+    /* Fix copyright text */
+    html.light .copyright-text {
+        color: #6b7280 !important;
+        font-weight: 500 !important;
+    }
+
+    /* Dark theme adjustments for sidebar text */
+    html.dark .dashboard-sidebar .text-gray-600,
+    html.dark .dashboard-sidebar .text-gray-500,
+    html.dark .dashboard-sidebar .text-gray-400,
+    html.dark .dashboard-sidebar .text-gray-300,
+    html.dark .dashboard-sidebar a,
+    html.dark .dashboard-sidebar p,
+    html.dark .dashboard-sidebar span,
+    html.dark .dashboard-sidebar div {
+        color: #d1d5db !important; /* Light gray for dark theme */
+    }
+
+    html.dark .dashboard-sidebar .sidebar-heading {
+        color: #9ca3af !important; /* Lighter gray for headings */
+    }
+
+    html.dark .dashboard-sidebar .nav-link {
+        color: #d1d5db !important;
+    }
+
+    html.dark .dashboard-sidebar .nav-link:hover {
+        color: #e5e7eb !important;
+    }
+
+    html.dark .dashboard-sidebar .copyright-text {
+        color: #9ca3af !important;
+    }
+
+    /* Ensure the main content area's background is correct in dark mode */
+    html.dark .main-content {
+        background-color: #1f2937 !important; /* Dark background for main content */
+        color: #e5e7eb !important; /* Light text for dark theme */
+    }
+
+    html.dark .main-content h1,
+    html.dark .main-content h2,
+    html.dark .main-content h3,
+    html.dark .main-content h4,
+    html.dark .main-content .text-gray-900 {
+        color: #e5e7eb !important;
+    }
+
+    html.dark .main-content .text-gray-700,
+    html.dark .main-content .text-gray-600,
+    html.dark .main-content .text-gray-500 {
+        color: #d1d5db !important;
+    }
+
+    /* Loan application specific styles */
+    .loan-application-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        border-radius: 1rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+    }
+
+    html.dark .loan-application-container {
+        background-color: #374151 !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    /* Form styles */
+    .form-section {
+        padding: 2rem;
+    }
+
+    .form-section h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    html.dark .form-section h2 {
+        color: #e5e7eb !important;
+    }
+
+    .form-section h2 i {
+        color: #3b82f6;
+        font-size: 1.25rem;
+    }
+
+    html.dark .form-section h2 i {
+        color: #60a5fa !important;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+
+    html.dark .form-group label {
+        color: #d1d5db !important;
+    }
+
+    .form-control {
+        display: block;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 0.5rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    html.dark .form-control {
+        background-color: #4b5563 !important;
+        border-color: #6b7280 !important;
+        color: #e5e7eb !important;
+    }
+
+    .form-control::placeholder {
+        color: #6c757d;
+        opacity: 1;
+    }
+
+    html.dark .form-control::placeholder {
+        color: #9ca3af !important;
+    }
+
+    .form-control:focus {
+        border-color: #80bdff;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .form-select {
+        display: block;
+        width: 100%;
+        padding: 0.75rem 2.25rem 0.75rem 1rem;
+        -moz-padding-start: calc(1rem - 3px);
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #fff;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 16px 12px;
+        border: 1px solid #ced4da;
+        border-radius: 0.5rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+
+    html.dark .form-select {
+        background-color: #4b5563 !important;
+        border-color: #6b7280 !important;
+        color: #e5e7eb !important;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23e5e7eb' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    }
+
+    .form-select:focus {
+        border-color: #80bdff;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .form-error {
+        color: #dc2626;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .form-control.is-invalid {
+        border-color: #dc2626;
+    }
+
+    /* Action buttons */
+    .action-buttons {
+        padding: 2rem;
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    html.dark .action-buttons {
+        border-color: #4b5563 !important;
+    }
+
+    .btn-submit {
+        background-color: #3b82f6;
+        color: #ffffff;
+        padding: 1rem 2rem;
+        border-radius: 0.75rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-grow: 1;
+        justify-content: center;
+    }
+
+    .btn-submit:hover {
+        background-color: #2563eb;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-back {
+        background-color: #ffffff;
+        color: #374151;
+        padding: 1rem 2rem;
+        border-radius: 0.75rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border: 1px solid #d1d5db;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+
+    html.dark .btn-back {
+        background-color: #4b5563 !important;
+        color: #d1d5db !important;
+        border-color: #6b7280 !important;
+    }
+
+    .btn-back:hover {
+        background-color: #f9fafb;
+        border-color: #9ca3af;
+        transform: translateY(-1px);
+        text-decoration: none;
+    }
+
+    html.dark .btn-back:hover {
+        background-color: #6b7280 !important;
+        border-color: #9ca3af !important;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .dashboard-sidebar {
+            width: 100%;
+            height: auto;
+            position: relative;
+            box-shadow: none;
+        }
+
+        .main-content {
+            margin-left: 0;
+            padding: 1rem;
+        }
+
+        .loan-application-container {
+            margin: 0.5rem;
+        }
+
+        .form-section {
+            padding: 1.5rem;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            padding: 1.5rem;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .form-section {
+            padding: 1rem;
+        }
+
+        .action-buttons {
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Dashboard Layout -->
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-white shadow-lg dashboard-sidebar" style="width: 16rem;">
+            <div class="p-6">
+                <!-- User Profile Section -->
+                <div class="mb-8">
+                    <div class="flex flex-col items-center text-center mb-4">
+                        <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-3">
+                            {{ user.first_name|first|upper }}
+                        </div>
+                        <h3 class="font-bold text-gray-900 text-lg">{{ vip_member.full_name }}</h3>
+                        <p class="text-sm text-gray-500">ID: {{ vip_member.member_id }}</p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="space-y-3 mb-8">
+                    <button class="w-full bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded-md transition-colors mb-3 flex items-center justify-center gap-2">
+                        <i class="fas fa-shield-alt"></i>
+                        Verify KYC
+                    </button>
+                    <button class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-gem"></i>
+                        MERIDIAN VIP
+                    </button>
+                </div>
+
+                <!-- Main Menu -->
+                <div class="mb-6">
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 sidebar-heading">MAIN MENU</h3>
+                    <nav class="space-y-2">
+                        <a href="{% url 'accounts:vip_dashboard' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-home w-4"></i>
+                            Dashboard
+                        </a>
+                        <a href="{% url 'accounts:vip_transactions' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-exchange-alt w-4"></i>
+                            Transactions
+                        </a>
+                        <a href="{% url 'accounts:vip_cards' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-credit-card w-4"></i>
+                            Cards
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Transfers -->
+                <div class="mb-6">
+                    <h3 class="sidebar-heading text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">TRANSFERS</h3>
+                    <nav class="space-y-2">
+                        <a href="{% url 'accounts:vip_transfer_local' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-paper-plane w-4"></i>
+                            Local Transfer
+                        </a>
+                        <a href="{% url 'accounts:vip_transfer_international' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-globe w-4"></i>
+                            International Wire
+                        </a>
+                        <a href="{% url 'accounts:vip_deposit' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-plus w-4"></i>
+                            Deposit
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Services -->
+                <div class="mb-6">
+                    <h3 class="sidebar-heading text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">SERVICES</h3>
+                    <nav class="space-y-2">
+                        <a href="{% url 'accounts:vip_loan_services' %}" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-hand-holding-usd w-4"></i>
+                            Loan Request
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-receipt w-4"></i>
+                            IRS Tax Refund
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-history w-4"></i>
+                            Loan History
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Account -->
+                <div class="mb-6">
+                    <h3 class="sidebar-heading text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">ACCOUNT</h3>
+                    <nav class="space-y-2">
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-cog w-4"></i>
+                            Account Settings
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-envelope w-4"></i>
+                            Message us
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-university w-4"></i>
+                            Online Banking
+                        </a>
+                    </nav>
+                </div>
+
+                <div class="mt-auto text-center">
+                    <p class="text-xs text-gray-500 copyright-text">© 2025 Meridian Asset Logistics</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-y-auto bg-gray-50 main-content">
+            <div class="w-full">
+                <!-- Header -->
+                <div class="mb-8">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-900 mb-2">Apply for Loan</h1>
+                            <p class="text-sm text-gray-500">Dashboard > Loan Services > Apply</p>
+                        </div>
+                        <a href="{% url 'accounts:vip_loan_services' %}" class="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg flex items-center gap-2 hover:bg-gray-300 transition-colors">
+                            <i class="fas fa-arrow-left"></i>
+                            Back to Loan Services
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Loan Application Form -->
+                <div class="loan-application-container">
+                    <form method="post" id="loanApplicationForm">
+                        {% csrf_token %}
+                        
+                        <!-- Loan Information -->
+                        <div class="form-section">
+                            <h2><i class="fas fa-info-circle"></i> Loan Information</h2>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="{{ form.loan_type.id_for_label }}">Loan Type</label>
+                                    {{ form.loan_type }}
+                                    {% if form.loan_type.errors %}
+                                        <div class="form-error">
+                                            {% for error in form.loan_type.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="{{ form.loan_amount.id_for_label }}">Loan Amount ($)</label>
+                                    {{ form.loan_amount }}
+                                    {% if form.loan_amount.errors %}
+                                        <div class="form-error">
+                                            {% for error in form.loan_amount.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="{{ form.loan_purpose.id_for_label }}">Purpose of Loan</label>
+                                {{ form.loan_purpose }}
+                                {% if form.loan_purpose.errors %}
+                                    <div class="form-error">
+                                        {% for error in form.loan_purpose.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Employment Information -->
+                        <div class="form-section">
+                            <h2><i class="fas fa-briefcase"></i> Employment Information</h2>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="{{ form.employment_status.id_for_label }}">Employment Status</label>
+                                    {{ form.employment_status }}
+                                    {% if form.employment_status.errors %}
+                                        <div class="form-error">
+                                            {% for error in form.employment_status.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="{{ form.monthly_income.id_for_label }}">Monthly Income ($)</label>
+                                    {{ form.monthly_income }}
+                                    {% if form.monthly_income.errors %}
+                                        <div class="form-error">
+                                            {% for error in form.monthly_income.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="{{ form.employment_company.id_for_label }}">Company Name</label>
+                                    {{ form.employment_company }}
+                                    {% if form.employment_company.errors %}
+                                        <div class="form-error">
+                                            {% for error in form.employment_company.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="{{ form.employment_position.id_for_label }}">Job Title/Position</label>
+                                    {{ form.employment_position }}
+                                    {% if form.employment_position.errors %}
+                                        <div class="form-error">
+                                            {% for error in form.employment_position.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="form-section">
+                            <h2><i class="fas fa-phone"></i> Contact Information</h2>
+                            
+                            <div class="form-group">
+                                <label for="{{ form.phone_number.id_for_label }}">Phone Number</label>
+                                {{ form.phone_number }}
+                                {% if form.phone_number.errors %}
+                                    <div class="form-error">
+                                        {% for error in form.phone_number.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group">
+                                <label for="{{ form.address.id_for_label }}">Street Address</label>
+                                {{ form.address }}
+                                {% if form.address.errors %}
+                                    <div class="form-error">
+                                        {% for error in form.address.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="{{ form.city.id_for_label }}">City</label>
+                                    {{ form.city }}
+                                    {% if form.city.errors %}
+                                        <div class="form-error">
+                                            {% for error in form.city.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="{{ form.state.id_for_label }}">State</label>
+                                    {{ form.state }}
+                                    {% if form.state.errors %}
+                                        <div class="form-error">
+                                            {% for error in form.state.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="{{ form.zip_code.id_for_label }}">ZIP Code</label>
+                                    {{ form.zip_code }}
+                                    {% if form.zip_code.errors %}
+                                        <div class="form-error">
+                                            {% for error in form.zip_code.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="{{ form.country.id_for_label }}">Country</label>
+                                    {{ form.country }}
+                                    {% if form.country.errors %}
+                                        <div class="form-error">
+                                            {% for error in form.country.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="action-buttons">
+                            <button type="submit" class="btn-submit">
+                                <i class="fas fa-paper-plane"></i>
+                                Submit Application
+                            </button>
+                            <a href="{% url 'accounts:vip_loan_services' %}" class="btn-back">
+                                <i class="fas fa-arrow-left"></i>
+                                Back to Loan Services
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Form validation
+    document.getElementById('loanApplicationForm').addEventListener('submit', function(e) {
+        const loanAmount = document.getElementById('{{ form.loan_amount.id_for_label }}').value;
+        const monthlyIncome = document.getElementById('{{ form.monthly_income.id_for_label }}').value;
+        
+        if (parseFloat(loanAmount) < 1000) {
+            e.preventDefault();
+            alert('Minimum loan amount is $1,000.00');
+            return false;
+        }
+        
+        if (parseFloat(loanAmount) > 10000000) {
+            e.preventDefault();
+            alert('Maximum loan amount is $10,000,000.00');
+            return false;
+        }
+        
+        if (parseFloat(monthlyIncome) < 0) {
+            e.preventDefault();
+            alert('Monthly income cannot be negative');
+            return false;
+        }
+    });
+</script>
+{% endblock %}

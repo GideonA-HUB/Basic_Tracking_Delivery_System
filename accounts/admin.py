@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
-from .models import StaffProfile, CustomerProfile, VIPProfile, RecentActivity, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit
+from .models import StaffProfile, CustomerProfile, VIPProfile, RecentActivity, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ
 
 
 class StaffProfileInline(admin.StackedInline):
@@ -591,3 +591,201 @@ class DepositAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         """Only superusers can delete deposits"""
         return request.user.is_superuser
+
+
+@admin.register(Loan)
+class LoanAdmin(admin.ModelAdmin):
+    """Admin configuration for Loan model"""
+    
+    list_display = [
+        'title', 'loan_type', 'min_amount', 'max_amount', 
+        'interest_rate_min', 'interest_rate_max', 'is_active', 'created_at'
+    ]
+    
+    list_filter = [
+        'loan_type', 'is_active', 'created_at'
+    ]
+    
+    search_fields = [
+        'title', 'description', 'loan_type'
+    ]
+    
+    fieldsets = (
+        ('Loan Information', {
+            'fields': (
+                'loan_type', 'title', 'description', 'is_active'
+            )
+        }),
+        ('Visual Settings', {
+            'fields': (
+                'icon_class', 'icon_color'
+            )
+        }),
+        ('Loan Terms', {
+            'fields': (
+                'min_amount', 'max_amount', 'interest_rate_min', 
+                'interest_rate_max', 'term_min_months', 'term_max_months'
+            )
+        }),
+        ('Timestamps', {
+            'fields': (
+                'created_at', 'updated_at'
+            ),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    readonly_fields = ['created_at', 'updated_at']
+
+
+@admin.register(LoanApplication)
+class LoanApplicationAdmin(admin.ModelAdmin):
+    """Admin configuration for LoanApplication model"""
+    
+    list_display = [
+        'reference_number', 'vip_member', 'loan_type', 'loan_amount', 
+        'status', 'created_at', 'approved_at'
+    ]
+    
+    list_filter = [
+        'status', 'loan_type__loan_type', 'employment_status', 'created_at', 'approved_at'
+    ]
+    
+    search_fields = [
+        'reference_number', 'vip_member__full_name', 'vip_member__member_id',
+        'employment_company', 'phone_number', 'city', 'state'
+    ]
+    
+    readonly_fields = [
+        'reference_number', 'created_at', 'updated_at'
+    ]
+    
+    fieldsets = (
+        ('Application Information', {
+            'fields': (
+                'reference_number', 'vip_member', 'loan_type', 'loan_amount', 'loan_purpose'
+            )
+        }),
+        ('Employment Details', {
+            'fields': (
+                'employment_status', 'monthly_income', 'employment_company', 'employment_position'
+            )
+        }),
+        ('Contact Information', {
+            'fields': (
+                'phone_number', 'address', 'city', 'state', 'zip_code', 'country'
+            )
+        }),
+        ('Status & Processing', {
+            'fields': (
+                'status', 'admin_notes'
+            )
+        }),
+        ('Approval Details', {
+            'fields': (
+                'approved_amount', 'approved_interest_rate', 'approved_term_months'
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': (
+                'created_at', 'updated_at', 'reviewed_at', 'approved_at', 'disbursed_at'
+            ),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    actions = ['mark_as_under_review', 'mark_as_approved', 'mark_as_rejected']
+    
+    def mark_as_under_review(self, request, queryset):
+        """Mark selected applications as under review"""
+        from django.utils import timezone
+        updated = queryset.update(status='under_review', reviewed_at=timezone.now())
+        self.message_user(request, f'{updated} applications marked as under review.')
+    mark_as_under_review.short_description = "Mark selected applications as under review"
+    
+    def mark_as_approved(self, request, queryset):
+        """Mark selected applications as approved"""
+        from django.utils import timezone
+        updated = queryset.update(status='approved', approved_at=timezone.now())
+        self.message_user(request, f'{updated} applications marked as approved.')
+    mark_as_approved.short_description = "Mark selected applications as approved"
+    
+    def mark_as_rejected(self, request, queryset):
+        """Mark selected applications as rejected"""
+        updated = queryset.update(status='rejected')
+        self.message_user(request, f'{updated} applications marked as rejected.')
+    mark_as_rejected.short_description = "Mark selected applications as rejected"
+    
+    def get_queryset(self, request):
+        """Filter applications for current VIP member if not superuser"""
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        try:
+            vip_profile = request.user.vip_profile
+            return qs.filter(vip_member=vip_profile)
+        except:
+            return qs.none()
+    
+    def has_change_permission(self, request, obj=None):
+        """Allow VIP members to view their own applications"""
+        if obj and hasattr(request.user, 'vip_profile'):
+            return obj.vip_member == request.user.vip_profile
+        return super().has_change_permission(request, obj)
+    
+    def has_delete_permission(self, request, obj=None):
+        """Only superusers can delete applications"""
+        return request.user.is_superuser
+
+
+@admin.register(LoanFAQ)
+class LoanFAQAdmin(admin.ModelAdmin):
+    """Admin configuration for LoanFAQ model"""
+    
+    list_display = [
+        'question', 'order', 'is_active', 'created_at'
+    ]
+    
+    list_filter = [
+        'is_active', 'created_at'
+    ]
+    
+    search_fields = [
+        'question', 'answer'
+    ]
+    
+    fieldsets = (
+        ('FAQ Content', {
+            'fields': (
+                'question', 'answer'
+            )
+        }),
+        ('Display Settings', {
+            'fields': (
+                'order', 'is_active'
+            )
+        }),
+        ('Timestamps', {
+            'fields': (
+                'created_at', 'updated_at'
+            ),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    readonly_fields = ['created_at', 'updated_at']
+    
+    actions = ['mark_as_active', 'mark_as_inactive']
+    
+    def mark_as_active(self, request, queryset):
+        """Mark selected FAQs as active"""
+        updated = queryset.update(is_active=True)
+        self.message_user(request, f'{updated} FAQs marked as active.')
+    mark_as_active.short_description = "Mark selected FAQs as active"
+    
+    def mark_as_inactive(self, request, queryset):
+        """Mark selected FAQs as inactive"""
+        updated = queryset.update(is_active=False)
+        self.message_user(request, f'{updated} FAQs marked as inactive.')
+    mark_as_inactive.short_description = "Mark selected FAQs as inactive"

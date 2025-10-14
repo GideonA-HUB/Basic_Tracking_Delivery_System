@@ -41,4 +41,9 @@ urlpatterns = [
     path('vip/transfer/alipay/', views.vip_transfer_alipay, name='vip_transfer_alipay'),
     path('vip/transfer/wechat/', views.vip_transfer_wechat, name='vip_transfer_wechat'),
     path('vip/deposit/', views.vip_deposit, name='vip_deposit'),
+    
+    # VIP loan services
+    path('vip/loans/', views.vip_loan_services, name='vip_loan_services'),
+    path('vip/loans/apply/', views.vip_loan_application, name='vip_loan_application'),
+    path('vip/loans/faqs/', views.vip_loan_faqs, name='vip_loan_faqs'),
 ]

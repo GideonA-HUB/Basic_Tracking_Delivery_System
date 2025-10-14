@@ -6,8 +6,8 @@ from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
-from .forms import StaffLoginForm, StaffRegistrationForm, CustomerRegistrationForm, CustomerLoginForm, VIPLoginForm, CardApplicationForm, LocalTransferForm, InternationalTransferForm, WireTransferForm, CryptocurrencyForm, PayPalForm, WiseTransferForm, CashAppForm, SkrillForm, VenmoForm, ZelleForm, RevolutForm, AlipayForm, WeChatPayForm, DepositForm
-from .models import StaffProfile, CustomerProfile, VIPProfile, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit
+from .forms import StaffLoginForm, StaffRegistrationForm, CustomerRegistrationForm, CustomerLoginForm, VIPLoginForm, CardApplicationForm, LocalTransferForm, InternationalTransferForm, WireTransferForm, CryptocurrencyForm, PayPalForm, WiseTransferForm, CashAppForm, SkrillForm, VenmoForm, ZelleForm, RevolutForm, AlipayForm, WeChatPayForm, DepositForm, LoanApplicationForm
+from .models import StaffProfile, CustomerProfile, VIPProfile, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ
 
 
 def is_staff_user(user):
@@ -1027,6 +1027,100 @@ def vip_transfer_wechat(request):
         }
         
         return render(request, 'accounts/vip_transfer_method.html', context)
+        
+    except VIPProfile.DoesNotExist:
+        messages.error(request, 'VIP profile not found. Please contact support.')
+        return redirect('frontend:landing_page')
+
+
+@login_required
+@user_passes_test(is_vip_user)
+def vip_loan_services(request):
+    """VIP loan services information page"""
+    try:
+        vip_profile = request.user.vip_profile
+        
+        # Get all active loans
+        loans = Loan.objects.filter(is_active=True)
+        
+        # Get FAQs
+        faqs = LoanFAQ.objects.filter(is_active=True)[:2]  # Show first 2 on main page
+        
+        context = {
+            'vip_member': vip_profile,
+            'user': request.user,
+            'loans': loans,
+            'faqs': faqs,
+        }
+        
+        return render(request, 'accounts/vip_loan_services.html', context)
+        
+    except VIPProfile.DoesNotExist:
+        messages.error(request, 'VIP profile not found. Please contact support.')
+        return redirect('frontend:landing_page')
+
+
+@login_required
+@user_passes_test(is_vip_user)
+def vip_loan_application(request):
+    """VIP loan application form"""
+    try:
+        vip_profile = request.user.vip_profile
+        
+        if request.method == 'POST':
+            form = LoanApplicationForm(request.POST)
+            if form.is_valid():
+                # Create the loan application
+                application = form.save(commit=False)
+                application.vip_member = vip_profile
+                application.status = 'pending'
+                
+                # Set default values from VIP profile if not provided
+                if not application.phone_number and vip_profile.phone:
+                    application.phone_number = vip_profile.phone
+                
+                application.save()
+                
+                messages.success(request, f'Loan application submitted successfully! Reference: {application.reference_number}')
+                return redirect('accounts:vip_loan_services')
+            else:
+                messages.error(request, 'Please correct the errors below.')
+        else:
+            form = LoanApplicationForm()
+            # Pre-populate with VIP profile data if available
+            if vip_profile.phone:
+                form.fields['phone_number'].initial = vip_profile.phone
+        
+        context = {
+            'vip_member': vip_profile,
+            'user': request.user,
+            'form': form,
+        }
+        
+        return render(request, 'accounts/vip_loan_application.html', context)
+        
+    except VIPProfile.DoesNotExist:
+        messages.error(request, 'VIP profile not found. Please contact support.')
+        return redirect('frontend:landing_page')
+
+
+@login_required
+@user_passes_test(is_vip_user)
+def vip_loan_faqs(request):
+    """VIP loan FAQs page"""
+    try:
+        vip_profile = request.user.vip_profile
+        
+        # Get all active FAQs
+        faqs = LoanFAQ.objects.filter(is_active=True)
+        
+        context = {
+            'vip_member': vip_profile,
+            'user': request.user,
+            'faqs': faqs,
+        }
+        
+        return render(request, 'accounts/vip_loan_faqs.html', context)
         
     except VIPProfile.DoesNotExist:
         messages.error(request, 'VIP profile not found. Please contact support.')

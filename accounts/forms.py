@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
-from .models import Card, StaffProfile, CustomerProfile, VIPProfile, LocalTransfer, InternationalTransfer, Deposit
+from .models import Card, StaffProfile, CustomerProfile, VIPProfile, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ
 
 
 class StaffLoginForm(AuthenticationForm):
@@ -884,3 +884,110 @@ class DepositForm(forms.ModelForm):
         if amount is not None and amount < 1.00:
             raise forms.ValidationError('Minimum deposit amount is $1.00')
         return amount
+
+
+class LoanApplicationForm(forms.ModelForm):
+    """Form for VIP member loan applications"""
+    
+    class Meta:
+        model = LoanApplication
+        fields = [
+            'loan_type', 'loan_amount', 'loan_purpose', 'employment_status',
+            'monthly_income', 'employment_company', 'employment_position',
+            'phone_number', 'address', 'city', 'state', 'zip_code', 'country'
+        ]
+        widgets = {
+            'loan_type': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+            'loan_amount': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '1000',
+                'step': '0.01',
+                'placeholder': 'Enter loan amount'
+            }),
+            'loan_purpose': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Describe the purpose of your loan'
+            }),
+            'employment_status': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+            'monthly_income': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0',
+                'step': '0.01',
+                'placeholder': 'Enter monthly income'
+            }),
+            'employment_company': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter company name'
+            }),
+            'employment_position': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter job title/position'
+            }),
+            'phone_number': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter phone number'
+            }),
+            'address': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Enter street address'
+            }),
+            'city': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter city'
+            }),
+            'state': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter state'
+            }),
+            'zip_code': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter ZIP code'
+            }),
+            'country': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter country'
+            })
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Only show active loan types
+        self.fields['loan_type'].queryset = Loan.objects.filter(is_active=True)
+        
+        # Set default values
+        self.fields['country'].initial = 'United States'
+        
+        # Make some fields required conditionally
+        self.fields['employment_company'].required = False
+        self.fields['employment_position'].required = False
+    
+    def clean_loan_amount(self):
+        loan_amount = self.cleaned_data.get('loan_amount')
+        if loan_amount is not None:
+            if loan_amount < 1000:
+                raise forms.ValidationError('Minimum loan amount is $1,000.00')
+            if loan_amount > 10000000:  # 10 million max
+                raise forms.ValidationError('Maximum loan amount is $10,000,000.00')
+        return loan_amount
+    
+    def clean_monthly_income(self):
+        monthly_income = self.cleaned_data.get('monthly_income')
+        if monthly_income is not None and monthly_income < 0:
+            raise forms.ValidationError('Monthly income cannot be negative')
+        return monthly_income
+    
+    def clean_phone_number(self):
+        phone_number = self.cleaned_data.get('phone_number')
+        if phone_number:
+            # Basic phone number validation
+            import re
+            phone_pattern = r'^\+?1?[-.\s]?\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})$'
+            if not re.match(phone_pattern, phone_number):
+                raise forms.ValidationError('Please enter a valid phone number')
+        return phone_number
