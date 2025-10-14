@@ -141,19 +141,18 @@ class LocalTransferInline(admin.TabularInline):
     """Inline admin for LocalTransfer"""
     model = LocalTransfer
     extra = 0
-    fields = ('reference_number', 'transfer_amount', 'beneficiary_name', 'status', 'transfer_date', 'is_active')
-    readonly_fields = ('created_at', 'updated_at')
+    fields = ('reference_number', 'transfer_amount', 'beneficiary_name', 'status', 'is_active')
+    readonly_fields = ('transfer_date', 'created_at', 'updated_at')
 
 
 class InternationalTransferInline(admin.TabularInline):
     """Inline admin for InternationalTransfer"""
     model = InternationalTransfer
     extra = 0
-    readonly_fields = ('reference_number', 'created_at', 'updated_at')
+    readonly_fields = ('reference_number', 'transfer_date', 'created_at', 'updated_at')
     fields = (
         'transfer_method', 'transfer_amount', 'currency', 'recipient_name', 
-        'status', 'reference_number', 'transfer_fee', 'total_amount', 
-        'transfer_date', 'created_at'
+        'status', 'transfer_fee', 'total_amount'
     )
 
 
