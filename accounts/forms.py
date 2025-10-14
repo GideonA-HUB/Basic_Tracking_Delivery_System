@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
-from .models import Card, StaffProfile, CustomerProfile, VIPProfile, LocalTransfer, InternationalTransfer
+from .models import Card, StaffProfile, CustomerProfile, VIPProfile, LocalTransfer, InternationalTransfer, Deposit
 
 
 class StaffLoginForm(AuthenticationForm):
@@ -847,3 +847,49 @@ class WeChatPayForm(forms.ModelForm):
         self.fields['transfer_method'].initial = 'wechat_pay'
         self.fields['currency'].choices = InternationalTransfer.CURRENCY_CHOICES
         self.fields['description'].required = False
+
+
+class DepositForm(forms.ModelForm):
+    """Form for VIP member deposits"""
+    
+    class Meta:
+        model = Deposit
+        fields = ['deposit_method', 'amount', 'currency', 'notes']
+        widgets = {
+            'deposit_method': forms.RadioSelect(attrs={
+                'class': 'deposit-method-radio'
+            }),
+            'amount': forms.NumberInput(attrs={
+                'class': 'form-control amount-input',
+                'min': '1.00',
+                'step': '0.01',
+                'placeholder': '0.00'
+            }),
+            'currency': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+            'notes': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Optional notes for this deposit'
+            })
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['currency'].choices = [('USD', 'USD'), ('EUR', 'EUR'), ('GBP', 'GBP')]
+        self.fields['notes'].required = False
+        
+        # Customize the radio select widget for deposit methods
+        self.fields['deposit_method'].widget.attrs.update({
+            'class': 'deposit-method-radio',
+            'style': 'display: none;'  # Hide default radio styling
+        })
+    
+    def clean_amount(self):
+        amount = self.cleaned_data.get('amount')
+        if amount is not None and amount <= 0:
+            raise forms.ValidationError('Deposit amount must be greater than $0.00')
+        if amount is not None and amount < 1.00:
+            raise forms.ValidationError('Minimum deposit amount is $1.00')
+        return amount

@@ -882,3 +882,65 @@ class InternationalTransfer(models.Model):
         self.total_amount = self.transfer_amount + self.transfer_fee
         
         super().save(*args, **kwargs)
+
+
+class Deposit(models.Model):
+    """Model for VIP member deposits"""
+    
+    DEPOSIT_METHOD_CHOICES = [
+        ('usdt', 'USDT'),
+        ('bank_transfer', 'Bank Transfer'),
+        ('paypal', 'PayPal'),
+        ('bitcoin', 'Bitcoin'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('processing', 'Processing'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+        ('cancelled', 'Cancelled'),
+    ]
+    
+    vip_member = models.ForeignKey(VIPProfile, on_delete=models.CASCADE, related_name='deposits')
+    deposit_method = models.CharField(max_length=20, choices=DEPOSIT_METHOD_CHOICES)
+    amount = models.DecimalField(max_digits=15, decimal_places=2)
+    currency = models.CharField(max_length=3, default='USD')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    
+    # Transaction details
+    reference_number = models.CharField(max_length=50, unique=True, blank=True)
+    transaction_id = models.CharField(max_length=100, blank=True, null=True)
+    
+    # Additional information
+    notes = models.TextField(blank=True, null=True)
+    admin_notes = models.TextField(blank=True, null=True, help_text="Internal notes for admin")
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    processed_at = models.DateTimeField(blank=True, null=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Deposit'
+        verbose_name_plural = 'Deposits'
+    
+    def __str__(self):
+        return f"Deposit {self.reference_number} - {self.vip_member.full_name} - ${self.amount}"
+    
+    def save(self, *args, **kwargs):
+        if not self.reference_number:
+            # Generate unique reference number
+            import uuid
+            self.reference_number = f"DEP{str(uuid.uuid4())[:8].upper()}"
+        
+        super().save(*args, **kwargs)
+    
+    @property
+    def full_name(self):
+        return self.vip_member.full_name
+    
+    @property
+    def member_id(self):
+        return self.vip_member.member_id

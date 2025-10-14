@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
-from .models import StaffProfile, CustomerProfile, VIPProfile, RecentActivity, Transaction, Card, LocalTransfer, InternationalTransfer
+from .models import StaffProfile, CustomerProfile, VIPProfile, RecentActivity, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit
 
 
 class StaffProfileInline(admin.StackedInline):
@@ -499,4 +499,95 @@ class InternationalTransferAdmin(admin.ModelAdmin):
 
 
 # Admin classes are registered using decorators above
+
+
+@admin.register(Deposit)
+class DepositAdmin(admin.ModelAdmin):
+    """Admin configuration for Deposit model"""
     
+    list_display = [
+        'reference_number', 'vip_member', 'deposit_method', 'amount', 'currency', 
+        'status', 'created_at', 'processed_at'
+    ]
+    
+    list_filter = [
+        'deposit_method', 'status', 'currency', 'created_at'
+    ]
+    
+    search_fields = [
+        'reference_number', 'vip_member__full_name', 'vip_member__member_id',
+        'transaction_id', 'notes'
+    ]
+    
+    readonly_fields = [
+        'reference_number', 'created_at', 'updated_at'
+    ]
+    
+    fieldsets = (
+        ('Deposit Information', {
+            'fields': (
+                'reference_number', 'vip_member', 'deposit_method', 'amount', 'currency'
+            )
+        }),
+        ('Status & Processing', {
+            'fields': (
+                'status', 'transaction_id', 'processed_at'
+            )
+        }),
+        ('Additional Information', {
+            'fields': (
+                'notes', 'admin_notes'
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': (
+                'created_at', 'updated_at'
+            ),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    actions = ['mark_as_processing', 'mark_as_completed', 'mark_as_failed']
+    
+    def mark_as_processing(self, request, queryset):
+        """Mark selected deposits as processing"""
+        from django.utils import timezone
+        updated = queryset.update(status='processing', processed_at=timezone.now())
+        self.message_user(request, f'{updated} deposits marked as processing.')
+    mark_as_processing.short_description = "Mark selected deposits as processing"
+    
+    def mark_as_completed(self, request, queryset):
+        """Mark selected deposits as completed"""
+        from django.utils import timezone
+        updated = queryset.update(status='completed', processed_at=timezone.now())
+        self.message_user(request, f'{updated} deposits marked as completed.')
+    mark_as_completed.short_description = "Mark selected deposits as completed"
+    
+    def mark_as_failed(self, request, queryset):
+        """Mark selected deposits as failed"""
+        from django.utils import timezone
+        updated = queryset.update(status='failed', processed_at=timezone.now())
+        self.message_user(request, f'{updated} deposits marked as failed.')
+    mark_as_failed.short_description = "Mark selected deposits as failed"
+    
+    def get_queryset(self, request):
+        """Filter deposits for current VIP member if not superuser"""
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        try:
+            vip_profile = request.user.vip_profile
+            return qs.filter(vip_member=vip_profile)
+        except:
+            return qs.none()
+    
+    def has_change_permission(self, request, obj=None):
+        """Allow VIP members to view their own deposits"""
+        if obj and hasattr(request.user, 'vip_profile'):
+            return obj.vip_member == request.user.vip_profile
+        return super().has_change_permission(request, obj)
+    
+    def has_delete_permission(self, request, obj=None):
+        """Only superusers can delete deposits"""
+        return request.user.is_superuser

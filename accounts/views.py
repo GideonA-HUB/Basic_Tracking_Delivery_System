@@ -6,8 +6,8 @@ from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
-from .forms import StaffLoginForm, StaffRegistrationForm, CustomerRegistrationForm, CustomerLoginForm, VIPLoginForm, CardApplicationForm, LocalTransferForm, InternationalTransferForm, WireTransferForm, CryptocurrencyForm, PayPalForm, WiseTransferForm, CashAppForm, SkrillForm, VenmoForm, ZelleForm, RevolutForm, AlipayForm, WeChatPayForm
-from .models import StaffProfile, CustomerProfile, VIPProfile, Transaction, Card, LocalTransfer, InternationalTransfer
+from .forms import StaffLoginForm, StaffRegistrationForm, CustomerRegistrationForm, CustomerLoginForm, VIPLoginForm, CardApplicationForm, LocalTransferForm, InternationalTransferForm, WireTransferForm, CryptocurrencyForm, PayPalForm, WiseTransferForm, CashAppForm, SkrillForm, VenmoForm, ZelleForm, RevolutForm, AlipayForm, WeChatPayForm, DepositForm
+from .models import StaffProfile, CustomerProfile, VIPProfile, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit
 
 
 def is_staff_user(user):
@@ -416,9 +416,29 @@ def vip_deposit(request):
     try:
         vip_profile = request.user.vip_profile
         
+        if request.method == 'POST':
+            form = DepositForm(request.POST)
+            if form.is_valid():
+                # Create the deposit
+                deposit = form.save(commit=False)
+                deposit.vip_member = vip_profile
+                deposit.status = 'pending'
+                
+                # Update VIP member's balance (in a real app, this would be done after payment confirmation)
+                # For now, we'll just save the deposit request
+                deposit.save()
+                
+                messages.success(request, f'Deposit request submitted successfully! Reference: {deposit.reference_number}')
+                return redirect('accounts:vip_dashboard')
+            else:
+                messages.error(request, 'Please correct the errors below.')
+        else:
+            form = DepositForm()
+        
         context = {
             'vip_member': vip_profile,
             'user': request.user,
+            'form': form,
         }
         
         return render(request, 'accounts/vip_deposit.html', context)
