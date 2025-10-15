@@ -1352,10 +1352,16 @@ def kyc_welcome(request):
         vip_profile = request.user.vip_profile
         
         # Check if KYC already exists
-        kyc_verification, created = KYCVerification.objects.get_or_create(
-            vip_member=vip_profile,
-            defaults={'status': 'pending'}
-        )
+        try:
+            kyc_verification = KYCVerification.objects.get(vip_member=vip_profile)
+        except KYCVerification.DoesNotExist:
+            # Create a new KYC verification with minimal required data
+            kyc_verification = KYCVerification.objects.create(
+                vip_member=vip_profile,
+                full_name=vip_profile.full_name or '',
+                email=vip_profile.user.email or '',
+                status='pending'
+            )
         
         # If KYC is already approved, redirect to dashboard
         if kyc_verification.is_approved:
@@ -1382,14 +1388,16 @@ def kyc_verification(request):
         vip_profile = request.user.vip_profile
         
         # Get or create KYC verification
-        kyc_verification, created = KYCVerification.objects.get_or_create(
-            vip_member=vip_profile,
-            defaults={
-                'full_name': vip_profile.full_name,
-                'email': vip_profile.user.email,
-                'status': 'pending'
-            }
-        )
+        try:
+            kyc_verification = KYCVerification.objects.get(vip_member=vip_profile)
+        except KYCVerification.DoesNotExist:
+            # Create a new KYC verification with minimal required data
+            kyc_verification = KYCVerification.objects.create(
+                vip_member=vip_profile,
+                full_name=vip_profile.full_name or '',
+                email=vip_profile.user.email or '',
+                status='pending'
+            )
         
         # If KYC is already approved, redirect to dashboard
         if kyc_verification.is_approved:
@@ -1434,7 +1442,37 @@ def kyc_terms_accept(request):
     if request.method == 'POST':
         try:
             vip_profile = request.user.vip_profile
-            kyc_verification = KYCVerification.objects.get(vip_member=vip_profile)
+            
+            # Get or create KYC verification
+            try:
+                kyc_verification = KYCVerification.objects.get(vip_member=vip_profile)
+            except KYCVerification.DoesNotExist:
+                # Create a new KYC verification with minimal required data
+                kyc_verification = KYCVerification.objects.create(
+                    vip_member=vip_profile,
+                    full_name=vip_profile.full_name or '',
+                    email=vip_profile.user.email or '',
+                    status='pending',
+                    # Set default values for required fields to avoid null constraint errors
+                    phone='',
+                    title='mr',
+                    gender='male',
+                    date_of_birth='1990-01-01',  # Default date
+                    zipcode='',
+                    ssn_number='',
+                    account_type='savings',
+                    employment_type='employed',
+                    annual_income_range='under_25k',
+                    address_line='',
+                    city='',
+                    state='',
+                    nationality='',
+                    beneficiary_name='',
+                    beneficiary_address='',
+                    relationship='',
+                    beneficiary_age=0,
+                    document_type='passport'
+                )
             
             # Mark terms as accepted
             kyc_verification.terms_accepted = True
@@ -1447,9 +1485,6 @@ def kyc_terms_accept(request):
         except VIPProfile.DoesNotExist:
             messages.error(request, 'VIP profile not found. Please contact support.')
             return redirect('frontend:landing_page')
-        except KYCVerification.DoesNotExist:
-            messages.error(request, 'KYC verification not found. Please start the process again.')
-            return redirect('accounts:kyc_welcome')
     
     return redirect('accounts:kyc_welcome')
 

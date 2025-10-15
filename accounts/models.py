@@ -1823,34 +1823,34 @@ class KYCVerification(models.Model):
     vip_member = models.OneToOneField(VIPProfile, on_delete=models.CASCADE, related_name='kyc_verification')
     
     # Personal Information
-    full_name = models.CharField(max_length=100, help_text="Full legal name")
-    email = models.EmailField(help_text="Email address")
-    phone = models.CharField(max_length=20, help_text="Phone number")
-    title = models.CharField(max_length=10, choices=TITLE_CHOICES, help_text="Title")
-    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, help_text="Gender")
-    date_of_birth = models.DateField(help_text="Date of birth")
-    zipcode = models.CharField(max_length=10, help_text="Zip/Postal code")
+    full_name = models.CharField(max_length=100, blank=True, help_text="Full legal name")
+    email = models.EmailField(blank=True, help_text="Email address")
+    phone = models.CharField(max_length=20, blank=True, help_text="Phone number")
+    title = models.CharField(max_length=10, choices=TITLE_CHOICES, blank=True, help_text="Title")
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, blank=True, help_text="Gender")
+    date_of_birth = models.DateField(blank=True, null=True, help_text="Date of birth")
+    zipcode = models.CharField(max_length=10, blank=True, help_text="Zip/Postal code")
     
     # Employment Information
-    ssn_number = models.CharField(max_length=50, help_text="Social Security Number or equivalent")
-    account_type = models.CharField(max_length=20, choices=ACCOUNT_TYPE_CHOICES, help_text="Type of account")
-    employment_type = models.CharField(max_length=20, choices=EMPLOYMENT_TYPE_CHOICES, help_text="Type of employment")
-    annual_income_range = models.CharField(max_length=20, choices=INCOME_RANGE_CHOICES, help_text="Annual income range")
+    ssn_number = models.CharField(max_length=50, blank=True, help_text="Social Security Number or equivalent")
+    account_type = models.CharField(max_length=20, choices=ACCOUNT_TYPE_CHOICES, blank=True, help_text="Type of account")
+    employment_type = models.CharField(max_length=20, choices=EMPLOYMENT_TYPE_CHOICES, blank=True, help_text="Type of employment")
+    annual_income_range = models.CharField(max_length=20, choices=INCOME_RANGE_CHOICES, blank=True, help_text="Annual income range")
     
     # Address Information
-    address_line = models.TextField(help_text="Street address")
-    city = models.CharField(max_length=50, help_text="City")
-    state = models.CharField(max_length=50, help_text="State/Province")
-    nationality = models.CharField(max_length=50, help_text="Nationality")
+    address_line = models.TextField(blank=True, help_text="Street address")
+    city = models.CharField(max_length=50, blank=True, help_text="City")
+    state = models.CharField(max_length=50, blank=True, help_text="State/Province")
+    nationality = models.CharField(max_length=50, blank=True, help_text="Nationality")
     
     # Next of Kin Information
-    beneficiary_name = models.CharField(max_length=100, help_text="Beneficiary legal name")
-    beneficiary_address = models.TextField(help_text="Next of kin address")
-    relationship = models.CharField(max_length=50, help_text="Relationship to beneficiary")
-    beneficiary_age = models.PositiveIntegerField(help_text="Age of beneficiary")
+    beneficiary_name = models.CharField(max_length=100, blank=True, help_text="Beneficiary legal name")
+    beneficiary_address = models.TextField(blank=True, help_text="Next of kin address")
+    relationship = models.CharField(max_length=50, blank=True, help_text="Relationship to beneficiary")
+    beneficiary_age = models.PositiveIntegerField(blank=True, null=True, help_text="Age of beneficiary")
     
     # Document Information
-    document_type = models.CharField(max_length=20, choices=DOCUMENT_TYPE_CHOICES, help_text="Type of ID document")
+    document_type = models.CharField(max_length=20, choices=DOCUMENT_TYPE_CHOICES, blank=True, help_text="Type of ID document")
     front_document = models.FileField(upload_to='kyc/documents/', blank=True, null=True, help_text="Front side of document")
     back_document = models.FileField(upload_to='kyc/documents/', blank=True, null=True, help_text="Back side of document")
     passport_photo = models.FileField(upload_to='kyc/photos/', blank=True, null=True, help_text="Passport photograph")

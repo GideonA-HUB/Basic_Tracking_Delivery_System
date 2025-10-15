@@ -1,0 +1,304 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}KYC Status - {{ vip_member.full_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .kyc-status-container {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        padding: 2rem 0;
+    }
+    
+    .kyc-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        padding: 3rem;
+        max-width: 800px;
+        margin: 0 auto;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .kyc-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        margin: -3rem -3rem 2rem -3rem;
+        border-radius: 20px 20px 0 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .kyc-header-icon {
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+    
+    .kyc-header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+    }
+    
+    .status-section {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border-left: 5px solid #667eea;
+    }
+    
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+    
+    .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .status-approved {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .status-rejected {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .status-in-progress {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .status-requires-documents {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-top: 1rem;
+    }
+    
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #374151;
+    }
+    
+    .info-value {
+        color: #6b7280;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-secondary {
+        background: #f7fafc;
+        color: #4a5568;
+        border: 2px solid #e2e8f0;
+        padding: 1rem 2rem;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-secondary:hover {
+        background: #edf2f7;
+        border-color: #cbd5e0;
+        color: #4a5568;
+        text-decoration: none;
+    }
+    
+    @media (max-width: 768px) {
+        .kyc-card {
+            margin: 1rem;
+            padding: 2rem;
+        }
+        
+        .kyc-header {
+            margin: -2rem -2rem 2rem -2rem;
+            padding: 1.5rem;
+        }
+        
+        .kyc-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="kyc-status-container">
+    <div class="container">
+        <div class="kyc-card">
+            <!-- Header -->
+            <div class="kyc-header">
+                <div class="kyc-header-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div>
+                    <h1>KYC Verification Status</h1>
+                    <p class="mb-0">Track your verification progress</p>
+                </div>
+            </div>
+            
+            <!-- Status Section -->
+            <div class="status-section">
+                <div class="status-badge status-{{ kyc_verification.status }}">
+                    {% if kyc_verification.status == 'pending' %}
+                        <i class="fas fa-clock"></i>
+                        Pending Review
+                    {% elif kyc_verification.status == 'approved' %}
+                        <i class="fas fa-check-circle"></i>
+                        Approved
+                    {% elif kyc_verification.status == 'rejected' %}
+                        <i class="fas fa-times-circle"></i>
+                        Rejected
+                    {% elif kyc_verification.status == 'in_progress' %}
+                        <i class="fas fa-spinner"></i>
+                        In Progress
+                    {% elif kyc_verification.status == 'requires_documents' %}
+                        <i class="fas fa-file-upload"></i>
+                        Requires Additional Documents
+                    {% endif %}
+                </div>
+                
+                <h3 style="margin-bottom: 1rem;">Verification Details</h3>
+                
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Full Name:</span>
+                        <span class="info-value">{{ kyc_verification.full_name|default:"Not provided" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value">{{ kyc_verification.email|default:"Not provided" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Document Type:</span>
+                        <span class="info-value">{{ kyc_verification.get_document_type_display|default:"Not selected" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Terms Accepted:</span>
+                        <span class="info-value">
+                            {% if kyc_verification.terms_accepted %}
+                                <i class="fas fa-check text-green-600"></i> Yes
+                            {% else %}
+                                <i class="fas fa-times text-red-600"></i> No
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Submitted:</span>
+                        <span class="info-value">{{ kyc_verification.submitted_at|date:"M d, Y H:i"|default:"Not submitted" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Last Updated:</span>
+                        <span class="info-value">{{ kyc_verification.updated_at|date:"M d, Y H:i" }}</span>
+                    </div>
+                </div>
+                
+                {% if kyc_verification.verification_notes %}
+                <div style="margin-top: 1.5rem;">
+                    <h4 style="margin-bottom: 0.5rem;">Verification Notes:</h4>
+                    <p style="background: #f3f4f6; padding: 1rem; border-radius: 8px; color: #374151;">
+                        {{ kyc_verification.verification_notes }}
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                {% if kyc_verification.status == 'pending' or kyc_verification.status == 'requires_documents' %}
+                    <a href="{% url 'accounts:kyc_verification' %}" class="btn-primary">
+                        <i class="fas fa-edit"></i>
+                        Update Information
+                    </a>
+                {% endif %}
+                
+                {% if not kyc_verification.terms_accepted %}
+                    <a href="{% url 'accounts:kyc_welcome' %}" class="btn-primary">
+                        <i class="fas fa-file-contract"></i>
+                        Accept Terms & Start
+                    </a>
+                {% endif %}
+                
+                <a href="{% url 'accounts:vip_dashboard' %}" class="btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
