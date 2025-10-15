@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django import forms
 from .models import StaffProfile, CustomerProfile, VIPProfile, RecentActivity, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund, LoanHistory, AccountSettings, SupportTicket, VIPFinancialMetrics
 
 
@@ -1205,28 +1206,28 @@ class SupportTicketAdmin(admin.ModelAdmin):
         return super().get_queryset(request).select_related('vip_member')
 
 
-class VIPFinancialMetricsForm(admin.ModelForm):
+class VIPFinancialMetricsForm(forms.ModelForm):
     """Custom form for VIP Financial Metrics with calculated fields"""
     
-    balance_utilization = admin.CharField(
+    balance_utilization = forms.CharField(
         label='Balance Utilization (%)',
         required=False,
         help_text='Calculated: Current Balance / Transaction Limit * 100'
     )
     
-    monthly_net_flow = admin.CharField(
+    monthly_net_flow = forms.CharField(
         label='Monthly Net Flow ($)',
         required=False,
         help_text='Calculated: Monthly Income - Monthly Outgoing'
     )
     
-    investment_return_rate = admin.CharField(
+    investment_return_rate = forms.CharField(
         label='Investment Return Rate (%)',
         required=False,
         help_text='Calculated: Investment Growth / Total Investments * 100'
     )
     
-    risk_score = admin.CharField(
+    risk_score = forms.CharField(
         label='Risk Score',
         required=False,
         help_text='Calculated based on various factors'
