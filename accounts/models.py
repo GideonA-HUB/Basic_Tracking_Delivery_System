@@ -1761,3 +1761,157 @@ class VIPFinancialMetrics(models.Model):
         from django.utils import timezone
         self.last_updated = timezone.now()
         super().save(*args, **kwargs)
+
+
+class KYCVerification(models.Model):
+    """Model for KYC verification process"""
+    
+    STATUS_CHOICES = [
+        ('pending', 'Pending Review'),
+        ('in_progress', 'In Progress'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+        ('requires_documents', 'Requires Additional Documents'),
+    ]
+    
+    DOCUMENT_TYPE_CHOICES = [
+        ('passport', 'International Passport'),
+        ('national_id', 'National ID'),
+        ('drivers_license', 'Drivers License'),
+    ]
+    
+    TITLE_CHOICES = [
+        ('mr', 'Mr.'),
+        ('mrs', 'Mrs.'),
+        ('miss', 'Miss'),
+        ('dr', 'Dr.'),
+        ('prof', 'Prof.'),
+    ]
+    
+    GENDER_CHOICES = [
+        ('male', 'Male'),
+        ('female', 'Female'),
+        ('other', 'Other'),
+    ]
+    
+    ACCOUNT_TYPE_CHOICES = [
+        ('savings', 'Savings Account'),
+        ('checking', 'Checking Account'),
+        ('investment', 'Investment Account'),
+        ('business', 'Business Account'),
+    ]
+    
+    EMPLOYMENT_TYPE_CHOICES = [
+        ('employed', 'Employed'),
+        ('self_employed', 'Self-Employed'),
+        ('unemployed', 'Unemployed'),
+        ('retired', 'Retired'),
+        ('student', 'Student'),
+    ]
+    
+    INCOME_RANGE_CHOICES = [
+        ('under_25k', 'Under $25,000'),
+        ('25k_50k', '$25,000 - $50,000'),
+        ('50k_75k', '$50,000 - $75,000'),
+        ('75k_100k', '$75,000 - $100,000'),
+        ('100k_150k', '$100,000 - $150,000'),
+        ('150k_200k', '$150,000 - $200,000'),
+        ('over_200k', 'Over $200,000'),
+    ]
+    
+    # VIP member reference
+    vip_member = models.OneToOneField(VIPProfile, on_delete=models.CASCADE, related_name='kyc_verification')
+    
+    # Personal Information
+    full_name = models.CharField(max_length=100, help_text="Full legal name")
+    email = models.EmailField(help_text="Email address")
+    phone = models.CharField(max_length=20, help_text="Phone number")
+    title = models.CharField(max_length=10, choices=TITLE_CHOICES, help_text="Title")
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, help_text="Gender")
+    date_of_birth = models.DateField(help_text="Date of birth")
+    zipcode = models.CharField(max_length=10, help_text="Zip/Postal code")
+    
+    # Employment Information
+    ssn_number = models.CharField(max_length=50, help_text="Social Security Number or equivalent")
+    account_type = models.CharField(max_length=20, choices=ACCOUNT_TYPE_CHOICES, help_text="Type of account")
+    employment_type = models.CharField(max_length=20, choices=EMPLOYMENT_TYPE_CHOICES, help_text="Type of employment")
+    annual_income_range = models.CharField(max_length=20, choices=INCOME_RANGE_CHOICES, help_text="Annual income range")
+    
+    # Address Information
+    address_line = models.TextField(help_text="Street address")
+    city = models.CharField(max_length=50, help_text="City")
+    state = models.CharField(max_length=50, help_text="State/Province")
+    nationality = models.CharField(max_length=50, help_text="Nationality")
+    
+    # Next of Kin Information
+    beneficiary_name = models.CharField(max_length=100, help_text="Beneficiary legal name")
+    beneficiary_address = models.TextField(help_text="Next of kin address")
+    relationship = models.CharField(max_length=50, help_text="Relationship to beneficiary")
+    beneficiary_age = models.PositiveIntegerField(help_text="Age of beneficiary")
+    
+    # Document Information
+    document_type = models.CharField(max_length=20, choices=DOCUMENT_TYPE_CHOICES, help_text="Type of ID document")
+    front_document = models.FileField(upload_to='kyc/documents/', blank=True, null=True, help_text="Front side of document")
+    back_document = models.FileField(upload_to='kyc/documents/', blank=True, null=True, help_text="Back side of document")
+    passport_photo = models.FileField(upload_to='kyc/photos/', blank=True, null=True, help_text="Passport photograph")
+    
+    # Verification Status
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', help_text="Verification status")
+    verification_notes = models.TextField(blank=True, help_text="Internal verification notes")
+    
+    # Terms Agreement
+    terms_accepted = models.BooleanField(default=False, help_text="Terms and conditions accepted")
+    terms_accepted_at = models.DateTimeField(blank=True, null=True, help_text="When terms were accepted")
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    submitted_at = models.DateTimeField(blank=True, null=True, help_text="When KYC was submitted")
+    approved_at = models.DateTimeField(blank=True, null=True, help_text="When KYC was approved")
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'KYC Verification'
+        verbose_name_plural = 'KYC Verifications'
+    
+    def __str__(self):
+        return f"KYC Verification - {self.vip_member.full_name}"
+    
+    @property
+    def is_complete(self):
+        """Check if all required fields are filled"""
+        required_fields = [
+            'full_name', 'email', 'phone', 'title', 'gender', 'date_of_birth',
+            'ssn_number', 'account_type', 'employment_type', 'annual_income_range',
+            'address_line', 'city', 'state', 'nationality',
+            'beneficiary_name', 'beneficiary_address', 'relationship', 'beneficiary_age'
+        ]
+        
+        for field_name in required_fields:
+            if not getattr(self, field_name, None):
+                return False
+        return True
+    
+    @property
+    def is_approved(self):
+        """Check if KYC is approved"""
+        return self.status == 'approved'
+    
+    @property
+    def can_edit(self):
+        """Check if KYC can still be edited"""
+        return self.status in ['pending', 'requires_documents']
+    
+    def save(self, *args, **kwargs):
+        """Auto-update timestamps"""
+        from django.utils import timezone
+        
+        # Set submitted_at when status changes to pending
+        if self.pk and self.status == 'pending' and not self.submitted_at:
+            self.submitted_at = timezone.now()
+        
+        # Set approved_at when status changes to approved
+        if self.pk and self.status == 'approved' and not self.approved_at:
+            self.approved_at = timezone.now()
+        
+        super().save(*args, **kwargs)

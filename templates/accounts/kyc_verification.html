@@ -1,0 +1,836 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}KYC Verification - {{ vip_member.full_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .kyc-verification-container {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        padding: 2rem 0;
+    }
+    
+    .kyc-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        padding: 3rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .kyc-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        margin: -3rem -3rem 2rem -3rem;
+        border-radius: 20px 20px 0 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .kyc-header-icon {
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+    
+    .kyc-header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+    }
+    
+    .form-section {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border-left: 5px solid #667eea;
+    }
+    
+    .form-section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-section-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+    }
+    
+    .form-section-title {
+        margin: 0;
+        color: #2d3748;
+        font-size: 1.3rem;
+        font-weight: 600;
+    }
+    
+    .form-section-subtitle {
+        margin: 0.5rem 0 0 0;
+        color: #4a5568;
+        font-size: 0.9rem;
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #2d3748;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        background: white;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .form-control::placeholder {
+        color: #a0aec0;
+    }
+    
+    .form-control.error {
+        border-color: #e53e3e;
+    }
+    
+    .error-message {
+        color: #e53e3e;
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+    }
+    
+    .required {
+        color: #e53e3e;
+    }
+    
+    .document-type-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .document-type-card {
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: white;
+    }
+    
+    .document-type-card:hover {
+        border-color: #667eea;
+        transform: translateY(-2px);
+    }
+    
+    .document-type-card.selected {
+        border-color: #667eea;
+        background: linear-gradient(135deg, #f8f9ff 0%, #e6f0ff 100%);
+    }
+    
+    .document-type-icon {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 1rem;
+        background: #e2e8f0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #4a5568;
+        transition: all 0.3s ease;
+    }
+    
+    .document-type-card.selected .document-type-icon {
+        background: #667eea;
+        color: white;
+    }
+    
+    .document-type-name {
+        font-weight: 600;
+        color: #2d3748;
+        margin: 0;
+    }
+    
+    .upload-area {
+        border: 2px dashed #cbd5e0;
+        border-radius: 10px;
+        padding: 2rem;
+        text-align: center;
+        background: #f8f9fa;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+    }
+    
+    .upload-area:hover {
+        border-color: #667eea;
+        background: #f0f4ff;
+    }
+    
+    .upload-area.dragover {
+        border-color: #667eea;
+        background: #f0f4ff;
+    }
+    
+    .upload-icon {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 1rem;
+        background: #e2e8f0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #4a5568;
+    }
+    
+    .upload-text {
+        color: #4a5568;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .upload-subtext {
+        color: #718096;
+        font-size: 0.8rem;
+    }
+    
+    .verification-guidelines {
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .guidelines-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        color: #9a3412;
+        font-weight: 600;
+    }
+    
+    .guidelines-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .guidelines-list li {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+        color: #9a3412;
+        font-size: 0.9rem;
+    }
+    
+    .guidelines-list li:before {
+        content: "✓";
+        color: #ea580c;
+        font-weight: bold;
+    }
+    
+    .submit-section {
+        text-align: center;
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e2e8f0;
+    }
+    
+    .btn-submit {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 1rem 3rem;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .support-section {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .support-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+    }
+    
+    .support-content {
+        flex: 1;
+    }
+    
+    .support-content h4 {
+        margin: 0 0 0.5rem 0;
+        color: #2d3748;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+    
+    .support-content p {
+        margin: 0;
+        color: #4a5568;
+        font-size: 0.9rem;
+    }
+    
+    .btn-support {
+        background: white;
+        color: #667eea;
+        border: 2px solid #667eea;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+    
+    .btn-support:hover {
+        background: #667eea;
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .kyc-card {
+            margin: 1rem;
+            padding: 2rem;
+        }
+        
+        .kyc-header {
+            margin: -2rem -2rem 2rem -2rem;
+            padding: 1.5rem;
+        }
+        
+        .kyc-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .document-type-cards {
+            grid-template-columns: 1fr;
+        }
+        
+        .support-section {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="kyc-verification-container">
+    <div class="container">
+        <div class="kyc-card">
+            <!-- Header -->
+            <div class="kyc-header">
+                <div class="kyc-header-icon">
+                    <i class="fas fa-user-check"></i>
+                </div>
+                <div>
+                    <h1>KYC Verification</h1>
+                    <p class="mb-0">Complete your identity verification process</p>
+                </div>
+            </div>
+            
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <!-- Account Information Section -->
+                <div class="form-section">
+                    <div class="form-section-header">
+                        <div class="form-section-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div>
+                            <h3 class="form-section-title">Account Information</h3>
+                            <p class="form-section-subtitle">To comply with regulations, please provide your information to complete the verification process.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ form.full_name.id_for_label }}">Full Name <span class="required">*</span></label>
+                            {{ form.full_name }}
+                            {% if form.full_name.errors %}
+                                <div class="error-message">{{ form.full_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ form.email.id_for_label }}">Email <span class="required">*</span></label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="error-message">{{ form.email.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ form.phone.id_for_label }}">Phone <span class="required">*</span></label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}
+                                <div class="error-message">{{ form.phone.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ form.title.id_for_label }}">Title <span class="required">*</span></label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                                <div class="error-message">{{ form.title.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ form.gender.id_for_label }}">Gender <span class="required">*</span></label>
+                            {{ form.gender }}
+                            {% if form.gender.errors %}
+                                <div class="error-message">{{ form.gender.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ form.date_of_birth.id_for_label }}">Date of Birth <span class="required">*</span></label>
+                            {{ form.date_of_birth }}
+                            {% if form.date_of_birth.errors %}
+                                <div class="error-message">{{ form.date_of_birth.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ form.zipcode.id_for_label }}">Zipcode <span class="required">*</span></label>
+                            {{ form.zipcode }}
+                            {% if form.zipcode.errors %}
+                                <div class="error-message">{{ form.zipcode.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <!-- Empty column for layout -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Employment Information Section -->
+                <div class="form-section">
+                    <div class="form-section-header">
+                        <div class="form-section-icon">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div>
+                            <h3 class="form-section-title">Employment Information</h3>
+                            <p class="form-section-subtitle">Required in case of loan or facility application.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ form.ssn_number.id_for_label }}">State Security Number (SSN, NI, SIN etc.) <span class="required">*</span></label>
+                            {{ form.ssn_number }}
+                            {% if form.ssn_number.errors %}
+                                <div class="error-message">{{ form.ssn_number.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ form.account_type.id_for_label }}">Account Type <span class="required">*</span></label>
+                            {{ form.account_type }}
+                            {% if form.account_type.errors %}
+                                <div class="error-message">{{ form.account_type.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ form.employment_type.id_for_label }}">Type of Employment <span class="required">*</span></label>
+                            {{ form.employment_type }}
+                            {% if form.employment_type.errors %}
+                                <div class="error-message">{{ form.employment_type.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ form.annual_income_range.id_for_label }}">Annual Income Range <span class="required">*</span></label>
+                            {{ form.annual_income_range }}
+                            {% if form.annual_income_range.errors %}
+                                <div class="error-message">{{ form.annual_income_range.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Address Information Section -->
+                <div class="form-section">
+                    <div class="form-section-header">
+                        <div class="form-section-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div>
+                            <h3 class="form-section-title">Your Address</h3>
+                            <p class="form-section-subtitle">Your location information required for identification.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.address_line.id_for_label }}">Address Line <span class="required">*</span></label>
+                        {{ form.address_line }}
+                        {% if form.address_line.errors %}
+                            <div class="error-message">{{ form.address_line.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ form.city.id_for_label }}">City <span class="required">*</span></label>
+                            {{ form.city }}
+                            {% if form.city.errors %}
+                                <div class="error-message">{{ form.city.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ form.state.id_for_label }}">State <span class="required">*</span></label>
+                            {{ form.state }}
+                            {% if form.state.errors %}
+                                <div class="error-message">{{ form.state.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ form.nationality.id_for_label }}">Nationality <span class="required">*</span></label>
+                            {{ form.nationality }}
+                            {% if form.nationality.errors %}
+                                <div class="error-message">{{ form.nationality.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <!-- Empty column for layout -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Next of Kin Section -->
+                <div class="form-section">
+                    <div class="form-section-header">
+                        <div class="form-section-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <h3 class="form-section-title">Registered Next of Kin</h3>
+                            <p class="form-section-subtitle">Information about your beneficiary</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ form.beneficiary_name.id_for_label }}">Beneficiary Legal Name <span class="required">*</span></label>
+                            {{ form.beneficiary_name }}
+                            {% if form.beneficiary_name.errors %}
+                                <div class="error-message">{{ form.beneficiary_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ form.beneficiary_address.id_for_label }}">Next of Kin Address <span class="required">*</span></label>
+                            {{ form.beneficiary_address }}
+                            {% if form.beneficiary_address.errors %}
+                                <div class="error-message">{{ form.beneficiary_address.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ form.relationship.id_for_label }}">Relationship <span class="required">*</span></label>
+                            {{ form.relationship }}
+                            {% if form.relationship.errors %}
+                                <div class="error-message">{{ form.relationship.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ form.beneficiary_age.id_for_label }}">Age <span class="required">*</span></label>
+                            {{ form.beneficiary_age }}
+                            {% if form.beneficiary_age.errors %}
+                                <div class="error-message">{{ form.beneficiary_age.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Document Upload Section -->
+                <div class="form-section">
+                    <div class="form-section-header">
+                        <div class="form-section-icon">
+                            <i class="fas fa-file-upload"></i>
+                        </div>
+                        <div>
+                            <h3 class="form-section-title">Document Upload</h3>
+                            <p class="form-section-subtitle">Personal documents required for identity verification.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Document Type Selection -->
+                    <div class="document-type-cards">
+                        <div class="document-type-card" data-type="passport">
+                            <div class="document-type-icon">
+                                <i class="fas fa-passport"></i>
+                            </div>
+                            <p class="document-type-name">Int'l Passport</p>
+                        </div>
+                        <div class="document-type-card" data-type="national_id">
+                            <div class="document-type-icon">
+                                <i class="fas fa-id-card"></i>
+                            </div>
+                            <p class="document-type-name">National ID</p>
+                        </div>
+                        <div class="document-type-card" data-type="drivers_license">
+                            <div class="document-type-icon">
+                                <i class="fas fa-id-badge"></i>
+                            </div>
+                            <p class="document-type-name">Drivers License</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Hidden field for document type -->
+                    <input type="hidden" name="document_type" id="document_type" value="passport">
+                    
+                    <!-- Verification Guidelines -->
+                    <div class="verification-guidelines">
+                        <div class="guidelines-title">
+                            <i class="fas fa-info-circle"></i>
+                            To avoid delays when verifying your account
+                        </div>
+                        <ul class="guidelines-list">
+                            <li>Chosen credential must not have expired</li>
+                            <li>Document should be in good condition and clearly visible</li>
+                            <li>Make sure that there is no light glare on the document</li>
+                            <li>All text and images should be clearly readable</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Document Upload Areas -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ form.front_document.id_for_label }}">Upload front side <span class="required">*</span></label>
+                            <div class="upload-area" onclick="document.getElementById('{{ form.front_document.id_for_label }}').click()">
+                                <div class="upload-icon">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <div class="upload-text">Click to upload or drag and drop</div>
+                                <div class="upload-subtext">SVG, PNG, JPG or GIF (max. 2MB)</div>
+                            </div>
+                            {{ form.front_document }}
+                            {% if form.front_document.errors %}
+                                <div class="error-message">{{ form.front_document.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ form.back_document.id_for_label }}">Upload back side <span class="required">*</span></label>
+                            <div class="upload-area" onclick="document.getElementById('{{ form.back_document.id_for_label }}').click()">
+                                <div class="upload-icon">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <div class="upload-text">Click to upload or drag and drop</div>
+                                <div class="upload-subtext">SVG, PNG, JPG or GIF (max. 2MB)</div>
+                            </div>
+                            {{ form.back_document }}
+                            {% if form.back_document.errors %}
+                                <div class="error-message">{{ form.back_document.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.passport_photo.id_for_label }}">Upload Passport Photograph <span class="required">*</span></label>
+                        <div class="upload-area" onclick="document.getElementById('{{ form.passport_photo.id_for_label }}').click()">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="upload-text">Click to upload or drag and drop</div>
+                            <div class="upload-subtext">SVG, PNG, JPG or GIF (max. 2MB)</div>
+                        </div>
+                        {{ form.passport_photo }}
+                        {% if form.passport_photo.errors %}
+                            <div class="error-message">{{ form.passport_photo.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Submit Section -->
+                <div class="submit-section">
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-check-circle"></i>
+                        Submit Application
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Support Section -->
+            <div class="support-section">
+                <div class="support-icon">
+                    <i class="fas fa-cog"></i>
+                </div>
+                <div class="support-content">
+                    <h4>Need help with verification?</h4>
+                    <p>Our support team is available 24/7 to assist you with the verification process. Reach out with any questions.</p>
+                </div>
+                <a href="mailto:info@meridianassetlogistics.com" class="btn-support">
+                    <i class="fas fa-comment"></i>
+                    Contact Support
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Document type selection
+    const documentCards = document.querySelectorAll('.document-type-card');
+    const documentTypeInput = document.getElementById('document_type');
+    
+    documentCards.forEach(card => {
+        card.addEventListener('click', function() {
+            // Remove selected class from all cards
+            documentCards.forEach(c => c.classList.remove('selected'));
+            
+            // Add selected class to clicked card
+            this.classList.add('selected');
+            
+            // Update hidden input value
+            documentTypeInput.value = this.dataset.type;
+        });
+    });
+    
+    // Set default selection
+    documentCards[0].classList.add('selected');
+    
+    // File upload handling
+    const fileInputs = document.querySelectorAll('input[type="file"]');
+    
+    fileInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            const uploadArea = this.previousElementSibling;
+            const fileName = this.files[0]?.name;
+            
+            if (fileName) {
+                const uploadText = uploadArea.querySelector('.upload-text');
+                uploadText.textContent = `Selected: ${fileName}`;
+                uploadArea.style.borderColor = '#667eea';
+                uploadArea.style.background = '#f0f4ff';
+            }
+        });
+    });
+    
+    // Drag and drop functionality
+    const uploadAreas = document.querySelectorAll('.upload-area');
+    
+    uploadAreas.forEach(area => {
+        area.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('dragover');
+        });
+        
+        area.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+        });
+        
+        area.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const fileInput = this.nextElementSibling;
+                fileInput.files = files;
+                
+                // Trigger change event
+                const event = new Event('change', { bubbles: true });
+                fileInput.dispatchEvent(event);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

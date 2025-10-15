@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
-from .models import Card, StaffProfile, CustomerProfile, VIPProfile, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund
+from .models import Card, StaffProfile, CustomerProfile, VIPProfile, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund, KYCVerification
 
 
 class StaffLoginForm(AuthenticationForm):
@@ -1082,3 +1082,192 @@ class IRSTaxRefundForm(forms.ModelForm):
         if amount is not None and amount <= 0:
             raise forms.ValidationError('Expected refund amount must be greater than $0.00')
         return amount
+
+
+class KYCVerificationForm(forms.ModelForm):
+    """Form for KYC verification"""
+    
+    class Meta:
+        model = KYCVerification
+        fields = [
+            'full_name', 'email', 'phone', 'title', 'gender', 'date_of_birth', 'zipcode',
+            'ssn_number', 'account_type', 'employment_type', 'annual_income_range',
+            'address_line', 'city', 'state', 'nationality',
+            'beneficiary_name', 'beneficiary_address', 'relationship', 'beneficiary_age',
+            'document_type', 'front_document', 'back_document', 'passport_photo'
+        ]
+        widgets = {
+            'full_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter your full legal name'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter your email address'
+            }),
+            'phone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter your phone number'
+            }),
+            'title': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'gender': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'date_of_birth': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
+            }),
+            'zipcode': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter your zip code'
+            }),
+            'ssn_number': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter your SSN or equivalent'
+            }),
+            'account_type': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'employment_type': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'annual_income_range': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'address_line': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Enter your street address'
+            }),
+            'city': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter your city'
+            }),
+            'state': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter your state/province'
+            }),
+            'nationality': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter your nationality'
+            }),
+            'beneficiary_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter beneficiary legal name'
+            }),
+            'beneficiary_address': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Enter beneficiary address'
+            }),
+            'relationship': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter relationship to beneficiary'
+            }),
+            'beneficiary_age': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter beneficiary age'
+            }),
+            'document_type': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'front_document': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': '.jpg,.jpeg,.png,.gif,.svg'
+            }),
+            'back_document': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': '.jpg,.jpeg,.png,.gif,.svg'
+            }),
+            'passport_photo': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': '.jpg,.jpeg,.png,.gif,.svg'
+            })
+        }
+    
+    def clean_ssn_number(self):
+        ssn = self.cleaned_data.get('ssn_number')
+        if ssn:
+            # Remove any non-digit characters
+            ssn_digits = ''.join(filter(str.isdigit, ssn))
+            
+            # Basic validation for US SSN format
+            if len(ssn_digits) == 9:
+                # Check for invalid patterns
+                if ssn_digits.startswith('000') or ssn_digits.startswith('666') or ssn_digits.startswith('9'):
+                    raise forms.ValidationError('Invalid Social Security Number format')
+                
+                if ssn_digits[3:5] == '00' or ssn_digits[5:9] == '0000':
+                    raise forms.ValidationError('Invalid Social Security Number format')
+        
+        return ssn
+    
+    def clean_beneficiary_age(self):
+        age = self.cleaned_data.get('beneficiary_age')
+        if age is not None:
+            if age < 0 or age > 120:
+                raise forms.ValidationError('Please enter a valid age between 0 and 120')
+        return age
+    
+    def clean_front_document(self):
+        document = self.cleaned_data.get('front_document')
+        if document:
+            # Check file size (max 2MB)
+            if document.size > 2 * 1024 * 1024:
+                raise forms.ValidationError('Document size must be less than 2MB')
+            
+            # Check file type
+            allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml']
+            if document.content_type not in allowed_types:
+                raise forms.ValidationError('Only JPG, PNG, GIF, and SVG files are allowed')
+        
+        return document
+    
+    def clean_back_document(self):
+        document = self.cleaned_data.get('back_document')
+        if document:
+            # Check file size (max 2MB)
+            if document.size > 2 * 1024 * 1024:
+                raise forms.ValidationError('Document size must be less than 2MB')
+            
+            # Check file type
+            allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml']
+            if document.content_type not in allowed_types:
+                raise forms.ValidationError('Only JPG, PNG, GIF, and SVG files are allowed')
+        
+        return document
+    
+    def clean_passport_photo(self):
+        document = self.cleaned_data.get('passport_photo')
+        if document:
+            # Check file size (max 2MB)
+            if document.size > 2 * 1024 * 1024:
+                raise forms.ValidationError('Photo size must be less than 2MB')
+            
+            # Check file type
+            allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml']
+            if document.content_type not in allowed_types:
+                raise forms.ValidationError('Only JPG, PNG, GIF, and SVG files are allowed')
+        
+        return document
+
+
+class KYCTermsForm(forms.Form):
+    """Form for accepting KYC terms and conditions"""
+    
+    terms_accepted = forms.BooleanField(
+        required=True,
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input',
+            'required': True
+        }),
+        label="I accept the VIP Terms of Service and General Terms and Conditions"
+    )
+    
+    def clean_terms_accepted(self):
+        terms_accepted = self.cleaned_data.get('terms_accepted')
+        if not terms_accepted:
+            raise forms.ValidationError('You must accept the terms and conditions to proceed')
+        return terms_accepted

@@ -6,8 +6,9 @@ from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
-from .forms import StaffLoginForm, StaffRegistrationForm, CustomerRegistrationForm, CustomerLoginForm, VIPLoginForm, CardApplicationForm, LocalTransferForm, InternationalTransferForm, WireTransferForm, CryptocurrencyForm, PayPalForm, WiseTransferForm, CashAppForm, SkrillForm, VenmoForm, ZelleForm, RevolutForm, AlipayForm, WeChatPayForm, DepositForm, LoanApplicationForm, IRSTaxRefundForm
-from .models import StaffProfile, CustomerProfile, VIPProfile, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund, LoanHistory, AccountSettings, SupportTicket, VIPFinancialMetrics
+from django.utils import timezone
+from .forms import StaffLoginForm, StaffRegistrationForm, CustomerRegistrationForm, CustomerLoginForm, VIPLoginForm, CardApplicationForm, LocalTransferForm, InternationalTransferForm, WireTransferForm, CryptocurrencyForm, PayPalForm, WiseTransferForm, CashAppForm, SkrillForm, VenmoForm, ZelleForm, RevolutForm, AlipayForm, WeChatPayForm, DepositForm, LoanApplicationForm, IRSTaxRefundForm, KYCVerificationForm, KYCTermsForm
+from .models import StaffProfile, CustomerProfile, VIPProfile, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund, LoanHistory, AccountSettings, SupportTicket, VIPFinancialMetrics, KYCVerification
 
 
 def is_staff_user(user):
@@ -1341,3 +1342,138 @@ def vip_support_ticket(request):
     }
     
     return render(request, 'accounts/vip_support_ticket.html', context)
+
+
+@login_required
+@user_passes_test(is_vip_user)
+def kyc_welcome(request):
+    """KYC Welcome page with terms and conditions"""
+    try:
+        vip_profile = request.user.vip_profile
+        
+        # Check if KYC already exists
+        kyc_verification, created = KYCVerification.objects.get_or_create(
+            vip_member=vip_profile,
+            defaults={'status': 'pending'}
+        )
+        
+        # If KYC is already approved, redirect to dashboard
+        if kyc_verification.is_approved:
+            messages.info(request, 'Your KYC verification is already approved.')
+            return redirect('accounts:vip_dashboard')
+        
+        context = {
+            'vip_member': vip_profile,
+            'kyc_verification': kyc_verification,
+        }
+        
+        return render(request, 'accounts/kyc_welcome.html', context)
+        
+    except VIPProfile.DoesNotExist:
+        messages.error(request, 'VIP profile not found. Please contact support.')
+        return redirect('frontend:landing_page')
+
+
+@login_required
+@user_passes_test(is_vip_user)
+def kyc_verification(request):
+    """KYC verification form page"""
+    try:
+        vip_profile = request.user.vip_profile
+        
+        # Get or create KYC verification
+        kyc_verification, created = KYCVerification.objects.get_or_create(
+            vip_member=vip_profile,
+            defaults={
+                'full_name': vip_profile.full_name,
+                'email': vip_profile.user.email,
+                'status': 'pending'
+            }
+        )
+        
+        # If KYC is already approved, redirect to dashboard
+        if kyc_verification.is_approved:
+            messages.info(request, 'Your KYC verification is already approved.')
+            return redirect('accounts:vip_dashboard')
+        
+        # If KYC is not approved and terms not accepted, redirect to welcome
+        if not kyc_verification.terms_accepted:
+            return redirect('accounts:kyc_welcome')
+        
+        if request.method == 'POST':
+            form = KYCVerificationForm(request.POST, request.FILES, instance=kyc_verification)
+            if form.is_valid():
+                kyc_verification = form.save(commit=False)
+                kyc_verification.status = 'pending'
+                kyc_verification.save()
+                
+                messages.success(request, 'KYC verification submitted successfully. We will review your information and get back to you soon.')
+                return redirect('accounts:vip_dashboard')
+            else:
+                messages.error(request, 'Please correct the errors below.')
+        else:
+            form = KYCVerificationForm(instance=kyc_verification)
+        
+        context = {
+            'vip_member': vip_profile,
+            'kyc_verification': kyc_verification,
+            'form': form,
+        }
+        
+        return render(request, 'accounts/kyc_verification.html', context)
+        
+    except VIPProfile.DoesNotExist:
+        messages.error(request, 'VIP profile not found. Please contact support.')
+        return redirect('frontend:landing_page')
+
+
+@login_required
+@user_passes_test(is_vip_user)
+def kyc_terms_accept(request):
+    """Accept KYC terms and conditions"""
+    if request.method == 'POST':
+        try:
+            vip_profile = request.user.vip_profile
+            kyc_verification = KYCVerification.objects.get(vip_member=vip_profile)
+            
+            # Mark terms as accepted
+            kyc_verification.terms_accepted = True
+            kyc_verification.terms_accepted_at = timezone.now()
+            kyc_verification.save()
+            
+            messages.success(request, 'Terms and conditions accepted. You can now proceed with KYC verification.')
+            return redirect('accounts:kyc_verification')
+            
+        except VIPProfile.DoesNotExist:
+            messages.error(request, 'VIP profile not found. Please contact support.')
+            return redirect('frontend:landing_page')
+        except KYCVerification.DoesNotExist:
+            messages.error(request, 'KYC verification not found. Please start the process again.')
+            return redirect('accounts:kyc_welcome')
+    
+    return redirect('accounts:kyc_welcome')
+
+
+@login_required
+@user_passes_test(is_vip_user)
+def kyc_status(request):
+    """KYC verification status page"""
+    try:
+        vip_profile = request.user.vip_profile
+        
+        try:
+            kyc_verification = KYCVerification.objects.get(vip_member=vip_profile)
+        except KYCVerification.DoesNotExist:
+            messages.info(request, 'You have not started the KYC verification process yet.')
+            return redirect('accounts:kyc_welcome')
+        
+        context = {
+            'vip_member': vip_profile,
+            'kyc_verification': kyc_verification,
+        }
+        
+        return render(request, 'accounts/kyc_status.html', context)
+        
+    except VIPProfile.DoesNotExist:
+        messages.error(request, 'VIP profile not found. Please contact support.')
+        return redirect('frontend:landing_page')

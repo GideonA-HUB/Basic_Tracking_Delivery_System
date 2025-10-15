@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django import forms
-from .models import StaffProfile, CustomerProfile, VIPProfile, RecentActivity, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund, LoanHistory, AccountSettings, SupportTicket, VIPFinancialMetrics
+from .models import StaffProfile, CustomerProfile, VIPProfile, RecentActivity, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund, LoanHistory, AccountSettings, SupportTicket, VIPFinancialMetrics, KYCVerification
 
 
 class StaffProfileInline(admin.StackedInline):
@@ -168,6 +168,26 @@ class IRSTaxRefundInline(admin.TabularInline):
     )
 
 
+class KYCVerificationInline(admin.TabularInline):
+    """Inline admin for KYC Verification"""
+    model = KYCVerification
+    extra = 0
+    readonly_fields = [
+        'full_name', 'email', 'status', 'terms_accepted', 
+        'created_at', 'submitted_at', 'approved_at'
+    ]
+    fields = (
+        'full_name', 'email', 'status', 'terms_accepted', 
+        'document_type', 'created_at'
+    )
+    
+    def has_add_permission(self, request, obj=None):
+        return False
+    
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 @admin.register(VIPProfile)
 class VIPProfileAdmin(admin.ModelAdmin):
     """Admin for VIPProfile"""
@@ -175,7 +195,7 @@ class VIPProfileAdmin(admin.ModelAdmin):
     list_filter = ('membership_tier', 'status', 'assigned_staff', 'priority_support', 'dedicated_account_manager', 'created_at')
     search_fields = ('user__username', 'user__first_name', 'user__last_name', 'user__email', 'member_id', 'phone')
     readonly_fields = ('created_at', 'updated_at', 'membership_start_date')
-    inlines = [RecentActivityInline, TransactionInline, CardInline, LocalTransferInline, InternationalTransferInline, IRSTaxRefundInline]
+    inlines = [RecentActivityInline, TransactionInline, CardInline, LocalTransferInline, InternationalTransferInline, IRSTaxRefundInline, KYCVerificationInline]
     
     fieldsets = (
         ('User Information', {
@@ -1378,5 +1398,132 @@ class VIPFinancialMetricsAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         """Optimize queryset"""
         return super().get_queryset(request).select_related('vip_member')
+
+
+@admin.register(KYCVerification)
+class KYCVerificationAdmin(admin.ModelAdmin):
+    """Admin interface for KYC Verification"""
+    
+    list_display = [
+        'vip_member', 'full_name', 'email', 'status', 'terms_accepted', 
+        'created_at', 'submitted_at', 'approved_at'
+    ]
+    
+    list_filter = [
+        'status', 'terms_accepted', 'document_type', 'employment_type', 
+        'account_type', 'gender', 'created_at', 'submitted_at', 'approved_at'
+    ]
+    
+    search_fields = [
+        'vip_member__full_name', 'vip_member__member_id', 
+        'full_name', 'email', 'phone', 'ssn_number'
+    ]
+    
+    readonly_fields = [
+        'created_at', 'updated_at', 'submitted_at', 'approved_at', 'terms_accepted_at',
+        'is_complete', 'is_approved', 'can_edit'
+    ]
+    
+    fieldsets = (
+        ('VIP Member', {
+            'fields': ('vip_member',)
+        }),
+        ('Personal Information', {
+            'fields': (
+                'full_name', 'email', 'phone', 'title', 'gender', 'date_of_birth', 'zipcode'
+            )
+        }),
+        ('Employment Information', {
+            'fields': (
+                'ssn_number', 'account_type', 'employment_type', 'annual_income_range'
+            )
+        }),
+        ('Address Information', {
+            'fields': (
+                'address_line', 'city', 'state', 'nationality'
+            )
+        }),
+        ('Next of Kin Information', {
+            'fields': (
+                'beneficiary_name', 'beneficiary_address', 'relationship', 'beneficiary_age'
+            )
+        }),
+        ('Document Information', {
+            'fields': (
+                'document_type', 'front_document', 'back_document', 'passport_photo'
+            )
+        }),
+        ('Verification Status', {
+            'fields': (
+                'status', 'verification_notes'
+            )
+        }),
+        ('Terms Agreement', {
+            'fields': (
+                'terms_accepted', 'terms_accepted_at'
+            )
+        }),
+        ('Calculated Fields (Read-Only)', {
+            'fields': (
+                'is_complete', 'is_approved', 'can_edit'
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at', 'submitted_at', 'approved_at'),
+            'classes': ('collapse',)
+        })
+    )
+    
+    list_per_page = 25
+    date_hierarchy = 'created_at'
+    ordering = ['-created_at']
+    
+    actions = ['approve_kyc', 'reject_kyc', 'require_additional_documents', 'reset_kyc']
+    
+    def approve_kyc(self, request, queryset):
+        """Approve selected KYC verifications"""
+        updated = queryset.update(
+            status='approved',
+            approved_at=timezone.now(),
+            verification_notes='Approved by admin'
+        )
+        self.message_user(request, f'{updated} KYC verification(s) approved.')
+    approve_kyc.short_description = 'Approve selected KYC verifications'
+    
+    def reject_kyc(self, request, queryset):
+        """Reject selected KYC verifications"""
+        updated = queryset.update(
+            status='rejected',
+            verification_notes='Rejected by admin'
+        )
+        self.message_user(request, f'{updated} KYC verification(s) rejected.')
+    reject_kyc.short_description = 'Reject selected KYC verifications'
+    
+    def require_additional_documents(self, request, queryset):
+        """Mark KYC as requiring additional documents"""
+        updated = queryset.update(
+            status='requires_documents',
+            verification_notes='Additional documents required'
+        )
+        self.message_user(request, f'{updated} KYC verification(s) marked as requiring additional documents.')
+    require_additional_documents.short_description = 'Require additional documents'
+    
+    def reset_kyc(self, request, queryset):
+        """Reset KYC verification status"""
+        updated = queryset.update(
+            status='pending',
+            verification_notes='Reset by admin'
+        )
+        self.message_user(request, f'{updated} KYC verification(s) reset.')
+    reset_kyc.short_description = 'Reset KYC verification'
+    
+    def get_queryset(self, request):
+        """Optimize queryset"""
+        return super().get_queryset(request).select_related('vip_member')
+    
+    def has_add_permission(self, request):
+        """Only allow adding through the VIP profile"""
+        return False
 
 

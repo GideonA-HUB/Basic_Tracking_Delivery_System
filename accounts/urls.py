@@ -57,4 +57,10 @@ urlpatterns = [
     
     # VIP Support Ticket
     path('vip/support-ticket/', views.vip_support_ticket, name='vip_support_ticket'),
+    
+    # VIP KYC Verification
+    path('vip/kyc/', views.kyc_welcome, name='kyc_welcome'),
+    path('vip/kyc/verification/', views.kyc_verification, name='kyc_verification'),
+    path('vip/kyc/terms-accept/', views.kyc_terms_accept, name='kyc_terms_accept'),
+    path('vip/kyc/status/', views.kyc_status, name='kyc_status'),
 ]
