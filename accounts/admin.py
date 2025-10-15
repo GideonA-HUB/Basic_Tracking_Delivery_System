@@ -1205,9 +1205,57 @@ class SupportTicketAdmin(admin.ModelAdmin):
         return super().get_queryset(request).select_related('vip_member')
 
 
+class VIPFinancialMetricsForm(admin.ModelForm):
+    """Custom form for VIP Financial Metrics with calculated fields"""
+    
+    balance_utilization = admin.CharField(
+        label='Balance Utilization (%)',
+        required=False,
+        help_text='Calculated: Current Balance / Transaction Limit * 100'
+    )
+    
+    monthly_net_flow = admin.CharField(
+        label='Monthly Net Flow ($)',
+        required=False,
+        help_text='Calculated: Monthly Income - Monthly Outgoing'
+    )
+    
+    investment_return_rate = admin.CharField(
+        label='Investment Return Rate (%)',
+        required=False,
+        help_text='Calculated: Investment Growth / Total Investments * 100'
+    )
+    
+    risk_score = admin.CharField(
+        label='Risk Score',
+        required=False,
+        help_text='Calculated based on various factors'
+    )
+    
+    class Meta:
+        model = VIPFinancialMetrics
+        fields = '__all__'
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            # Display calculated values
+            self.fields['balance_utilization'].initial = f"{self.instance.balance_utilization:.2f}%"
+            self.fields['monthly_net_flow'].initial = f"${self.instance.monthly_net_flow:.2f}"
+            self.fields['investment_return_rate'].initial = f"{self.instance.investment_return_rate:.2f}%"
+            self.fields['risk_score'].initial = f"{self.instance.risk_score}/100"
+            
+            # Make calculated fields readonly
+            for field_name in ['balance_utilization', 'monthly_net_flow', 'investment_return_rate', 'risk_score']:
+                self.fields[field_name].widget.attrs['readonly'] = True
+                self.fields[field_name].widget.attrs['style'] = 'background-color: #f8f9fa;'
+
+
 @admin.register(VIPFinancialMetrics)
 class VIPFinancialMetricsAdmin(admin.ModelAdmin):
     """Admin interface for VIP Financial Metrics"""
+    
+    form = VIPFinancialMetricsForm
     
     list_display = [
         'vip_member', 'current_balance', 'monthly_income', 'monthly_outgoing', 
@@ -1225,8 +1273,7 @@ class VIPFinancialMetricsAdmin(admin.ModelAdmin):
     ]
     
     readonly_fields = [
-        'created_at', 'updated_at', 'last_updated', 'balance_utilization',
-        'monthly_net_flow', 'investment_return_rate', 'risk_score'
+        'created_at', 'updated_at', 'last_updated'
     ]
     
     fieldsets = (
@@ -1265,7 +1312,7 @@ class VIPFinancialMetricsAdmin(admin.ModelAdmin):
             ),
             'classes': ('collapse',)
         }),
-        ('Calculated Metrics', {
+        ('Calculated Metrics (Read-Only)', {
             'fields': (
                 'balance_utilization', 'monthly_net_flow', 
                 'investment_return_rate', 'risk_score'

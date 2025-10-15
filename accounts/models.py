@@ -1695,21 +1695,30 @@ class VIPFinancialMetrics(models.Model):
     @property
     def balance_utilization(self):
         """Calculate balance utilization percentage"""
-        if self.transaction_limit > 0:
-            return (self.current_balance / self.transaction_limit) * 100
-        return 0
+        try:
+            if self.transaction_limit > 0:
+                return float(self.current_balance) / float(self.transaction_limit) * 100
+            return 0
+        except (TypeError, ValueError, ZeroDivisionError):
+            return 0
     
     @property
     def monthly_net_flow(self):
         """Calculate monthly net cash flow"""
-        return self.monthly_income - self.monthly_outgoing
+        try:
+            return float(self.monthly_income) - float(self.monthly_outgoing)
+        except (TypeError, ValueError):
+            return 0
     
     @property
     def investment_return_rate(self):
         """Calculate investment return rate"""
-        if self.total_investments > 0:
-            return (self.investment_growth / self.total_investments) * 100
-        return 0
+        try:
+            if self.total_investments > 0:
+                return float(self.investment_growth) / float(self.total_investments) * 100
+            return 0
+        except (TypeError, ValueError, ZeroDivisionError):
+            return 0
     
     @property
     def risk_score(self):
