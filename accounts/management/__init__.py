@@ -1,1 +1,1 @@
-# Management commands for accounts app
+# This file makes Python treat the directory as a package

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load math_filters %}
 
 {% block title %}VIP Dashboard - {{ vip_member.full_name }}{% endblock %}
 
@@ -1111,7 +1112,7 @@
                                     <span class="text-sm font-medium text-gray-900">${{ financial_metrics.transaction_limit|floatformat:2 }}</span>
                                 </div>
                                 <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-blue-600 h-2 rounded-full progress-bar" style="width: {{ financial_metrics.balance_utilization|floatformat:0 }}%"></div>
+                                    <div class="bg-blue-600 h-2 rounded-full progress-bar" style="width: {{ financial_metrics.current_balance|percentage:financial_metrics.transaction_limit|floatformat:0 }}%"></div>
                                 </div>
                             </div>
 
@@ -1121,7 +1122,7 @@
                                     <span class="text-sm font-medium text-gray-900">${{ financial_metrics.pending_transactions|floatformat:2 }}</span>
                                 </div>
                                 <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-yellow-500 h-2 rounded-full progress-bar" style="width: {% if financial_metrics.transaction_limit > 0 %}{{ financial_metrics.pending_transactions|div:financial_metrics.transaction_limit|mul:100|floatformat:0 }}{% else %}0{% endif %}%"></div>
+                                    <div class="bg-yellow-500 h-2 rounded-full progress-bar" style="width: {{ financial_metrics.pending_transactions|percentage:financial_metrics.transaction_limit|floatformat:0 }}%"></div>
                                 </div>
                             </div>
 
@@ -1131,7 +1132,7 @@
                                     <span class="text-sm font-medium text-gray-900">${{ financial_metrics.transaction_volume|floatformat:2 }}</span>
                                 </div>
                                 <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-green-500 h-2 rounded-full progress-bar" style="width: {% if financial_metrics.monthly_transaction_limit > 0 %}{{ financial_metrics.transaction_volume|div:financial_metrics.monthly_transaction_limit|mul:100|floatformat:0 }}{% else %}0{% endif %}%"></div>
+                                    <div class="bg-green-500 h-2 rounded-full progress-bar" style="width: {{ financial_metrics.transaction_volume|percentage:financial_metrics.monthly_transaction_limit|floatformat:0 }}%"></div>
                                 </div>
                             </div>
                         </div>
