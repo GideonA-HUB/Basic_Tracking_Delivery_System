@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.utils import timezone
-from .models import StaffProfile, CustomerProfile, VIPProfile, RecentActivity, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund, LoanHistory, AccountSettings, SupportTicket
+from .models import StaffProfile, CustomerProfile, VIPProfile, RecentActivity, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund, LoanHistory, AccountSettings, SupportTicket, VIPFinancialMetrics
 
 
 class StaffProfileInline(admin.StackedInline):
@@ -1199,6 +1199,126 @@ class SupportTicketAdmin(admin.ModelAdmin):
         updated = queryset.update(status='in_progress')
         self.message_user(request, f'{updated} ticket(s) marked as in progress.')
     mark_as_in_progress.short_description = 'Mark as in progress'
+    
+    def get_queryset(self, request):
+        """Optimize queryset"""
+        return super().get_queryset(request).select_related('vip_member')
+
+
+@admin.register(VIPFinancialMetrics)
+class VIPFinancialMetricsAdmin(admin.ModelAdmin):
+    """Admin interface for VIP Financial Metrics"""
+    
+    list_display = [
+        'vip_member', 'current_balance', 'monthly_income', 'monthly_outgoing', 
+        'total_investments', 'net_worth', 'transaction_limit', 'account_status', 'updated_at'
+    ]
+    
+    list_filter = [
+        'account_status', 'risk_level', 'primary_currency', 'credit_score',
+        'created_at', 'updated_at'
+    ]
+    
+    search_fields = [
+        'vip_member__full_name', 'vip_member__member_id', 
+        'vip_member__user__username', 'vip_member__user__email'
+    ]
+    
+    readonly_fields = [
+        'created_at', 'updated_at', 'last_updated', 'balance_utilization',
+        'monthly_net_flow', 'investment_return_rate', 'risk_score'
+    ]
+    
+    fieldsets = (
+        ('VIP Member', {
+            'fields': ('vip_member',)
+        }),
+        ('Current Balance Information', {
+            'fields': (
+                'current_balance', 'available_balance', 'pending_balance'
+            )
+        }),
+        ('Monthly Financial Metrics', {
+            'fields': (
+                'monthly_income', 'monthly_outgoing', 'monthly_savings'
+            )
+        }),
+        ('Investment Information', {
+            'fields': (
+                'total_investments', 'net_worth', 'investment_growth'
+            )
+        }),
+        ('Transaction Limits and Volumes', {
+            'fields': (
+                'transaction_limit', 'monthly_transaction_limit', 
+                'pending_transactions', 'transaction_volume'
+            )
+        }),
+        ('Account Status and Risk', {
+            'fields': (
+                'account_status', 'credit_score', 'risk_level'
+            )
+        }),
+        ('Currency and Exchange', {
+            'fields': (
+                'primary_currency', 'exchange_rate'
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Calculated Metrics', {
+            'fields': (
+                'balance_utilization', 'monthly_net_flow', 
+                'investment_return_rate', 'risk_score'
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at', 'last_updated'),
+            'classes': ('collapse',)
+        })
+    )
+    
+    list_per_page = 25
+    date_hierarchy = 'updated_at'
+    ordering = ['-updated_at']
+    
+    actions = ['reset_balances', 'update_risk_levels', 'generate_monthly_report']
+    
+    def reset_balances(self, request, queryset):
+        """Reset balances for selected VIP members"""
+        updated = queryset.update(
+            current_balance=0.00,
+            available_balance=0.00,
+            pending_balance=0.00,
+            pending_transactions=0.00
+        )
+        self.message_user(request, f'{updated} VIP member(s) balances reset.')
+    reset_balances.short_description = 'Reset balances'
+    
+    def update_risk_levels(self, request, queryset):
+        """Update risk levels based on current metrics"""
+        updated = 0
+        for metrics in queryset:
+            risk_score = metrics.risk_score
+            if risk_score >= 80:
+                metrics.risk_level = 'very_high'
+            elif risk_score >= 60:
+                metrics.risk_level = 'high'
+            elif risk_score >= 40:
+                metrics.risk_level = 'medium'
+            else:
+                metrics.risk_level = 'low'
+            metrics.save()
+            updated += 1
+        
+        self.message_user(request, f'{updated} VIP member(s) risk levels updated.')
+    update_risk_levels.short_description = 'Update risk levels'
+    
+    def generate_monthly_report(self, request, queryset):
+        """Generate monthly financial report"""
+        # This would typically generate a PDF or Excel report
+        self.message_user(request, f'Monthly report generated for {queryset.count()} VIP member(s).')
+    generate_monthly_report.short_description = 'Generate monthly report'
     
     def get_queryset(self, request):
         """Optimize queryset"""

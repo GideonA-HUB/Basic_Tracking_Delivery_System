@@ -871,7 +871,7 @@
                     <div class="stats-card flex items-center justify-between">
                         <div>
                             <p class="text-sm text-gray-600">Current Balance</p>
-                            <p class="text-2xl font-bold text-gray-900">$0</p>
+                            <p class="text-2xl font-bold text-gray-900">${{ financial_metrics.current_balance|floatformat:2 }}</p>
                         </div>
                         <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                             <i class="fas fa-wallet text-blue-600"></i>
@@ -883,7 +883,7 @@
                     <div class="stats-card flex items-center justify-between">
                         <div>
                             <p class="text-sm text-gray-600">Monthly Income</p>
-                            <p class="text-2xl font-bold text-gray-900">$0</p>
+                            <p class="text-2xl font-bold text-gray-900">${{ financial_metrics.monthly_income|floatformat:2 }}</p>
                         </div>
                         <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                             <i class="fas fa-chart-line text-green-600"></i>
@@ -895,7 +895,7 @@
                     <div class="stats-card flex items-center justify-between">
                         <div>
                             <p class="text-sm text-gray-600">Monthly Outgoing</p>
-                            <p class="text-2xl font-bold text-gray-900">$0</p>
+                            <p class="text-2xl font-bold text-gray-900">${{ financial_metrics.monthly_outgoing|floatformat:2 }}</p>
                         </div>
                         <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
                             <i class="fas fa-chart-line-down text-red-600"></i>
@@ -907,7 +907,7 @@
                     <div class="stats-card flex items-center justify-between">
                         <div>
                             <p class="text-sm text-gray-600">Transaction Limit</p>
-                            <p class="text-2xl font-bold text-gray-900">$500,000</p>
+                            <p class="text-2xl font-bold text-gray-900">${{ financial_metrics.transaction_limit|floatformat:0 }}</p>
                         </div>
                         <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
                             <i class="fas fa-credit-card text-purple-600"></i>
@@ -937,8 +937,8 @@
                     <div class="text-center mb-6">
                         <p class="text-sm opacity-90 mb-2">Available Balance</p>
                         <div class="flex items-center justify-center gap-2 mb-2">
-                            <p class="text-5xl font-bold">$0.00</p>
-                            <span class="text-lg">USD</span>
+                            <p class="text-5xl font-bold">${{ financial_metrics.available_balance|floatformat:2 }}</p>
+                            <span class="text-lg">{{ financial_metrics.primary_currency }}</span>
                             <button class="ml-2">
                                 <i class="fas fa-eye-slash text-white opacity-70"></i>
                             </button>
@@ -1074,19 +1074,19 @@
                             <div class="space-y-3">
                                 <div class="flex items-center justify-between">
                                     <span class="text-gray-600">Total Investments</span>
-                                    <span class="font-semibold text-gray-900">$0.00</span>
+                                    <span class="font-semibold text-gray-900">${{ financial_metrics.total_investments|floatformat:2 }}</span>
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <span class="text-gray-600">Monthly Income</span>
-                                    <span class="font-semibold text-gray-900">$0.00</span>
+                                    <span class="font-semibold text-gray-900">${{ financial_metrics.monthly_income|floatformat:2 }}</span>
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <span class="text-gray-600">Net Worth</span>
-                                    <span class="font-semibold text-gray-900">$100,000.00</span>
+                                    <span class="font-semibold text-gray-900">${{ financial_metrics.net_worth|floatformat:2 }}</span>
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <span class="text-gray-600">Transaction Limit</span>
-                                    <span class="font-semibold text-gray-900">$500,000.00</span>
+                                    <span class="font-semibold text-gray-900">${{ financial_metrics.transaction_limit|floatformat:2 }}</span>
                                 </div>
                             </div>
 
@@ -1108,30 +1108,30 @@
                             <div>
                                 <div class="flex items-center justify-between mb-2">
                                     <span class="text-sm text-gray-600">Transaction Limit</span>
-                                    <span class="text-sm font-medium text-gray-900">$500,000.00</span>
+                                    <span class="text-sm font-medium text-gray-900">${{ financial_metrics.transaction_limit|floatformat:2 }}</span>
                                 </div>
                                 <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-blue-600 h-2 rounded-full progress-bar" style="width: 75%"></div>
+                                    <div class="bg-blue-600 h-2 rounded-full progress-bar" style="width: {{ financial_metrics.balance_utilization|floatformat:0 }}%"></div>
                                 </div>
                             </div>
 
                             <div>
                                 <div class="flex items-center justify-between mb-2">
                                     <span class="text-sm text-gray-600">Pending Transactions</span>
-                                    <span class="text-sm font-medium text-gray-900">$0.00</span>
+                                    <span class="text-sm font-medium text-gray-900">${{ financial_metrics.pending_transactions|floatformat:2 }}</span>
                                 </div>
                                 <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-yellow-500 h-2 rounded-full progress-bar" style="width: 30%"></div>
+                                    <div class="bg-yellow-500 h-2 rounded-full progress-bar" style="width: {% if financial_metrics.transaction_limit > 0 %}{{ financial_metrics.pending_transactions|div:financial_metrics.transaction_limit|mul:100|floatformat:0 }}{% else %}0{% endif %}%"></div>
                                 </div>
                             </div>
 
                             <div>
                                 <div class="flex items-center justify-between mb-2">
                                     <span class="text-sm text-gray-600">Transaction Volume</span>
-                                    <span class="text-sm font-medium text-gray-900">$0.00</span>
+                                    <span class="text-sm font-medium text-gray-900">${{ financial_metrics.transaction_volume|floatformat:2 }}</span>
                                 </div>
                                 <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-green-500 h-2 rounded-full progress-bar" style="width: 85%"></div>
+                                    <div class="bg-green-500 h-2 rounded-full progress-bar" style="width: {% if financial_metrics.monthly_transaction_limit > 0 %}{{ financial_metrics.transaction_volume|div:financial_metrics.monthly_transaction_limit|mul:100|floatformat:0 }}{% else %}0{% endif %}%"></div>
                                 </div>
                             </div>
                         </div>

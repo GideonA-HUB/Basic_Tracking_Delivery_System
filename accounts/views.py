@@ -7,7 +7,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
 from .forms import StaffLoginForm, StaffRegistrationForm, CustomerRegistrationForm, CustomerLoginForm, VIPLoginForm, CardApplicationForm, LocalTransferForm, InternationalTransferForm, WireTransferForm, CryptocurrencyForm, PayPalForm, WiseTransferForm, CashAppForm, SkrillForm, VenmoForm, ZelleForm, RevolutForm, AlipayForm, WeChatPayForm, DepositForm, LoanApplicationForm, IRSTaxRefundForm
-from .models import StaffProfile, CustomerProfile, VIPProfile, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund, LoanHistory, AccountSettings, SupportTicket
+from .models import StaffProfile, CustomerProfile, VIPProfile, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund, LoanHistory, AccountSettings, SupportTicket, VIPFinancialMetrics
 
 
 def is_staff_user(user):
@@ -220,16 +220,46 @@ def vip_dashboard(request):
         vip_profile = request.user.vip_profile
         assigned_staff = vip_profile.assigned_staff
         
+        # Get or create financial metrics for this VIP member
+        financial_metrics, created = VIPFinancialMetrics.objects.get_or_create(
+            vip_member=vip_profile,
+            defaults={
+                'current_balance': 0.00,
+                'monthly_income': 0.00,
+                'monthly_outgoing': 0.00,
+                'total_investments': 0.00,
+                'net_worth': 100000.00,
+                'transaction_limit': 500000.00,
+                'pending_transactions': 0.00,
+                'transaction_volume': 0.00,
+            }
+        )
+        
         # Get recent activities for this VIP member
         recent_activities = vip_profile.recent_activities.filter(
             is_active=True
         ).order_by('-display_order', '-activity_date')[:10]  # Show last 10 activities
+        
+        # Get recent transactions for statistics
+        recent_transactions = vip_profile.transactions.filter(
+            is_active=True
+        ).order_by('-transaction_date')[:5]
+        
+        # Get account statistics
+        total_transactions = vip_profile.transactions.filter(is_active=True).count()
+        pending_transactions = vip_profile.transactions.filter(
+            is_active=True, status='pending'
+        ).count()
         
         context = {
             'vip_member': vip_profile,
             'assigned_staff': assigned_staff,
             'user': request.user,
             'recent_activities': recent_activities,
+            'recent_transactions': recent_transactions,
+            'financial_metrics': financial_metrics,
+            'total_transactions': total_transactions,
+            'pending_transactions': pending_transactions,
         }
         
         return render(request, 'accounts/vip_dashboard.html', context)

@@ -1622,3 +1622,126 @@ class SupportTicket(models.Model):
     def is_resolved(self):
         """Check if ticket is resolved"""
         return self.status in ['resolved', 'closed']
+
+
+class VIPFinancialMetrics(models.Model):
+    """Model for VIP financial metrics and dashboard statistics"""
+    
+    # VIP member this metrics belongs to
+    vip_member = models.OneToOneField(VIPProfile, on_delete=models.CASCADE, related_name='financial_metrics')
+    
+    # Current Balance Information
+    current_balance = models.DecimalField(max_digits=15, decimal_places=2, default=0.00, help_text="Current account balance")
+    available_balance = models.DecimalField(max_digits=15, decimal_places=2, default=0.00, help_text="Available balance for transactions")
+    pending_balance = models.DecimalField(max_digits=15, decimal_places=2, default=0.00, help_text="Pending transactions balance")
+    
+    # Monthly Financial Metrics
+    monthly_income = models.DecimalField(max_digits=15, decimal_places=2, default=0.00, help_text="Monthly income amount")
+    monthly_outgoing = models.DecimalField(max_digits=15, decimal_places=2, default=0.00, help_text="Monthly outgoing transactions")
+    monthly_savings = models.DecimalField(max_digits=15, decimal_places=2, default=0.00, help_text="Monthly savings amount")
+    
+    # Investment Information
+    total_investments = models.DecimalField(max_digits=15, decimal_places=2, default=0.00, help_text="Total investment amount")
+    net_worth = models.DecimalField(max_digits=15, decimal_places=2, default=100000.00, help_text="Total net worth")
+    investment_growth = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, help_text="Investment growth percentage")
+    
+    # Transaction Limits and Volumes
+    transaction_limit = models.DecimalField(max_digits=15, decimal_places=2, default=500000.00, help_text="Daily transaction limit")
+    monthly_transaction_limit = models.DecimalField(max_digits=15, decimal_places=2, default=2000000.00, help_text="Monthly transaction limit")
+    pending_transactions = models.DecimalField(max_digits=15, decimal_places=2, default=0.00, help_text="Amount in pending transactions")
+    transaction_volume = models.DecimalField(max_digits=15, decimal_places=2, default=0.00, help_text="Total transaction volume")
+    
+    # Account Status and Limits
+    account_status = models.CharField(max_length=20, choices=[
+        ('active', 'Active'),
+        ('inactive', 'Inactive'),
+        ('suspended', 'Suspended'),
+        ('under_review', 'Under Review'),
+    ], default='active', help_text="Account status")
+    
+    credit_score = models.IntegerField(default=750, help_text="Credit score (300-850)")
+    risk_level = models.CharField(max_length=20, choices=[
+        ('low', 'Low Risk'),
+        ('medium', 'Medium Risk'),
+        ('high', 'High Risk'),
+        ('very_high', 'Very High Risk'),
+    ], default='low', help_text="Risk assessment level")
+    
+    # Currency and Exchange
+    primary_currency = models.CharField(max_length=3, default='USD', choices=[
+        ('USD', 'US Dollar'),
+        ('EUR', 'Euro'),
+        ('GBP', 'British Pound'),
+        ('JPY', 'Japanese Yen'),
+        ('CAD', 'Canadian Dollar'),
+        ('AUD', 'Australian Dollar'),
+    ], help_text="Primary currency")
+    
+    exchange_rate = models.DecimalField(max_digits=10, decimal_places=6, default=1.000000, help_text="Current exchange rate")
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    last_updated = models.DateTimeField(auto_now=True, help_text="Last time metrics were updated")
+    
+    class Meta:
+        ordering = ['-updated_at']
+        verbose_name = 'VIP Financial Metrics'
+        verbose_name_plural = 'VIP Financial Metrics'
+    
+    def __str__(self):
+        return f"Financial Metrics - {self.vip_member.full_name}"
+    
+    @property
+    def balance_utilization(self):
+        """Calculate balance utilization percentage"""
+        if self.transaction_limit > 0:
+            return (self.current_balance / self.transaction_limit) * 100
+        return 0
+    
+    @property
+    def monthly_net_flow(self):
+        """Calculate monthly net cash flow"""
+        return self.monthly_income - self.monthly_outgoing
+    
+    @property
+    def investment_return_rate(self):
+        """Calculate investment return rate"""
+        if self.total_investments > 0:
+            return (self.investment_growth / self.total_investments) * 100
+        return 0
+    
+    @property
+    def risk_score(self):
+        """Calculate risk score based on various factors"""
+        score = 0
+        
+        # Balance utilization factor
+        if self.balance_utilization > 90:
+            score += 30
+        elif self.balance_utilization > 70:
+            score += 20
+        elif self.balance_utilization > 50:
+            score += 10
+        
+        # Credit score factor
+        if self.credit_score < 600:
+            score += 25
+        elif self.credit_score < 700:
+            score += 15
+        elif self.credit_score < 750:
+            score += 5
+        
+        # Transaction volume factor
+        if self.transaction_volume > self.monthly_transaction_limit:
+            score += 20
+        elif self.transaction_volume > (self.monthly_transaction_limit * 0.8):
+            score += 10
+        
+        return min(score, 100)  # Cap at 100
+    
+    def save(self, *args, **kwargs):
+        """Auto-update last_updated timestamp"""
+        from django.utils import timezone
+        self.last_updated = timezone.now()
+        super().save(*args, **kwargs)
