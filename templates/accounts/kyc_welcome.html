@@ -5,14 +5,24 @@
 
 {% block extra_css %}
 <style>
-    /* VIP Dashboard Layout Styles */
+    /* Force white theme and proper layout */
+    html, body {
+        background: #f8fafc !important;
+        color: #1f2937 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    }
+
+    /* VIP Dashboard Layout */
     .dashboard-layout {
         display: grid !important;
         grid-template-columns: 280px 1fr !important;
         min-height: 100vh !important;
-        background: white !important;
+        background: #f8fafc !important;
     }
     
+    /* Sidebar Styling */
     .dashboard-sidebar {
         width: 280px !important;
         background: white !important;
@@ -44,47 +54,53 @@
         background: #94a3b8 !important;
     }
     
+    /* Main Content Area */
     .dashboard-main {
         flex: 1 !important;
         overflow-y: auto !important;
         overflow-x: hidden !important;
         height: 100vh !important;
-        background: white !important;
+        background: #f8fafc !important;
+        padding: 2rem !important;
     }
     
     .dashboard-content {
-        padding: 2rem !important;
-        max-width: none !important;
-        background: white !important;
+        max-width: 1000px !important;
+        margin: 0 auto !important;
     }
-    
-    /* KYC Welcome Specific Styles */
-    .kyc-welcome-container {
-        min-height: 100vh;
-        background: white;
-        padding: 0;
+
+    /* Sidebar Elements */
+    .sidebar-heading {
+        color: #6b7280 !important;
+        font-weight: 600 !important;
+        font-size: 0.75rem !important;
+        letter-spacing: 0.05em !important;
+        text-transform: uppercase !important;
     }
-    
-    .kyc-card {
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        padding: 2rem;
-        max-width: 1000px;
-        margin: 0 auto;
-        position: relative;
-        overflow: hidden;
+
+    .nav-link {
+        color: #6b7280 !important;
+        text-decoration: none !important;
+        font-weight: 500 !important;
+        transition: all 0.2s ease !important;
     }
-    
+
+    .nav-link:hover {
+        color: #374151 !important;
+        background: #f3f4f6 !important;
+    }
+
+    /* KYC Welcome Page Styling */
     .kyc-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
         color: white;
         padding: 2rem;
-        margin: -3rem -3rem 2rem -3rem;
-        border-radius: 20px 20px 0 0;
+        border-radius: 16px;
+        margin-bottom: 2rem;
         display: flex;
         align-items: center;
         gap: 1rem;
+        box-shadow: 0 10px 25px rgba(79, 70, 229, 0.2);
     }
     
     .kyc-header-icon {
@@ -102,23 +118,72 @@
         margin: 0;
         font-size: 2rem;
         font-weight: 700;
+        line-height: 1.2;
     }
-    
-    .welcome-section {
+
+    .kyc-header p {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+        font-size: 1rem;
+    }
+
+    /* Verify Identity Banner */
+    .verify-banner {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
         display: flex;
         align-items: center;
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-        padding: 1.5rem;
-        background: linear-gradient(135deg, #f8f9ff 0%, #e6f0ff 100%);
-        border-radius: 15px;
-        border-left: 5px solid #667eea;
+        gap: 1rem;
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
     }
-    
+
+    .verify-icon {
+        width: 50px;
+        height: 50px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+
+    .verify-content h2 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .verify-content p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 1rem;
+    }
+
+    /* Welcome Section */
+    .welcome-section {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e5e7eb;
+    }
+
+    .welcome-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
     .welcome-icon {
         width: 50px;
         height: 50px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -126,28 +191,95 @@
         color: white;
         font-size: 1.2rem;
     }
-    
+
     .welcome-content h2 {
         margin: 0 0 0.5rem 0;
-        color: #2d3748;
+        color: #1f2937;
         font-size: 1.5rem;
         font-weight: 600;
     }
-    
+
     .welcome-content p {
         margin: 0;
-        color: #4a5568;
+        color: #6b7280;
         font-size: 1rem;
+        line-height: 1.5;
     }
-    
+
+    .personal-greeting {
+        color: #1f2937;
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+
+    .welcome-text {
+        color: #4b5563;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+
+    .contact-info {
+        color: #4b5563;
+        margin-bottom: 1.5rem;
+    }
+
+    .contact-info a {
+        color: #3b82f6;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .contact-info a:hover {
+        text-decoration: underline;
+    }
+
+    /* Terms and Conditions */
+    .terms-section {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e5e7eb;
+    }
+
+    .terms-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f3f4f6;
+    }
+
+    .terms-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+    }
+
+    .terms-header h3 {
+        margin: 0;
+        color: #1f2937;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
     .terms-container {
         max-height: 400px;
         overflow-y: auto;
-        border: 2px solid #e2e8f0;
-        border-radius: 10px;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
         padding: 1.5rem;
-        background: #f8f9fa;
-        margin-bottom: 2rem;
+        background: #f9fafb;
+        margin-bottom: 1.5rem;
         scrollbar-width: thin;
         scrollbar-color: #cbd5e1 #f1f5f9;
     }
@@ -157,38 +289,38 @@
     }
     
     .terms-container::-webkit-scrollbar-track {
-        background: #f1f1f1;
+        background: #f1f5f9;
         border-radius: 4px;
     }
     
     .terms-container::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
+        background: #cbd5e1;
         border-radius: 4px;
     }
     
     .terms-container::-webkit-scrollbar-thumb:hover {
-        background: #a8a8a8;
+        background: #94a3b8;
     }
     
     .terms-content {
         line-height: 1.6;
-        color: #2d3748;
+        color: #374151;
     }
     
-    .terms-content h3 {
-        color: #1a202c;
-        font-size: 1.2rem;
+    .terms-content h4 {
+        color: #1f2937;
+        font-size: 1.1rem;
         font-weight: 600;
-        margin: 1.5rem 0 0.5rem 0;
+        margin: 1.5rem 0 0.75rem 0;
     }
     
-    .terms-content h3:first-child {
+    .terms-content h4:first-child {
         margin-top: 0;
     }
     
     .terms-content p {
         margin-bottom: 1rem;
-        color: #4a5568;
+        color: #4b5563;
     }
     
     .terms-content ul {
@@ -198,9 +330,10 @@
     
     .terms-content li {
         margin-bottom: 0.5rem;
-        color: #4a5568;
+        color: #4b5563;
     }
-    
+
+    /* Action Buttons */
     .action-buttons {
         display: flex;
         gap: 1rem;
@@ -209,7 +342,7 @@
     }
     
     .btn-accept {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
         color: white;
         border: none;
         padding: 1rem 2rem;
@@ -221,17 +354,18 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
     
     .btn-accept:hover {
         transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
     }
     
     .btn-decline {
-        background: #f7fafc;
-        color: #4a5568;
-        border: 2px solid #e2e8f0;
+        background: white;
+        color: #6b7280;
+        border: 2px solid #d1d5db;
         padding: 1rem 2rem;
         border-radius: 10px;
         font-size: 1.1rem;
@@ -244,24 +378,27 @@
     }
     
     .btn-decline:hover {
-        background: #edf2f7;
-        border-color: #cbd5e0;
+        background: #f9fafb;
+        border-color: #9ca3af;
+        color: #374151;
     }
-    
+
+    /* Support Section */
     .support-section {
-        background: #f8f9fa;
-        border-radius: 15px;
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        border-radius: 16px;
         padding: 1.5rem;
         margin-top: 2rem;
         display: flex;
         align-items: center;
         gap: 1rem;
+        border: 1px solid #bae6fd;
     }
     
     .support-icon {
         width: 50px;
         height: 50px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -276,21 +413,22 @@
     
     .support-content h4 {
         margin: 0 0 0.5rem 0;
-        color: #2d3748;
+        color: #0c4a6e;
         font-size: 1.1rem;
         font-weight: 600;
     }
     
     .support-content p {
         margin: 0;
-        color: #4a5568;
+        color: #075985;
         font-size: 0.9rem;
+        line-height: 1.4;
     }
     
     .btn-support {
         background: white;
-        color: #667eea;
-        border: 2px solid #667eea;
+        color: #0ea5e9;
+        border: 2px solid #0ea5e9;
         padding: 0.75rem 1.5rem;
         border-radius: 8px;
         font-size: 0.9rem;
@@ -300,26 +438,27 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        text-decoration: none;
     }
     
     .btn-support:hover {
-        background: #667eea;
+        background: #0ea5e9;
         color: white;
+        transform: translateY(-1px);
     }
-    
+
+    /* Responsive Design */
     @media (max-width: 768px) {
-        .kyc-card {
-            margin: 1rem;
-            padding: 2rem;
+        .dashboard-layout {
+            grid-template-columns: 1fr !important;
         }
         
-        .kyc-header {
-            margin: -2rem -2rem 2rem -2rem;
-            padding: 1.5rem;
+        .dashboard-sidebar {
+            display: none !important;
         }
         
-        .kyc-header h1 {
-            font-size: 1.5rem;
+        .dashboard-main {
+            padding: 1rem !important;
         }
         
         .action-buttons {
@@ -433,209 +572,227 @@
     <!-- Main Content -->
     <main class="dashboard-main">
         <div class="dashboard-content">
-            <div class="kyc-card">
-            <!-- Header -->
+            <!-- Page Header -->
             <div class="kyc-header">
                 <div class="kyc-header-icon">
                     <i class="fas fa-shield-alt"></i>
                 </div>
                 <div>
                     <h1>Account Verification</h1>
-                    <p class="mb-0">Complete your verification to access all VIP features</p>
+                    <p>Dashboard > Account Verification</p>
+                </div>
+            </div>
+            
+            <!-- Verify Identity Banner -->
+            <div class="verify-banner">
+                <div class="verify-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="verify-content">
+                    <h2>Verify Your Identity</h2>
+                    <p>Complete your account verification to access all VIP features</p>
                 </div>
             </div>
             
             <!-- Welcome Section -->
             <div class="welcome-section">
-                <div class="welcome-icon">
-                    <i class="fas fa-user-plus"></i>
+                <div class="welcome-header">
+                    <div class="welcome-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="welcome-content">
+                        <h2>Welcome to Meridian VIP</h2>
+                        <p>Complete your account verification to access all features.</p>
+                    </div>
                 </div>
-                <div class="welcome-content">
-                    <h2>Welcome to Meridian VIP</h2>
-                    <p>Complete your account verification to access all features.</p>
-                </div>
-            </div>
-            
-            <!-- Personalized Greeting -->
-            <div class="mb-4">
-                <h3 style="color: #2d3748; margin-bottom: 1rem;">Dear {{ vip_member.full_name }},</h3>
                 
-                <p style="color: #4a5568; margin-bottom: 1rem;">
+                <div class="personal-greeting">Dear {{ vip_member.full_name }},</div>
+                
+                <div class="welcome-text">
                     Welcome Onboard! Meridian VIP is the market's most innovative and fastest-growing company in the financial industry. 
                     We look forward to working with you to help you get the most out of our financial services and realize your banking goals.
-                </p>
+                </div>
                 
-                <p style="color: #4a5568; margin-bottom: 1rem;">
+                <div class="welcome-text">
                     Here at Meridian VIP, we are committed to providing a wide variety of savings, investment, and loan products, 
                     all designed to meet your specific needs. Our services are being used by over two million customers around the world.
-                </p>
+                </div>
                 
-                <p style="color: #4a5568; margin-bottom: 1rem;">
+                <div class="contact-info">
                     Our excellent customer support team is available 24/7 to help you with any questions. 
-                    You can contact them at: <a href="mailto:info@meridianassetlogistics.com" style="color: #667eea;">info@meridianassetlogistics.com</a>
-                </p>
+                    You can contact them at: <a href="mailto:info@meridianassetlogistics.com">info@meridianassetlogistics.com</a>
+                </div>
                 
-                <p style="color: #4a5568; margin-bottom: 2rem;">
+                <div class="welcome-text">
                     We need a little more information to complete your registration, including completing the AML/KYC form. 
                     Please review our terms and conditions below before proceeding.
-                </p>
+                </div>
             </div>
             
             <!-- Terms and Conditions -->
-            <div class="terms-container">
-                <div class="terms-content">
-                    <h3>1. INTRODUCTION & AGREEMENT TO TERMS</h3>
-                    <p>
-                        This VIP Terms of Service ("VIP Terms") governs the exclusive relationship between you ("VIP Investor," "you," or "your") 
-                        and Meridian, a Delaware limited liability company ("the Fund," "we," "us," or "our"). These VIP Terms apply to your 
-                        participation in our Meridian Elite program, an exclusive investment tier providing enhanced benefits, customized support, 
-                        and elevated profit participation.
-                    </p>
-                    <p>
-                        By enrolling in this VIP program and remitting the onboarding fee, you agree to be bound by these VIP Terms and the 
-                        general Meridian Terms of Service. In the event of any inconsistency, these VIP Terms shall prevail for VIP Investors.
-                    </p>
-                    
-                    <h3>2. VIP ONBOARDING FEE</h3>
-                    <p>All VIP Investors are required to remit a non-refundable onboarding fee of $11,000 USD. This fee grants access to:</p>
-                    <ul>
-                        <li>Personalized portfolio management and strategy alignment</li>
-                        <li>Direct priority support and reporting access</li>
-                        <li>Elevated profit participation rates</li>
-                        <li>Accelerated withdrawal processing windows</li>
-                    </ul>
-                    
-                    <h3>3. PROFIT PARTICIPATION ADVANTAGE</h3>
-                    <p>
-                        VIP Investors benefit from an enhanced profit distribution of 20%, calculated on realized net gains per investment cycle. 
-                        This payout structure replaces the standard 12-month profit distribution schedule, allowing VIP Investors to receive 20% 
-                        returns upon liquidation or at cycle maturity, subject to applicable performance verification.
-                    </p>
-                    
-                    <h3>4. WITHDRAWAL TERMS</h3>
-                    <p>Withdrawals by VIP Investors are subject to the following:</p>
-                    <ul>
-                        <li><strong>Pre-Charge Fee:</strong> 11% standard on all withdrawals</li>
-                        <li><strong>Negotiation Clause:</strong> The Fund may, at its sole discretion, reduce this fee to a minimum threshold of 9.7% based on client relationship status, investment performance, and duration of capital commitment</li>
-                        <li><strong>Processing Period:</strong> Withdrawals shall be executed within no more than 14 calendar days from the date of request approval</li>
-                    </ul>
-                    <p>These conditions ensure optimal liquidity management and protection of fund stability while providing expedited access for VIP participants.</p>
-                    
-                    <h3>GENERAL TERMS AND CONDITIONS</h3>
-                    <p>
-                        Before you can start using our online service you must agree to be bound by the conditions below. You must read the 
-                        conditions before you decide whether to accept them. If you agree to be bound by these conditions, please click the 
-                        "I Accept & Proceed to Verification" button below. If you click on the "Decline" button, you will not be able to 
-                        continue your registration for our online services. We strongly recommend that you print a copy of these conditions for your reference.
-                    </p>
-                    
-                    <h3>1. DEFINITIONS</h3>
-                    <p>In these conditions the following words have the following meanings:</p>
-                    <ul>
-                        <li><strong>ACCOUNT:</strong> any account which you hold and access via our online service.</li>
-                        <li><strong>ADDITIONAL SECURITY DETAILS:</strong> the additional information you give us to help us identify you including the additional security question you provide yourself.</li>
-                        <li><strong>IDENTITY DETAILS:</strong> the access code we may provide you with.</li>
-                        <li><strong>Meridian VIP ACCOUNT NUMBER, PASSWORD and ACCOUNT PIN:</strong> you choose to identify yourself when you use our online service.</li>
-                        <li><strong>YOU, YOUR and YOURSELF:</strong> refer to the person who has entered into this agreement with us.</li>
-                    </ul>
-                    
-                    <h3>2. USING THE ONLINE SERVICE</h3>
-                    <p>
-                        These conditions apply to your use of our online service and in relation to any accounts. They explain the relationship 
-                        between you and us in relation to our online service. You should read these conditions carefully to understand how these 
-                        services work and your and our rights and duties under them. If there is a conflict between these conditions and your 
-                        account conditions, these conditions will apply. This means that, when you use our online service both sets of conditions 
-                        will apply unless they contradict each other in which case, the relevant condition in these conditions apply.
-                    </p>
-                    <p>
-                        If any of your accounts is a joint account, these conditions apply to all of you together and any of you separately. 
-                        If more than one of you uses our online service you must each choose your own username, password and additional security details.
-                    </p>
-                    <p>
-                        By registering to use our online service, you accept these conditions and agree that we may communicate with you by 
-                        e-mail or through our website.
-                    </p>
-                    <p>
-                        When you use our online service you must follow the instructions we give you from time to time. You are responsible 
-                        for ensuring that your computer, software and other equipment are capable of being used with our online service.
-                    </p>
-                    <p>
-                        Our online sites are secure. Disconnection from the Internet or leaving these sites will not automatically log you off. 
-                        You must always use the log off facility when you are finished and never leave your machine unattended while you are 
-                        logged in. As a security measure, if you have not used the sites for more than a specified period of time we will ask you to log in again.
-                    </p>
-                    
-                    <h3>3. WHAT RULES APPLY TO SECURITY?</h3>
-                    <p>
-                        As part of the registration for our online service you must provide us with identity details before we will allow you 
-                        to use the services for the first time. You must enter your identity details immediately after signing in, so we can identify you.
-                    </p>
-                    <p>
-                        Every time you use our online service you must give us your username, your password and the answer to an additional security question.
-                    </p>
-                    <p>
-                        You can change your username or password online by following the instructions on the screen.
-                    </p>
-                    <p>
-                        For administration or security reasons, we can require you to choose a new username or change your password before you 
-                        use (or carry on using) our online service.
-                    </p>
-                    <p>
-                        You must not write down, store (whether encrypted or otherwise) on your computer or let anyone else know your password, 
-                        identity details or additional security details, and the fact that they are for use with your accounts.
-                    </p>
-                    
-                    <h3>4. WHAT IS THE EXTENT OF YOUR LIABILITY?</h3>
-                    <p>
-                        If you are a victim of online fraud, we guarantee that you won't lose any money on your accounts and will always be reimbursed in full.
-                    </p>
-                    <p>
-                        Unless you are a victim of fraud you are responsible for all instructions and other information sent using your username, 
-                        password or additional security details.
-                    </p>
-                    <p>
-                        You will not be held responsible for any instructions or information sent after you have told us that someone knows your 
-                        password or additional security details and has used any of them to access our online service.
-                    </p>
-                    <p>
-                        Meridian VIP does not accept responsibility for any loss you or anybody else may suffer because any instructions or 
-                        information you sent us are sent in error, fail to reach us or are distorted unless you have been the victim of fraud.
-                    </p>
-                    <p>
-                        Meridian VIP does not accept responsibility for any loss you or anybody else may suffer because any instructions or 
-                        information we send you fail to reach you or are distorted unless you have been the victim of fraud.
-                    </p>
-                    
-                    <h3>5. HOW WE CAN CHANGE THESE CONDITIONS</h3>
-                    <p>
-                        Meridian VIP may change these conditions for any reason by giving you written notice or publishing the change on our website.
-                    </p>
-                    <p>
-                        We may send all written notices to you at the last e-mail address you gave us. You must let us know immediately if you 
-                        change your e-mail address (you can do so online), to make sure that we have your current e-mail address at all times.
-                    </p>
-                    
-                    <h3>6. GENERAL</h3>
-                    <p>
-                        Meridian VIP service is available to you if you are 18 years of age or over.
-                    </p>
+            <div class="terms-section">
+                <div class="terms-header">
+                    <div class="terms-icon">
+                        <i class="fas fa-file-contract"></i>
+                    </div>
+                    <h3>Terms and Conditions</h3>
                 </div>
-            </div>
-            
-            <!-- Action Buttons -->
-            <div class="action-buttons">
-                <form method="post" action="{% url 'accounts:kyc_terms_accept' %}" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="btn-accept">
-                        <i class="fas fa-check"></i>
-                        I Accept & Proceed to Verification
-                    </button>
-                </form>
                 
-                <button type="button" class="btn-decline" onclick="history.back()">
-                    <i class="fas fa-times"></i>
-                    Decline
-                </button>
+                <div class="terms-container">
+                    <div class="terms-content">
+                        <h4>1. INTRODUCTION & AGREEMENT TO TERMS</h4>
+                        <p>
+                            This VIP Terms of Service ("VIP Terms") governs the exclusive relationship between you ("VIP Investor," "you," or "your") 
+                            and Meridian, a Delaware limited liability company ("the Fund," "we," "us," or "our"). These VIP Terms apply to your 
+                            participation in our Meridian Elite program, an exclusive investment tier providing enhanced benefits, customized support, 
+                            and elevated profit participation.
+                        </p>
+                        <p>
+                            By enrolling in this VIP program and remitting the onboarding fee, you agree to be bound by these VIP Terms and the 
+                            general Meridian Terms of Service. In the event of any inconsistency, these VIP Terms shall prevail for VIP Investors.
+                        </p>
+                        
+                        <h4>2. VIP ONBOARDING FEE</h4>
+                        <p>All VIP Investors are required to remit a non-refundable onboarding fee of $11,000 USD. This fee grants access to:</p>
+                        <ul>
+                            <li>Personalized portfolio management and strategy alignment</li>
+                            <li>Direct priority support and reporting access</li>
+                            <li>Elevated profit participation rates</li>
+                            <li>Accelerated withdrawal processing windows</li>
+                        </ul>
+                        
+                        <h4>3. PROFIT PARTICIPATION ADVANTAGE</h4>
+                        <p>
+                            VIP Investors benefit from an enhanced profit distribution of 20%, calculated on realized net gains per investment cycle. 
+                            This payout structure replaces the standard 12-month profit distribution schedule, allowing VIP Investors to receive 20% 
+                            returns upon liquidation or at cycle maturity, subject to applicable performance verification.
+                        </p>
+                        
+                        <h4>4. WITHDRAWAL TERMS</h4>
+                        <p>Withdrawals by VIP Investors are subject to the following:</p>
+                        <ul>
+                            <li><strong>Pre-Charge Fee:</strong> 11% standard on all withdrawals</li>
+                            <li><strong>Negotiation Clause:</strong> The Fund may, at its sole discretion, reduce this fee to a minimum threshold of 9.7% based on client relationship status, investment performance, and duration of capital commitment</li>
+                            <li><strong>Processing Period:</strong> Withdrawals shall be executed within no more than 14 calendar days from the date of request approval</li>
+                        </ul>
+                        <p>These conditions ensure optimal liquidity management and protection of fund stability while providing expedited access for VIP participants.</p>
+                        
+                        <h4>GENERAL TERMS AND CONDITIONS</h4>
+                        <p>
+                            Before you can start using our online service you must agree to be bound by the conditions below. You must read the 
+                            conditions before you decide whether to accept them. If you agree to be bound by these conditions, please click the 
+                            "I Accept & Proceed to Verification" button below. If you click on the "Decline" button, you will not be able to 
+                            continue your registration for our online services. We strongly recommend that you print a copy of these conditions for your reference.
+                        </p>
+                        
+                        <h4>1. DEFINITIONS</h4>
+                        <p>In these conditions the following words have the following meanings:</p>
+                        <ul>
+                            <li><strong>ACCOUNT:</strong> any account which you hold and access via our online service.</li>
+                            <li><strong>ADDITIONAL SECURITY DETAILS:</strong> the additional information you give us to help us identify you including the additional security question you provide yourself.</li>
+                            <li><strong>IDENTITY DETAILS:</strong> the access code we may provide you with.</li>
+                            <li><strong>Meridian VIP ACCOUNT NUMBER, PASSWORD and ACCOUNT PIN:</strong> you choose to identify yourself when you use our online service.</li>
+                            <li><strong>YOU, YOUR and YOURSELF:</strong> refer to the person who has entered into this agreement with us.</li>
+                        </ul>
+                        
+                        <h4>2. USING THE ONLINE SERVICE</h4>
+                        <p>
+                            These conditions apply to your use of our online service and in relation to any accounts. They explain the relationship 
+                            between you and us in relation to our online service. You should read these conditions carefully to understand how these 
+                            services work and your and our rights and duties under them. If there is a conflict between these conditions and your 
+                            account conditions, these conditions will apply. This means that, when you use our online service both sets of conditions 
+                            will apply unless they contradict each other in which case, the relevant condition in these conditions apply.
+                        </p>
+                        <p>
+                            If any of your accounts is a joint account, these conditions apply to all of you together and any of you separately. 
+                            If more than one of you uses our online service you must each choose your own username, password and additional security details.
+                        </p>
+                        <p>
+                            By registering to use our online service, you accept these conditions and agree that we may communicate with you by 
+                            e-mail or through our website.
+                        </p>
+                        <p>
+                            When you use our online service you must follow the instructions we give you from time to time. You are responsible 
+                            for ensuring that your computer, software and other equipment are capable of being used with our online service.
+                        </p>
+                        <p>
+                            Our online sites are secure. Disconnection from the Internet or leaving these sites will not automatically log you off. 
+                            You must always use the log off facility when you are finished and never leave your machine unattended while you are 
+                            logged in. As a security measure, if you have not used the sites for more than a specified period of time we will ask you to log in again.
+                        </p>
+                        
+                        <h4>3. WHAT RULES APPLY TO SECURITY?</h4>
+                        <p>
+                            As part of the registration for our online service you must provide us with identity details before we will allow you 
+                            to use the services for the first time. You must enter your identity details immediately after signing in, so we can identify you.
+                        </p>
+                        <p>
+                            Every time you use our online service you must give us your username, your password and the answer to an additional security question.
+                        </p>
+                        <p>
+                            You can change your username or password online by following the instructions on the screen.
+                        </p>
+                        <p>
+                            For administration or security reasons, we can require you to choose a new username or change your password before you 
+                            use (or carry on using) our online service.
+                        </p>
+                        <p>
+                            You must not write down, store (whether encrypted or otherwise) on your computer or let anyone else know your password, 
+                            identity details or additional security details, and the fact that they are for use with your accounts.
+                        </p>
+                        
+                        <h4>4. WHAT IS THE EXTENT OF YOUR LIABILITY?</h4>
+                        <p>
+                            If you are a victim of online fraud, we guarantee that you won't lose any money on your accounts and will always be reimbursed in full.
+                        </p>
+                        <p>
+                            Unless you are a victim of fraud you are responsible for all instructions and other information sent using your username, 
+                            password or additional security details.
+                        </p>
+                        <p>
+                            You will not be held responsible for any instructions or information sent after you have told us that someone knows your 
+                            password or additional security details and has used any of them to access our online service.
+                        </p>
+                        <p>
+                            Meridian VIP does not accept responsibility for any loss you or anybody else may suffer because any instructions or 
+                            information you sent us are sent in error, fail to reach us or are distorted unless you have been the victim of fraud.
+                        </p>
+                        <p>
+                            Meridian VIP does not accept responsibility for any loss you or anybody else may suffer because any instructions or 
+                            information we send you fail to reach you or are distorted unless you have been the victim of fraud.
+                        </p>
+                        
+                        <h4>5. HOW WE CAN CHANGE THESE CONDITIONS</h4>
+                        <p>
+                            Meridian VIP may change these conditions for any reason by giving you written notice or publishing the change on our website.
+                        </p>
+                        <p>
+                            We may send all written notices to you at the last e-mail address you gave us. You must let us know immediately if you 
+                            change your e-mail address (you can do so online), to make sure that we have your current e-mail address at all times.
+                        </p>
+                        
+                        <h4>6. GENERAL</h4>
+                        <p>
+                            Meridian VIP service is available to you if you are 18 years of age or over.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <form method="post" action="{% url 'accounts:kyc_terms_accept' %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-accept">
+                            <i class="fas fa-check"></i>
+                            I Accept & Proceed to Verification
+                        </button>
+                    </form>
+                    
+                    <button type="button" class="btn-decline" onclick="history.back()">
+                        <i class="fas fa-times"></i>
+                        Decline
+                    </button>
+                </div>
             </div>
             
             <!-- Support Section -->
@@ -651,7 +808,6 @@
                     <i class="fas fa-comment"></i>
                     Contact Support
                 </a>
-            </div>
             </div>
         </div>
     </main>
