@@ -1723,31 +1723,38 @@ class VIPFinancialMetrics(models.Model):
     @property
     def risk_score(self):
         """Calculate risk score based on various factors"""
-        score = 0
-        
-        # Balance utilization factor
-        if self.balance_utilization > 90:
-            score += 30
-        elif self.balance_utilization > 70:
-            score += 20
-        elif self.balance_utilization > 50:
-            score += 10
-        
-        # Credit score factor
-        if self.credit_score < 600:
-            score += 25
-        elif self.credit_score < 700:
-            score += 15
-        elif self.credit_score < 750:
-            score += 5
-        
-        # Transaction volume factor
-        if self.transaction_volume > self.monthly_transaction_limit:
-            score += 20
-        elif self.transaction_volume > (self.monthly_transaction_limit * 0.8):
-            score += 10
-        
-        return min(score, 100)  # Cap at 100
+        try:
+            score = 0
+            
+            # Balance utilization factor
+            balance_util = self.balance_utilization
+            if balance_util > 90:
+                score += 30
+            elif balance_util > 70:
+                score += 20
+            elif balance_util > 50:
+                score += 10
+            
+            # Credit score factor
+            if self.credit_score < 600:
+                score += 25
+            elif self.credit_score < 700:
+                score += 15
+            elif self.credit_score < 750:
+                score += 5
+            
+            # Transaction volume factor
+            transaction_volume = float(self.transaction_volume)
+            monthly_limit = float(self.monthly_transaction_limit)
+            
+            if transaction_volume > monthly_limit:
+                score += 20
+            elif transaction_volume > (monthly_limit * 0.8):
+                score += 10
+            
+            return min(score, 100)  # Cap at 100
+        except (TypeError, ValueError, AttributeError):
+            return 0
     
     def save(self, *args, **kwargs):
         """Auto-update last_updated timestamp"""

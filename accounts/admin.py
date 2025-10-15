@@ -1240,11 +1240,18 @@ class VIPFinancialMetricsForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.pk:
-            # Display calculated values
-            self.fields['balance_utilization'].initial = f"{self.instance.balance_utilization:.2f}%"
-            self.fields['monthly_net_flow'].initial = f"${self.instance.monthly_net_flow:.2f}"
-            self.fields['investment_return_rate'].initial = f"{self.instance.investment_return_rate:.2f}%"
-            self.fields['risk_score'].initial = f"{self.instance.risk_score}/100"
+            try:
+                # Display calculated values with error handling
+                self.fields['balance_utilization'].initial = f"{self.instance.balance_utilization:.2f}%"
+                self.fields['monthly_net_flow'].initial = f"${self.instance.monthly_net_flow:.2f}"
+                self.fields['investment_return_rate'].initial = f"{self.instance.investment_return_rate:.2f}%"
+                self.fields['risk_score'].initial = f"{self.instance.risk_score}/100"
+            except (TypeError, ValueError, AttributeError, ZeroDivisionError):
+                # Fallback values if calculations fail
+                self.fields['balance_utilization'].initial = "0.00%"
+                self.fields['monthly_net_flow'].initial = "$0.00"
+                self.fields['investment_return_rate'].initial = "0.00%"
+                self.fields['risk_score'].initial = "0/100"
             
             # Make calculated fields readonly
             for field_name in ['balance_utilization', 'monthly_net_flow', 'investment_return_rate', 'risk_score']:
