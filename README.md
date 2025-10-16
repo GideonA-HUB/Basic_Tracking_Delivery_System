@@ -253,7 +253,7 @@ python manage.py test
 5. Open a Pull Request
 
 ## 📄 License
-
+VIP
 This project is proprietary software owned by Meridian Asset Logistics.
 
 ## 🆘 Support
