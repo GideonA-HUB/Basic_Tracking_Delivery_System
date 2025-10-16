@@ -548,17 +548,18 @@ class NOWPaymentsService:
             except Exception:
                 # Create financial metrics if they don't exist
                 from accounts.models import VIPFinancialMetrics
+                from decimal import Decimal
                 financial_metrics = VIPFinancialMetrics.objects.create(
                     vip_member=vip_member,
-                    current_balance=0.00,
-                    available_balance=100000.00,  # Default available balance
-                    monthly_income=5000.00,
-                    monthly_outgoing=0.00,
-                    total_investments=0.00,
-                    net_worth=100000.00,
-                    transaction_limit=500000.00,
-                    pending_transactions=0.00,
-                    transaction_volume=0.00
+                    current_balance=Decimal('0.00'),
+                    available_balance=Decimal('100000.00'),  # Default available balance
+                    monthly_income=Decimal('5000.00'),
+                    monthly_outgoing=Decimal('0.00'),
+                    total_investments=Decimal('0.00'),
+                    net_worth=Decimal('100000.00'),
+                    transaction_limit=Decimal('500000.00'),
+                    pending_transactions=Decimal('0.00'),
+                    transaction_volume=Decimal('0.00')
                 )
             
             # Create payment transaction record

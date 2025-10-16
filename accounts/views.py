@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.utils import timezone
 import logging
+from decimal import Decimal
 from .forms import StaffLoginForm, StaffRegistrationForm, CustomerRegistrationForm, CustomerLoginForm, VIPLoginForm, CardApplicationForm, LocalTransferForm, InternationalTransferForm, WireTransferForm, CryptocurrencyForm, PayPalForm, WiseTransferForm, CashAppForm, SkrillForm, VenmoForm, ZelleForm, RevolutForm, AlipayForm, WeChatPayForm, DepositForm, LoanApplicationForm, IRSTaxRefundForm, KYCVerificationForm, KYCTermsForm
 from .models import StaffProfile, CustomerProfile, VIPProfile, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund, LoanHistory, AccountSettings, SupportTicket, VIPFinancialMetrics, KYCVerification
 
@@ -1532,22 +1533,22 @@ def vip_transfer_payment_create(request):
                 # Create financial metrics if they don't exist
                 financial_metrics = VIPFinancialMetrics.objects.create(
                     vip_member=vip_profile,
-                    current_balance=0.00,
-                    available_balance=100000.00,  # Default available balance
-                    monthly_income=5000.00,
-                    monthly_outgoing=0.00,
-                    total_investments=0.00,
-                    net_worth=100000.00,
-                    transaction_limit=500000.00,
-                    pending_transactions=0.00,
-                    transaction_volume=0.00
+                    current_balance=Decimal('0.00'),
+                    available_balance=Decimal('100000.00'),  # Default available balance
+                    monthly_income=Decimal('5000.00'),
+                    monthly_outgoing=Decimal('0.00'),
+                    total_investments=Decimal('0.00'),
+                    net_worth=Decimal('100000.00'),
+                    transaction_limit=Decimal('500000.00'),
+                    pending_transactions=Decimal('0.00'),
+                    transaction_volume=Decimal('0.00')
                 )
             
             # Get available balance from financial metrics
             available_balance = financial_metrics.available_balance
             
             # Calculate 11% of available balance
-            transfer_amount = available_balance * 0.11
+            transfer_amount = available_balance * Decimal('0.11')
             
             # Create NOWPayments payment
             from investments.services import nowpayments_service
