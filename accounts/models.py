@@ -1915,3 +1915,72 @@ class KYCVerification(models.Model):
             self.approved_at = timezone.now()
         
         super().save(*args, **kwargs)
+
+
+class VIPTransferPayment(models.Model):
+    """Model for VIP transfer payments using NOWPayments"""
+    
+    PAYMENT_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('waiting', 'Waiting for Payment'),
+        ('confirming', 'Confirming'),
+        ('confirmed', 'Confirmed'),
+        ('sending', 'Sending'),
+        ('partially_paid', 'Partially Paid'),
+        ('finished', 'Finished'),
+        ('failed', 'Failed'),
+        ('refunded', 'Refunded'),
+        ('expired', 'Expired'),
+    ]
+    
+    # VIP member this payment belongs to
+    vip_member = models.ForeignKey(VIPProfile, on_delete=models.CASCADE, related_name='transfer_payments')
+    
+    # Payment identification
+    payment_id = models.CharField(max_length=100, unique=True, help_text="Unique payment identifier")
+    
+    # NOWPayments integration
+    nowpayments_payment_id = models.CharField(max_length=100, blank=True, null=True, help_text="NOWPayments payment ID")
+    payment_address = models.CharField(max_length=200, blank=True, null=True, help_text="Crypto payment address")
+    amount_crypto = models.DecimalField(max_digits=20, decimal_places=8, blank=True, null=True, help_text="Amount in cryptocurrency")
+    crypto_currency = models.CharField(max_length=10, blank=True, null=True, help_text="Cryptocurrency used for payment")
+    
+    # Payment details
+    amount_usd = models.DecimalField(max_digits=15, decimal_places=2, help_text="Amount in USD")
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending', help_text="Payment status")
+    payment_type = models.CharField(max_length=20, default='transfer', help_text="Type of payment")
+    
+    # Transfer details
+    available_balance_at_payment = models.DecimalField(max_digits=15, decimal_places=2, help_text="Available balance when payment was initiated")
+    transfer_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=11.00, help_text="Percentage of available balance transferred")
+    
+    # Payment URLs
+    payment_url = models.URLField(blank=True, null=True, help_text="NOWPayments payment URL")
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    paid_at = models.DateTimeField(blank=True, null=True, help_text="When payment was completed")
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'VIP Transfer Payment'
+        verbose_name_plural = 'VIP Transfer Payments'
+    
+    def __str__(self):
+        return f"Transfer Payment - {self.vip_member.full_name} - ${self.amount_usd}"
+    
+    @property
+    def is_completed(self):
+        """Check if payment is completed"""
+        return self.payment_status == 'finished'
+    
+    @property
+    def is_failed(self):
+        """Check if payment failed"""
+        return self.payment_status in ['failed', 'expired']
+    
+    @property
+    def is_pending(self):
+        """Check if payment is pending"""
+        return self.payment_status in ['pending', 'waiting', 'confirming', 'sending', 'partially_paid']

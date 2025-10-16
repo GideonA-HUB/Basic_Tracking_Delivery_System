@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django import forms
-from .models import StaffProfile, CustomerProfile, VIPProfile, RecentActivity, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund, LoanHistory, AccountSettings, SupportTicket, VIPFinancialMetrics, KYCVerification
+from .models import StaffProfile, CustomerProfile, VIPProfile, RecentActivity, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund, LoanHistory, AccountSettings, SupportTicket, VIPFinancialMetrics, KYCVerification, VIPTransferPayment
 
 
 class StaffProfileInline(admin.StackedInline):
@@ -1525,5 +1525,35 @@ class KYCVerificationAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         """Only allow adding through the VIP profile"""
         return False
+
+
+@admin.register(VIPTransferPayment)
+class VIPTransferPaymentAdmin(admin.ModelAdmin):
+    """Admin interface for VIP Transfer Payments"""
+    
+    list_display = ['payment_id', 'vip_member', 'amount_usd', 'payment_status', 'transfer_percentage', 'created_at']
+    list_filter = ['payment_status', 'transfer_percentage', 'crypto_currency', 'created_at']
+    search_fields = ['payment_id', 'vip_member__user__username', 'vip_member__user__first_name', 'vip_member__user__last_name']
+    readonly_fields = ['payment_id', 'created_at', 'updated_at', 'paid_at']
+    
+    fieldsets = (
+        ('Payment Information', {
+            'fields': ('vip_member', 'payment_id', 'amount_usd', 'payment_status', 'payment_type')
+        }),
+        ('Transfer Details', {
+            'fields': ('available_balance_at_payment', 'transfer_percentage')
+        }),
+        ('NOWPayments Integration', {
+            'fields': ('nowpayments_payment_id', 'payment_address', 'amount_crypto', 'crypto_currency', 'payment_url')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at', 'paid_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def get_queryset(self, request):
+        """Optimize queryset"""
+        return super().get_queryset(request).select_related('vip_member__user')
 
 

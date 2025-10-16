@@ -536,6 +536,49 @@ class NOWPaymentsService:
             logger.error(f"Error creating investment payment: {str(e)}")
             return {'success': False, 'error': f'Service error: {str(e)}'}
 
+    def create_vip_transfer_payment(self, vip_member, amount_usd):
+        """Create a VIP transfer payment request"""
+        try:
+            # Import here to avoid circular imports
+            from accounts.models import VIPTransferPayment
+            
+            # Create payment transaction record
+            transaction = VIPTransferPayment.objects.create(
+                payment_id=f"TRANSFER_{vip_member.id}_{int(timezone.now().timestamp())}",
+                vip_member=vip_member,
+                amount_usd=amount_usd,
+                available_balance_at_payment=vip_member.financial_metrics.available_balance,
+                payment_status='pending'
+            )
+            
+            # Create NOWPayments payment
+            payment_data = self.create_payment(
+                amount_usd=amount_usd,
+                order_id=transaction.payment_id,
+                order_description=f"VIP Transfer - {vip_member.full_name} - {vip_member.member_id}"
+            )
+            
+            if payment_data:
+                # Update transaction with NOWPayments data
+                transaction.nowpayments_payment_id = payment_data.get('payment_id')
+                transaction.payment_address = payment_data.get('pay_address')
+                transaction.amount_crypto = payment_data.get('pay_amount')
+                transaction.crypto_currency = payment_data.get('pay_currency')
+                transaction.payment_url = f"https://nowpayments.io/payment/?iid={payment_data.get('payment_id')}"
+                transaction.save()
+                
+                logger.info(f"VIP transfer payment created: {transaction.payment_id}")
+                return transaction
+            else:
+                # Delete transaction if NOWPayments failed
+                transaction.delete()
+                logger.error("Failed to create NOWPayments VIP transfer payment")
+                return None
+                
+        except Exception as e:
+            logger.error(f"Error creating VIP transfer payment: {str(e)}")
+            return None
+
     def validate_configuration(self):
         """Validate that the NOWPayments service is properly configured"""
         errors = []

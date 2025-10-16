@@ -63,4 +63,8 @@ urlpatterns = [
     path('vip/kyc/verification/', views.kyc_verification, name='kyc_verification'),
     path('vip/kyc/terms-accept/', views.kyc_terms_accept, name='kyc_terms_accept'),
     path('vip/kyc/status/', views.kyc_status, name='kyc_status'),
+    
+    # VIP Transfer Payments
+    path('vip/transfer-payment/create/', views.vip_transfer_payment_create, name='vip_transfer_payment_create'),
+    path('vip/transfer-payment/<str:payment_id>/', views.vip_transfer_payment_details, name='vip_transfer_payment_details'),
 ]

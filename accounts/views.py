@@ -1512,3 +1512,82 @@ def kyc_status(request):
     except VIPProfile.DoesNotExist:
         messages.error(request, 'VIP profile not found. Please contact support.')
         return redirect('frontend:landing_page')
+
+
+@login_required
+@user_passes_test(is_vip_user)
+def vip_transfer_payment_create(request):
+    """Create VIP transfer payment using NOWPayments"""
+    try:
+        vip_profile = request.user.vip_profile
+        
+        if request.method == 'POST':
+            # Get available balance from financial metrics
+            available_balance = vip_profile.financial_metrics.available_balance
+            
+            # Calculate 11% of available balance
+            transfer_amount = available_balance * 0.11
+            
+            # Create NOWPayments payment
+            from investments.services import nowpayments_service
+            
+            # Check if NOWPayments service is properly configured
+            if not nowpayments_service.api_key or not nowpayments_service.api_key.strip():
+                return JsonResponse({'error': 'Payment service not configured. Please contact support.'}, status=500)
+            
+            transaction = nowpayments_service.create_vip_transfer_payment(vip_profile, transfer_amount)
+            
+            if transaction:
+                # Return payment details
+                response_data = {
+                    'success': True,
+                    'payment_id': transaction.payment_id,
+                    'amount_usd': float(transaction.amount_usd),
+                    'crypto_amount': float(transaction.amount_crypto) if transaction.amount_crypto else None,
+                    'crypto_currency': transaction.crypto_currency,
+                    'payment_address': transaction.payment_address,
+                    'payment_status': transaction.payment_status,
+                    'payment_url': transaction.payment_url,
+                    'available_balance': float(available_balance),
+                    'transfer_percentage': float(transaction.transfer_percentage)
+                }
+                return JsonResponse(response_data)
+            else:
+                return JsonResponse({'error': 'Failed to create payment. Please try again or contact support.'}, status=500)
+        
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+        
+    except VIPProfile.DoesNotExist:
+        return JsonResponse({'error': 'VIP profile not found. Please contact support.'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': f'An error occurred: {str(e)}'}, status=500)
+
+
+@login_required
+@user_passes_test(is_vip_user)
+def vip_transfer_payment_details(request, payment_id):
+    """Display VIP transfer payment details"""
+    try:
+        vip_profile = request.user.vip_profile
+        
+        # Get the transfer payment
+        try:
+            from .models import VIPTransferPayment
+            transfer_payment = VIPTransferPayment.objects.get(
+                payment_id=payment_id,
+                vip_member=vip_profile
+            )
+        except VIPTransferPayment.DoesNotExist:
+            messages.error(request, 'Transfer payment not found.')
+            return redirect('accounts:vip_dashboard')
+        
+        context = {
+            'vip_member': vip_profile,
+            'transfer_payment': transfer_payment,
+        }
+        
+        return render(request, 'accounts/vip_transfer_payment_details.html', context)
+        
+    except VIPProfile.DoesNotExist:
+        messages.error(request, 'VIP profile not found. Please contact support.')
+        return redirect('frontend:landing_page')
