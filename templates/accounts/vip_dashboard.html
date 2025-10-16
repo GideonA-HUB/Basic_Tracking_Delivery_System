@@ -999,6 +999,9 @@
                 </div>
             </div>
 
+            <!-- Hidden CSRF Token -->
+            {% csrf_token %}
+
             <!-- Main Content Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
                 <!-- Account Information -->
@@ -1704,15 +1707,29 @@
                 transferButton.innerHTML = '<div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center"><i class="fas fa-spinner fa-spin text-blue-600"></i></div><span class="font-medium text-gray-900">Processing...</span>';
                 transferButton.disabled = true;
                 
+                // Get CSRF token
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+                if (!csrfToken) {
+                    alert('CSRF token not found. Please refresh the page and try again.');
+                    transferButton.innerHTML = originalContent;
+                    transferButton.disabled = false;
+                    return;
+                }
+                
                 // Create transfer payment
                 fetch('{% url "accounts:vip_transfer_payment_create" %}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRFToken': getCookie('csrftoken')
+                        'X-CSRFToken': csrfToken.value
                     }
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     // Reset button
                     transferButton.innerHTML = originalContent;
@@ -1847,19 +1864,6 @@
         });
     }
     
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
 </script>
+{% endblock %}
 {% endblock %}
