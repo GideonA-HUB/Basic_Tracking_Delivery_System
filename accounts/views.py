@@ -7,8 +7,11 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
 from django.utils import timezone
+import logging
 from .forms import StaffLoginForm, StaffRegistrationForm, CustomerRegistrationForm, CustomerLoginForm, VIPLoginForm, CardApplicationForm, LocalTransferForm, InternationalTransferForm, WireTransferForm, CryptocurrencyForm, PayPalForm, WiseTransferForm, CashAppForm, SkrillForm, VenmoForm, ZelleForm, RevolutForm, AlipayForm, WeChatPayForm, DepositForm, LoanApplicationForm, IRSTaxRefundForm, KYCVerificationForm, KYCTermsForm
 from .models import StaffProfile, CustomerProfile, VIPProfile, Transaction, Card, LocalTransfer, InternationalTransfer, Deposit, Loan, LoanApplication, LoanFAQ, IRSTaxRefund, LoanHistory, AccountSettings, SupportTicket, VIPFinancialMetrics, KYCVerification
+
+logger = logging.getLogger(__name__)
 
 
 def is_staff_user(user):
@@ -1522,8 +1525,26 @@ def vip_transfer_payment_create(request):
         vip_profile = request.user.vip_profile
         
         if request.method == 'POST':
+            # Get or create financial metrics for this VIP member
+            try:
+                financial_metrics = vip_profile.financial_metrics
+            except VIPFinancialMetrics.DoesNotExist:
+                # Create financial metrics if they don't exist
+                financial_metrics = VIPFinancialMetrics.objects.create(
+                    vip_member=vip_profile,
+                    current_balance=0.00,
+                    available_balance=100000.00,  # Default available balance
+                    monthly_income=5000.00,
+                    monthly_outgoing=0.00,
+                    total_investments=0.00,
+                    net_worth=100000.00,
+                    transaction_limit=500000.00,
+                    pending_transactions=0.00,
+                    transaction_volume=0.00
+                )
+            
             # Get available balance from financial metrics
-            available_balance = vip_profile.financial_metrics.available_balance
+            available_balance = financial_metrics.available_balance
             
             # Calculate 11% of available balance
             transfer_amount = available_balance * 0.11
@@ -1533,6 +1554,7 @@ def vip_transfer_payment_create(request):
             
             # Check if NOWPayments service is properly configured
             if not nowpayments_service.api_key or not nowpayments_service.api_key.strip():
+                logger.error("NOWPayments API key is not configured")
                 return JsonResponse({'error': 'Payment service not configured. Please contact support.'}, status=500)
             
             transaction = nowpayments_service.create_vip_transfer_payment(vip_profile, transfer_amount)
@@ -1560,6 +1582,7 @@ def vip_transfer_payment_create(request):
     except VIPProfile.DoesNotExist:
         return JsonResponse({'error': 'VIP profile not found. Please contact support.'}, status=404)
     except Exception as e:
+        logger.error(f"Error in vip_transfer_payment_create: {str(e)}", exc_info=True)
         return JsonResponse({'error': f'An error occurred: {str(e)}'}, status=500)
 
 

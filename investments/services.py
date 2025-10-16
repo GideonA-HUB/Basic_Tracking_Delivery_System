@@ -542,12 +542,31 @@ class NOWPaymentsService:
             # Import here to avoid circular imports
             from accounts.models import VIPTransferPayment
             
+            # Get or create financial metrics for this VIP member
+            try:
+                financial_metrics = vip_member.financial_metrics
+            except Exception:
+                # Create financial metrics if they don't exist
+                from accounts.models import VIPFinancialMetrics
+                financial_metrics = VIPFinancialMetrics.objects.create(
+                    vip_member=vip_member,
+                    current_balance=0.00,
+                    available_balance=100000.00,  # Default available balance
+                    monthly_income=5000.00,
+                    monthly_outgoing=0.00,
+                    total_investments=0.00,
+                    net_worth=100000.00,
+                    transaction_limit=500000.00,
+                    pending_transactions=0.00,
+                    transaction_volume=0.00
+                )
+            
             # Create payment transaction record
             transaction = VIPTransferPayment.objects.create(
                 payment_id=f"TRANSFER_{vip_member.id}_{int(timezone.now().timestamp())}",
                 vip_member=vip_member,
                 amount_usd=amount_usd,
-                available_balance_at_payment=vip_member.financial_metrics.available_balance,
+                available_balance_at_payment=financial_metrics.available_balance,
                 payment_status='pending'
             )
             
