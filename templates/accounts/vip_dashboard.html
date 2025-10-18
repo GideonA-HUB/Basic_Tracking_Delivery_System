@@ -413,29 +413,59 @@
     }
 
     /* CRITICAL: Dedicated Handler card ALWAYS stays blue with white text */
-    .bg-gradient-to-r.from-blue-600.to-blue-800 {
+    .dedicated-handler-card {
         background: linear-gradient(to right, #2563eb, #1e40af) !important;
         color: white !important;
     }
 
-    .bg-gradient-to-r.from-blue-600.to-blue-800 * {
+    .dedicated-handler-card * {
+        color: white !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    /* NUCLEAR OPTION - Override EVERYTHING for dedicated handler */
+    .dedicated-handler-card,
+    .dedicated-handler-card *,
+    .dedicated-handler-card h1,
+    .dedicated-handler-card h2,
+    .dedicated-handler-card h3,
+    .dedicated-handler-card h4,
+    .dedicated-handler-card h5,
+    .dedicated-handler-card h6,
+    .dedicated-handler-card p,
+    .dedicated-handler-card span,
+    .dedicated-handler-card div,
+    .dedicated-handler-card a,
+    .dedicated-handler-card i,
+    .dedicated-handler-card button {
         color: white !important;
         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
     }
 
     /* Override any theme changes to dedicated handler card */
-    html.light .bg-gradient-to-r.from-blue-600.to-blue-800,
-    html.dark .bg-gradient-to-r.from-blue-600.to-blue-800,
-    body.light .bg-gradient-to-r.from-blue-600.to-blue-800,
-    body.dark .bg-gradient-to-r.from-blue-600.to-blue-800 {
+    html.light .dedicated-handler-card,
+    html.dark .dedicated-handler-card,
+    body.light .dedicated-handler-card,
+    body.dark .dedicated-handler-card {
         background: linear-gradient(to right, #2563eb, #1e40af) !important;
         color: white !important;
     }
 
-    html.light .bg-gradient-to-r.from-blue-600.to-blue-800 *,
-    html.dark .bg-gradient-to-r.from-blue-600.to-blue-800 *,
-    body.light .bg-gradient-to-r.from-blue-600.to-blue-800 *,
-    body.dark .bg-gradient-to-r.from-blue-600.to-blue-800 * {
+    html.light .dedicated-handler-card *,
+    html.dark .dedicated-handler-card *,
+    body.light .dedicated-handler-card *,
+    body.dark .dedicated-handler-card * {
+        color: white !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    /* FINAL NUCLEAR OVERRIDE - Target specific elements */
+    .dedicated-handler-card h3,
+    .dedicated-handler-card h4,
+    .dedicated-handler-card p,
+    .dedicated-handler-card span,
+    .dedicated-handler-card a,
+    .dedicated-handler-card i {
         color: white !important;
         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
     }
@@ -1228,7 +1258,7 @@
                 <!-- Account Manager -->
                 {% if assigned_staff %}
                 <div>
-                    <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-6 text-white card-hover" style="color: white !important;">
+                    <div class="dedicated-handler-card bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-6 text-white card-hover" style="color: white !important;">
                         <h3 class="text-lg font-semibold mb-6 text-white" style="color: white !important;">Your Dedicated Handler</h3>
                         
                         <div class="flex items-center gap-4">
