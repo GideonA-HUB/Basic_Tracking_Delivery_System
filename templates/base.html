@@ -472,9 +472,10 @@
                 </div>
 
                 <!-- Desktop Navigation -->
-                <div class="hidden lg:flex items-center space-x-8">
-                    <!-- Main Navigation Links -->
-                    <div class="flex items-center space-x-6">
+                <div class="hidden lg:flex items-center">
+                    <!-- All Navigation Links Grouped Together -->
+                    <div class="flex items-center space-x-4 ml-8">
+                        <!-- Main Navigation Links -->
                         <a href="{% url 'investments:investment-marketplace' %}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                             Services
                         </a>
@@ -484,18 +485,16 @@
                         <a href="{% url 'frontend:landing_page' %}#contact-section" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                             Contact
                         </a>
-                    </div>
-                    
-                    <!-- Dark Mode Toggle -->
-                    <button id="theme-toggle" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 rounded-md transition-colors">
-                        <i id="theme-icon" class="fas fa-moon"></i>
-                    </button>
-                    
-                    <!-- User Navigation -->
-                    {% if user.is_authenticated %}
-                        {% if user.is_staff %}
-                            <!-- Staff Navigation -->
-                            <div class="flex items-center space-x-4">
+                        
+                        <!-- Dark Mode Toggle -->
+                        <button id="theme-toggle" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 rounded-md transition-colors">
+                            <i id="theme-icon" class="fas fa-moon"></i>
+                        </button>
+                        
+                        <!-- User Navigation -->
+                        {% if user.is_authenticated %}
+                            {% if user.is_staff %}
+                                <!-- Staff Navigation -->
                                 <a href="{% url 'frontend:dashboard' %}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium">
                                     Dashboard
                                 </a>
@@ -516,10 +515,8 @@
                                         </a>
                                     </div>
                                 </div>
-                            </div>
-                        {% else %}
-                            <!-- Customer Navigation -->
-                            <div class="flex items-center space-x-4">
+                            {% else %}
+                                <!-- Customer Navigation -->
                                 <a href="{% url 'investments:investment-dashboard' %}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium">
                                     Investment Dashboard
                                 </a>
@@ -548,25 +545,23 @@
                                         </a>
                                     </div>
                                 </div>
-                            </div>
-                        {% endif %}
-                    {% else %}
-                        <!-- Guest Navigation -->
-                        <div class="flex items-center space-x-4">
+                            {% endif %}
+                        {% else %}
+                            <!-- Guest Navigation -->
                             <a href="{% url 'accounts:customer_login' %}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                                 Login
                             </a>
                             <a href="{% url 'accounts:customer_register' %}" class="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium transition-colors">
                                 Get Started
                             </a>
-                        </div>
-                    {% endif %}
+                        {% endif %}
+                    </div>
                 </div>
 
                 <!-- Mobile Navigation -->
-                <div class="lg:hidden flex items-center">
+                <div class="lg:hidden flex items-center justify-end">
                     <!-- Mobile Menu Button -->
-                    <button id="mobile-menu-button" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 rounded-md transition-colors">
+                    <button id="mobile-menu-button" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-3 rounded-md transition-colors">
                         <i class="fas fa-bars text-xl"></i>
                     </button>
                 </div>
