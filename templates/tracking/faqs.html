@@ -1,0 +1,450 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - Meridian Asset Logistics{% endblock %}
+
+{% block extra_css %}
+<style>
+    .faq-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .faq-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .faq-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .faq-subtitle {
+        font-size: 1.125rem;
+        color: #6b7280;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .faq-categories {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+    
+    .faq-category {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .faq-category:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .faq-category.active {
+        border-color: #3b82f6;
+        background: #f8fafc;
+    }
+    
+    .category-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        font-size: 1.25rem;
+    }
+    
+    .category-icon.general { background: #dbeafe; color: #1e40af; }
+    .category-icon.investment { background: #dcfce7; color: #166534; }
+    .category-icon.logistics { background: #fef3c7; color: #92400e; }
+    .category-icon.vip { background: #fce7f3; color: #be185d; }
+    .category-icon.technical { background: #e0e7ff; color: #3730a3; }
+    
+    .category-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+    
+    .category-description {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 1rem;
+    }
+    
+    .category-count {
+        font-size: 0.75rem;
+        color: #9ca3af;
+        font-weight: 500;
+    }
+    
+    .faq-content {
+        display: none;
+    }
+    
+    .faq-content.active {
+        display: block;
+    }
+    
+    .faq-section {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+    }
+    
+    .faq-item {
+        border-bottom: 1px solid #e5e7eb;
+        padding: 1.5rem 0;
+    }
+    
+    .faq-item:last-child {
+        border-bottom: none;
+    }
+    
+    .faq-question {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.75rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: color 0.3s ease;
+    }
+    
+    .faq-question:hover {
+        color: #3b82f6;
+    }
+    
+    .faq-question i {
+        font-size: 0.875rem;
+        transition: transform 0.3s ease;
+    }
+    
+    .faq-question.active i {
+        transform: rotate(180deg);
+    }
+    
+    .faq-answer {
+        font-size: 1rem;
+        color: #4b5563;
+        line-height: 1.6;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+    
+    .faq-answer.active {
+        max-height: 500px;
+    }
+    
+    .search-box {
+        max-width: 500px;
+        margin: 0 auto 2rem;
+        position: relative;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 3rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+    }
+    
+    .no-results {
+        text-align: center;
+        padding: 3rem;
+        color: #6b7280;
+    }
+    
+    .no-results i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #d1d5db;
+    }
+    
+    @media (max-width: 768px) {
+        .faq-title {
+            font-size: 2rem;
+        }
+        
+        .faq-categories {
+            grid-template-columns: 1fr;
+        }
+        
+        .faq-container {
+            padding: 1rem;
+        }
+    }
+    
+    .dark .faq-title {
+        color: #f9fafb;
+    }
+    
+    .dark .faq-subtitle {
+        color: #d1d5db;
+    }
+    
+    .dark .faq-category {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .faq-category:hover {
+        background: #374151;
+    }
+    
+    .dark .faq-category.active {
+        background: #1e3a8a;
+        border-color: #3b82f6;
+    }
+    
+    .dark .category-title {
+        color: #f9fafb;
+    }
+    
+    .dark .category-description {
+        color: #d1d5db;
+    }
+    
+    .dark .faq-section {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .faq-question {
+        color: #f9fafb;
+    }
+    
+    .dark .faq-answer {
+        color: #d1d5db;
+    }
+    
+    .dark .faq-item {
+        border-color: #374151;
+    }
+    
+    .dark .search-input {
+        background: #1f2937;
+        border-color: #374151;
+        color: #f9fafb;
+    }
+    
+    .dark .search-input:focus {
+        border-color: #3b82f6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="faq-container">
+    <!-- FAQ Header -->
+    <div class="faq-header">
+        <h1 class="faq-title">Frequently Asked Questions</h1>
+        <p class="faq-subtitle">
+            Find answers to common questions about our logistics services, investment opportunities, and VIP membership benefits.
+        </p>
+    </div>
+    
+    <!-- Search Box -->
+    <div class="search-box">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="faq-search" class="search-input" placeholder="Search FAQs...">
+    </div>
+    
+    <!-- FAQ Categories -->
+    <div class="faq-categories">
+        <div class="faq-category" data-category="general">
+            <div class="category-icon general">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            <div class="category-title">General</div>
+            <div class="category-description">Basic information about our services and company</div>
+            <div class="category-count">{{ faq_data.general|length }} questions</div>
+        </div>
+        
+        <div class="faq-category" data-category="investment">
+            <div class="category-icon investment">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="category-title">Investment</div>
+            <div class="category-description">Investment opportunities and portfolio management</div>
+            <div class="category-count">{{ faq_data.investment|length }} questions</div>
+        </div>
+        
+        <div class="faq-category" data-category="logistics">
+            <div class="category-icon logistics">
+                <i class="fas fa-shipping-fast"></i>
+            </div>
+            <div class="category-title">Logistics</div>
+            <div class="category-description">Shipping, tracking, and delivery services</div>
+            <div class="category-count">{{ faq_data.logistics|length }} questions</div>
+        </div>
+        
+        <div class="faq-category" data-category="vip">
+            <div class="category-icon vip">
+                <i class="fas fa-gem"></i>
+            </div>
+            <div class="category-title">VIP Membership</div>
+            <div class="category-description">VIP benefits and exclusive services</div>
+            <div class="category-count">{{ faq_data.vip|length }} questions</div>
+        </div>
+        
+        <div class="faq-category" data-category="technical">
+            <div class="category-icon technical">
+                <i class="fas fa-cog"></i>
+            </div>
+            <div class="category-title">Technical</div>
+            <div class="category-description">Account management and technical support</div>
+            <div class="category-count">{{ faq_data.technical|length }} questions</div>
+        </div>
+    </div>
+    
+    <!-- FAQ Content -->
+    <div id="faq-content">
+        {% for category, faqs in faq_data.items %}
+        <div class="faq-content" id="faq-{{ category }}">
+            <div class="faq-section">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+                    {% if category == 'general' %}General Questions
+                    {% elif category == 'investment' %}Investment & Portfolio
+                    {% elif category == 'logistics' %}Logistics & Shipping
+                    {% elif category == 'vip' %}VIP Membership
+                    {% elif category == 'technical' %}Technical Support
+                    {% endif %}
+                </h2>
+                
+                {% for faq in faqs %}
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        {{ faq.question }}
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        {{ faq.answer }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- No Results -->
+    <div class="no-results" id="no-results" style="display: none;">
+        <i class="fas fa-search"></i>
+        <h3>No FAQs found</h3>
+        <p>Try adjusting your search terms or browse by category above.</p>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Category selection
+    const categories = document.querySelectorAll('.faq-category');
+    const faqContents = document.querySelectorAll('.faq-content');
+    
+    categories.forEach(category => {
+        category.addEventListener('click', function() {
+            const categoryName = this.dataset.category;
+            
+            // Remove active class from all categories and contents
+            categories.forEach(c => c.classList.remove('active'));
+            faqContents.forEach(c => c.classList.remove('active'));
+            
+            // Add active class to selected category and content
+            this.classList.add('active');
+            document.getElementById(`faq-${categoryName}`).classList.add('active');
+        });
+    });
+    
+    // Set first category as active by default
+    if (categories.length > 0) {
+        categories[0].click();
+    }
+    
+    // FAQ toggle functionality
+    window.toggleFAQ = function(element) {
+        const answer = element.nextElementSibling;
+        const icon = element.querySelector('i');
+        
+        // Close other FAQs in the same section
+        const parentSection = element.closest('.faq-content');
+        const allQuestions = parentSection.querySelectorAll('.faq-question');
+        const allAnswers = parentSection.querySelectorAll('.faq-answer');
+        
+        allQuestions.forEach(q => q.classList.remove('active'));
+        allAnswers.forEach(a => a.classList.remove('active'));
+        
+        // Toggle current FAQ
+        element.classList.toggle('active');
+        answer.classList.toggle('active');
+    };
+    
+    // Search functionality
+    const searchInput = document.getElementById('faq-search');
+    const noResults = document.getElementById('no-results');
+    
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const allFaqItems = document.querySelectorAll('.faq-item');
+        let hasResults = false;
+        
+        allFaqItems.forEach(item => {
+            const question = item.querySelector('.faq-question').textContent.toLowerCase();
+            const answer = item.querySelector('.faq-answer').textContent.toLowerCase();
+            
+            if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+                item.style.display = 'block';
+                hasResults = true;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        
+        // Show/hide no results message
+        if (searchTerm && !hasResults) {
+            noResults.style.display = 'block';
+            document.querySelectorAll('.faq-content').forEach(content => {
+                content.style.display = 'none';
+            });
+        } else {
+            noResults.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %}

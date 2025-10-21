@@ -26,4 +26,7 @@ urlpatterns = [
     
     # Newsletter subscription endpoint
     path('newsletter/subscribe/', frontend_views.newsletter_subscribe, name='newsletter_subscribe'),
+    
+    # FAQ page
+    path('faqs/', frontend_views.faqs, name='faqs'),
 ]

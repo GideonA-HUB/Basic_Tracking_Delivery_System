@@ -203,3 +203,104 @@ def newsletter_subscribe(request):
             'success': False,
             'error': 'An error occurred while subscribing. Please try again.'
         }, status=500)
+
+
+def faqs(request):
+    """FAQ page with comprehensive questions and answers"""
+    faq_data = {
+        'general': [
+            {
+                'question': 'What is Meridian Asset Logistics?',
+                'answer': 'Meridian Asset Logistics is a comprehensive logistics and investment platform that combines cutting-edge supply chain solutions with strategic investment opportunities. We provide end-to-end logistics services including maritime, air freight, ground transportation, and warehousing, while also offering investment opportunities in logistics assets.'
+            },
+            {
+                'question': 'How do I get started with Meridian Asset Logistics?',
+                'answer': 'Getting started is easy! You can create an account on our website, explore our investment marketplace, or contact our team for personalized logistics solutions. For VIP members, we offer exclusive access to premium services and investment opportunities.'
+            },
+            {
+                'question': 'What services does Meridian Asset Logistics offer?',
+                'answer': 'We offer comprehensive logistics services including maritime shipping, air freight, ground transportation, warehousing, customs brokerage, and supply chain management. Additionally, we provide investment opportunities in logistics assets and portfolio management services.'
+            },
+            {
+                'question': 'How can I contact customer support?',
+                'answer': 'You can reach our customer support team 24/7 through multiple channels: email at support@meridianassetlogistics.com, phone at +1 (555) 123-4567, or through our online support center. VIP members have access to dedicated account managers.'
+            }
+        ],
+        'investment': [
+            {
+                'question': 'What investment opportunities are available?',
+                'answer': 'We offer diverse investment opportunities including logistics asset investments, portfolio management, real-time trading, and strategic partnerships. Our investment marketplace features various asset categories with different risk profiles and return potentials.'
+            },
+            {
+                'question': 'How do I become a VIP member?',
+                'answer': 'VIP membership is available through our application process. VIP members enjoy exclusive benefits including priority support, dedicated account managers, premium investment opportunities, faster processing times, and enhanced transaction limits.'
+            },
+            {
+                'question': 'What are the minimum investment requirements?',
+                'answer': 'Investment requirements vary by opportunity and membership level. Standard investments start from $1,000, while VIP members have access to exclusive opportunities with different minimum thresholds. Contact our investment team for personalized guidance.'
+            },
+            {
+                'question': 'How secure are my investments?',
+                'answer': 'Security is our top priority. We use advanced encryption, multi-factor authentication, and comply with international financial regulations. All investments are backed by real logistics assets and managed by certified professionals.'
+            }
+        ],
+        'logistics': [
+            {
+                'question': 'How do I track my shipments?',
+                'answer': 'You can track your shipments using our online tracking system by entering your tracking number. We provide real-time updates on shipment status, location, and estimated delivery times. VIP members receive priority tracking and detailed analytics.'
+            },
+            {
+                'question': 'What shipping methods are available?',
+                'answer': 'We offer comprehensive shipping solutions including maritime, air freight, ground transportation, and express delivery. Our services cover domestic and international shipping with various speed and cost options to meet your needs.'
+            },
+            {
+                'question': 'How do I calculate shipping costs?',
+                'answer': 'You can use our online cost calculator to get instant quotes based on package dimensions, weight, destination, and service level. Our system provides transparent pricing with no hidden fees.'
+            },
+            {
+                'question': 'What is your delivery guarantee?',
+                'answer': 'We provide delivery guarantees based on service level selected. Express services include time-definite delivery guarantees, while standard services have estimated delivery windows. VIP members receive enhanced guarantees and priority handling.'
+            }
+        ],
+        'vip': [
+            {
+                'question': 'What are VIP member benefits?',
+                'answer': 'VIP members enjoy exclusive benefits including dedicated account managers, priority support, premium investment opportunities, enhanced transaction limits, faster processing times, exclusive events, and personalized logistics solutions.'
+            },
+            {
+                'question': 'How do I apply for VIP membership?',
+                'answer': 'VIP membership applications are available through our website. The process includes completing a comprehensive application, providing required documentation, and meeting eligibility criteria. Our team reviews applications and provides personalized guidance.'
+            },
+            {
+                'question': 'What is the VIP membership fee?',
+                'answer': 'VIP membership includes various fee structures depending on the membership tier and services selected. Contact our VIP team for detailed information about membership fees and benefits tailored to your needs.'
+            },
+            {
+                'question': 'Do VIP members get priority support?',
+                'answer': 'Yes! VIP members receive 24/7 priority support with dedicated account managers, faster response times, and access to exclusive support channels. Our VIP support team is specially trained to handle complex logistics and investment needs.'
+            }
+        ],
+        'technical': [
+            {
+                'question': 'How do I reset my password?',
+                'answer': 'You can reset your password by clicking "Forgot Password" on the login page. Enter your email address and follow the instructions sent to your email. For VIP members, contact your dedicated account manager for assistance.'
+            },
+            {
+                'question': 'Is my data secure?',
+                'answer': 'Absolutely. We use industry-standard encryption, secure servers, and comply with international data protection regulations. All personal and financial information is protected with advanced security measures and regular security audits.'
+            },
+            {
+                'question': 'Can I access my account from mobile devices?',
+                'answer': 'Yes! Our platform is fully responsive and optimized for mobile devices. You can access all features including tracking, investments, and account management from any smartphone or tablet.'
+            },
+            {
+                'question': 'What browsers are supported?',
+                'answer': 'Our platform supports all modern browsers including Chrome, Firefox, Safari, and Edge. We recommend using the latest version of your preferred browser for the best experience.'
+            }
+        ]
+    }
+    
+    return render(request, 'tracking/faqs.html', {
+        'faq_data': faq_data,
+        'page_title': 'Frequently Asked Questions'
+    })
