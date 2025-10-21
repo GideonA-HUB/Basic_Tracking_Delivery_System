@@ -26,16 +26,10 @@
 
 {% block extra_css %}
 <style>
-    /* CRITICAL OVERRIDE - FORCE WHITE THEME FIRST */
-    html, body, * {
-        background: white !important;
-        color: #374151 !important;
-    }
-
-    /* Override dark theme completely */
-    .dark, .dark *, [class*="dark"] {
-        background: white !important;
-        color: #374151 !important;
+    /* Theme compatibility - allow proper styling */
+    html, body {
+        background: var(--background, white);
+        color: var(--foreground, #374151);
     }
 
     /* Global CSS Variables for Figma Design */
@@ -90,8 +84,8 @@
     }
 
     body {
-        background-color: white !important;
-        color: #374151 !important;
+        background-color: var(--background, white);
+        color: var(--foreground, #374151);
     }
 
     /* Dashboard Layout - FORCE SIDE BY SIDE */
@@ -99,7 +93,7 @@
         display: grid !important;
         grid-template-columns: 280px 1fr !important;
         min-height: 100vh;
-        background: white !important;
+        background: var(--background, white);
         gap: 0 !important;
         width: 100vw !important;
         overflow-x: hidden !important;
@@ -164,16 +158,10 @@
         z-index: 9999 !important;
     }
 
-    /* CRITICAL: Override any dark theme classes */
-    .dark, .dark *, [class*="dark"] {
-        background: white !important;
-        color: #374151 !important;
-    }
-
-    /* Force all elements to be white except specific colored elements */
-    * {
-        background-color: white !important;
-        color: #374151 !important;
+    /* Allow proper theme styling */
+    .dark {
+        --background: 222.2 84% 4.9%;
+        --foreground: 210 40% 98%;
     }
 
     /* Exception for specific elements that need colors */
@@ -203,23 +191,10 @@
         color: #374151 !important;
     }
 
-    /* THEME COMPATIBILITY - LIGHT THEME */
+    /* THEME COMPATIBILITY - Allow proper theming */
     html.light, body.light {
-        background: white !important;
-        color: #374151 !important;
-    }
-
-    html.light .dashboard-layout,
-    html.light .dashboard-sidebar,
-    html.light .dashboard-main,
-    html.light .dashboard-content {
-        background: white !important;
-        color: #374151 !important;
-    }
-
-    html.light .card-hover {
-        background: white !important;
-        color: #374151 !important;
+        background: var(--background, white);
+        color: var(--foreground, #374151);
     }
 
     html.light .card-hover * {
@@ -545,16 +520,21 @@
         padding: 0 !important;
     }
 
-    /* Override any Tailwind dark classes */
-    .dark\:bg-gray-900, .dark\:bg-gray-800, .dark\:text-white {
-        background: white !important;
-        color: #374151 !important;
+    /* Allow proper Tailwind dark classes */
+    .dark\:bg-gray-900 {
+        background: hsl(var(--card)) !important;
+    }
+    .dark\:bg-gray-800 {
+        background: hsl(var(--muted)) !important;
+    }
+    .dark\:text-white {
+        color: hsl(var(--foreground)) !important;
     }
 
     .dashboard-sidebar {
         width: 280px !important;
-        background: white !important;
-        border-right: 1px solid #e5e7eb !important;
+        background: var(--card, white);
+        border-right: 1px solid hsl(var(--border));
         padding: 2rem 1.5rem !important;
         overflow-y: auto !important;
         overflow-x: hidden !important;
@@ -585,7 +565,7 @@
     }
 
     .dashboard-main {
-        background: white !important;
+        background: var(--background, white);
         height: 100vh !important;
         display: flex !important;
         flex-direction: column !important;
@@ -616,8 +596,8 @@
     }
 
     .dashboard-header {
-        background: white !important;
-        border-bottom: 1px solid #e5e7eb !important;
+        background: var(--card, white);
+        border-bottom: 1px solid hsl(var(--border));
         padding: 1rem 2rem !important;
         display: flex !important;
         justify-content: space-between !important;
@@ -628,7 +608,7 @@
     .dashboard-content {
         flex: 1 !important;
         padding: 2rem !important;
-        background: white !important;
+        background: var(--background, white);
         max-width: 100% !important;
         margin: 0 auto !important;
     }
