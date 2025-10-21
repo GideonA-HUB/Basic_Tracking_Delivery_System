@@ -1,0 +1,451 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - Meridian Asset Logistics{% endblock %}
+
+{% block extra_css %}
+<style>
+    .security-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .security-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .security-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .security-subtitle {
+        font-size: 1.125rem;
+        color: #6b7280;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .hero-section {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        border-radius: 16px;
+        padding: 3rem 2rem;
+        text-align: center;
+        color: white;
+        margin-bottom: 3rem;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .hero-description {
+        font-size: 1.125rem;
+        opacity: 0.9;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .security-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    .security-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+    }
+    
+    .security-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .security-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+    }
+    
+    .security-icon.encryption { background: #dbeafe; color: #1e40af; }
+    .security-icon.authentication { background: #dcfce7; color: #166534; }
+    .security-icon.monitoring { background: #fef3c7; color: #92400e; }
+    .security-icon.compliance { background: #fce7f3; color: #be185d; }
+    
+    .security-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+    
+    .security-description {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+    }
+    
+    .security-features {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 1.5rem;
+    }
+    
+    .security-features li {
+        padding: 0.25rem 0;
+        color: #4b5563;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .security-features li i {
+        color: #10b981;
+        width: 16px;
+    }
+    
+    .security-button {
+        background: #3b82f6;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .security-button:hover {
+        background: #2563eb;
+        color: white;
+    }
+    
+    .info-section {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        margin-bottom: 2rem;
+    }
+    
+    .info-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1.5rem;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .info-item {
+        padding: 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: #f8fafc;
+    }
+    
+    .info-item-title {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+    
+    .info-item-description {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+    
+    .contact-section {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .contact-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .contact-description {
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+    }
+    
+    .contact-button {
+        background: #10b981;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .contact-button:hover {
+        background: #059669;
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .security-title {
+            font-size: 2rem;
+        }
+        
+        .hero-section {
+            padding: 2rem 1rem;
+        }
+        
+        .security-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .security-container {
+            padding: 1rem;
+        }
+    }
+    
+    .dark .security-title {
+        color: #f9fafb;
+    }
+    
+    .dark .security-subtitle {
+        color: #d1d5db;
+    }
+    
+    .dark .security-card {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .security-title {
+        color: #f9fafb;
+    }
+    
+    .dark .security-description {
+        color: #d1d5db;
+    }
+    
+    .dark .security-features li {
+        color: #d1d5db;
+    }
+    
+    .dark .info-section {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .info-title {
+        color: #f9fafb;
+    }
+    
+    .dark .info-item {
+        background: #374151;
+        border-color: #4b5563;
+    }
+    
+    .dark .info-item-title {
+        color: #f9fafb;
+    }
+    
+    .dark .info-item-description {
+        color: #d1d5db;
+    }
+    
+    .dark .contact-section {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .contact-title {
+        color: #f9fafb;
+    }
+    
+    .dark .contact-description {
+        color: #d1d5db;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="security-container">
+    <!-- Security Header -->
+    <div class="security-header">
+        <h1 class="security-title">Security Center</h1>
+        <p class="security-subtitle">
+            Comprehensive security measures and resources to protect your accounts and data.
+        </p>
+    </div>
+    
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <h2 class="hero-title">Advanced Security Protection</h2>
+        <p class="hero-description">
+            Your security is our top priority. We employ industry-leading security measures 
+            to protect your accounts, transactions, and personal information.
+        </p>
+    </div>
+    
+    <!-- Security Features -->
+    <div class="security-grid">
+        <div class="security-card">
+            <div class="security-icon encryption">
+                <i class="fas fa-lock"></i>
+            </div>
+            <div class="security-title">Data Encryption</div>
+            <div class="security-description">
+                All your data is protected with bank-level encryption both in transit and at rest.
+            </div>
+            <ul class="security-features">
+                <li><i class="fas fa-check"></i> AES-256 encryption</li>
+                <li><i class="fas fa-check"></i> SSL/TLS secure connections</li>
+                <li><i class="fas fa-check"></i> Encrypted data storage</li>
+                <li><i class="fas fa-check"></i> Secure key management</li>
+            </ul>
+            <a href="#" class="security-button">
+                <i class="fas fa-info-circle"></i>
+                Learn More
+            </a>
+        </div>
+        
+        <div class="security-card">
+            <div class="security-icon authentication">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <div class="security-title">Multi-Factor Authentication</div>
+            <div class="security-description">
+                Enhanced account protection with multiple layers of identity verification.
+            </div>
+            <ul class="security-features">
+                <li><i class="fas fa-check"></i> SMS verification</li>
+                <li><i class="fas fa-check"></i> Email confirmation</li>
+                <li><i class="fas fa-check"></i> Authenticator apps</li>
+                <li><i class="fas fa-check"></i> Biometric authentication</li>
+            </ul>
+            <a href="#" class="security-button">
+                <i class="fas fa-info-circle"></i>
+                Learn More
+            </a>
+        </div>
+        
+        <div class="security-card">
+            <div class="security-icon monitoring">
+                <i class="fas fa-eye"></i>
+            </div>
+            <div class="security-title">24/7 Monitoring</div>
+            <div class="security-description">
+                Continuous monitoring of your accounts and transactions for suspicious activity.
+            </div>
+            <ul class="security-features">
+                <li><i class="fas fa-check"></i> Real-time threat detection</li>
+                <li><i class="fas fa-check"></i> Behavioral analysis</li>
+                <li><i class="fas fa-check"></i> Automated alerts</li>
+                <li><i class="fas fa-check"></i> Expert security team</li>
+            </ul>
+            <a href="#" class="security-button">
+                <i class="fas fa-info-circle"></i>
+                Learn More
+            </a>
+        </div>
+        
+        <div class="security-card">
+            <div class="security-icon compliance">
+                <i class="fas fa-certificate"></i>
+            </div>
+            <div class="security-title">Compliance & Certifications</div>
+            <div class="security-description">
+                We maintain the highest security standards and industry certifications.
+            </div>
+            <ul class="security-features">
+                <li><i class="fas fa-check"></i> SOC 2 Type II certified</li>
+                <li><i class="fas fa-check"></i> ISO 27001 compliant</li>
+                <li><i class="fas fa-check"></i> PCI DSS compliant</li>
+                <li><i class="fas fa-check"></i> Regular security audits</li>
+            </ul>
+            <a href="#" class="security-button">
+                <i class="fas fa-info-circle"></i>
+                Learn More
+            </a>
+        </div>
+    </div>
+    
+    <!-- Security Information -->
+    <div class="info-section">
+        <h2 class="info-title">Security Best Practices</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-item-title">Strong Passwords</div>
+                <div class="info-item-description">Use unique, complex passwords for all your accounts</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-item-title">Regular Updates</div>
+                <div class="info-item-description">Keep your devices and software up to date</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-item-title">Secure Networks</div>
+                <div class="info-item-description">Only access your accounts from trusted networks</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-item-title">Phishing Awareness</div>
+                <div class="info-item-description">Be cautious of suspicious emails and links</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-item-title">Account Monitoring</div>
+                <div class="info-item-description">Regularly review your account activity</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-item-title">Report Issues</div>
+                <div class="info-item-description">Immediately report any suspicious activity</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contact Section -->
+    <div class="contact-section">
+        <h3 class="contact-title">Security Questions or Concerns?</h3>
+        <p class="contact-description">
+            Our security team is available 24/7 to help with any security questions or concerns you may have.
+        </p>
+        <a href="mailto:security@meridianassetlogistics.com" class="contact-button">
+            <i class="fas fa-envelope"></i>
+            Contact Security Team
+        </a>
+    </div>
+</div>
+{% endblock %}

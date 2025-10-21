@@ -1,0 +1,551 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - Meridian Asset Logistics{% endblock %}
+
+{% block extra_css %}
+<style>
+    .newsroom-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .newsroom-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .newsroom-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .newsroom-subtitle {
+        font-size: 1.125rem;
+        color: #6b7280;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .featured-article {
+        background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+        border-radius: 16px;
+        padding: 3rem 2rem;
+        color: white;
+        margin-bottom: 3rem;
+        text-align: center;
+    }
+    
+    .featured-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .featured-description {
+        font-size: 1.125rem;
+        opacity: 0.9;
+        max-width: 600px;
+        margin: 0 auto 2rem;
+    }
+    
+    .featured-button {
+        background: white;
+        color: #3b82f6;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .featured-button:hover {
+        background: #f8fafc;
+        color: #1e40af;
+    }
+    
+    .news-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    .news-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+    }
+    
+    .news-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .news-category {
+        background: #3b82f6;
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        display: inline-block;
+        margin-bottom: 1rem;
+    }
+    
+    .news-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.75rem;
+        line-height: 1.4;
+    }
+    
+    .news-excerpt {
+        font-size: 0.875rem;
+        color: #6b7280;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+    }
+    
+    .news-meta {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-size: 0.75rem;
+        color: #9ca3af;
+        margin-bottom: 1rem;
+    }
+    
+    .news-date {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .news-author {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .news-button {
+        background: #3b82f6;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .news-button:hover {
+        background: #2563eb;
+        color: white;
+    }
+    
+    .press-section {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        margin-bottom: 2rem;
+    }
+    
+    .press-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1.5rem;
+    }
+    
+    .press-list {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .press-item {
+        padding: 1rem 0;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .press-item:last-child {
+        border-bottom: none;
+    }
+    
+    .press-item-title {
+        font-weight: 500;
+        color: #1f2937;
+        margin-bottom: 0.25rem;
+    }
+    
+    .press-item-date {
+        font-size: 0.75rem;
+        color: #9ca3af;
+    }
+    
+    .press-item-button {
+        background: #f3f4f6;
+        color: #374151;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.75rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .press-item-button:hover {
+        background: #e5e7eb;
+        color: #1f2937;
+    }
+    
+    .contact-section {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .contact-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .contact-description {
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+    }
+    
+    .contact-button {
+        background: #10b981;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .contact-button:hover {
+        background: #059669;
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .newsroom-title {
+            font-size: 2rem;
+        }
+        
+        .featured-article {
+            padding: 2rem 1rem;
+        }
+        
+        .news-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .newsroom-container {
+            padding: 1rem;
+        }
+    }
+    
+    .dark .newsroom-title {
+        color: #f9fafb;
+    }
+    
+    .dark .newsroom-subtitle {
+        color: #d1d5db;
+    }
+    
+    .dark .news-card {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .news-title {
+        color: #f9fafb;
+    }
+    
+    .dark .news-excerpt {
+        color: #d1d5db;
+    }
+    
+    .dark .press-section {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .press-title {
+        color: #f9fafb;
+    }
+    
+    .dark .press-item {
+        border-color: #374151;
+    }
+    
+    .dark .press-item-title {
+        color: #f9fafb;
+    }
+    
+    .dark .press-item-button {
+        background: #374151;
+        color: #d1d5db;
+    }
+    
+    .dark .press-item-button:hover {
+        background: #4b5563;
+        color: #f9fafb;
+    }
+    
+    .dark .contact-section {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .contact-title {
+        color: #f9fafb;
+    }
+    
+    .dark .contact-description {
+        color: #d1d5db;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="newsroom-container">
+    <!-- Newsroom Header -->
+    <div class="newsroom-header">
+        <h1 class="newsroom-title">Newsroom</h1>
+        <p class="newsroom-subtitle">
+            Stay updated with the latest news, press releases, and announcements from Meridian Asset Logistics.
+        </p>
+    </div>
+    
+    <!-- Featured Article -->
+    <div class="featured-article">
+        <h2 class="featured-title">Meridian Asset Logistics Expands Global Operations</h2>
+        <p class="featured-description">
+            We're excited to announce the opening of new facilities in Asia and Europe, 
+            strengthening our global logistics network and investment opportunities.
+        </p>
+        <a href="#" class="featured-button">
+            <i class="fas fa-arrow-right"></i>
+            Read Full Article
+        </a>
+    </div>
+    
+    <!-- News Grid -->
+    <div class="news-grid">
+        <div class="news-card">
+            <div class="news-category">Company News</div>
+            <h3 class="news-title">New Investment Platform Launches with Advanced Features</h3>
+            <p class="news-excerpt">
+                Our enhanced investment platform now offers real-time analytics, automated portfolio 
+                management, and exclusive access to logistics investment opportunities.
+            </p>
+            <div class="news-meta">
+                <div class="news-date">
+                    <i class="fas fa-calendar"></i>
+                    December 15, 2024
+                </div>
+                <div class="news-author">
+                    <i class="fas fa-user"></i>
+                    Press Team
+                </div>
+            </div>
+            <a href="#" class="news-button">
+                <i class="fas fa-arrow-right"></i>
+                Read More
+            </a>
+        </div>
+        
+        <div class="news-card">
+            <div class="news-category">Industry News</div>
+            <h3 class="news-title">Logistics Industry Sees Record Growth in Q4 2024</h3>
+            <p class="news-excerpt">
+                Industry analysis shows unprecedented growth in logistics investments, with Meridian 
+                Asset Logistics leading the market in innovative solutions and customer satisfaction.
+            </p>
+            <div class="news-meta">
+                <div class="news-date">
+                    <i class="fas fa-calendar"></i>
+                    December 10, 2024
+                </div>
+                <div class="news-author">
+                    <i class="fas fa-user"></i>
+                    Research Team
+                </div>
+            </div>
+            <a href="#" class="news-button">
+                <i class="fas fa-arrow-right"></i>
+                Read More
+            </a>
+        </div>
+        
+        <div class="news-card">
+            <div class="news-category">Technology</div>
+            <h3 class="news-title">AI-Powered Logistics Optimization Goes Live</h3>
+            <p class="news-excerpt">
+                Our new artificial intelligence system is now optimizing routes, reducing costs, 
+                and improving delivery times across our entire logistics network.
+            </p>
+            <div class="news-meta">
+                <div class="news-date">
+                    <i class="fas fa-calendar"></i>
+                    December 5, 2024
+                </div>
+                <div class="news-author">
+                    <i class="fas fa-user"></i>
+                    Tech Team
+                </div>
+            </div>
+            <a href="#" class="news-button">
+                <i class="fas fa-arrow-right"></i>
+                Read More
+            </a>
+        </div>
+        
+        <div class="news-card">
+            <div class="news-category">Sustainability</div>
+            <h3 class="news-title">Carbon Neutral Operations Achieved Ahead of Schedule</h3>
+            <p class="news-excerpt">
+                We're proud to announce that all our logistics operations are now carbon neutral, 
+                exceeding our environmental sustainability goals by two years.
+            </p>
+            <div class="news-meta">
+                <div class="news-date">
+                    <i class="fas fa-calendar"></i>
+                    November 28, 2024
+                </div>
+                <div class="news-author">
+                    <i class="fas fa-user"></i>
+                    Sustainability Team
+                </div>
+            </div>
+            <a href="#" class="news-button">
+                <i class="fas fa-arrow-right"></i>
+                Read More
+            </a>
+        </div>
+        
+        <div class="news-card">
+            <div class="news-category">Partnerships</div>
+            <h3 class="news-title">Strategic Partnership with Global Shipping Alliance</h3>
+            <p class="news-excerpt">
+                New partnership expands our shipping capabilities and provides customers with 
+                enhanced global reach and improved service reliability.
+            </p>
+            <div class="news-meta">
+                <div class="news-date">
+                    <i class="fas fa-calendar"></i>
+                    November 20, 2024
+                </div>
+                <div class="news-author">
+                    <i class="fas fa-user"></i>
+                    Partnership Team
+                </div>
+            </div>
+            <a href="#" class="news-button">
+                <i class="fas fa-arrow-right"></i>
+                Read More
+            </a>
+        </div>
+        
+        <div class="news-card">
+            <div class="news-category">Awards</div>
+            <h3 class="news-title">Best Logistics Company 2024 Award Received</h3>
+            <p class="news-excerpt">
+                Industry recognition for our outstanding service delivery, innovation, and 
+                customer satisfaction across all logistics and investment services.
+            </p>
+            <div class="news-meta">
+                <div class="news-date">
+                    <i class="fas fa-calendar"></i>
+                    November 15, 2024
+                </div>
+                <div class="news-author">
+                    <i class="fas fa-user"></i>
+                    Awards Team
+                </div>
+            </div>
+            <a href="#" class="news-button">
+                <i class="fas fa-arrow-right"></i>
+                Read More
+            </a>
+        </div>
+    </div>
+    
+    <!-- Press Releases -->
+    <div class="press-section">
+        <h2 class="press-title">Press Releases</h2>
+        <ul class="press-list">
+            <li class="press-item">
+                <div>
+                    <div class="press-item-title">Meridian Asset Logistics Reports Record Q3 2024 Results</div>
+                    <div class="press-item-date">December 1, 2024</div>
+                </div>
+                <a href="#" class="press-item-button">Download</a>
+            </li>
+            <li class="press-item">
+                <div>
+                    <div class="press-item-title">New CEO Appointed to Lead Global Expansion</div>
+                    <div class="press-item-date">November 25, 2024</div>
+                </div>
+                <a href="#" class="press-item-button">Download</a>
+            </li>
+            <li class="press-item">
+                <div>
+                    <div class="press-item-title">Investment Fund Reaches $1 Billion Milestone</div>
+                    <div class="press-item-date">November 18, 2024</div>
+                </div>
+                <a href="#" class="press-item-button">Download</a>
+            </li>
+            <li class="press-item">
+                <div>
+                    <div class="press-item-title">Sustainability Initiative Launched Across All Operations</div>
+                    <div class="press-item-date">November 10, 2024</div>
+                </div>
+                <a href="#" class="press-item-button">Download</a>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Contact Section -->
+    <div class="contact-section">
+        <h3 class="contact-title">Media Inquiries</h3>
+        <p class="contact-description">
+            For media inquiries, press releases, or interview requests, please contact our 
+            communications team.
+        </p>
+        <a href="mailto:media@meridianassetlogistics.com" class="contact-button">
+            <i class="fas fa-envelope"></i>
+            Contact Media Team
+        </a>
+    </div>
+</div>
+{% endblock %}

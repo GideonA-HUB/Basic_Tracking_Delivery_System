@@ -1,0 +1,354 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - Meridian Asset Logistics{% endblock %}
+
+{% block extra_css %}
+<style>
+    .company-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .company-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .company-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .company-subtitle {
+        font-size: 1.125rem;
+        color: #6b7280;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .hero-section {
+        background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+        border-radius: 16px;
+        padding: 3rem 2rem;
+        text-align: center;
+        color: white;
+        margin-bottom: 3rem;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .hero-description {
+        font-size: 1.125rem;
+        opacity: 0.9;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #3b82f6;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+        font-weight: 500;
+    }
+    
+    .content-section {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        margin-bottom: 2rem;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1.5rem;
+    }
+    
+    .section-content {
+        color: #4b5563;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+    
+    .values-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+    
+    .value-card {
+        padding: 1.5rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: #f8fafc;
+    }
+    
+    .value-title {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+    
+    .value-description {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+    
+    .cta-section {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .cta-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .cta-description {
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+    }
+    
+    .cta-button {
+        background: #3b82f6;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .cta-button:hover {
+        background: #2563eb;
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .company-title {
+            font-size: 2rem;
+        }
+        
+        .hero-section {
+            padding: 2rem 1rem;
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .company-container {
+            padding: 1rem;
+        }
+    }
+    
+    .dark .company-title {
+        color: #f9fafb;
+    }
+    
+    .dark .company-subtitle {
+        color: #d1d5db;
+    }
+    
+    .dark .content-section {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .section-title {
+        color: #f9fafb;
+    }
+    
+    .dark .section-content {
+        color: #d1d5db;
+    }
+    
+    .dark .value-card {
+        background: #374151;
+        border-color: #4b5563;
+    }
+    
+    .dark .value-title {
+        color: #f9fafb;
+    }
+    
+    .dark .value-description {
+        color: #d1d5db;
+    }
+    
+    .dark .cta-section {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .cta-title {
+        color: #f9fafb;
+    }
+    
+    .dark .cta-description {
+        color: #d1d5db;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="company-container">
+    <!-- Company Header -->
+    <div class="company-header">
+        <h1 class="company-title">Company Overview</h1>
+        <p class="company-subtitle">
+            Leading the future of logistics and investment solutions with innovation, reliability, and excellence.
+        </p>
+    </div>
+    
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <h2 class="hero-title">Meridian Asset Logistics</h2>
+        <p class="hero-description">
+            A comprehensive logistics and investment platform that combines cutting-edge supply chain solutions with strategic investment opportunities, serving clients worldwide with excellence and innovation.
+        </p>
+    </div>
+    
+    <!-- Company Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">15+</div>
+            <div class="stat-label">Years of Experience</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">50+</div>
+            <div class="stat-label">Countries Served</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">1M+</div>
+            <div class="stat-label">Packages Delivered</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">99.9%</div>
+            <div class="stat-label">On-Time Delivery</div>
+        </div>
+    </div>
+    
+    <!-- About Section -->
+    <div class="content-section">
+        <h2 class="section-title">About Meridian Asset Logistics</h2>
+        <div class="section-content">
+            <p>
+                Meridian Asset Logistics is a global leader in integrated logistics and investment services, 
+                providing end-to-end supply chain solutions that drive business success. Founded with a vision 
+                to revolutionize the logistics industry, we combine traditional shipping expertise with cutting-edge 
+                technology and innovative investment opportunities.
+            </p>
+            <p>
+                Our comprehensive platform serves businesses of all sizes, from startups to Fortune 500 companies, 
+                offering everything from maritime shipping and air freight to warehousing, distribution, and 
+                customs brokerage. We also provide exclusive investment opportunities in logistics assets, 
+                helping our clients grow their wealth while supporting the global supply chain.
+            </p>
+        </div>
+    </div>
+    
+    <!-- Mission & Vision -->
+    <div class="content-section">
+        <h2 class="section-title">Our Mission & Vision</h2>
+        <div class="values-grid">
+            <div class="value-card">
+                <div class="value-title">Our Mission</div>
+                <div class="value-description">
+                    To provide innovative logistics solutions and investment opportunities that connect businesses 
+                    and individuals worldwide, fostering economic growth and global connectivity.
+                </div>
+            </div>
+            <div class="value-card">
+                <div class="value-title">Our Vision</div>
+                <div class="value-description">
+                    To be the world's leading integrated logistics and investment platform, setting the standard 
+                    for excellence, innovation, and customer satisfaction in the global supply chain.
+                </div>
+            </div>
+            <div class="value-card">
+                <div class="value-title">Our Values</div>
+                <div class="value-description">
+                    Integrity, innovation, excellence, and customer-centricity guide everything we do, 
+                    ensuring we deliver exceptional value to our clients and partners.
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Services Overview -->
+    <div class="content-section">
+        <h2 class="section-title">What We Do</h2>
+        <div class="section-content">
+            <p>
+                <strong>Logistics Services:</strong> We offer comprehensive logistics solutions including maritime shipping, 
+                air freight, ground transportation, warehousing, and distribution services. Our global network 
+                ensures your goods reach their destination safely and on time.
+            </p>
+            <p>
+                <strong>Investment Opportunities:</strong> Through our investment platform, we provide access to 
+                exclusive logistics asset investments, portfolio management, and strategic partnerships that 
+                help our clients build wealth while supporting the global supply chain.
+            </p>
+            <p>
+                <strong>Technology Solutions:</strong> Our advanced tracking systems, automated processes, and 
+                data analytics capabilities provide complete visibility and control over your supply chain operations.
+            </p>
+        </div>
+    </div>
+    
+    <!-- Call to Action -->
+    <div class="cta-section">
+        <h3 class="cta-title">Ready to Partner with Us?</h3>
+        <p class="cta-description">
+            Discover how Meridian Asset Logistics can transform your business operations and investment portfolio.
+        </p>
+        <a href="mailto:info@meridianassetlogistics.com" class="cta-button">
+            <i class="fas fa-envelope"></i>
+            Contact Us
+        </a>
+    </div>
+</div>
+{% endblock %}

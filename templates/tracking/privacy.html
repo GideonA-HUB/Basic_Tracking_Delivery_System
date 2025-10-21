@@ -1,0 +1,433 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - Meridian Asset Logistics{% endblock %}
+
+{% block extra_css %}
+<style>
+    .privacy-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .privacy-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .privacy-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .privacy-subtitle {
+        font-size: 1.125rem;
+        color: #6b7280;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .privacy-content {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        line-height: 1.6;
+    }
+    
+    .privacy-section {
+        margin-bottom: 2rem;
+    }
+    
+    .privacy-section:last-child {
+        margin-bottom: 0;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .section-content {
+        color: #4b5563;
+        margin-bottom: 1rem;
+    }
+    
+    .section-content p {
+        margin-bottom: 1rem;
+    }
+    
+    .section-content ul {
+        margin-left: 2rem;
+        margin-bottom: 1rem;
+    }
+    
+    .section-content li {
+        margin-bottom: 0.5rem;
+    }
+    
+    .highlight-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+    }
+    
+    .highlight-title {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+    
+    .highlight-content {
+        color: #4b5563;
+        font-size: 0.875rem;
+    }
+    
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+    }
+    
+    .data-table th,
+    .data-table td {
+        border: 1px solid #e5e7eb;
+        padding: 0.75rem;
+        text-align: left;
+    }
+    
+    .data-table th {
+        background: #f8fafc;
+        font-weight: 600;
+        color: #1f2937;
+    }
+    
+    .data-table td {
+        color: #4b5563;
+    }
+    
+    .contact-info {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        border: 1px solid #e2e8f0;
+        margin-top: 2rem;
+    }
+    
+    .contact-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .contact-description {
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+    }
+    
+    .contact-button {
+        background: #3b82f6;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .contact-button:hover {
+        background: #2563eb;
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .privacy-title {
+            font-size: 2rem;
+        }
+        
+        .privacy-container {
+            padding: 1rem;
+        }
+        
+        .privacy-content {
+            padding: 1.5rem;
+        }
+        
+        .data-table {
+            font-size: 0.875rem;
+        }
+    }
+    
+    .dark .privacy-title {
+        color: #f9fafb;
+    }
+    
+    .dark .privacy-subtitle {
+        color: #d1d5db;
+    }
+    
+    .dark .privacy-content {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .section-title {
+        color: #f9fafb;
+    }
+    
+    .dark .section-content {
+        color: #d1d5db;
+    }
+    
+    .dark .highlight-box {
+        background: #374151;
+        border-color: #4b5563;
+    }
+    
+    .dark .highlight-title {
+        color: #f9fafb;
+    }
+    
+    .dark .highlight-content {
+        color: #d1d5db;
+    }
+    
+    .dark .data-table th {
+        background: #374151;
+        color: #f9fafb;
+    }
+    
+    .dark .data-table td {
+        color: #d1d5db;
+    }
+    
+    .dark .data-table th,
+    .dark .data-table td {
+        border-color: #4b5563;
+    }
+    
+    .dark .contact-info {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .contact-title {
+        color: #f9fafb;
+    }
+    
+    .dark .contact-description {
+        color: #d1d5db;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="privacy-container">
+    <!-- Privacy Header -->
+    <div class="privacy-header">
+        <h1 class="privacy-title">Privacy Policy</h1>
+        <p class="privacy-subtitle">
+            Your privacy is important to us. This policy explains how we collect, use, and protect your personal information.
+        </p>
+    </div>
+    
+    <!-- Privacy Content -->
+    <div class="privacy-content">
+        <div class="privacy-section">
+            <h2 class="section-title">1. Information We Collect</h2>
+            <div class="section-content">
+                <p>We collect information you provide directly to us, such as when you:</p>
+                <ul>
+                    <li>Create an account or profile</li>
+                    <li>Use our logistics services</li>
+                    <li>Make investments through our platform</li>
+                    <li>Contact us for support</li>
+                    <li>Subscribe to our newsletter</li>
+                </ul>
+                
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Information Type</th>
+                            <th>Examples</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Personal Information</td>
+                            <td>Name, email, phone number</td>
+                            <td>Account management and communication</td>
+                        </tr>
+                        <tr>
+                            <td>Financial Information</td>
+                            <td>Bank details, investment preferences</td>
+                            <td>Investment services and transactions</td>
+                        </tr>
+                        <tr>
+                            <td>Logistics Data</td>
+                            <td>Shipping addresses, tracking information</td>
+                            <td>Service delivery and tracking</td>
+                        </tr>
+                        <tr>
+                            <td>Technical Data</td>
+                            <td>IP address, browser type, device info</td>
+                            <td>Platform optimization and security</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="privacy-section">
+            <h2 class="section-title">2. How We Use Your Information</h2>
+            <div class="section-content">
+                <p>We use the information we collect to:</p>
+                <ul>
+                    <li>Provide, maintain, and improve our services</li>
+                    <li>Process transactions and manage your account</li>
+                    <li>Communicate with you about our services</li>
+                    <li>Comply with legal and regulatory requirements</li>
+                    <li>Protect against fraud and ensure security</li>
+                    <li>Personalize your experience and recommendations</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="privacy-section">
+            <h2 class="section-title">3. Information Sharing</h2>
+            <div class="section-content">
+                <p>We do not sell, trade, or rent your personal information to third parties. We may share your information only in the following circumstances:</p>
+                <ul>
+                    <li>With your explicit consent</li>
+                    <li>To comply with legal obligations</li>
+                    <li>With trusted service providers who assist in our operations</li>
+                    <li>In connection with a business transfer or merger</li>
+                    <li>To protect our rights and prevent fraud</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="privacy-section">
+            <h2 class="section-title">4. Data Security</h2>
+            <div class="section-content">
+                <p>We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.</p>
+                <div class="highlight-box">
+                    <div class="highlight-title">Security Measures</div>
+                    <div class="highlight-content">
+                        • Encryption of sensitive data in transit and at rest<br>
+                        • Regular security audits and assessments<br>
+                        • Access controls and authentication systems<br>
+                        • Employee training on data protection<br>
+                        • Incident response and breach notification procedures
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="privacy-section">
+            <h2 class="section-title">5. Your Rights</h2>
+            <div class="section-content">
+                <p>You have the right to:</p>
+                <ul>
+                    <li>Access your personal information</li>
+                    <li>Correct inaccurate or incomplete data</li>
+                    <li>Request deletion of your personal information</li>
+                    <li>Object to processing of your personal information</li>
+                    <li>Data portability (receive your data in a structured format)</li>
+                    <li>Withdraw consent at any time</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="privacy-section">
+            <h2 class="section-title">6. Cookies and Tracking</h2>
+            <div class="section-content">
+                <p>
+                    We use cookies and similar tracking technologies to enhance your experience on our platform. 
+                    You can control cookie settings through your browser preferences, though some features may not function properly if cookies are disabled.
+                </p>
+            </div>
+        </div>
+        
+        <div class="privacy-section">
+            <h2 class="section-title">7. Data Retention</h2>
+            <div class="section-content">
+                <p>
+                    We retain your personal information only for as long as necessary to fulfill the purposes outlined in this privacy policy, 
+                    comply with legal obligations, resolve disputes, and enforce our agreements.
+                </p>
+            </div>
+        </div>
+        
+        <div class="privacy-section">
+            <h2 class="section-title">8. International Transfers</h2>
+            <div class="section-content">
+                <p>
+                    Your information may be transferred to and processed in countries other than your own. We ensure appropriate safeguards 
+                    are in place to protect your information in accordance with applicable data protection laws.
+                </p>
+            </div>
+        </div>
+        
+        <div class="privacy-section">
+            <h2 class="section-title">9. Children's Privacy</h2>
+            <div class="section-content">
+                <p>
+                    Our services are not intended for individuals under the age of 18. We do not knowingly collect personal information 
+                    from children under 18. If we become aware that we have collected such information, we will take steps to delete it.
+                </p>
+            </div>
+        </div>
+        
+        <div class="privacy-section">
+            <h2 class="section-title">10. Changes to This Policy</h2>
+            <div class="section-content">
+                <p>
+                    We may update this privacy policy from time to time. We will notify you of any material changes by posting the new 
+                    policy on our website and updating the "Last Updated" date. Your continued use of our services after such changes 
+                    constitutes acceptance of the updated policy.
+                </p>
+            </div>
+        </div>
+        
+        <div class="privacy-section">
+            <h2 class="section-title">11. Contact Us</h2>
+            <div class="section-content">
+                <p>If you have any questions about this privacy policy or our data practices, please contact us:</p>
+                <p>
+                    <strong>Email:</strong> privacy@meridianassetlogistics.com<br>
+                    <strong>Address:</strong> 447 Broadway, 2nd Floor, New York, 10013<br>
+                    <strong>Phone:</strong> +1 (555) 123-4567<br>
+                    <strong>Data Protection Officer:</strong> dpo@meridianassetlogistics.com
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contact Section -->
+    <div class="contact-info">
+        <h3 class="contact-title">Questions About Your Privacy?</h3>
+        <p class="contact-description">
+            Our privacy team is here to help with any questions or concerns about how we handle your personal information.
+        </p>
+        <a href="mailto:privacy@meridianassetlogistics.com" class="contact-button">
+            <i class="fas fa-envelope"></i>
+            Contact Privacy Team
+        </a>
+    </div>
+</div>
+{% endblock %}

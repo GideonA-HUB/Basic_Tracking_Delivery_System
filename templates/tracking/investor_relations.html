@@ -1,0 +1,402 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - Meridian Asset Logistics{% endblock %}
+
+{% block extra_css %}
+<style>
+    .investor-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .investor-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .investor-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .investor-subtitle {
+        font-size: 1.125rem;
+        color: #6b7280;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .hero-section {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        border-radius: 16px;
+        padding: 3rem 2rem;
+        text-align: center;
+        color: white;
+        margin-bottom: 3rem;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .hero-description {
+        font-size: 1.125rem;
+        opacity: 0.9;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .financial-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    .financial-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+    }
+    
+    .financial-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #10b981;
+        margin-bottom: 0.5rem;
+    }
+    
+    .financial-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+        font-weight: 500;
+    }
+    
+    .content-section {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        margin-bottom: 2rem;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1.5rem;
+    }
+    
+    .section-content {
+        color: #4b5563;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+    
+    .documents-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+    
+    .document-card {
+        padding: 1.5rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: #f8fafc;
+        transition: all 0.3s ease;
+    }
+    
+    .document-card:hover {
+        border-color: #3b82f6;
+        background: #f0f9ff;
+    }
+    
+    .document-title {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+    
+    .document-description {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 1rem;
+    }
+    
+    .document-button {
+        background: #3b82f6;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .document-button:hover {
+        background: #2563eb;
+        color: white;
+    }
+    
+    .contact-section {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .contact-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .contact-description {
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+    }
+    
+    .contact-button {
+        background: #10b981;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .contact-button:hover {
+        background: #059669;
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .investor-title {
+            font-size: 2rem;
+        }
+        
+        .hero-section {
+            padding: 2rem 1rem;
+        }
+        
+        .financial-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .investor-container {
+            padding: 1rem;
+        }
+    }
+    
+    .dark .investor-title {
+        color: #f9fafb;
+    }
+    
+    .dark .investor-subtitle {
+        color: #d1d5db;
+    }
+    
+    .dark .content-section {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .section-title {
+        color: #f9fafb;
+    }
+    
+    .dark .section-content {
+        color: #d1d5db;
+    }
+    
+    .dark .document-card {
+        background: #374151;
+        border-color: #4b5563;
+    }
+    
+    .dark .document-card:hover {
+        background: #4b5563;
+    }
+    
+    .dark .document-title {
+        color: #f9fafb;
+    }
+    
+    .dark .document-description {
+        color: #d1d5db;
+    }
+    
+    .dark .contact-section {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .contact-title {
+        color: #f9fafb;
+    }
+    
+    .dark .contact-description {
+        color: #d1d5db;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="investor-container">
+    <!-- Investor Header -->
+    <div class="investor-header">
+        <h1 class="investor-title">Investor Relations</h1>
+        <p class="investor-subtitle">
+            Comprehensive financial information and investment opportunities for our valued stakeholders.
+        </p>
+    </div>
+    
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <h2 class="hero-title">Investing in the Future of Logistics</h2>
+        <p class="hero-description">
+            Join us in building the next generation of integrated logistics and investment solutions 
+            that drive global economic growth and connectivity.
+        </p>
+    </div>
+    
+    <!-- Financial Highlights -->
+    <div class="financial-grid">
+        <div class="financial-card">
+            <div class="financial-number">$2.5B</div>
+            <div class="financial-label">Annual Revenue</div>
+        </div>
+        <div class="financial-card">
+            <div class="financial-number">15%</div>
+            <div class="financial-label">Year-over-Year Growth</div>
+        </div>
+        <div class="financial-card">
+            <div class="financial-number">$500M</div>
+            <div class="financial-label">Assets Under Management</div>
+        </div>
+        <div class="financial-card">
+            <div class="financial-number">25%</div>
+            <div class="financial-label">Average ROI</div>
+        </div>
+    </div>
+    
+    <!-- Investment Opportunities -->
+    <div class="content-section">
+        <h2 class="section-title">Investment Opportunities</h2>
+        <div class="section-content">
+            <p>
+                <strong>Logistics Asset Investments:</strong> Invest directly in high-performing logistics assets 
+                including warehouses, distribution centers, and transportation infrastructure. Our carefully 
+                selected portfolio offers stable returns and long-term growth potential.
+            </p>
+            <p>
+                <strong>Portfolio Management:</strong> Let our expert team manage your investment portfolio 
+                with access to exclusive logistics investment opportunities, real-time market analysis, 
+                and personalized investment strategies.
+            </p>
+            <p>
+                <strong>Strategic Partnerships:</strong> Partner with us in joint ventures and strategic 
+                investments that leverage our industry expertise and global network for maximum returns.
+            </p>
+        </div>
+    </div>
+    
+    <!-- Financial Documents -->
+    <div class="content-section">
+        <h2 class="section-title">Financial Documents</h2>
+        <div class="documents-grid">
+            <div class="document-card">
+                <div class="document-title">Annual Report 2024</div>
+                <div class="document-description">Comprehensive overview of our financial performance and strategic initiatives</div>
+                <a href="#" class="document-button">
+                    <i class="fas fa-download"></i>
+                    Download PDF
+                </a>
+            </div>
+            
+            <div class="document-card">
+                <div class="document-title">Quarterly Earnings</div>
+                <div class="document-description">Latest quarterly financial results and performance metrics</div>
+                <a href="#" class="document-button">
+                    <i class="fas fa-download"></i>
+                    Download PDF
+                </a>
+            </div>
+            
+            <div class="document-card">
+                <div class="document-title">Investment Prospectus</div>
+                <div class="document-description">Detailed information about our investment opportunities and strategies</div>
+                <a href="#" class="document-button">
+                    <i class="fas fa-download"></i>
+                    Download PDF
+                </a>
+            </div>
+            
+            <div class="document-card">
+                <div class="document-title">ESG Report</div>
+                <div class="document-description">Our commitment to environmental, social, and governance practices</div>
+                <a href="#" class="document-button">
+                    <i class="fas fa-download"></i>
+                    Download PDF
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Investment Performance -->
+    <div class="content-section">
+        <h2 class="section-title">Investment Performance</h2>
+        <div class="section-content">
+            <p>
+                Our investment strategies have consistently delivered strong returns across various market conditions. 
+                Our diversified portfolio of logistics assets provides stable income streams while our growth investments 
+                offer significant upside potential.
+            </p>
+            <p>
+                <strong>Key Performance Metrics:</strong>
+            </p>
+            <ul style="margin-left: 2rem; color: #4b5563;">
+                <li>Average annual return of 25% over the past 5 years</li>
+                <li>Low volatility with consistent quarterly distributions</li>
+                <li>Diversified portfolio across multiple logistics sectors</li>
+                <li>Professional risk management and due diligence</li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Contact Section -->
+    <div class="contact-section">
+        <h3 class="contact-title">Interested in Investing?</h3>
+        <p class="contact-description">
+            Contact our investor relations team to learn more about our investment opportunities 
+            and how you can become part of our success story.
+        </p>
+        <a href="mailto:investors@meridianassetlogistics.com" class="contact-button">
+            <i class="fas fa-envelope"></i>
+            Contact Investor Relations
+        </a>
+    </div>
+</div>
+{% endblock %}

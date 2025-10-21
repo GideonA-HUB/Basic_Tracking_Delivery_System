@@ -1,0 +1,372 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - Meridian Asset Logistics{% endblock %}
+
+{% block extra_css %}
+<style>
+    .leadership-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .leadership-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .leadership-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .leadership-subtitle {
+        font-size: 1.125rem;
+        color: #6b7280;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .leadership-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    .leader-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .leader-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .leader-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #3b82f6, #1e40af);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2rem;
+        color: white;
+        font-weight: 700;
+    }
+    
+    .leader-name {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+    
+    .leader-title {
+        font-size: 1rem;
+        color: #3b82f6;
+        font-weight: 500;
+        margin-bottom: 1rem;
+    }
+    
+    .leader-bio {
+        font-size: 0.875rem;
+        color: #6b7280;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+    }
+    
+    .leader-experience {
+        font-size: 0.75rem;
+        color: #9ca3af;
+        font-weight: 500;
+    }
+    
+    .team-section {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        margin-bottom: 2rem;
+    }
+    
+    .team-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    
+    .team-description {
+        color: #4b5563;
+        line-height: 1.6;
+        text-align: center;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .values-section {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 2rem;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .values-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    
+    .values-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .value-item {
+        text-align: center;
+        padding: 1rem;
+    }
+    
+    .value-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: #3b82f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        color: white;
+        font-size: 1.25rem;
+    }
+    
+    .value-title {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+    
+    .value-description {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+    
+    @media (max-width: 768px) {
+        .leadership-title {
+            font-size: 2rem;
+        }
+        
+        .leadership-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .leadership-container {
+            padding: 1rem;
+        }
+    }
+    
+    .dark .leadership-title {
+        color: #f9fafb;
+    }
+    
+    .dark .leadership-subtitle {
+        color: #d1d5db;
+    }
+    
+    .dark .leader-card {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .leader-name {
+        color: #f9fafb;
+    }
+    
+    .dark .leader-bio {
+        color: #d1d5db;
+    }
+    
+    .dark .team-section {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .team-title {
+        color: #f9fafb;
+    }
+    
+    .dark .team-description {
+        color: #d1d5db;
+    }
+    
+    .dark .values-section {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .values-title {
+        color: #f9fafb;
+    }
+    
+    .dark .value-title {
+        color: #f9fafb;
+    }
+    
+    .dark .value-description {
+        color: #d1d5db;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="leadership-container">
+    <!-- Leadership Header -->
+    <div class="leadership-header">
+        <h1 class="leadership-title">Leadership Team</h1>
+        <p class="leadership-subtitle">
+            Meet the visionary leaders driving innovation and excellence at Meridian Asset Logistics.
+        </p>
+    </div>
+    
+    <!-- Leadership Grid -->
+    <div class="leadership-grid">
+        <div class="leader-card">
+            <div class="leader-avatar">JD</div>
+            <div class="leader-name">John Davidson</div>
+            <div class="leader-title">Chief Executive Officer</div>
+            <div class="leader-bio">
+                John brings over 20 years of experience in global logistics and supply chain management. 
+                He has led the company's expansion into new markets and the development of innovative 
+                logistics solutions that have transformed the industry.
+            </div>
+            <div class="leader-experience">20+ years in logistics leadership</div>
+        </div>
+        
+        <div class="leader-card">
+            <div class="leader-avatar">SM</div>
+            <div class="leader-name">Sarah Mitchell</div>
+            <div class="leader-title">Chief Operating Officer</div>
+            <div class="leader-bio">
+                Sarah oversees all operational aspects of our global logistics network. With expertise 
+                in process optimization and technology integration, she ensures our services meet the 
+                highest standards of efficiency and reliability.
+            </div>
+            <div class="leader-experience">15+ years in operations management</div>
+        </div>
+        
+        <div class="leader-card">
+            <div class="leader-avatar">MR</div>
+            <div class="leader-name">Michael Rodriguez</div>
+            <div class="leader-title">Chief Technology Officer</div>
+            <div class="leader-bio">
+                Michael leads our technology initiatives, driving innovation in tracking systems, 
+                automation, and data analytics. His vision has positioned us as a technology leader 
+                in the logistics industry.
+            </div>
+            <div class="leader-experience">18+ years in technology leadership</div>
+        </div>
+        
+        <div class="leader-card">
+            <div class="leader-avatar">LC</div>
+            <div class="leader-name">Lisa Chen</div>
+            <div class="leader-title">Chief Financial Officer</div>
+            <div class="leader-bio">
+                Lisa manages our financial strategy and investment portfolio. Her expertise in 
+                financial planning and risk management has been instrumental in our company's 
+                sustainable growth and profitability.
+            </div>
+            <div class="leader-experience">12+ years in financial leadership</div>
+        </div>
+        
+        <div class="leader-card">
+            <div class="leader-avatar">DW</div>
+            <div class="leader-name">David Wilson</div>
+            <div class="leader-title">Chief Investment Officer</div>
+            <div class="leader-bio">
+                David oversees our investment strategies and portfolio management services. 
+                His deep understanding of logistics assets and market dynamics has created 
+                exceptional value for our investment clients.
+            </div>
+            <div class="leader-experience">16+ years in investment management</div>
+        </div>
+        
+        <div class="leader-card">
+            <div class="leader-avatar">AJ</div>
+            <div class="leader-name">Amanda Johnson</div>
+            <div class="leader-title">Chief Marketing Officer</div>
+            <div class="leader-bio">
+                Amanda leads our global marketing and brand strategy. Her innovative approach 
+                to customer engagement and market development has significantly expanded our 
+                reach and customer base.
+            </div>
+            <div class="leader-experience">14+ years in marketing leadership</div>
+        </div>
+    </div>
+    
+    <!-- Team Section -->
+    <div class="team-section">
+        <h2 class="team-title">Our Leadership Philosophy</h2>
+        <div class="team-description">
+            Our leadership team is united by a shared commitment to excellence, innovation, and customer success. 
+            We believe in leading by example, fostering a culture of continuous improvement, and empowering 
+            our teams to deliver exceptional results. Our diverse backgrounds and expertise create a dynamic 
+            leadership environment that drives our company's success and growth.
+        </div>
+    </div>
+    
+    <!-- Values Section -->
+    <div class="values-section">
+        <h2 class="values-title">Leadership Values</h2>
+        <div class="values-grid">
+            <div class="value-item">
+                <div class="value-icon">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <div class="value-title">Innovation</div>
+                <div class="value-description">Continuously seeking new ways to improve and innovate</div>
+            </div>
+            
+            <div class="value-item">
+                <div class="value-icon">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <div class="value-title">Integrity</div>
+                <div class="value-description">Maintaining the highest ethical standards in all decisions</div>
+            </div>
+            
+            <div class="value-item">
+                <div class="value-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="value-title">Collaboration</div>
+                <div class="value-description">Working together to achieve common goals and success</div>
+            </div>
+            
+            <div class="value-item">
+                <div class="value-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="value-title">Excellence</div>
+                <div class="value-description">Striving for the highest quality in everything we do</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

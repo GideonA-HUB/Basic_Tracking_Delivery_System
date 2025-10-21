@@ -1,0 +1,378 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - Meridian Asset Logistics{% endblock %}
+
+{% block extra_css %}
+<style>
+    .report-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .report-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .report-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .report-subtitle {
+        font-size: 1.125rem;
+        color: #6b7280;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .report-form {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        margin-bottom: 2rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        display: block;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-input, .form-select, .form-textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+    }
+    
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .form-textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+    
+    .form-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .form-checkbox input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+    }
+    
+    .form-checkbox label {
+        font-size: 0.875rem;
+        color: #4b5563;
+    }
+    
+    .submit-button {
+        background: #dc2626;
+        color: white;
+        padding: 0.75rem 2rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .submit-button:hover {
+        background: #991b1b;
+    }
+    
+    .info-section {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 2rem;
+        border: 1px solid #e2e8f0;
+        margin-bottom: 2rem;
+    }
+    
+    .info-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .info-content {
+        color: #4b5563;
+        line-height: 1.6;
+    }
+    
+    .info-content ul {
+        margin-left: 2rem;
+        margin-top: 1rem;
+    }
+    
+    .info-content li {
+        margin-bottom: 0.5rem;
+    }
+    
+    .contact-section {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+    }
+    
+    .contact-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .contact-description {
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+    }
+    
+    .contact-button {
+        background: #3b82f6;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .contact-button:hover {
+        background: #2563eb;
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .report-title {
+            font-size: 2rem;
+        }
+        
+        .report-container {
+            padding: 1rem;
+        }
+        
+        .report-form {
+            padding: 1.5rem;
+        }
+    }
+    
+    .dark .report-title {
+        color: #f9fafb;
+    }
+    
+    .dark .report-subtitle {
+        color: #d1d5db;
+    }
+    
+    .dark .report-form {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .form-label {
+        color: #f9fafb;
+    }
+    
+    .dark .form-input, .dark .form-select, .dark .form-textarea {
+        background: #374151;
+        border-color: #4b5563;
+        color: #f9fafb;
+    }
+    
+    .dark .form-input:focus, .dark .form-select:focus, .dark .form-textarea:focus {
+        border-color: #3b82f6;
+    }
+    
+    .dark .form-checkbox label {
+        color: #d1d5db;
+    }
+    
+    .dark .info-section {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .info-title {
+        color: #f9fafb;
+    }
+    
+    .dark .info-content {
+        color: #d1d5db;
+    }
+    
+    .dark .contact-section {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .contact-title {
+        color: #f9fafb;
+    }
+    
+    .dark .contact-description {
+        color: #d1d5db;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="report-container">
+    <!-- Report Header -->
+    <div class="report-header">
+        <h1 class="report-title">Report Security Issues</h1>
+        <p class="report-subtitle">
+            Help us maintain a secure environment by reporting any security concerns or suspicious activity.
+        </p>
+    </div>
+    
+    <!-- Report Form -->
+    <div class="report-form">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Security Issue Report</h2>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="form-group">
+                    <label class="form-label">Issue Type</label>
+                    <select class="form-select" name="issue_type" required>
+                        <option value="">Select issue type</option>
+                        <option value="fraud">Fraud or Scam</option>
+                        <option value="phishing">Phishing Attempt</option>
+                        <option value="unauthorized">Unauthorized Access</option>
+                        <option value="data_breach">Data Breach</option>
+                        <option value="malware">Malware or Virus</option>
+                        <option value="other">Other Security Issue</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Priority Level</label>
+                    <select class="form-select" name="priority" required>
+                        <option value="">Select priority</option>
+                        <option value="low">Low - Minor security concern</option>
+                        <option value="medium">Medium - Moderate security risk</option>
+                        <option value="high">High - Significant security threat</option>
+                        <option value="critical">Critical - Immediate security risk</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Your Name</label>
+                    <input type="text" class="form-input" name="reporter_name" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-input" name="email" placeholder="Enter your email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" class="form-input" name="phone" placeholder="Enter your phone number">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Account Number (if applicable)</label>
+                    <input type="text" class="form-input" name="account_number" placeholder="Enter account number">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Description of Issue</label>
+                <textarea class="form-textarea" name="description" placeholder="Please provide a detailed description of the security issue..." required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Additional Information</label>
+                <textarea class="form-textarea" name="additional_info" placeholder="Any additional information that might help with the investigation..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Evidence or Screenshots</label>
+                <input type="file" class="form-input" name="evidence" accept="image/*,.pdf,.doc,.docx" multiple>
+                <p class="text-sm text-gray-500 mt-1">You can upload screenshots, documents, or other evidence (max 10MB per file)</p>
+            </div>
+            
+            <div class="form-checkbox">
+                <input type="checkbox" id="urgent" name="urgent">
+                <label for="urgent">This is an urgent security issue requiring immediate attention</label>
+            </div>
+            
+            <div class="form-checkbox">
+                <input type="checkbox" id="anonymous" name="anonymous">
+                <label for="anonymous">Submit this report anonymously</label>
+            </div>
+            
+            <div class="form-checkbox">
+                <input type="checkbox" id="consent" name="consent" required>
+                <label for="consent">I consent to the processing of this report and understand that false reports may have legal consequences</label>
+            </div>
+            
+            <button type="submit" class="submit-button">
+                <i class="fas fa-paper-plane"></i>
+                Submit Report
+            </button>
+        </form>
+    </div>
+    
+    <!-- Information Section -->
+    <div class="info-section">
+        <h3 class="info-title">What to Report</h3>
+        <div class="info-content">
+            <p>Please report any of the following security concerns:</p>
+            <ul>
+                <li><strong>Fraudulent Activity:</strong> Unauthorized transactions, fake investment schemes, or financial fraud</li>
+                <li><strong>Phishing Attempts:</strong> Suspicious emails, calls, or messages claiming to be from us</li>
+                <li><strong>Data Breaches:</strong> Unauthorized access to personal or financial information</li>
+                <li><strong>Malware or Viruses:</strong> Suspicious software or files that may compromise security</li>
+                <li><strong>Account Compromise:</strong> Unauthorized access to your account or suspicious login attempts</li>
+                <li><strong>Other Security Issues:</strong> Any other security concerns that may affect our platform or users</li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Contact Section -->
+    <div class="contact-section">
+        <h3 class="contact-title">Need Immediate Help?</h3>
+        <p class="contact-description">
+            For urgent security issues, contact our security team directly by phone or email.
+        </p>
+        <a href="mailto:security@meridianassetlogistics.com" class="contact-button">
+            <i class="fas fa-envelope"></i>
+            Contact Security Team
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,349 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - Meridian Asset Logistics{% endblock %}
+
+{% block extra_css %}
+<style>
+    .terms-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .terms-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .terms-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .terms-subtitle {
+        font-size: 1.125rem;
+        color: #6b7280;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .terms-content {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        line-height: 1.6;
+    }
+    
+    .terms-section {
+        margin-bottom: 2rem;
+    }
+    
+    .terms-section:last-child {
+        margin-bottom: 0;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .section-content {
+        color: #4b5563;
+        margin-bottom: 1rem;
+    }
+    
+    .section-content p {
+        margin-bottom: 1rem;
+    }
+    
+    .section-content ul {
+        margin-left: 2rem;
+        margin-bottom: 1rem;
+    }
+    
+    .section-content li {
+        margin-bottom: 0.5rem;
+    }
+    
+    .highlight-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+    }
+    
+    .highlight-title {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+    
+    .highlight-content {
+        color: #4b5563;
+        font-size: 0.875rem;
+    }
+    
+    .contact-info {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        border: 1px solid #e2e8f0;
+        margin-top: 2rem;
+    }
+    
+    .contact-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .contact-description {
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+    }
+    
+    .contact-button {
+        background: #3b82f6;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .contact-button:hover {
+        background: #2563eb;
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .terms-title {
+            font-size: 2rem;
+        }
+        
+        .terms-container {
+            padding: 1rem;
+        }
+        
+        .terms-content {
+            padding: 1.5rem;
+        }
+    }
+    
+    .dark .terms-title {
+        color: #f9fafb;
+    }
+    
+    .dark .terms-subtitle {
+        color: #d1d5db;
+    }
+    
+    .dark .terms-content {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .section-title {
+        color: #f9fafb;
+    }
+    
+    .dark .section-content {
+        color: #d1d5db;
+    }
+    
+    .dark .highlight-box {
+        background: #374151;
+        border-color: #4b5563;
+    }
+    
+    .dark .highlight-title {
+        color: #f9fafb;
+    }
+    
+    .dark .highlight-content {
+        color: #d1d5db;
+    }
+    
+    .dark .contact-info {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .contact-title {
+        color: #f9fafb;
+    }
+    
+    .dark .contact-description {
+        color: #d1d5db;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="terms-container">
+    <!-- Terms Header -->
+    <div class="terms-header">
+        <h1 class="terms-title">Terms of Service</h1>
+        <p class="terms-subtitle">
+            Please read these terms carefully before using our services. By accessing or using our platform, you agree to be bound by these terms.
+        </p>
+    </div>
+    
+    <!-- Terms Content -->
+    <div class="terms-content">
+        <div class="terms-section">
+            <h2 class="section-title">1. Acceptance of Terms</h2>
+            <div class="section-content">
+                <p>
+                    By accessing and using the services provided by Meridian Asset Logistics ("Company", "we", "us", or "our"), 
+                    you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide 
+                    by the above, please do not use this service.
+                </p>
+            </div>
+        </div>
+        
+        <div class="terms-section">
+            <h2 class="section-title">2. Description of Service</h2>
+            <div class="section-content">
+                <p>
+                    Meridian Asset Logistics provides comprehensive logistics and investment services including but not limited to:
+                </p>
+                <ul>
+                    <li>Maritime shipping and air freight services</li>
+                    <li>Warehousing and distribution solutions</li>
+                    <li>Customs brokerage services</li>
+                    <li>Investment opportunities in logistics assets</li>
+                    <li>Portfolio management services</li>
+                    <li>Technology solutions for supply chain management</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="terms-section">
+            <h2 class="section-title">3. User Responsibilities</h2>
+            <div class="section-content">
+                <p>As a user of our services, you agree to:</p>
+                <ul>
+                    <li>Provide accurate and complete information when required</li>
+                    <li>Maintain the confidentiality of your account credentials</li>
+                    <li>Use our services only for lawful purposes</li>
+                    <li>Comply with all applicable laws and regulations</li>
+                    <li>Not interfere with or disrupt our services</li>
+                    <li>Respect the intellectual property rights of others</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="terms-section">
+            <h2 class="section-title">4. Investment Services</h2>
+            <div class="section-content">
+                <p>
+                    Our investment services are subject to market risks and past performance does not guarantee future results. 
+                    All investments carry risk of loss, and you should carefully consider your investment objectives, level of 
+                    experience, and risk appetite before investing.
+                </p>
+                <div class="highlight-box">
+                    <div class="highlight-title">Important Notice</div>
+                    <div class="highlight-content">
+                        Investment decisions should be made based on your own research and consultation with qualified financial advisors. 
+                        We do not provide personalized investment advice and all investment decisions are your sole responsibility.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="terms-section">
+            <h2 class="section-title">5. Limitation of Liability</h2>
+            <div class="section-content">
+                <p>
+                    To the maximum extent permitted by law, Meridian Asset Logistics shall not be liable for any indirect, incidental, 
+                    special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, 
+                    or other intangible losses, resulting from your use of our services.
+                </p>
+            </div>
+        </div>
+        
+        <div class="terms-section">
+            <h2 class="section-title">6. Privacy and Data Protection</h2>
+            <div class="section-content">
+                <p>
+                    We are committed to protecting your privacy and personal information. Our collection, use, and disclosure of 
+                    personal information is governed by our Privacy Policy, which is incorporated into these terms by reference.
+                </p>
+            </div>
+        </div>
+        
+        <div class="terms-section">
+            <h2 class="section-title">7. Termination</h2>
+            <div class="section-content">
+                <p>
+                    We may terminate or suspend your account and access to our services immediately, without prior notice or liability, 
+                    for any reason whatsoever, including without limitation if you breach these terms.
+                </p>
+            </div>
+        </div>
+        
+        <div class="terms-section">
+            <h2 class="section-title">8. Governing Law</h2>
+            <div class="section-content">
+                <p>
+                    These terms shall be governed by and construed in accordance with the laws of the State of New York, without 
+                    regard to its conflict of law provisions. Any disputes arising from these terms shall be resolved in the courts 
+                    of New York.
+                </p>
+            </div>
+        </div>
+        
+        <div class="terms-section">
+            <h2 class="section-title">9. Changes to Terms</h2>
+            <div class="section-content">
+                <p>
+                    We reserve the right to modify these terms at any time. We will notify users of any material changes by posting 
+                    the new terms on our website. Your continued use of our services after such modifications constitutes acceptance 
+                    of the updated terms.
+                </p>
+            </div>
+        </div>
+        
+        <div class="terms-section">
+            <h2 class="section-title">10. Contact Information</h2>
+            <div class="section-content">
+                <p>
+                    If you have any questions about these terms, please contact us at:
+                </p>
+                <p>
+                    <strong>Email:</strong> legal@meridianassetlogistics.com<br>
+                    <strong>Address:</strong> 447 Broadway, 2nd Floor, New York, 10013<br>
+                    <strong>Phone:</strong> +1 (555) 123-4567
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contact Section -->
+    <div class="contact-info">
+        <h3 class="contact-title">Questions About Our Terms?</h3>
+        <p class="contact-description">
+            If you have any questions or concerns about these terms of service, our legal team is here to help.
+        </p>
+        <a href="mailto:legal@meridianassetlogistics.com" class="contact-button">
+            <i class="fas fa-envelope"></i>
+            Contact Legal Team
+        </a>
+    </div>
+</div>
+{% endblock %}

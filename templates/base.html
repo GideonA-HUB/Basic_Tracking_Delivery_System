@@ -680,10 +680,10 @@
                 <div>
                     <h3 class="text-sm font-semibold mb-3 text-blue-400">About</h3>
                     <ul class="space-y-1.5 text-gray-300">
-                        <li><a href="#" class="text-xs hover:text-white transition-colors">Company Overview</a></li>
-                        <li><a href="#" class="text-xs hover:text-white transition-colors">Leadership</a></li>
-                        <li><a href="#" class="text-xs hover:text-white transition-colors">Investor Relations</a></li>
-                        <li><a href="#" class="text-xs hover:text-white transition-colors">Newsroom</a></li>
+                        <li><a href="{% url 'frontend:company_overview' %}" class="text-xs hover:text-white transition-colors">Company Overview</a></li>
+                        <li><a href="{% url 'frontend:leadership' %}" class="text-xs hover:text-white transition-colors">Leadership</a></li>
+                        <li><a href="{% url 'frontend:investor_relations' %}" class="text-xs hover:text-white transition-colors">Investor Relations</a></li>
+                        <li><a href="{% url 'frontend:newsroom' %}" class="text-xs hover:text-white transition-colors">Newsroom</a></li>
                     </ul>
                 </div>
             </div>
@@ -733,18 +733,18 @@
                     <div class="text-center md:text-left">
                         <h4 class="text-sm font-semibold mb-2 text-blue-400">Legal</h4>
                         <div class="flex flex-wrap gap-4 text-xs text-gray-300">
-                            <a href="#" class="hover:text-white transition-colors">Terms</a>
-                            <a href="#" class="hover:text-white transition-colors">Privacy</a>
-                            <a href="#" class="hover:text-white transition-colors">Cookies</a>
+                            <a href="{% url 'frontend:terms' %}" class="hover:text-white transition-colors">Terms</a>
+                            <a href="{% url 'frontend:privacy' %}" class="hover:text-white transition-colors">Privacy</a>
+                            <a href="{% url 'frontend:cookies' %}" class="hover:text-white transition-colors">Cookies</a>
                         </div>
                     </div>
                     
                     <div class="text-center md:text-left">
                         <h4 class="text-sm font-semibold mb-2 text-blue-400">Security</h4>
                         <div class="flex flex-wrap gap-4 text-xs text-gray-300">
-                            <a href="#" class="hover:text-white transition-colors">Fraud Protection</a>
-                            <a href="#" class="hover:text-white transition-colors">Security Center</a>
-                            <a href="#" class="hover:text-white transition-colors">Report Issues</a>
+                            <a href="{% url 'frontend:fraud_protection' %}" class="hover:text-white transition-colors">Fraud Protection</a>
+                            <a href="{% url 'frontend:security_center' %}" class="hover:text-white transition-colors">Security Center</a>
+                            <a href="{% url 'frontend:report_issues' %}" class="hover:text-white transition-colors">Report Issues</a>
                         </div>
                     </div>
                 </div>

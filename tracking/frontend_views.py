@@ -346,3 +346,76 @@ def customs_brokerage(request):
     return render(request, 'tracking/customs_brokerage.html', {
         'page_title': 'Customs Brokerage Services'
     })
+
+
+# About section pages
+def company_overview(request):
+    """Company overview and information page"""
+    return render(request, 'tracking/company_overview.html', {
+        'page_title': 'Company Overview'
+    })
+
+
+def leadership(request):
+    """Leadership team and management page"""
+    return render(request, 'tracking/leadership.html', {
+        'page_title': 'Leadership Team'
+    })
+
+
+def investor_relations(request):
+    """Investor relations and financial information page"""
+    return render(request, 'tracking/investor_relations.html', {
+        'page_title': 'Investor Relations'
+    })
+
+
+def newsroom(request):
+    """Newsroom and press releases page"""
+    return render(request, 'tracking/newsroom.html', {
+        'page_title': 'Newsroom'
+    })
+
+
+# Legal section pages
+def terms(request):
+    """Terms of service page"""
+    return render(request, 'tracking/terms.html', {
+        'page_title': 'Terms of Service'
+    })
+
+
+def privacy(request):
+    """Privacy policy page"""
+    return render(request, 'tracking/privacy.html', {
+        'page_title': 'Privacy Policy'
+    })
+
+
+def cookies(request):
+    """Cookie policy page"""
+    return render(request, 'tracking/cookies.html', {
+        'page_title': 'Cookie Policy'
+    })
+
+
+# Security section pages
+def fraud_protection(request):
+    """Fraud protection information page"""
+    return render(request, 'tracking/fraud_protection.html', {
+        'page_title': 'Fraud Protection'
+    })
+
+
+def security_center(request):
+    """Security center and safety information page"""
+    return render(request, 'tracking/security_center.html', {
+        'page_title': 'Security Center'
+    })
+
+
+def report_issues(request):
+    """Report security issues page"""
+    return render(request, 'tracking/report_issues.html', {
+        'page_title': 'Report Security Issues'
+    })

@@ -37,4 +37,20 @@ urlpatterns = [
     path('warehousing/', frontend_views.warehousing, name='warehousing'),
     path('distribution/', frontend_views.distribution, name='distribution'),
     path('customs-brokerage/', frontend_views.customs_brokerage, name='customs_brokerage'),
+    
+    # About section pages
+    path('company-overview/', frontend_views.company_overview, name='company_overview'),
+    path('leadership/', frontend_views.leadership, name='leadership'),
+    path('investor-relations/', frontend_views.investor_relations, name='investor_relations'),
+    path('newsroom/', frontend_views.newsroom, name='newsroom'),
+    
+    # Legal section pages
+    path('terms/', frontend_views.terms, name='terms'),
+    path('privacy/', frontend_views.privacy, name='privacy'),
+    path('cookies/', frontend_views.cookies, name='cookies'),
+    
+    # Security section pages
+    path('fraud-protection/', frontend_views.fraud_protection, name='fraud_protection'),
+    path('security-center/', frontend_views.security_center, name='security_center'),
+    path('report-issues/', frontend_views.report_issues, name='report_issues'),
 ]
