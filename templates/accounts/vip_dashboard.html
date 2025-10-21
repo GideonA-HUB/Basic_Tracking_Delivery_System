@@ -237,6 +237,25 @@
         z-index: 100000 !important;
         position: relative !important;
     }
+    
+    /* CRITICAL: Ensure Support Ticket button is visible */
+    .dashboard-sidebar .nav-link {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    /* Ensure sidebar content is fully visible */
+    .dashboard-sidebar .space-y-1 {
+        display: block !important;
+    }
+    
+    /* Make sure ACCOUNT section is visible */
+    .dashboard-sidebar .space-y-1 a {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
 
     /* Exception for specific elements that need colors */
     .bg-blue-600, .bg-red-600, .bg-green-600, .bg-yellow-500, .bg-purple-600, 
@@ -613,7 +632,7 @@
         overflow-y: auto !important;
         overflow-x: hidden !important;
         position: relative !important;
-        height: 100vh !important;
+        height: calc(100vh - 80px) !important; /* Account for main navigation */
         z-index: 1 !important;
         flex-shrink: 0 !important;
         /* Custom scrollbar */
@@ -1480,7 +1499,7 @@
         const sidebar = document.querySelector('.dashboard-sidebar');
         if (sidebar) {
             sidebar.style.width = '280px';
-            sidebar.style.height = '100vh';
+            sidebar.style.height = 'calc(100vh - 80px)'; // Account for main navigation
             sidebar.style.background = 'white';
             sidebar.style.overflowY = 'auto';
             sidebar.style.overflowX = 'hidden';
