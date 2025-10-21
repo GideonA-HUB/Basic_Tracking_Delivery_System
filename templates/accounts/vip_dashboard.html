@@ -1045,7 +1045,7 @@
                                 <span class="text-gray-600 font-bold text-lg">{{ user.first_name|first|upper }}</span>
                             </div>
                             <div>
-                                <p class="text-lg font-semibold">Good Morning, {{ vip_member.full_name }}</p>
+                                <p class="text-lg font-semibold" id="greeting">Good Morning, {{ vip_member.full_name }}</p>
                             </div>
                         </div>
                         <div class="text-right">
@@ -1057,17 +1057,17 @@
                     <div class="text-center mb-6">
                         <p class="text-sm opacity-90 mb-2">Available Balance</p>
                         <div class="flex items-center justify-center gap-2 mb-2">
-                            <p class="text-5xl font-bold">${{ financial_metrics.available_balance|floatformat:2 }}</p>
+                            <p class="text-5xl font-bold" id="balance-amount">${{ financial_metrics.available_balance|floatformat:2 }}</p>
                             <span class="text-lg">{{ financial_metrics.primary_currency }}</span>
-                            <button class="ml-2">
-                                <i class="fas fa-eye-slash text-white opacity-70"></i>
+                            <button id="toggle-balance" class="ml-2 cursor-pointer" onclick="toggleBalance()">
+                                <i class="fas fa-eye-slash text-white opacity-70" id="balance-icon"></i>
                             </button>
                         </div>
                         <div class="flex items-center justify-center gap-2 mt-4">
                             <i class="fas fa-shield-alt text-white"></i>
                             <span class="text-sm">Your Account Number</span>
                             <span class="text-sm font-bold">{{ vip_member.member_id }}</span>
-                            <span class="bg-red-500 text-white px-2 py-1 rounded text-xs">Inactive</span>
+                            <span class="bg-green-500 text-white px-2 py-1 rounded text-xs">Active</span>
                         </div>
                     </div>
 
@@ -1982,6 +1982,88 @@
             alert('Failed to copy address');
         });
     }
+    
+    // Dynamic greeting based on time of day
+    function updateGreeting() {
+        const now = new Date();
+        const hour = now.getHours();
+        const greetingElement = document.getElementById('greeting');
+        
+        if (greetingElement) {
+            let greeting = '';
+            if (hour < 12) {
+                greeting = 'Good Morning';
+            } else if (hour < 17) {
+                greeting = 'Good Afternoon';
+            } else {
+                greeting = 'Good Evening';
+            }
+            
+            // Get the user's name from the current greeting
+            const currentText = greetingElement.textContent;
+            const nameMatch = currentText.match(/, (.+)$/);
+            const userName = nameMatch ? nameMatch[1] : '{{ vip_member.full_name }}';
+            
+            greetingElement.textContent = `${greeting}, ${userName}`;
+        }
+    }
+    
+    // Balance toggle functionality
+    let balanceVisible = true;
+    const originalBalance = '{{ financial_metrics.available_balance|floatformat:2 }}';
+    
+    function toggleBalance() {
+        const balanceElement = document.getElementById('balance-amount');
+        const iconElement = document.getElementById('balance-icon');
+        
+        if (balanceVisible) {
+            // Hide balance
+            balanceElement.textContent = '••••••••';
+            iconElement.className = 'fas fa-eye text-white opacity-70';
+            balanceVisible = false;
+        } else {
+            // Show balance
+            balanceElement.textContent = `$${originalBalance}`;
+            iconElement.className = 'fas fa-eye-slash text-white opacity-70';
+            balanceVisible = true;
+        }
+    }
+    
+    // Update time and date
+    function updateTimeAndDate() {
+        const now = new Date();
+        const timeElement = document.getElementById('current-time');
+        const dateElement = document.getElementById('current-date-main');
+        
+        if (timeElement) {
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            });
+            timeElement.textContent = timeString;
+        }
+        
+        if (dateElement) {
+            const dateString = now.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            dateElement.textContent = dateString;
+        }
+    }
+    
+    // Initialize functions on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        updateGreeting();
+        updateTimeAndDate();
+        
+        // Update time every second
+        setInterval(updateTimeAndDate, 1000);
+    });
     
 </script>
 {% endblock %}
