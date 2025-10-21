@@ -7,7 +7,7 @@
 {% block extra_head %}
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <style>
-    /* FORCE FULL VIEWPORT - CRITICAL */
+    /* Allow main navigation to show */
     html, body {
         width: 100vw !important;
         height: 100vh !important;
@@ -15,6 +15,13 @@
         padding: 0 !important;
         overflow-x: hidden !important;
         background: white !important;
+    }
+    
+    /* Ensure main navigation is visible */
+    nav, .navbar, header {
+        display: block !important;
+        position: relative !important;
+        z-index: 1000 !important;
     }
     
     /* Override any existing styles */
@@ -92,11 +99,12 @@
     .dashboard-layout {
         display: grid !important;
         grid-template-columns: 280px 1fr !important;
-        min-height: 100vh;
+        min-height: calc(100vh - 80px) !important; /* Account for main navigation */
         background: var(--background, white);
         gap: 0 !important;
         width: 100vw !important;
         overflow-x: hidden !important;
+        margin-top: 80px !important; /* Push below main navigation */
     }
 
     /* Force container to be full width */
@@ -150,18 +158,61 @@
     .dashboard-layout {
         display: flex !important;
         width: 100vw !important;
-        height: 100vh !important;
+        height: calc(100vh - 80px) !important; /* Account for main navigation */
         background: white !important;
-        position: fixed !important;
+        position: relative !important; /* Changed from fixed to relative */
         top: 0 !important;
         left: 0 !important;
-        z-index: 9999 !important;
+        z-index: 1 !important; /* Lower z-index to not cover navigation */
+        margin-top: 80px !important; /* Push below main navigation */
     }
 
     /* Allow proper theme styling */
     .dark {
         --background: 222.2 84% 4.9%;
         --foreground: 210 40% 98%;
+    }
+    
+    /* CRITICAL: Style the Verify KYC and MERIDIAN VIP buttons */
+    .verify-kyc-btn {
+        background: #dc2626 !important;
+        color: white !important;
+        border: none !important;
+        padding: 0.75rem 1.5rem !important;
+        border-radius: 0.5rem !important;
+        font-weight: 600 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+        width: 100% !important;
+        justify-content: center !important;
+        margin-bottom: 0.75rem !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .verify-kyc-btn:hover {
+        background: #b91c1c !important;
+        transform: translateY(-1px) !important;
+    }
+    
+    .meridian-vip-btn {
+        background: #3b82f6 !important;
+        color: white !important;
+        border: none !important;
+        padding: 0.75rem 1.5rem !important;
+        border-radius: 0.5rem !important;
+        font-weight: 600 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+        width: 100% !important;
+        justify-content: center !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .meridian-vip-btn:hover {
+        background: #2563eb !important;
+        transform: translateY(-1px) !important;
     }
 
     /* Exception for specific elements that need colors */
@@ -829,6 +880,7 @@
 {% endblock %}
 
 {% block content %}
+<!-- Main Navigation is included from base.html -->
 <div class="dashboard-layout">
     <!-- Sidebar -->
     <aside class="dashboard-sidebar">
@@ -843,12 +895,12 @@
                     <p class="text-sm text-gray-500">ID: {{ vip_member.member_id }}</p>
                 </div>
                 
-                <a href="{% url 'accounts:kyc_welcome' %}" class="w-full bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded-md transition-colors mb-3 flex items-center justify-center gap-2">
+                <a href="{% url 'accounts:kyc_welcome' %}" class="verify-kyc-btn">
                     <i class="fas fa-shield-alt"></i>
                     Verify KYC
                 </a>
                 
-                <div class="flex items-center justify-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-md">
+                <div class="meridian-vip-btn">
                     <i class="fas fa-shield-alt"></i>
                     <span class="text-sm font-medium">MERIDIAN VIP</span>
                 </div>
