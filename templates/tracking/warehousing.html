@@ -1,0 +1,416 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - Meridian Asset Logistics{% endblock %}
+
+{% block extra_css %}
+<style>
+    .warehousing-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .warehousing-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .warehousing-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .warehousing-subtitle {
+        font-size: 1.125rem;
+        color: #6b7280;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    .feature-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .feature-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+    }
+    
+    .feature-icon.climate { background: #dbeafe; color: #1e40af; }
+    .feature-icon.security { background: #dcfce7; color: #166534; }
+    .feature-icon.management { background: #fef3c7; color: #92400e; }
+    .feature-icon.value { background: #fce7f3; color: #be185d; }
+    
+    .feature-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+    
+    .feature-description {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+    }
+    
+    .feature-list {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 1.5rem;
+    }
+    
+    .feature-list li {
+        padding: 0.25rem 0;
+        color: #4b5563;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .feature-list li i {
+        color: #10b981;
+        width: 16px;
+    }
+    
+    .feature-button {
+        background: #3b82f6;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .feature-button:hover {
+        background: #2563eb;
+        color: white;
+    }
+    
+    .info-section {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        margin-bottom: 2rem;
+    }
+    
+    .info-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1.5rem;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .info-item {
+        padding: 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: #f8fafc;
+    }
+    
+    .info-item-title {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+    
+    .info-item-description {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+    
+    .cta-section {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .cta-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .cta-description {
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+    }
+    
+    .cta-button {
+        background: #10b981;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .cta-button:hover {
+        background: #059669;
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .warehousing-title {
+            font-size: 2rem;
+        }
+        
+        .features-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .warehousing-container {
+            padding: 1rem;
+        }
+    }
+    
+    .dark .warehousing-title {
+        color: #f9fafb;
+    }
+    
+    .dark .warehousing-subtitle {
+        color: #d1d5db;
+    }
+    
+    .dark .feature-card {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .feature-title {
+        color: #f9fafb;
+    }
+    
+    .dark .feature-description {
+        color: #d1d5db;
+    }
+    
+    .dark .feature-list li {
+        color: #d1d5db;
+    }
+    
+    .dark .info-section {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .info-title {
+        color: #f9fafb;
+    }
+    
+    .dark .info-item {
+        background: #374151;
+        border-color: #4b5563;
+    }
+    
+    .dark .info-item-title {
+        color: #f9fafb;
+    }
+    
+    .dark .info-item-description {
+        color: #d1d5db;
+    }
+    
+    .dark .cta-section {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .cta-title {
+        color: #f9fafb;
+    }
+    
+    .dark .cta-description {
+        color: #d1d5db;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="warehousing-container">
+    <!-- Warehousing Header -->
+    <div class="warehousing-header">
+        <h1 class="warehousing-title">Warehousing Solutions</h1>
+        <p class="warehousing-subtitle">
+            Secure, efficient, and strategically located warehousing facilities to optimize your inventory management and distribution.
+        </p>
+    </div>
+    
+    <!-- Features Grid -->
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon climate">
+                <i class="fas fa-thermometer-half"></i>
+            </div>
+            <div class="feature-title">Climate-Controlled Storage</div>
+            <div class="feature-description">
+                Temperature and humidity-controlled environments for sensitive products and materials.
+            </div>
+            <ul class="feature-list">
+                <li><i class="fas fa-check"></i> Temperature range: -20°C to +25°C</li>
+                <li><i class="fas fa-check"></i> Humidity control systems</li>
+                <li><i class="fas fa-check"></i> 24/7 monitoring</li>
+                <li><i class="fas fa-check"></i> Specialized zones</li>
+            </ul>
+            <a href="#" class="feature-button">
+                <i class="fas fa-info-circle"></i>
+                Learn More
+            </a>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon security">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="feature-title">Advanced Security</div>
+            <div class="feature-description">
+                Multi-layered security systems to protect your valuable inventory and assets.
+            </div>
+            <ul class="feature-list">
+                <li><i class="fas fa-check"></i> 24/7 surveillance</li>
+                <li><i class="fas fa-check"></i> Access control systems</li>
+                <li><i class="fas fa-check"></i> Motion detection</li>
+                <li><i class="fas fa-check"></i> Fire suppression systems</li>
+            </ul>
+            <a href="#" class="feature-button">
+                <i class="fas fa-info-circle"></i>
+                Learn More
+            </a>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon management">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="feature-title">Inventory Management</div>
+            <div class="feature-description">
+                Real-time inventory tracking and management systems for complete visibility.
+            </div>
+            <ul class="feature-list">
+                <li><i class="fas fa-check"></i> Real-time tracking</li>
+                <li><i class="fas fa-check"></i> Automated reporting</li>
+                <li><i class="fas fa-check"></i> Stock level alerts</li>
+                <li><i class="fas fa-check"></i> Integration capabilities</li>
+            </ul>
+            <a href="#" class="feature-button">
+                <i class="fas fa-info-circle"></i>
+                Learn More
+            </a>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon value">
+                <i class="fas fa-cogs"></i>
+            </div>
+            <div class="feature-title">Value-Added Services</div>
+            <div class="feature-description">
+                Comprehensive services to enhance your supply chain efficiency and customer satisfaction.
+            </div>
+            <ul class="feature-list">
+                <li><i class="fas fa-check"></i> Pick and pack services</li>
+                <li><i class="fas fa-check"></i> Labeling and packaging</li>
+                <li><i class="fas fa-check"></i> Quality inspection</li>
+                <li><i class="fas fa-check"></i> Cross-docking</li>
+            </ul>
+            <a href="#" class="feature-button">
+                <i class="fas fa-info-circle"></i>
+                Learn More
+            </a>
+        </div>
+    </div>
+    
+    <!-- Information Section -->
+    <div class="info-section">
+        <h2 class="info-title">Warehouse Locations & Capabilities</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-item-title">Strategic Locations</div>
+                <div class="info-item-description">Warehouses in major logistics hubs across North America, Europe, and Asia</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-item-title">Storage Capacity</div>
+                <div class="info-item-description">Over 2 million square feet of storage space across our network</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-item-title">Technology Integration</div>
+                <div class="info-item-description">WMS integration with your existing systems for seamless operations</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-item-title">Flexible Terms</div>
+                <div class="info-item-description">Short-term and long-term storage options to meet your needs</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-item-title">Compliance</div>
+                <div class="info-item-description">Full compliance with international warehousing and safety standards</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-item-title">Scalability</div>
+                <div class="info-item-description">Easy expansion and contraction based on your business requirements</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Call to Action -->
+    <div class="cta-section">
+        <h3 class="cta-title">Need Warehousing Solutions?</h3>
+        <p class="cta-description">
+            Contact our warehousing team to discuss your storage needs and get a customized solution.
+        </p>
+        <a href="mailto:warehousing@meridianassetlogistics.com" class="cta-button">
+            <i class="fas fa-envelope"></i>
+            Get Quote
+        </a>
+    </div>
+</div>
+{% endblock %}

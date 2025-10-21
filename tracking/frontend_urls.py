@@ -29,4 +29,12 @@ urlpatterns = [
     
     # FAQ page
     path('faqs/', frontend_views.faqs, name='faqs'),
+    
+    # Footer pages
+    path('claims/', frontend_views.claims, name='claims'),
+    path('support-center/', frontend_views.support_center, name='support_center'),
+    path('logistics/', frontend_views.logistics, name='logistics'),
+    path('warehousing/', frontend_views.warehousing, name='warehousing'),
+    path('distribution/', frontend_views.distribution, name='distribution'),
+    path('customs-brokerage/', frontend_views.customs_brokerage, name='customs_brokerage'),
 ]

@@ -304,3 +304,45 @@ def faqs(request):
         'faq_data': faq_data,
         'page_title': 'Frequently Asked Questions'
     })
+
+
+def claims(request):
+    """Claims information and submission page"""
+    return render(request, 'tracking/claims.html', {
+        'page_title': 'Claims - File a Claim'
+    })
+
+
+def support_center(request):
+    """Support center with help resources and contact options"""
+    return render(request, 'tracking/support_center.html', {
+        'page_title': 'Support Center - Get Help'
+    })
+
+
+def logistics(request):
+    """Logistics services information page"""
+    return render(request, 'tracking/logistics.html', {
+        'page_title': 'Logistics Services'
+    })
+
+
+def warehousing(request):
+    """Warehousing services information page"""
+    return render(request, 'tracking/warehousing.html', {
+        'page_title': 'Warehousing Solutions'
+    })
+
+
+def distribution(request):
+    """Distribution services information page"""
+    return render(request, 'tracking/distribution.html', {
+        'page_title': 'Distribution Services'
+    })
+
+
+def customs_brokerage(request):
+    """Customs brokerage services information page"""
+    return render(request, 'tracking/customs_brokerage.html', {
+        'page_title': 'Customs Brokerage Services'
+    })

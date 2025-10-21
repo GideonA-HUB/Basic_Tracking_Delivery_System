@@ -1,0 +1,416 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - Meridian Asset Logistics{% endblock %}
+
+{% block extra_css %}
+<style>
+    .logistics-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .logistics-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .logistics-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .logistics-subtitle {
+        font-size: 1.125rem;
+        color: #6b7280;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    .service-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+    }
+    
+    .service-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .service-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+    }
+    
+    .service-icon.maritime { background: #dbeafe; color: #1e40af; }
+    .service-icon.air { background: #dcfce7; color: #166534; }
+    .service-icon.ground { background: #fef3c7; color: #92400e; }
+    .service-icon.warehouse { background: #fce7f3; color: #be185d; }
+    
+    .service-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+    
+    .service-description {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+    }
+    
+    .service-features {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 1.5rem;
+    }
+    
+    .service-features li {
+        padding: 0.25rem 0;
+        color: #4b5563;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .service-features li i {
+        color: #10b981;
+        width: 16px;
+    }
+    
+    .service-button {
+        background: #3b82f6;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .service-button:hover {
+        background: #2563eb;
+        color: white;
+    }
+    
+    .info-section {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        margin-bottom: 2rem;
+    }
+    
+    .info-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1.5rem;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .info-item {
+        padding: 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: #f8fafc;
+    }
+    
+    .info-item-title {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+    
+    .info-item-description {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+    
+    .cta-section {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .cta-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .cta-description {
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+    }
+    
+    .cta-button {
+        background: #10b981;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .cta-button:hover {
+        background: #059669;
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .logistics-title {
+            font-size: 2rem;
+        }
+        
+        .services-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .logistics-container {
+            padding: 1rem;
+        }
+    }
+    
+    .dark .logistics-title {
+        color: #f9fafb;
+    }
+    
+    .dark .logistics-subtitle {
+        color: #d1d5db;
+    }
+    
+    .dark .service-card {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .service-title {
+        color: #f9fafb;
+    }
+    
+    .dark .service-description {
+        color: #d1d5db;
+    }
+    
+    .dark .service-features li {
+        color: #d1d5db;
+    }
+    
+    .dark .info-section {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .info-title {
+        color: #f9fafb;
+    }
+    
+    .dark .info-item {
+        background: #374151;
+        border-color: #4b5563;
+    }
+    
+    .dark .info-item-title {
+        color: #f9fafb;
+    }
+    
+    .dark .info-item-description {
+        color: #d1d5db;
+    }
+    
+    .dark .cta-section {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .cta-title {
+        color: #f9fafb;
+    }
+    
+    .dark .cta-description {
+        color: #d1d5db;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="logistics-container">
+    <!-- Logistics Header -->
+    <div class="logistics-header">
+        <h1 class="logistics-title">Logistics Services</h1>
+        <p class="logistics-subtitle">
+            Comprehensive logistics solutions designed to optimize your supply chain and deliver your goods efficiently and safely.
+        </p>
+    </div>
+    
+    <!-- Services Grid -->
+    <div class="services-grid">
+        <div class="service-card">
+            <div class="service-icon maritime">
+                <i class="fas fa-ship"></i>
+            </div>
+            <div class="service-title">Maritime Shipping</div>
+            <div class="service-description">
+                Cost-effective ocean freight solutions for large volume shipments with global reach.
+            </div>
+            <ul class="service-features">
+                <li><i class="fas fa-check"></i> Full container load (FCL)</li>
+                <li><i class="fas fa-check"></i> Less than container load (LCL)</li>
+                <li><i class="fas fa-check"></i> Break bulk shipping</li>
+                <li><i class="fas fa-check"></i> Roll-on/roll-off services</li>
+            </ul>
+            <a href="#" class="service-button">
+                <i class="fas fa-info-circle"></i>
+                Learn More
+            </a>
+        </div>
+        
+        <div class="service-card">
+            <div class="service-icon air">
+                <i class="fas fa-plane"></i>
+            </div>
+            <div class="service-title">Air Freight</div>
+            <div class="service-description">
+                Fast and reliable air cargo services for time-sensitive shipments worldwide.
+            </div>
+            <ul class="service-features">
+                <li><i class="fas fa-check"></i> Express air freight</li>
+                <li><i class="fas fa-check"></i> Standard air cargo</li>
+                <li><i class="fas fa-check"></i> Charter services</li>
+                <li><i class="fas fa-check"></i> Temperature-controlled</li>
+            </ul>
+            <a href="#" class="service-button">
+                <i class="fas fa-info-circle"></i>
+                Learn More
+            </a>
+        </div>
+        
+        <div class="service-card">
+            <div class="service-icon ground">
+                <i class="fas fa-truck"></i>
+            </div>
+            <div class="service-title">Ground Transportation</div>
+            <div class="service-description">
+                Reliable overland transportation services for domestic and cross-border shipments.
+            </div>
+            <ul class="service-features">
+                <li><i class="fas fa-check"></i> Long-haul trucking</li>
+                <li><i class="fas fa-check"></i> Local delivery</li>
+                <li><i class="fas fa-check"></i> Cross-border transport</li>
+                <li><i class="fas fa-check"></i> Specialized equipment</li>
+            </ul>
+            <a href="#" class="service-button">
+                <i class="fas fa-info-circle"></i>
+                Learn More
+            </a>
+        </div>
+        
+        <div class="service-card">
+            <div class="service-icon warehouse">
+                <i class="fas fa-warehouse"></i>
+            </div>
+            <div class="service-title">Warehousing</div>
+            <div class="service-description">
+                Secure storage and inventory management solutions with strategic locations.
+            </div>
+            <ul class="service-features">
+                <li><i class="fas fa-check"></i> Climate-controlled storage</li>
+                <li><i class="fas fa-check"></i> Inventory management</li>
+                <li><i class="fas fa-check"></i> Cross-docking</li>
+                <li><i class="fas fa-check"></i> Value-added services</li>
+            </ul>
+            <a href="#" class="service-button">
+                <i class="fas fa-info-circle"></i>
+                Learn More
+            </a>
+        </div>
+    </div>
+    
+    <!-- Information Section -->
+    <div class="info-section">
+        <h2 class="info-title">Why Choose Our Logistics Services?</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-item-title">Global Network</div>
+                <div class="info-item-description">Extensive network of partners and facilities worldwide</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-item-title">Real-time Tracking</div>
+                <div class="info-item-description">Advanced tracking technology for complete visibility</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-item-title">Custom Solutions</div>
+                <div class="info-item-description">Tailored logistics solutions for your specific needs</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-item-title">Expert Team</div>
+                <div class="info-item-description">Experienced professionals dedicated to your success</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-item-title">Cost Optimization</div>
+                <div class="info-item-description">Efficient routing and consolidation to reduce costs</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-item-title">Compliance</div>
+                <div class="info-item-description">Full compliance with international regulations</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Call to Action -->
+    <div class="cta-section">
+        <h3 class="cta-title">Ready to Optimize Your Supply Chain?</h3>
+        <p class="cta-description">
+            Contact our logistics experts to discuss your shipping needs and get a customized solution.
+        </p>
+        <a href="mailto:logistics@meridianassetlogistics.com" class="cta-button">
+            <i class="fas fa-envelope"></i>
+            Get Quote
+        </a>
+    </div>
+</div>
+{% endblock %}

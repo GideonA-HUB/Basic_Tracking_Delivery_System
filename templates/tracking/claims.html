@@ -1,0 +1,418 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - Meridian Asset Logistics{% endblock %}
+
+{% block extra_css %}
+<style>
+    .claims-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .claims-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .claims-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .claims-subtitle {
+        font-size: 1.125rem;
+        color: #6b7280;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .claims-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    .claim-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+    }
+    
+    .claim-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .claim-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        font-size: 1.25rem;
+    }
+    
+    .claim-icon.damage { background: #fef3c7; color: #92400e; }
+    .claim-icon.lost { background: #fce7f3; color: #be185d; }
+    .claim-icon.delay { background: #dbeafe; color: #1e40af; }
+    .claim-icon.other { background: #dcfce7; color: #166534; }
+    
+    .claim-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+    
+    .claim-description {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+    }
+    
+    .claim-button {
+        background: #3b82f6;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .claim-button:hover {
+        background: #2563eb;
+        color: white;
+    }
+    
+    .claims-form {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        margin-bottom: 2rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        display: block;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-input, .form-select, .form-textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+    }
+    
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .form-textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+    
+    .submit-button {
+        background: #10b981;
+        color: white;
+        padding: 0.75rem 2rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .submit-button:hover {
+        background: #059669;
+    }
+    
+    .info-section {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 2rem;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .info-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .info-list {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .info-list li {
+        padding: 0.5rem 0;
+        color: #4b5563;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .info-list li i {
+        color: #10b981;
+        width: 16px;
+    }
+    
+    @media (max-width: 768px) {
+        .claims-title {
+            font-size: 2rem;
+        }
+        
+        .claims-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .claims-container {
+            padding: 1rem;
+        }
+    }
+    
+    .dark .claims-title {
+        color: #f9fafb;
+    }
+    
+    .dark .claims-subtitle {
+        color: #d1d5db;
+    }
+    
+    .dark .claim-card {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .claim-title {
+        color: #f9fafb;
+    }
+    
+    .dark .claim-description {
+        color: #d1d5db;
+    }
+    
+    .dark .claims-form {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .form-label {
+        color: #f9fafb;
+    }
+    
+    .dark .form-input, .dark .form-select, .dark .form-textarea {
+        background: #374151;
+        border-color: #4b5563;
+        color: #f9fafb;
+    }
+    
+    .dark .form-input:focus, .dark .form-select:focus, .dark .form-textarea:focus {
+        border-color: #3b82f6;
+    }
+    
+    .dark .info-section {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dark .info-title {
+        color: #f9fafb;
+    }
+    
+    .dark .info-list li {
+        color: #d1d5db;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="claims-container">
+    <!-- Claims Header -->
+    <div class="claims-header">
+        <h1 class="claims-title">File a Claim</h1>
+        <p class="claims-subtitle">
+            We understand that issues can occur during shipping. Our claims process is designed to be fast, fair, and transparent.
+        </p>
+    </div>
+    
+    <!-- Claim Types -->
+    <div class="claims-grid">
+        <div class="claim-card">
+            <div class="claim-icon damage">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="claim-title">Package Damage</div>
+            <div class="claim-description">
+                Report damage to your package or its contents during transit. We'll investigate and process your claim promptly.
+            </div>
+            <a href="#damage-claim" class="claim-button">
+                <i class="fas fa-file-alt"></i>
+                File Damage Claim
+            </a>
+        </div>
+        
+        <div class="claim-card">
+            <div class="claim-icon lost">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="claim-title">Lost Package</div>
+            <div class="claim-description">
+                If your package hasn't arrived within the expected timeframe, we'll help locate it or process a replacement.
+            </div>
+            <a href="#lost-claim" class="claim-button">
+                <i class="fas fa-file-alt"></i>
+                File Lost Package Claim
+            </a>
+        </div>
+        
+        <div class="claim-card">
+            <div class="claim-icon delay">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="claim-title">Delivery Delay</div>
+            <div class="claim-description">
+                Report significant delays in delivery. We'll investigate the cause and provide appropriate compensation.
+            </div>
+            <a href="#delay-claim" class="claim-button">
+                <i class="fas fa-file-alt"></i>
+                File Delay Claim
+            </a>
+        </div>
+        
+        <div class="claim-card">
+            <div class="claim-icon other">
+                <i class="fas fa-question-circle"></i>
+            </div>
+            <div class="claim-title">Other Issues</div>
+            <div class="claim-description">
+                For any other shipping-related issues not covered above, we're here to help resolve your concerns.
+            </div>
+            <a href="#other-claim" class="claim-button">
+                <i class="fas fa-file-alt"></i>
+                File Other Claim
+            </a>
+        </div>
+    </div>
+    
+    <!-- Claims Form -->
+    <div class="claims-form">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Submit Your Claim</h2>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="form-group">
+                    <label class="form-label">Claim Type</label>
+                    <select class="form-select" name="claim_type" required>
+                        <option value="">Select claim type</option>
+                        <option value="damage">Package Damage</option>
+                        <option value="lost">Lost Package</option>
+                        <option value="delay">Delivery Delay</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Tracking Number</label>
+                    <input type="text" class="form-input" name="tracking_number" placeholder="Enter tracking number" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Your Name</label>
+                    <input type="text" class="form-input" name="customer_name" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-input" name="email" placeholder="Enter your email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" class="form-input" name="phone" placeholder="Enter your phone number">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Claim Amount (USD)</label>
+                    <input type="number" class="form-input" name="claim_amount" placeholder="Enter claim amount" step="0.01" min="0">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Description of Issue</label>
+                <textarea class="form-textarea" name="description" placeholder="Please provide a detailed description of the issue..." required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Additional Information</label>
+                <textarea class="form-textarea" name="additional_info" placeholder="Any additional information that might help with your claim..."></textarea>
+            </div>
+            
+            <button type="submit" class="submit-button">
+                <i class="fas fa-paper-plane"></i>
+                Submit Claim
+            </button>
+        </form>
+    </div>
+    
+    <!-- Information Section -->
+    <div class="info-section">
+        <h3 class="info-title">Claims Process Information</h3>
+        <ul class="info-list">
+            <li>
+                <i class="fas fa-check"></i>
+                <span>Claims are typically processed within 5-7 business days</span>
+            </li>
+            <li>
+                <i class="fas fa-check"></i>
+                <span>You'll receive email updates throughout the process</span>
+            </li>
+            <li>
+                <i class="fas fa-check"></i>
+                <span>Documentation may be required for claims over $100</span>
+            </li>
+            <li>
+                <i class="fas fa-check"></i>
+                <span>Our team will contact you if additional information is needed</span>
+            </li>
+            <li>
+                <i class="fas fa-check"></i>
+                <span>Compensation is provided based on the nature and value of the claim</span>
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
