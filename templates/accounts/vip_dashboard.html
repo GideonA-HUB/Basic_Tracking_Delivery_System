@@ -17,11 +17,18 @@
         background: white !important;
     }
     
-    /* Ensure main navigation is visible */
+    /* Ensure main navigation is visible but below modal */
     nav, .navbar, header {
         display: block !important;
         position: relative !important;
         z-index: 1000 !important;
+    }
+    
+    /* When modal is open, reduce nav z-index */
+    body:has(#transferPaymentModal) nav,
+    body:has(#transferPaymentModal) .navbar,
+    body:has(#transferPaymentModal) header {
+        z-index: 100 !important;
     }
     
     /* Override any existing styles */
@@ -213,6 +220,22 @@
     .meridian-vip-btn:hover {
         background: #2563eb !important;
         transform: translateY(-1px) !important;
+    }
+    
+    /* CRITICAL: Ensure modal appears above everything */
+    #transferPaymentModal {
+        z-index: 99999 !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+    }
+    
+    /* Ensure modal content is properly positioned */
+    #transferPaymentModal .bg-white {
+        z-index: 100000 !important;
+        position: relative !important;
     }
 
     /* Exception for specific elements that need colors */
@@ -1907,7 +1930,7 @@
     function showTransferPaymentModal(paymentData) {
         // Create modal HTML
         const modalHTML = `
-            <div id="transferPaymentModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div id="transferPaymentModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" style="z-index: 9999 !important;">
                 <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-bold text-gray-900">Transfer Payment</h3>
@@ -1974,7 +1997,8 @@
                     
                     <div class="flex space-x-4">
                         <button onclick="openNowPayments('${paymentData.payment_url}')" 
-                                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-200 flex items-center justify-center gap-2">
+                                class="flex-1 text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-200 flex items-center justify-center gap-2" 
+                                style="background-color: #3b82f6 !important; border: none !important;">
                             <i class="fas fa-external-link-alt"></i>
                             Pay with NOWPayments
                         </button>
@@ -1989,6 +2013,17 @@
         
         // Add modal to page
         document.body.insertAdjacentHTML('beforeend', modalHTML);
+        
+        // Ensure modal has highest z-index
+        const modal = document.getElementById('transferPaymentModal');
+        if (modal) {
+            modal.style.zIndex = '99999';
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100vw';
+            modal.style.height = '100vh';
+        }
     }
     
     function closeTransferPaymentModal() {
